@@ -7,6 +7,9 @@
 #include <sys/epoll.h>
 #include <stdint.h>
 #include <linux/lustre/lustre_idl.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 
 #include "logs.h"
 
@@ -16,12 +19,12 @@ struct state {
 	int archive_cnt;
 	int archive_id[LL_HSM_MAX_ARCHIVES_PER_AGENT];
 	const char *host;
-	unsigned short port;
+	const char *port;
 	// states value
 	struct hsm_copytool_private *ctdata;
 	int epoll_fd;
 	int hsm_fd;
-	int listen_socket;
+	int listen_fd;
 };
 
 static inline int epoll_addfd(int epoll_fd, int fd) {
@@ -39,7 +42,101 @@ static inline int epoll_addfd(int epoll_fd, int fd) {
 	return 0;
 }
 
-int ct_handle_event(struct hsm_copytool_private *ctdata) {
+int tcp_listen(struct state *state) {
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
+	int sfd, s;
+	int rc;
+
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+
+	s = getaddrinfo(state->host, state->port, &hints, &result);
+	if (s != 0) {
+		/* getaddrinfo does not use errno, cheat with debug */
+		LOG_DEBUG("ERROR getaddrinfo: %s\n", gai_strerror(s));
+		return -EIO;
+	}
+
+	for (rp = result; rp != NULL; rp = rp->ai_next) {
+		sfd = socket(rp->ai_family, rp->ai_socktype,
+				rp->ai_protocol);
+		if (sfd == -1)
+			continue;
+
+		if (bind(sfd, rp->ai_addr, rp->ai_addrlen) == 0)
+			break;                  /* Success */
+
+		close(sfd);
+	}
+
+	if (rp == NULL) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not bind tcp server");
+		return rc;
+	}
+
+	freeaddrinfo(result);
+
+	rc = listen(sfd, 10);
+	if (rc < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not listen");
+		return rc;
+	}
+	state->listen_fd = sfd;
+	rc = epoll_addfd(state->epoll_fd, sfd);
+	if (rc < 0) {
+		LOG_ERROR(rc, "Could not add listen socket to epoll");
+		return rc;
+	}
+
+	return 0;
+}
+
+static inline char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
+	char host[NI_MAXHOST], service[NI_MAXSERV];
+	int rc;
+
+	rc = getnameinfo((struct sockaddr*)addr, len,
+			 host, sizeof(host),
+			 service, sizeof(service),
+			 NI_NUMERICSERV);
+	if (rc != 0) {
+		LOG_DEBUG("ERROR getnameinfo: %s", gai_strerror(rc));
+		return NULL;
+	}
+
+	char *addrstring;
+	asprintf(&addrstring, "%s:%s", host, service);
+
+	return addrstring;
+}
+
+
+int handle_client_connect(struct state *state) {
+	int fd, rc;
+	struct sockaddr_storage peer_addr;
+	socklen_t peer_addr_len = sizeof(peer_addr);
+
+	fd = accept(state->listen_fd, (struct sockaddr*)&peer_addr,
+		    &peer_addr_len);
+	if (fd < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not accept connection");
+		return rc;
+	}
+
+	char *peer_str = sockaddr2str(&peer_addr, peer_addr_len);
+
+	LOG_DEBUG("Got client connection from %s", peer_str);
+	free(peer_str);
+	return 0;
+}
+
+int handle_ct_event(struct hsm_copytool_private *ctdata) {
 	struct hsm_action_list *hal;
 	int msgsize, rc;
 
@@ -78,24 +175,24 @@ int ct_handle_event(struct hsm_copytool_private *ctdata) {
 	return hal->hal_count;
 }
 
-int ct_register(struct state state) {
+int ct_register(struct state *state) {
 	int rc;
 
-	rc = llapi_hsm_copytool_register(&state.ctdata, state.mntpath,
-					 state.archive_cnt, state.archive_id, 0);
+	rc = llapi_hsm_copytool_register(&state->ctdata, state->mntpath,
+					 state->archive_cnt, state->archive_id, 0);
 	if (rc < 0) {
 		LOG_ERROR(rc, "cannot start copytool interface");
 		return rc;
 	}
 
-	state.hsm_fd = llapi_hsm_copytool_get_fd(state.ctdata);
-	if (state.hsm_fd < 0) {
-		LOG_ERROR(state.hsm_fd,
+	state->hsm_fd = llapi_hsm_copytool_get_fd(state->ctdata);
+	if (state->hsm_fd < 0) {
+		LOG_ERROR(state->hsm_fd,
 			  "cannot get kuc fd after hsm registration");
-		return state.hsm_fd;
+		return state->hsm_fd;
 	}
 
-	rc = epoll_addfd(state.epoll_fd, state.hsm_fd);
+	rc = epoll_addfd(state->epoll_fd, state->hsm_fd);
 	if (rc < 0) {
 		LOG_ERROR(rc, "could not add hsm fd to epoll");
 		return rc;
@@ -105,24 +202,28 @@ int ct_register(struct state state) {
 }
 
 #define MAX_EVENTS 10
-int ct_start(struct state state) {
+int ct_start(struct state *state) {
 	int rc;
 	struct epoll_event events[MAX_EVENTS];
 	int nfds;
 
-	state.epoll_fd = epoll_create1(0);
-	if (state.epoll_fd < 0) {
+	state->epoll_fd = epoll_create1(0);
+	if (state->epoll_fd < 0) {
 		rc = -errno;
 		LOG_ERROR(rc, "could not create epoll fd");
 		return rc;
 	}
+
+	rc = tcp_listen(state);
+	if (rc < 0)
+		return rc;
 
 	rc = ct_register(state);
 	if (rc < 0)
 		return rc;
 
 	while (1) {
-		nfds = epoll_wait(state.epoll_fd, events, MAX_EVENTS, -1);
+		nfds = epoll_wait(state->epoll_fd, events, MAX_EVENTS, -1);
 		if (nfds < 0) {
 			rc = -errno;
 			LOG_ERROR(rc, "epoll_wait failed");
@@ -130,8 +231,12 @@ int ct_start(struct state state) {
 		}
 		int n;
 		for (n = 0; n < nfds; n++) {
-			if (events[n].data.fd == state.hsm_fd) {
-				ct_handle_event(state.ctdata);
+			if (events[n].data.fd == state->hsm_fd) {
+				handle_ct_event(state->ctdata);
+			} else if (events[n].data.fd == state->listen_fd) {
+				handle_client_connect(state);
+			} else {
+				// client request
 			}
 		}
 
@@ -165,10 +270,12 @@ int main(int argc, char *argv[]) {
 		{ 0 },
 	};
 	int rc;
+
+	// default options
 	int verbose = LLAPI_MSG_INFO;
 	struct state state = {
 		.host = "::",
-		.port = 5123,
+		.port = "5123",
 	};
 
 	while ((rc = getopt_long(argc, argv, "vqA:h:p:",
@@ -195,10 +302,7 @@ int main(int argc, char *argv[]) {
 			state.host = optarg;
 			break;
 		case 'p':
-			rc = parse_int(optarg, UINT16_MAX);
-			if (rc < 0)
-				return EXIT_FAILURE;
-			state.port = rc;
+			state.port = optarg;
 			break;
 		}
 	}
@@ -210,7 +314,7 @@ int main(int argc, char *argv[]) {
 
 	llapi_msg_set_level(verbose);
 
-	rc = ct_start(state);
+	rc = ct_start(&state);
 	if (rc)
 		return EXIT_FAILURE;
 	return EXIT_SUCCESS;
