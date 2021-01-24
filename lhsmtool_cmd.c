@@ -890,7 +890,9 @@ static int ct_run(void)
 			};
 			break;
 		case HSMA_CANCEL:
-			LOG_ERROR(ENOTSUP, "Operation not implemented");
+			hai->hai_action = HSMA_RESTORE;
+			ct_fini(NULL, hai, 0, 0);
+			//LOG_ERROR(ENOTSUP, "Operation not implemented");
 			break;
 		}
 	}
