@@ -33,7 +33,7 @@ static inline pid_t gettid(void)
 
 
 
-static inline const char *llapi_hsm_action2str(int action)
+static inline const char *ct_action2str(int action)
 {
         switch (action) {
 	case HSMA_ARCHIVE: return "HSMA_ARCHIVE";

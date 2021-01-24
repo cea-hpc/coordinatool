@@ -9,13 +9,16 @@ project(
 	],
 )
 
-add_project_arguments([
+cc = meson.get_compiler('c')
+
+global_arguments = cc.get_supported_arguments([
 		'-D_GNU_SOURCE',
 		'-Wno-gnu-zero-variadic-macro-arguments',
-	], language: 'c')
+	])
+
+add_project_arguments(global_arguments, language: 'c')
 
 jansson = dependency('jansson')
-cc = meson.get_compiler('c')
 lustre = cc.find_library('lustreapi')
 
 subdir('tests')

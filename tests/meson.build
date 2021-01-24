@@ -7,14 +7,19 @@ executable(
 		'lhsmtool_cmd.c',
 		],
 	dependencies: [glib2, lustre, resolv],
-	c_args: [
+	c_args: cc.get_supported_arguments([
+		# gcc
+		'-Wno-implicit-fallthrough',
+		'-Wno-pedantic',
+		'-Wno-cast-function-type',
+		# clang
 		'-Wno-unused-parameter',
 		'-Wno-sign-compare',
 		'-Wno-address-of-packed-member',
 		'-Wno-incompatible-pointer-types',
 		'-Wno-pointer-sign',
 		'-Wno-zero-length-array',
-	],
+	]),
 )
 executable(
 	'json',
