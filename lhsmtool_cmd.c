@@ -669,6 +669,77 @@ static void handler(int signal)
 	_exit(1);
 }
 
+#define CT_PRIV_MAGIC 0xC0BE2001
+struct hsm_copytool_private {
+        int                              magic;
+        char                            *mnt;
+        struct kuc_hdr                  *kuch;
+        int                              mnt_fd;
+        int                              open_by_fid_fd;
+        struct lustre_kernelcomm        *kuc;
+};
+
+#define CP_PRIV_MAGIC 0x19880429
+struct hsm_copyaction_private {
+        __u32                                    magic;
+        __u32                                    source_fd;
+        __s32                                    data_fd;
+        const struct hsm_copytool_private       *ct_priv;
+        struct hsm_copy                          copy;
+        lstatx_t                                 statx;
+};
+#define OPEN_BY_FID_PATH ".lustre/fid"
+
+int fake_register(struct hsm_copytool_private **priv,
+		  const char *mnt, int archive_count,
+		  int *archives, int rfd_flags)
+{
+	int rc = 0;
+        struct hsm_copytool_private     *ct;
+
+
+        ct = calloc(1, sizeof(*ct));
+        if (ct == NULL)
+                return -ENOMEM;
+
+        ct->magic = CT_PRIV_MAGIC;
+        ct->mnt_fd = -1;
+        ct->open_by_fid_fd = -1;
+
+        ct->mnt = strdup(mnt);
+        if (ct->mnt == NULL) {
+                rc = -ENOMEM;
+                goto out_err;
+        }
+
+        ct->mnt_fd = open(ct->mnt, O_RDONLY);
+        if (ct->mnt_fd < 0) {
+                rc = -errno;
+                goto out_err;
+        }
+
+        ct->open_by_fid_fd = openat(ct->mnt_fd, OPEN_BY_FID_PATH, O_RDONLY);
+        if (ct->open_by_fid_fd < 0) {
+                rc = -errno;
+                goto out_err;
+        }
+
+	*priv = ct;
+	return 0;
+
+out_err:
+        if (!(ct->mnt_fd < 0))
+                close(ct->mnt_fd);
+
+        if (!(ct->open_by_fid_fd < 0))
+                close(ct->open_by_fid_fd);
+
+	free(ct->mnt);
+	free(ct);
+	return rc;
+}
+
+
 /* Daemon waits for messages from the kernel; run it in the background. */
 static int ct_run(void)
 {
@@ -684,10 +755,13 @@ static int ct_run(void)
 		}
 	}
 
-	//if (!opt.o_work)
+	if (!opt.o_work)
 		rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt,
 						 opt.o_archive_cnt,
 						 opt.o_archive_id, 0);
+	else
+		rc = fake_register(&ctdata, opt.o_mnt, opt.o_archive_cnt, opt.o_archive_id, 0);
+
 	if (rc < 0) {
 		LOG_ERROR(rc, "cannot start copytool interface");
 		return rc;
@@ -823,7 +897,7 @@ static int ct_run(void)
 out:
 
 	stop = true;
-	//if (!opt.o_work)
+	if (!opt.o_work)
 		llapi_hsm_copytool_unregister(&ctdata);
 
 	return rc;
