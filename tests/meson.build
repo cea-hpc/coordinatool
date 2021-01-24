@@ -8,7 +8,6 @@ executable(
 		],
 	dependencies: [glib2, lustre, resolv],
 	c_args: [
-		'-Wno-gnu-zero-variadic-macro-arguments',
 		'-Wno-unused-parameter',
 		'-Wno-sign-compare',
 		'-Wno-address-of-packed-member',

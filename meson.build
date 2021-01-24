@@ -9,7 +9,10 @@ project(
 	],
 )
 
-add_project_arguments(['-D_GNU_SOURCE',], language: 'c')
+add_project_arguments([
+		'-D_GNU_SOURCE',
+		'-Wno-gnu-zero-variadic-macro-arguments',
+	], language: 'c')
 
 jansson = dependency('jansson')
 cc = meson.get_compiler('c')

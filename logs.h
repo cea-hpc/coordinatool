@@ -1,0 +1,48 @@
+#include <lustre/lustreapi.h>
+#include <sys/time.h>
+#include <sys/syscall.h>
+
+static inline double ct_now(void)
+{
+        struct timeval tv;
+
+        gettimeofday(&tv, NULL);
+        return tv.tv_sec + 0.000001 * tv.tv_usec;
+}
+
+static inline pid_t gettid(void)
+{
+        return syscall(SYS_gettid);
+}
+
+#define LOG_ERROR(_rc, _format, ...)                                    \
+        llapi_error(LLAPI_MSG_ERROR, _rc,                               \
+		    "%s:%d ERROR "_format, __FILE__, __LINE__,                \
+                    ## __VA_ARGS__)
+
+#define LOG_INFO(_format, ...)                                         \
+        llapi_error(LLAPI_MSG_INFO | LLAPI_MSG_NO_ERRNO, 0,            \
+		    "%s:%d "_format, __FILE__, __LINE__,                \
+                    ## __VA_ARGS__)
+
+#define LOG_DEBUG(_format, ...)                                         \
+        llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0,            \
+		    "%s:%d "_format, __FILE__, __LINE__,                \
+                    ## __VA_ARGS__)
+
+
+
+
+static inline const char *llapi_hsm_action2str(int action)
+{
+        switch (action) {
+	case HSMA_ARCHIVE: return "HSMA_ARCHIVE";
+	case HSMA_RESTORE: return "HSMA_RESTORE";
+	case HSMA_REMOVE: return "HSMA_REMOVE";
+	case HSMA_CANCEL: return "HSMA_CANCEL";
+        default:
+		LOG_ERROR(-EINVAL, "Unknown action: %d", action);
+                return NULL;
+        }
+}
+
