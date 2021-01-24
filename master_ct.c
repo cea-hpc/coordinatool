@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 		{ "quiet",   no_argument, NULL, 'q' },
 		{ "archive", required_argument, NULL, 'A' },
 		{ "port", required_argument, NULL, 'p' },
-		{ "host", required_argument, NULL, 'h' },
+		{ "host", required_argument, NULL, 'H' },
 		{ 0 },
 	};
 	int rc;
@@ -278,7 +278,7 @@ int main(int argc, char *argv[]) {
 		.port = "5123",
 	};
 
-	while ((rc = getopt_long(argc, argv, "vqA:h:p:",
+	while ((rc = getopt_long(argc, argv, "vqA:H:p:",
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
 		case 'A':
@@ -298,12 +298,14 @@ int main(int argc, char *argv[]) {
 		case 'q':
 			verbose--;
 			break;
-		case 'h':
+		case 'H':
 			state.host = optarg;
 			break;
 		case 'p':
 			state.port = optarg;
 			break;
+		default:
+			return EXIT_FAILURE;
 		}
 	}
 	if (argc != optind + 1) {

@@ -31,3 +31,13 @@ executable(
 	dependencies: [lustre, jansson],
 	install: true,
 )
+
+executable(
+	'client',
+	sources: [
+		'client.c',
+	],
+	# needs lustre for logs
+	dependencies: [lustre, jansson],
+	install: true,
+)
