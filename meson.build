@@ -12,6 +12,7 @@ project(
 add_project_arguments(['-D_GNU_SOURCE',], language: 'c')
 
 glib2 = dependency('glib-2.0')
+jansson = dependency('jansson')
 cc = meson.get_compiler('c')
 lustre = cc.find_library('lustreapi')
 resolv = cc.find_library('resolv')
@@ -22,5 +23,13 @@ executable(
 		'lhsmtool_cmd.c',
 		],
 	dependencies: [glib2, lustre, resolv],
+	install: true,
+)
+executable(
+	'json',
+	sources: [
+		'json.c',
+		],
+	dependencies: [lustre, jansson],
 	install: true,
 )
