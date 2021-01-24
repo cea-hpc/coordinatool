@@ -1,5 +1,6 @@
 #include <jansson.h>
 #include <stdio.h>
+#include <unistd.h>
 
 int main() {
 	json_t *val, *obj;
