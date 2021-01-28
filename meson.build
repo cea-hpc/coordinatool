@@ -20,8 +20,7 @@ add_project_arguments(global_arguments, language: 'c')
 
 jansson = dependency('jansson')
 lustre = cc.find_library('lustreapi')
-
-subdir('tests')
+urcu = dependency('liburcu')
 
 common = static_library(
 	'master_ct_common',
@@ -29,8 +28,11 @@ common = static_library(
 		'common/protocol.c',
 	),
 	# need lustre for logs
-	dependencies: [lustre, jansson]
+	dependencies: [lustre, jansson],
 )
+
+subdir('tests')
+
 
 executable(
 	'master_ct',
@@ -40,6 +42,7 @@ executable(
 		'master/lhsm.c',
 		'master/master_ct.c',
 	),
+        dependencies: [urcu],
 	include_directories: include_directories('common'),
 	link_with: [common],
 	install: true,

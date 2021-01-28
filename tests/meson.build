@@ -27,4 +27,6 @@ executable(
 		'json.c',
 		],
 	dependencies: [lustre, jansson],
+	include_directories: include_directories('../common'),
+	link_with: [common],
 )

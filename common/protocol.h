@@ -3,6 +3,7 @@
 #ifndef MASTER_CT_PROTOCOL_H
 #define MASTER_CT_PROTOCOL_H
 
+#include <lustre/lustreapi.h>
 #include <jansson.h>
 
 /**
@@ -100,7 +101,7 @@ json_t *json_fid(struct lu_fid *fid);
 int json_fid_get(json_t *json, struct lu_fid *fid);
 
 json_t *json_hsm_action_item(struct hsm_action_item *hai);
-int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t hai_len);
+int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai);
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal);
 
 #endif
