@@ -1,3 +1,8 @@
+/* SPDX-License-Identifier: LGPL-3.0-or-later */
+
+#ifndef MASTER_CT_LOGS_H
+#define MASTER_CT_LOGS_H
+
 #include <lustre/lustreapi.h>
 #include <sys/time.h>
 #include <sys/syscall.h>
@@ -35,6 +40,8 @@ static inline pid_t gettid(void)
 
 static inline const char *ct_action2str(int action)
 {
+	static char buf[32];
+
         switch (action) {
 	case HSMA_ARCHIVE: return "HSMA_ARCHIVE";
 	case HSMA_RESTORE: return "HSMA_RESTORE";
@@ -42,7 +49,9 @@ static inline const char *ct_action2str(int action)
 	case HSMA_CANCEL: return "HSMA_CANCEL";
         default:
 		LOG_ERROR(-EINVAL, "Unknown action: %d", action);
-                return NULL;
+		snprintf(buf, sizeof(buf), "%d", action);
+                return buf;
         }
 }
 
+#endif

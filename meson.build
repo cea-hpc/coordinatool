@@ -23,21 +23,34 @@ lustre = cc.find_library('lustreapi')
 
 subdir('tests')
 
+common = static_library(
+	'master_ct_common',
+	files(
+		'common/protocol.c',
+	),
+	# need lustre for logs
+	dependencies: [lustre, jansson]
+)
+
 executable(
 	'master_ct',
-	sources: [
-		'master_ct.c',
-	],
-	dependencies: [lustre, jansson],
+	sources: files(
+                'master/queue.c',
+		'master/tcp.c',
+		'master/lhsm.c',
+		'master/master_ct.c',
+	),
+	include_directories: include_directories('common'),
+	link_with: [common],
 	install: true,
 )
 
 executable(
 	'client',
-	sources: [
-		'client.c',
-	],
-	# needs lustre for logs
-	dependencies: [lustre, jansson],
+	sources: files(
+		'client/client.c',
+	),
+	include_directories: include_directories('common'),
+	link_with: [common],
 	install: true,
 )
