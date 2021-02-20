@@ -25,7 +25,7 @@ urcu = dependency('liburcu')
 common = static_library(
 	'master_ct_common',
 	files(
-		'common/protocol.c',
+		'common/protocol_lustre.c',
 		'common/lustre.c',
 	),
 	# need lustre for logs
