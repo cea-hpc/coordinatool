@@ -23,6 +23,12 @@ enum protocol_commands {
 	PROTOCOL_COMMANDS_MAX,
 };
 
+/**
+ * enum to string conversion helpers
+ */
+enum protocol_commands protocol_str2command(const char *str);
+const char *protocol_command2str(enum protocol_commands cmd);
+
 
 typedef int (*protocol_read_cb)(json_t *json, void *arg);
 
