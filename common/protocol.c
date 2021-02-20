@@ -65,4 +65,5 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai) {
 	return 0;
 }
 
-int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal);
+int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
+			     size_t hal_len);

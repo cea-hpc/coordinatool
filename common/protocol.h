@@ -13,7 +13,30 @@
  *   object, which then expect a single json object as a response
  * - if a client disconnects, any requests it owned are reassigned to be
  *   redistributed
+ */
+
+enum protocol_commands {
+	STATUS,
+	RECV,
+	DONE,
+	QUEUE,
+	PROTOCOL_COMMANDS_MAX,
+};
+
+
+typedef int (*protocol_read_cb)(json_t *json, void *arg);
+
+/**
+ * read one json object exactly
  *
+ * @param fd fd of socket to read one json object from
+ * @param cbs vector of callbacks, must be readable up to PROTOCOL_COMMANDS_MAX.
+ * if cb is null for a given command, an error is logged and message is ignored.
+ * @return 0 on success, -errno on error.
+ */
+int protocol_read_command(int fd, protocol_read_cb *cbs, void *cb_arg);
+
+/**
  * - STATUS command
  *   request properties:
  *     command = "status"
@@ -28,7 +51,40 @@
  * example:
  * CLIENT: { "command": "status" }
  * SERVER: { "command": "status", "pending_archive": 2, "running_restore": 3 }
- * 
+ */
+/**
+ * send status request
+ *
+ * @param fd socket to write on
+ * @return 0 on success, -errno on error
+ */
+int protocol_request_status(int fd);
+
+struct ct_stats {
+	unsigned int running_archive;
+	unsigned int running_restore;
+	unsigned int running_remove;
+	unsigned int pending_archive;
+	unsigned int pending_restore;
+	unsigned int pending_remove;
+	long unsigned int done_archive;
+	long unsigned int done_restore;
+	long unsigned int done_remove;
+	unsigned int clients_connected;
+};
+
+/**
+ * send status reply
+ *
+ * @param fd socket to write on
+ * @param ct_stats stats to get stats to send from
+ * @param status error code
+ * @param error nul-terminated error string, can be NULL
+ * @return 0 on success, -errno on error
+ */
+int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *error);
+
+/**
  * - RECV command
  *   request properties:
  *     command = "recv"
@@ -97,11 +153,54 @@
  *     that sets lock property above
  */
 
+/**
+ * helpers
+ */
+
+/**
+ * jansson-like function, fid -> json value
+ *
+ * @param fid input fid
+ * @return json value representing the fid, or NULL on error
+ */
 json_t *json_fid(struct lu_fid *fid);
+
+/**
+ * jansson-like function to get fid from json value
+ *
+ * @param json input json representing a fid
+ * @param fid output fid value
+ * @return 0 on success, -1 if json isn't correct (missing, extra field)
+ */
 int json_fid_get(json_t *json, struct lu_fid *fid);
 
+/**
+ * jansson-like function, hai -> json value
+ *
+ * @param hai input hsm_action_item
+ * @return json value representing the fid, or NULL on error
+ */
 json_t *json_hsm_action_item(struct hsm_action_item *hai);
+
+/**
+ * jansson-like function to get hai from json value
+ *
+ * @param json input representing hsm_action_item
+ * @param hai output hsm_action_item, must have been preallocated and
+ *            hai->hai_len set
+ * @return 0 on success, -1 if json isn't correct
+ */
 int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai);
-int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal);
+
+/**
+ * helper to parse hsm_action_list json value
+ *
+ * @param json input json representing a fid
+ * @param hal buffer to write to
+ * @param hal_len length of the buffer we can write in
+ * @return 0 on success, -1 on json parsing error, or
+ *         -E2BIG if we could not write everything to the hsm action list
+ */
+int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal, size_t hal_len);
 
 #endif
