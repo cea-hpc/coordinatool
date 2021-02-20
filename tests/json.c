@@ -28,7 +28,7 @@ int main() {
 
 	struct hsm_action_item *hai, *newhai;
 	hai = calloc(sizeof(*hai)+10, 1);
-	newhai = calloc(sizeof(*hai)+10, 1);
+	newhai = calloc(sizeof(*hai)+16, 1);
 	hai->hai_action = HSMA_RESTORE;
 	hai->hai_fid.f_seq = 0x4200000000L;;
 	hai->hai_fid.f_oid = 1;
@@ -37,7 +37,7 @@ int main() {
 	hai->hai_extent.length = 0x100000000L;
 	hai->hai_cookie = 0x123412341234L;
 	hai->hai_gid = 0;
-	hai->hai_len = sizeof(*hai)+10;
+	hai->hai_len = sizeof(*hai)+16;
 	memcpy(hai->hai_data, "test\0test\0", 10);
 	val = json_hsm_action_item(hai);
 	s = json_dumps(val, JSON_INDENT(2));

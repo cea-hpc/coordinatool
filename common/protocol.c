@@ -50,12 +50,17 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai) {
 		return -1;
 
 	hai->hai_len = sizeof(*hai) + data_len;
+	/* round up to next byte */
+	hai->hai_len += 7;
+	hai->hai_len -= hai->hai_len % 8;
 	if (hai_len < hai->hai_len) {
 		free(data);
 		return -EOVERFLOW;
 	}
 
 	memcpy(hai->hai_data, data, data_len);
+	memset(hai->hai_data + data_len, 0,
+	       hai->hai_len - sizeof(*hai) - data_len);
 
 	return 0;
 }
