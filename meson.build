@@ -26,6 +26,7 @@ common = static_library(
 	'master_ct_common',
 	files(
 		'common/protocol.c',
+		'common/lustre.c',
 	),
 	# need lustre for logs
 	dependencies: [lustre, jansson],

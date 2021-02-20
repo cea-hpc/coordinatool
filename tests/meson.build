@@ -21,12 +21,21 @@ executable(
 		'-Wno-zero-length-array',
 	]),
 )
+
+executable(
+	'parse_active_requests',
+	sources: [
+		'parse_active_requests.c',
+		],
+	include_directories: include_directories('../common'),
+	link_with: [common],
+)
+
 executable(
 	'json',
 	sources: [
 		'json.c',
 		],
-	dependencies: [lustre, jansson],
 	include_directories: include_directories('../common'),
 	link_with: [common],
 )
