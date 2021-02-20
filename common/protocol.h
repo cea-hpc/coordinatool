@@ -13,6 +13,7 @@
  *   object, which then expect a single json object as a response
  * - if a client disconnects, any requests it owned are reassigned to be
  *   redistributed
+ * - all the way thorough, a missing key means 0 or null string
  */
 
 enum protocol_commands {
@@ -49,7 +50,7 @@ int protocol_read_command(int fd, protocol_read_cb *cbs, void *cb_arg);
  *   reply properties (any omitted integer means 0):
  *     command = "status"
  *     status = int (0 on success, errno on failure)
- *     error = string (extra error message, optional)
+ *     error = string (extra error message)
  *     {running,pending}_{archive,restore,remove} = integer (u32)
  *     done_{archive,restore,remove} = integer (u64)
  *     clients_connected = integer (u32)
@@ -106,7 +107,7 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *e
  *   reply properties:
  *     command = "recv"
  *     status = int (0 on success, errno on failure)
- *     error = string (extra error message, optional)
+ *     error = string (extra error message)
  *     hsm_action_list = hsm_action_list object
  *
  *   hsm_action_list object properties
@@ -141,7 +142,7 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *e
  *   reply properties:
  *     command = "done"
  *     status = int (0 on success, errno on failure)
- *     error = string (extra error message, optional)
+ *     error = string (extra error message)
  *
  * - QUEUE command
  *   request properties:
@@ -150,7 +151,7 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *e
  *   reply properties:
  *     command = "queue"
  *     status = int (0 on success, errno on failure)
- *     error = string (extra error message, optional)
+ *     error = string (extra error message)
  *
  * - future command ideas:
  *   * dump (list all started and pending requests, list clients)
