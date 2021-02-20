@@ -50,6 +50,8 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 	int rc = -EINVAL, n;
 	size_t len, i;
 	struct hsm_action_item *hai;
+	unsigned int archive_id;
+	unsigned long flags;
 
 	/* parsing is done in two steps:
 	 * - first fine data to allocate proper length
@@ -142,10 +144,21 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 	hai->hai_gid = strtol(item, NULL, 0);
 	// XXX check (use parse_int?)
 
-	/* XXX archive# / flags : belong to hal, not hai :| */
+	/* archive# */
+	item = find_keyword(line, "archive#=");
+	if (!item)
+		goto out;
+	archive_id = strtol(item, NULL, 0);
+
+	/* flags */
+	item = find_keyword(line, "flags=");
+	if (!item)
+		goto out;
+	flags = strtol(item, NULL, 0);
+
 	/* XXX canceled, done?, uuid? */
 
-	rc = cb(hai, cb_arg);
+	rc = cb(hai, archive_id, flags, cb_arg);
 
 out:
 	free(hai);

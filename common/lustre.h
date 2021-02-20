@@ -5,7 +5,9 @@
 
 #include <lustre/lustreapi.h>
 
-typedef int (*parse_request_cb)(struct hsm_action_item *hai, void *arg);
+typedef int (*parse_request_cb)(struct hsm_action_item *hai,
+				unsigned int archive_id, unsigned long flags,
+				void *arg);
 
 /* returns number of requests parsed, or negative errno on error
  *
