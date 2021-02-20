@@ -85,8 +85,11 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 	if (!item)
 		goto out;
 	if (strncmp(item, "RESTORE ", 8) == 0) {
+		hai->hai_action = HSMA_RESTORE;
 	} else if (strncmp(item, "ARCHIVE ", 8) == 0) {
+		hai->hai_action = HSMA_ARCHIVE;
 	} else if (strncmp(item, "REMOVE ", 8) == 0) {
+		hai->hai_action = HSMA_REMOVE;
 	} else {
 		LOG_ERROR(rc, "Unknown action %s in \"%s\"", item, line);
 		goto out;
@@ -111,11 +114,36 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 	}
 
 	/* extent offset/length */
+	item = find_keyword(line, "extent=");
+	if (!item)
+		goto out;
+	n = sscanf(item, "%llx-%llx", &hai->hai_extent.offset, &hai->hai_extent.length);
+	if (n != 2) {
+		LOG_ERROR(rc, "scanf failed to read offset start/end from %s",
+			  item);
+		goto out;
+	}
 
 	/* cookie */
+	item = find_keyword(line, "compound/cookie=");
+	if (!item)
+		goto out;
+	n = sscanf(item, "%*x/%llx", &hai->hai_cookie);
+	if (n != 1) {
+		LOG_ERROR(rc, "scanf failed to read compound/cookie from %s",
+			  item);
+		goto out;
+	}
+
 	/* gid */
-	/* canceled */
-	/* archive# / flags */
+	item = find_keyword(line, "gid=");
+	if (!item)
+		goto out;
+	hai->hai_gid = strtol(item, NULL, 0);
+	// XXX check (use parse_int?)
+
+	/* XXX archive# / flags : belong to hal, not hai :| */
+	/* XXX canceled, done?, uuid? */
 
 	rc = cb(hai, cb_arg);
 

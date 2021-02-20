@@ -2,10 +2,14 @@
 #include <stdio.h>
 
 #include "lustre.h"
+#include "logs.h"
 
 int parse_hai_cb(struct hsm_action_item *hai, void *arg) {
 	(void)arg;
-	(void)hai;
+	printf("got hai fid="DFID" dfid="DFID" cookie=%#llx action=%s extent=%#llx-%#llx gid=%#llx data=%s\n",
+	       PFID(&hai->hai_fid), PFID(&hai->hai_dfid), hai->hai_cookie,
+	       ct_action2str(hai->hai_action), hai->hai_extent.offset,
+	       hai->hai_extent.length, hai->hai_gid, hai->hai_data);
 	return 0;
 }
 

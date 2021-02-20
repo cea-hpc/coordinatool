@@ -3,6 +3,7 @@
 #ifndef MASTER_CT_LOGS_H
 #define MASTER_CT_LOGS_H
 
+#include <errno.h>
 #include <lustre/lustreapi.h>
 #include <sys/time.h>
 #include <sys/syscall.h>
