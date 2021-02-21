@@ -31,7 +31,7 @@ const char *protocol_command2str(enum protocol_commands command) {
 	case DONE: return "done";
 	case QUEUE: return "queue";
 	default:
-		LOG_ERROR(-EINVAL, "invalid command: %d\n", command);
+		LOG_ERROR(-EINVAL, "invalid command: %d", command);
 		snprintf(buf, sizeof(buf), "%d", command);
 		return buf;
 	}
@@ -43,7 +43,8 @@ int protocol_read_command(int fd, protocol_read_cb *cbs, void *cb_arg) {
 	json_error_t json_error;
 	int rc = 0;
 
-	request = json_loadfd(fd, JSON_ALLOW_NUL, &json_error);
+	request = json_loadfd(fd, JSON_DISABLE_EOF_CHECK | JSON_ALLOW_NUL,
+			      &json_error);
 	if (!request) {
 		// XXX map json_error_code(error) (enum json_error_code) to errno ?
 		rc = -EINVAL;
@@ -72,7 +73,13 @@ int protocol_read_command(int fd, protocol_read_cb *cbs, void *cb_arg) {
 		goto out_freereq;
 	}
 
-	cbs[command](request, cb_arg);
+	LOG_INFO("Got command %s from %d", command_str, fd);
+	if (!cbs || !cbs[command]) {
+		rc = -ENOTSUP;
+		LOG_ERROR(rc, "command %s not implemented", command_str);
+		goto out_freereq;
+	}
+	cbs[command](fd, request, cb_arg);
 
 out_freereq:
 	json_decref(request);
@@ -115,6 +122,29 @@ static inline int protocol_setjson_int(json_t *obj, const char *key,
 	return protocol_setjson(obj, key, json_val);
 }
 
+int protocol_request_status(int fd) {
+	json_t *request;
+	int rc = 0;
+
+	request = json_pack("{ss}", "command", "status");
+	if (!request) {
+		rc = -ENOMEM;
+		LOG_ERROR(rc, "Could not pack status request");
+		return rc;
+	}
+
+	LOG_INFO("Sending request status to %d", fd);
+	if (json_dumpfd(request, fd, 0)) {
+		rc = -EIO;
+		LOG_ERROR(rc, "Could not write status request to %d", fd);
+		goto out_free;
+	}
+
+out_free:
+	json_decref(request);
+	return rc;
+}
+
 int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 			  char *error) {
 	json_t *reply;
@@ -141,6 +171,7 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 	    (rc = protocol_setjson_int(reply, "clients_connected", ct_stats->clients_connected)))
 		goto out_freereply;
 
+	LOG_INFO("Sending reply status to %d: %s", fd, json_dumps(reply, 0));
 	if (json_dumpfd(reply, fd, 0) != 0) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write reply to %d: %s", fd,

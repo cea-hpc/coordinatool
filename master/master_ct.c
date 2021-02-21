@@ -23,6 +23,16 @@ int epoll_addfd(int epoll_fd, int fd) {
 	return 0;
 }
 
+int epoll_delfd(int epoll_fd, int fd) {
+	int rc = 0;
+
+	if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL) < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not remove fd from epoll watches");
+	}
+	return rc;
+}
+
 long parse_int(const char *arg, long max) {
 	long rc;
 	char *endptr;

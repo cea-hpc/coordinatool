@@ -42,6 +42,7 @@ executable(
                 'master/queue.c',
 		'master/tcp.c',
 		'master/lhsm.c',
+		'master/protocol.c',
 		'master/master_ct.c',
 	),
         dependencies: [urcu],

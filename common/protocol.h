@@ -31,7 +31,7 @@ enum protocol_commands protocol_str2command(const char *str);
 const char *protocol_command2str(enum protocol_commands cmd);
 
 
-typedef int (*protocol_read_cb)(json_t *json, void *arg);
+typedef int (*protocol_read_cb)(int fd, json_t *json, void *arg);
 
 /**
  * read one json object exactly
@@ -79,6 +79,14 @@ struct ct_stats {
 	long unsigned int done_remove;
 	unsigned int clients_connected;
 };
+
+/**
+ * send status request
+ *
+ * @param fd socket to write on
+ * @return 0 on success, -errno on error
+ */
+int protocol_request_status(int fd);
 
 /**
  * send status reply

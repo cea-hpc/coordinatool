@@ -50,6 +50,7 @@ struct state {
 	int hsm_fd;
 	int listen_fd;
 	struct hsm_action_queues queues;
+	struct ct_stats stats;
 };
 
 
@@ -59,6 +60,9 @@ struct state {
 int handle_ct_event(struct state *state);
 int ct_register(struct state *state);
 int ct_start(struct state *state);
+
+/* protocol */
+extern protocol_read_cb protocol_cbs[];
 
 /* tcp */
 
@@ -77,5 +81,6 @@ struct hsm_action_item *hsm_action_dequeue(struct state *state,
 /* common */
 
 int epoll_addfd(int epoll_fd, int fd);
+int epoll_delfd(int epoll_fd, int fd);
 
 #endif

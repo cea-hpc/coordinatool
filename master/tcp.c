@@ -18,7 +18,7 @@ int tcp_listen(struct state *state) {
 	s = getaddrinfo(state->host, state->port, &hints, &result);
 	if (s != 0) {
 		/* getaddrinfo does not use errno, cheat with debug */
-		LOG_DEBUG("ERROR getaddrinfo: %s\n", gai_strerror(s));
+		LOG_DEBUG("ERROR getaddrinfo: %s", gai_strerror(s));
 		return -EIO;
 	}
 
@@ -93,6 +93,12 @@ int handle_client_connect(struct state *state) {
 	char *peer_str = sockaddr2str(&peer_addr, peer_addr_len);
 
 	LOG_DEBUG("Got client connection from %s", peer_str);
+
+	rc = epoll_addfd(state->epoll_fd, fd);
+	if (rc < 0) {
+		LOG_ERROR(rc, "Could not add client %s to epoll", peer_str);
+	}
+
 	free(peer_str);
-	return 0;
+	return rc;
 }

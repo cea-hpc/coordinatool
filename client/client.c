@@ -11,6 +11,7 @@
 #include <netdb.h>
 
 #include "logs.h"
+#include "protocol.h"
 
 struct state {
 	// options
@@ -33,7 +34,7 @@ int tcp_connect(struct state *state) {
 	s = getaddrinfo(state->host, state->port, &hints, &result);
 	if (s != 0) {
 		/* getaddrinfo does not use errno, cheat with debug */
-		LOG_DEBUG("ERROR getaddrinfo: %s\n", gai_strerror(s));
+		LOG_DEBUG("ERROR getaddrinfo: %s", gai_strerror(s));
 		return -EIO;
 	}
 
