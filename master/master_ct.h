@@ -64,6 +64,18 @@ int ct_start(struct state *state);
 /* protocol */
 extern protocol_read_cb protocol_cbs[];
 
+/**
+ * send status reply
+ *
+ * @param fd socket to write on
+ * @param ct_stats stats to get stats to send from
+ * @param status error code
+ * @param error nul-terminated error string, can be NULL
+ * @return 0 on success, -errno on error
+ */
+int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *error);
+
+
 /* tcp */
 
 int tcp_listen(struct state *state);

@@ -39,13 +39,13 @@ subdir('tests')
 executable(
 	'master_ct',
 	sources: files(
-                'master/queue.c',
+		'master/queue.c',
 		'master/tcp.c',
 		'master/lhsm.c',
 		'master/protocol.c',
 		'master/master_ct.c',
 	),
-        dependencies: [urcu],
+	dependencies: [urcu],
 	include_directories: include_directories('common'),
 	link_with: [common],
 	install: true,
@@ -54,6 +54,7 @@ executable(
 executable(
 	'client',
 	sources: files(
+		'client/protocol.c',
 		'client/client.c',
 	),
 	include_directories: include_directories('common'),

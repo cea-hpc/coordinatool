@@ -10,16 +10,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
-#include "logs.h"
-#include "protocol.h"
-
-struct state {
-	// options
-	const char *host;
-	const char *port;
-	// states value
-	int socket_fd;
-};
+#include "client.h"
 
 int tcp_connect(struct state *state) {
 	struct addrinfo hints;

@@ -6,6 +6,8 @@
 #include <lustre/lustreapi.h>
 #include <jansson.h>
 
+#include "logs.h"
+
 /**
  * Protocol overview:
  * - requests always come from clients (e.g. give up on interrupting
@@ -81,25 +83,6 @@ struct ct_stats {
 };
 
 /**
- * send status request
- *
- * @param fd socket to write on
- * @return 0 on success, -errno on error
- */
-int protocol_request_status(int fd);
-
-/**
- * send status reply
- *
- * @param fd socket to write on
- * @param ct_stats stats to get stats to send from
- * @param status error code
- * @param error nul-terminated error string, can be NULL
- * @return 0 on success, -errno on error
- */
-int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *error);
-
-/**
  * - RECV command
  *   request properties:
  *     command = "recv"
@@ -142,7 +125,9 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *e
  *     f_seq = integer (u64)
  *     f_oid = integer (u32)
  *     f_ver = integer (u32)
- *
+ */
+
+/**
  * - DONE command
  *   request properties:
  *     command = "done"
@@ -151,7 +136,9 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *e
  *     command = "done"
  *     status = int (0 on success, errno on failure)
  *     error = string (extra error message)
- *
+ */
+
+/**
  * - QUEUE command
  *   request properties:
  *     command = "queue"
@@ -160,7 +147,9 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *e
  *     command = "queue"
  *     status = int (0 on success, errno on failure)
  *     error = string (extra error message)
- *
+ */
+
+/**
  * - future command ideas:
  *   * dump (list all started and pending requests, list clients)
  *   * lock/unlock
@@ -169,7 +158,48 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *e
  */
 
 /**
- * helpers
+ * common helpers
+ */
+
+static inline int protocol_setjson(json_t *obj, const char *key, json_t *val) {
+	// nocheck is only about key being valid utf8, we only use constants
+	if (json_object_set_new_nocheck(obj, key, val)) {
+		LOG_ERROR(-ENOMEM, "Could not assign key %s to object", key);
+		return -ENOMEM;
+	}
+	return 0;
+}
+
+static inline int protocol_setjson_str(json_t *obj, const char *key,
+				       char *val) {
+	// skip if no value
+	if (val == NULL || val[0] == '\0')
+		return 0;
+	json_t *json_val = json_string(val);
+	if (!json_val) {
+		LOG_ERROR(-ENOMEM, "Could not instanciate string for %s: %s",
+			  key, val);
+		return -ENOMEM;
+	}
+	return protocol_setjson(obj, key, json_val);
+}
+
+static inline int protocol_setjson_int(json_t *obj, const char *key,
+				       json_int_t val) {
+	// skip if no value
+	if (val == 0)
+		return 0;
+	json_t *json_val = json_integer(val);
+	if (!json_val) {
+		LOG_ERROR(-ENOMEM, "Could not instanciate int for %s: %"JSON_INTEGER_FORMAT,
+			  key, val);
+		return -ENOMEM;
+	}
+	return protocol_setjson(obj, key, json_val);
+}
+
+/**
+ * lustre helpers
  */
 
 /**
