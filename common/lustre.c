@@ -66,9 +66,7 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 		return rc;
 	}
 	len = (end-item)/2;
-	/* round up to next byte */
-	n = sizeof(*hai) + len + 7;
-	n -= n % 8;
+	n = __ALIGN_KERNEL(sizeof(*hai) + len, 8);
 	hai = malloc(n);
 	hai->hai_len = n;
 	for (i=0; i < len; i++) {

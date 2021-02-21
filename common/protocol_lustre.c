@@ -25,10 +25,9 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai) {
 			 "hai_data", hai->hai_data,
 			 hai->hai_len - sizeof(*hai));
 }
-int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai) {
+int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t hai_len) {
 	char *data;
 	size_t data_len;
-	unsigned int hai_len = hai->hai_len;
 
 	if (hai_len < sizeof(*hai))
 		return -EINVAL;
@@ -49,12 +48,8 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai) {
 			 "hai_data", &data, &data_len) != 0)
 		return -1;
 
-	hai->hai_len = sizeof(*hai) + data_len;
-	/* round up to next byte */
-	hai->hai_len += 7;
-	hai->hai_len -= hai->hai_len % 8;
+	hai->hai_len = __ALIGN_KERNEL(sizeof(*hai) + data_len, 8);
 	if (hai_len < hai->hai_len) {
-		free(data);
 		return -EOVERFLOW;
 	}
 
@@ -66,4 +61,48 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai) {
 }
 
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
-			     size_t hal_len);
+			     size_t hal_len) {
+	struct hsm_action_item *hai;
+	unsigned int count;
+	int rc;
+	char *fsname;
+	size_t fsname_len, len;
+	json_t *json_list, *item;
+
+	if (hal_len < sizeof(*hal))
+		return -EINVAL;
+	hal_len -= sizeof(*hal);
+
+	if (json_unpack(json,
+			"{si,si,sI,si,ss%,so!}",
+			"hal_version", &hal->hal_version,
+			"hal_count", &hal->hal_count,
+			"hal_flags", &hal->hal_flags,
+			"hal_archive_id", &hal->hal_archive_id,
+			"hal_fsname", &fsname, &fsname_len,
+			"list", &json_list) != 0)
+		return -1;
+
+	len = __ALIGN_KERNEL(fsname_len + 1, 8);
+	if (hal_len < len)
+		return -EINVAL;
+	hal_len -= len;
+	/* guaranteed to be nul-terminated by jansson and len is +1 */
+	strncpy(hal->hal_fsname, fsname, len);
+
+	hai = hai_first(hal);
+	json_array_foreach(json_list, count, item) {
+		if ((rc = json_hsm_action_item_get(item, hai, hal_len)) < 0)
+			return rc;
+		hai = hai_next(hai);
+	}
+
+	if (hal->hal_count != count) {
+		rc = -EINVAL;
+		LOG_ERROR(rc, "Expected %u items got %u in hsm action list",
+			  hal->hal_count, count);
+		return rc;
+	}
+
+	return count;
+}

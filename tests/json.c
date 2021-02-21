@@ -27,7 +27,7 @@ int main() {
 
 
 	struct hsm_action_item *hai, *newhai;
-	hai = calloc(sizeof(*hai)+10, 1);
+	hai = calloc(sizeof(*hai)+16, 1);
 	newhai = calloc(sizeof(*hai)+16, 1);
 	hai->hai_action = HSMA_RESTORE;
 	hai->hai_fid.f_seq = 0x4200000000L;;
@@ -47,11 +47,10 @@ int main() {
 
 	val = json_loads(s, JSON_ALLOW_NUL, NULL);
 	free(s);
-	newhai->hai_len = sizeof(*hai)+10;
-	assert(json_hsm_action_item_get(val, newhai) == 0);
+	assert(json_hsm_action_item_get(val, newhai, sizeof(*hai)+16) == 0);
 	json_decref(val);
 
-	printf("memcmp: %d\n", memcmp(hai, newhai, sizeof(*hai)+10));
+	printf("memcmp: %d\n", memcmp(hai, newhai, sizeof(*hai)+16));
 
 	free(hai);
 	free(newhai);

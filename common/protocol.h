@@ -105,6 +105,7 @@ struct ct_stats {
  *     hal_version = integer (u32)
  *     hal_count = integer (u32)
  *     hal_archive_id = integer (u32)
+ *     hal_flags = integer (u64)
  *     hal_fsname = string
  *     list = array of hsm_action_items objects
  *   note hal_compount_id, hal_flags aren't set (ignored)
@@ -158,7 +159,7 @@ struct ct_stats {
  */
 
 /**
- * common helpers
+ * common helpers for packing
  */
 
 static inline int protocol_setjson(json_t *obj, const char *key, json_t *val) {
@@ -231,11 +232,13 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai);
  * jansson-like function to get hai from json value
  *
  * @param json input representing hsm_action_item
- * @param hai output hsm_action_item, must have been preallocated and
- *            hai->hai_len set
+ * @param hai output hsm_action_item, must have been preallocated
+ * @param hai_len size of hai we can write on
+ *
  * @return 0 on success, -1 if json isn't correct
  */
-int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai);
+int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
+			     size_t hai_len);
 
 /**
  * helper to parse hsm_action_list json value
@@ -243,7 +246,8 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai);
  * @param json input json representing a fid
  * @param hal buffer to write to
  * @param hal_len length of the buffer we can write in
- * @return 0 on success, -1 on json parsing error, or
+ * @return positive number of items processed on success,
+ *         -1 on json parsing error, or
  *         -E2BIG if we could not write everything to the hsm action list
  */
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal, size_t hal_len);
