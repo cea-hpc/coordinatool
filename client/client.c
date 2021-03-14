@@ -22,7 +22,7 @@ int tcp_connect(struct state *state) {
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	s = getaddrinfo(state->host, state->port, &hints, &result);
+	s = getaddrinfo(state->config.host, state->config.port, &hints, &result);
 	if (s != 0) {
 		/* getaddrinfo does not use errno, cheat with debug */
 		LOG_DEBUG("ERROR getaddrinfo: %s", gai_strerror(s));
@@ -43,7 +43,7 @@ int tcp_connect(struct state *state) {
 
 	if (rp == NULL) {
 		rc = -errno;
-		LOG_ERROR(rc, "Could not connect to %s:%s", state->host, state->port);
+		LOG_ERROR(rc, "Could not connect to %s:%s", state->config.host, state->config.port);
 		return rc;
 	}
 
@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
 	// default options
 	int verbose = LLAPI_MSG_INFO;
 	struct state state = {
-		.host = "::1",
-		.port = "5123",
+		.config.host = "::1",
+		.config.port = "5123",
 	};
 
 	while ((rc = getopt_long(argc, argv, "vqH:p:",
@@ -90,10 +90,10 @@ int main(int argc, char *argv[]) {
 			verbose--;
 			break;
 		case 'H':
-			state.host = optarg;
+			state.config.host = optarg;
 			break;
 		case 'p':
-			state.port = optarg;
+			state.config.port = optarg;
 			break;
 		default:
 			return EXIT_FAILURE;

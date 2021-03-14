@@ -8,8 +8,15 @@
 
 struct state {
 	// options
-	const char *host;
-	const char *port;
+	struct {
+		const char *host;
+		const char *port;
+		uint32_t max_archive;
+		uint32_t max_restore;
+		uint32_t max_remove;
+		uint32_t hsm_action_list_size;
+		uint32_t archive_id;
+	} config;
 	// states value
 	int socket_fd;
 };
@@ -23,6 +30,6 @@ struct state {
  * @return 0 on success, -errno on error
  */
 int protocol_request_status(int fd);
-
+int protocol_request_recv(int fd, struct state *state);
 
 #endif

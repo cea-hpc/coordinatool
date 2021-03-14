@@ -86,7 +86,7 @@ struct ct_stats {
  * - RECV command
  *   request properties:
  *     command = "recv"
- *     max_{archive,restore,remove} = integer
+ *     max_{archive,restore,remove} = integer (u32)
  *      ^ maximum number of requests to send at a time for each type and
  *        cummulative, defaults to 1
  *     max_bytes = integer (u32)
