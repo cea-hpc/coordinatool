@@ -48,7 +48,7 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 		goto out_freereply;
 
 	LOG_INFO("Sending reply status to %d: %s", fd, json_dumps(reply, 0));
-	if (json_dumpfd(reply, fd, 0) != 0) {
+	if (protocol_write(reply, fd, 0) != 0) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write reply to %d: %s", fd,
 			  json_dumps(reply, 0));

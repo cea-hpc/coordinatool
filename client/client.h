@@ -5,6 +5,7 @@
 
 #include "logs.h"
 #include "protocol.h"
+#include "utils.h"
 
 struct state {
 	// options
@@ -23,6 +24,9 @@ struct state {
 
 
 /* protocol */
+/** reply handlers vector */
+extern protocol_read_cb protocol_cbs[];
+
 /**
  * send status request
  *

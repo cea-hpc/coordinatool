@@ -14,6 +14,7 @@
 
 #include "logs.h"
 #include "protocol.h"
+#include "utils.h"
 
 
 /* queue types */

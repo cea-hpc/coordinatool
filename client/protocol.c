@@ -6,10 +6,10 @@
  *  callbacks *
  **************/
 
-static int status_cb(int fd, json_t *json, void *arg) {
-	(void)json; // XXX unused, use attribute
-	(void)arg;
-	(void)fd;
+static int status_cb(int fd UNUSED, json_t *json, void *arg UNUSED) {
+	printf("Got status reply:\n");
+	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
+	printf("\n");
 	return 0;
 }
 
@@ -33,7 +33,7 @@ int protocol_request_status(int fd) {
 	}
 
 	LOG_INFO("Sending status request to %d", fd);
-	if (json_dumpfd(request, fd, 0)) {
+	if (protocol_write(request, fd, 0)) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write status request to %d", fd);
 		goto out_free;
@@ -61,7 +61,7 @@ int protocol_request_recv(int fd, struct state *state) {
 		return rc;
 	}
 	LOG_INFO("Sending recv request to %d", fd);
-	if (json_dumpfd(request, fd, 0)) {
+	if (protocol_write(request, fd, 0)) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write recv request to %d", fd);
 		goto out_free;

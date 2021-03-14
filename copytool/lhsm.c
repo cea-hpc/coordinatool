@@ -105,17 +105,18 @@ int ct_start(struct state *state) {
 		int n;
 		for (n = 0; n < nfds; n++) {
 			if (events[n].events & (EPOLLERR|EPOLLHUP)) {
-				epoll_delfd(state->epoll_fd, events[n].data.fd);
-				// there might be data left to read but we
-				// probably won't be able to reply, so skip
-				continue;
+				LOG_INFO("%d on error/hup\n", events[n].data.fd);
 			}
 			if (events[n].data.fd == state->hsm_fd) {
 				handle_ct_event(state);
 			} else if (events[n].data.fd == state->listen_fd) {
 				handle_client_connect(state);
 			} else {
-				protocol_read_command(events[n].data.fd, protocol_cbs, state);
+				if (protocol_read_command(events[n].data.fd, protocol_cbs, state) < 0) {
+					LOG_INFO("Disconnecting %d\n", events[n].data.fd);
+					epoll_delfd(state->epoll_fd, events[n].data.fd);
+					state->stats.clients_connected--;
+				}
 			}
 		}
 

@@ -99,6 +99,8 @@ int handle_client_connect(struct state *state) {
 		LOG_ERROR(rc, "Could not add client %s to epoll", peer_str);
 	}
 
+	state->stats.clients_connected++;
+
 	free(peer_str);
 	return rc;
 }

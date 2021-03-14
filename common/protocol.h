@@ -36,7 +36,8 @@ const char *protocol_command2str(enum protocol_commands cmd);
 typedef int (*protocol_read_cb)(int fd, json_t *json, void *arg);
 
 /**
- * read one json object exactly
+ * read json objects and callbacks -- this keeps reading until the end
+ * of buffer coincides with the end of a json object for efficiency
  *
  * @param fd fd of socket to read one json object from
  * @param cbs vector of callbacks, must be readable up to PROTOCOL_COMMANDS_MAX.
@@ -44,6 +45,8 @@ typedef int (*protocol_read_cb)(int fd, json_t *json, void *arg);
  * @return 0 on success, -errno on error.
  */
 int protocol_read_command(int fd, protocol_read_cb *cbs, void *cb_arg);
+
+int protocol_write(json_t *json, int fd, size_t flags);
 
 /**
  * - STATUS command
