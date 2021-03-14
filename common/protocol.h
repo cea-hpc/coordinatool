@@ -91,7 +91,7 @@ struct ct_stats {
  *        cummulative, defaults to 1
  *     max_bytes = integer (u32)
  *      ^ maximum size of items to send when reencoded, defaults to 1MB
- *        (this is due to how llapi_hsm_copytool_recv works with a static 
+ *        (this is due to how llapi_hsm_copytool_recv works with a static
  *         buffer for kuc in lustre code)
  *     archive_id = integer (u32)
  *      ^ defaults to any if unset or 0

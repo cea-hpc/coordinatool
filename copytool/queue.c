@@ -13,7 +13,7 @@ int hsm_action_enqueue(struct state *state,
 
 	struct hsm_action_queues *queues = &state->queues;
 	struct hsm_action_node *node;
-       
+
 	if (hai->hai_action == HSMA_CANCEL) {
 		/* XXX look through all the lists, for now ignore */
 		// memo API: cds_wfcq_for_each_blocking_safe
@@ -32,15 +32,15 @@ int hsm_action_enqueue(struct state *state,
 	/* else enqueue */
 	switch (hai->hai_action) {
 	case HSMA_RESTORE:
-		cds_wfcq_enqueue(&queues->restore_head, &queues->restore_tail, 
+		cds_wfcq_enqueue(&queues->restore_head, &queues->restore_tail,
 				 &node->node);
 		break;
 	case HSMA_ARCHIVE:
-		cds_wfcq_enqueue(&queues->archive_head, &queues->archive_tail, 
+		cds_wfcq_enqueue(&queues->archive_head, &queues->archive_tail,
 				 &node->node);
 		break;
 	case HSMA_REMOVE:
-		cds_wfcq_enqueue(&queues->remove_head, &queues->remove_tail, 
+		cds_wfcq_enqueue(&queues->remove_head, &queues->remove_tail,
 				 &node->node);
 		break;
 	default:
