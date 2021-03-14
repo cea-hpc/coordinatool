@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
-#ifndef MASTER_CT_PROTOCOL_H
-#define MASTER_CT_PROTOCOL_H
+#ifndef COORDINATOOL_PROTOCOL_H
+#define COORDINATOOL_PROTOCOL_H
 
 #include <lustre/lustreapi.h>
 #include <jansson.h>

@@ -3,7 +3,7 @@
 #include <sys/epoll.h>
 #include <limits.h>
 
-#include "master_ct.h"
+#include "coordinatool.h"
 
 int handle_ct_event(struct state *state) {
 	struct hsm_action_list *hal;

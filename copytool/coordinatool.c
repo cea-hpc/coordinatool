@@ -6,7 +6,7 @@
 #include <sys/epoll.h>
 #include <stdint.h>
 
-#include "master_ct.h"
+#include "coordinatool.h"
 
 int epoll_addfd(int epoll_fd, int fd) {
 	struct epoll_event ev;

@@ -2,7 +2,7 @@
 
 #include <netdb.h>
 
-#include "master_ct.h"
+#include "coordinatool.h"
 
 int tcp_listen(struct state *state) {
 	struct addrinfo hints;

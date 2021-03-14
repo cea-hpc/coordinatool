@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
-#include "master_ct.h"
+#include "coordinatool.h"
 
 /**************
  *  callbacks *

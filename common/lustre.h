@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
-#ifndef MASTER_CT_LUSTRE_H
-#define MASTER_CT_LUSTRE_H
+#ifndef COORDINATOOL_LUSTRE_H
+#define COORDINATOOL_LUSTRE_H
 
 #include <lustre/lustreapi.h>
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
-#include "master_ct.h"
+#include "coordinatool.h"
 
 void hsm_action_queues_init(struct hsm_action_queues *queues) {
 	cds_wfcq_init(&queues->restore_head, &queues->restore_tail);

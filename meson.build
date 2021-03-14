@@ -1,5 +1,5 @@
 project(
-	'master_ct',
+	'coordinatool',
 	'c',
 	version: '0.0.0',
 	license: 'LGPL3.0-or-later',
@@ -23,7 +23,7 @@ lustre = cc.find_library('lustreapi')
 urcu = dependency('liburcu')
 
 common = static_library(
-	'master_ct_common',
+	'coordinatool_common',
 	files(
 		'common/protocol.c',
 		'common/protocol_lustre.c',
@@ -37,13 +37,13 @@ subdir('tests')
 
 
 executable(
-	'master_ct',
+	'coordinatool',
 	sources: files(
-		'master/queue.c',
-		'master/tcp.c',
-		'master/lhsm.c',
-		'master/protocol.c',
-		'master/master_ct.c',
+		'copytool/queue.c',
+		'copytool/tcp.c',
+		'copytool/lhsm.c',
+		'copytool/protocol.c',
+		'copytool/coordinatool.c',
 	),
 	dependencies: [urcu],
 	include_directories: include_directories('common'),

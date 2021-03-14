@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
-#ifndef MASTER_CT_H
-#define MASTER_CT_H
+#ifndef COORDINATOOL_H
+#define COORDINATOOL_H
 
 // for urcu slight optimization
 #define _LGPL_SOURCE
