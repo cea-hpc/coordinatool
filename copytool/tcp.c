@@ -8,7 +8,7 @@ int tcp_listen(struct state *state) {
 	struct addrinfo hints;
 	struct addrinfo *result, *rp;
 	int sfd, s;
-	int rc;
+	int rc, optval = 1;
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
@@ -27,6 +27,9 @@ int tcp_listen(struct state *state) {
 				rp->ai_protocol);
 		if (sfd == -1)
 			continue;
+
+		if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
+			LOG_ERROR(errno, "setting SO_REUSEADDR failed, continuing anyway");
 
 		if (bind(sfd, rp->ai_addr, rp->ai_addrlen) == 0)
 			break;                  /* Success */
