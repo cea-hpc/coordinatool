@@ -24,10 +24,35 @@ int handle_ct_event(struct state *state) {
 			  hal->hal_count);
 		return rc;
 	}
+	if (hal->hal_version != HAL_VERSION) {
+		rc = -EINVAL;
+		LOG_ERROR(rc, "received hsm action list version %d, expecting %d",
+			  hal->hal_version, HAL_VERSION);
+		abort();
+	}
 	LOG_DEBUG("copytool fs=%s, archive#=%d, item_count=%d",
 			hal->hal_fsname, hal->hal_archive_id,
 			hal->hal_count);
-	// XXX match fsname with known one?
+
+	if (state->queues.archive_id == ARCHIVE_ID_UNINIT) {
+		// XXX we only support one archive_id, first one we sees
+		// determines what others should be.
+		state->queues.archive_id = hal->hal_archive_id;
+		state->queues.fsname = strdup(hal->hal_fsname);
+		state->queues.hal_flags = hal->hal_flags;
+	} else {
+		// XXX strcmp fsname?
+		if (state->queues.archive_id != hal->hal_archive_id) {
+			rc = -EINVAL;
+			LOG_ERROR(rc, "received action list for archive id %d but already seen %d, ignoring these",
+				  hal->hal_archive_id, state->queues.archive_id);
+			return rc;
+		}
+		if (state->queues.hal_flags != hal->hal_flags) {
+			LOG_ERROR(rc, "received action list with different flags (got %llx, expected %llx); keeping current flags anyway",
+				  hal->hal_flags, state->queues.hal_flags);
+		}
+	}
 
 	struct hsm_action_item *hai = hai_first(hal);
 	unsigned int i = 0;

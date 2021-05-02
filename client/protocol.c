@@ -13,8 +13,16 @@ static int status_cb(int fd UNUSED, json_t *json, void *arg UNUSED) {
 	return 0;
 }
 
+static int recv_cb(int fd UNUSED, json_t *json, void *arg UNUSED) {
+	printf("Got recv reply:\n");
+	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
+	printf("\n");
+	return 0;
+}
+
 protocol_read_cb protocol_cbs[PROTOCOL_COMMANDS_MAX] = {
 	[STATUS] = status_cb,
+	[RECV] = recv_cb,
 };
 
 /*****************

@@ -89,9 +89,9 @@ struct ct_stats {
  * - RECV command
  *   request properties:
  *     command = "recv"
- *     max_{archive,restore,remove} = integer (u32)
+ *     max_{archive,restore,remove} = integer (s32)
  *      ^ maximum number of requests to send at a time for each type and
- *        cummulative, defaults to 1
+ *        cummulative, negative means no limit. defaults to -1
  *     max_bytes = integer (u32)
  *      ^ maximum size of items to send when reencoded, defaults to 1MB
  *        (this is due to how llapi_hsm_copytool_recv works with a static
@@ -200,6 +200,29 @@ static inline int protocol_setjson_int(json_t *obj, const char *key,
 		return -ENOMEM;
 	}
 	return protocol_setjson(obj, key, json_val);
+}
+
+
+/**
+ * helpers for getting, with default values
+ */
+static inline json_int_t protocol_getjson_int(json_t *obj, const char *key,
+					      json_int_t defval) {
+	json_t *json_val = json_object_get(obj, key);
+	if (!json_val)
+		return defval;
+
+	/* slight premature optimization: jansson will return 0 if not passed
+	 * an integer, so try to get the value first and skip the double check
+	 * in common case
+	 */
+	json_int_t val = json_integer_value(json_val);
+	if (val == 0 && !json_is_integer(json_val)) {
+		LOG_ERROR(-EINVAL, "field %s was set, but not an integer - assuming default",
+			  key);
+		return defval;
+	}
+	return val;
 }
 
 /**

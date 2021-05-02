@@ -25,6 +25,7 @@ struct hsm_action_node {
 	struct hsm_action_item hai;
 };
 
+#define ARCHIVE_ID_UNINIT ((unsigned int)-1)
 struct hsm_action_queues {
 	struct cds_wfcq_head restore_head;
 	struct cds_wfcq_tail restore_tail;
@@ -34,6 +35,9 @@ struct hsm_action_queues {
 	struct cds_wfcq_tail remove_tail;
 	struct cds_wfcq_head running_head;
 	struct cds_wfcq_tail running_tail;
+	char *fsname;
+	unsigned long long hal_flags;
+	unsigned int archive_id;
 };
 
 /* common types */
@@ -75,6 +79,7 @@ extern protocol_read_cb protocol_cbs[];
  * @return 0 on success, -errno on error
  */
 int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *error);
+int protocol_reply_recv(int fd, json_t *hal, int status, char *error);
 
 
 /* tcp */

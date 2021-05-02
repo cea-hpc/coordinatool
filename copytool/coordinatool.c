@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
 	struct state state = {
 		.host = "::",
 		.port = "5123",
+		.queues.archive_id = ARCHIVE_ID_UNINIT,
 	};
 
 	while ((rc = getopt_long(argc, argv, "vqA:H:p:",

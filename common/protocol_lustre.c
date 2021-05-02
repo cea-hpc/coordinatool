@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
 #include <errno.h>
+#include <lustre/lustreapi.h>
 
 #include "protocol.h"
 
@@ -83,6 +84,12 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 			"list", &json_list) != 0)
 		return -1;
 
+	if (hal->hal_version != HAL_VERSION) {
+		rc = -EINVAL;
+		LOG_ERROR(rc, "hal_version was %d, expecting %d",
+			  hal->hal_version, HAL_VERSION);
+		return rc;
+	}
 	len = __ALIGN_KERNEL(fsname_len + 1, 8);
 	if (hal_len < len)
 		return -EINVAL;
