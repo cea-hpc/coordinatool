@@ -52,6 +52,7 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 	struct hsm_action_item *hai;
 	unsigned int archive_id;
 	unsigned long flags;
+	unsigned long long tmp1, tmp2;
 
 	/* parsing is done in two steps:
 	 * - first fine data to allocate proper length
@@ -66,7 +67,7 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 		return rc;
 	}
 	len = (end-item)/2;
-	n = __ALIGN_KERNEL(sizeof(*hai) + len, 8);
+	n = __ALIGN_KERNEL_MASK(sizeof(*hai) + len, 7);
 	hai = malloc(n);
 	hai->hai_len = n;
 	for (i=0; i < len; i++) {
@@ -117,23 +118,27 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 	item = find_keyword(line, "extent=");
 	if (!item)
 		goto out;
-	n = sscanf(item, "%llx-%llx", &hai->hai_extent.offset, &hai->hai_extent.length);
+	/* (use temp values to avoid unaligned accesses) */
+	n = sscanf(item, "%llx-%llx", &tmp1, &tmp2);
 	if (n != 2) {
 		LOG_ERROR(rc, "scanf failed to read offset start/end from %s",
 			  item);
 		goto out;
 	}
+	hai->hai_extent.offset = tmp1;
+	hai->hai_extent.length = tmp2;
 
 	/* cookie */
 	item = find_keyword(line, "compound/cookie=");
 	if (!item)
 		goto out;
-	n = sscanf(item, "%*x/%llx", &hai->hai_cookie);
+	n = sscanf(item, "%*x/%llx", &tmp1);
 	if (n != 1) {
 		LOG_ERROR(rc, "scanf failed to read compound/cookie from %s",
 			  item);
 		goto out;
 	}
+	hai->hai_cookie = tmp1;
 
 	/* gid */
 	item = find_keyword(line, "gid=");
