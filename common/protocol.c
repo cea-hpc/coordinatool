@@ -71,11 +71,11 @@ static size_t json_load_cb(void *buffer, size_t buflen, void *data) {
 	size_t len = cbdata->bufread - cbdata->bufoff;
 	if (buflen > len)
 		buflen = len;
-	memcpy(buffer, cbdata->buffer + cbdata->bufoff, len);
-	cbdata->bufoff += len;
-	cbdata->position += len;
+	memcpy(buffer, cbdata->buffer + cbdata->bufoff, buflen);
+	cbdata->bufoff += buflen;
+	cbdata->position += buflen;
 
-	return len;
+	return buflen;
 }
 
 int protocol_read_command(int fd, protocol_read_cb *cbs, void *cb_arg) {
