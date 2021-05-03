@@ -108,11 +108,11 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 	    (rc = protocol_setjson_int(reply, "clients_connected", ct_stats->clients_connected)))
 		goto out_freereply;
 
-	LOG_INFO("Sending reply status to %d: %s", fd, json_dumps(reply, 0));
 	if (protocol_write(reply, fd, 0) != 0) {
+		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %d: %s", fd,
-			  json_dumps(reply, 0));
+		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		free(json_str);
 		goto out_freereply;
 	};
 
@@ -135,11 +135,11 @@ int protocol_reply_recv(int fd, json_t *hal, int status, char *error) {
 	    (rc = protocol_setjson(reply, "hsm_action_list", hal)))
 		goto out_freereply;
 
-	LOG_INFO("Sending reply recv to %d: %s", fd, json_dumps(reply, 0));
 	if (protocol_write(reply, fd, 0) != 0) {
+		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %d: %s", fd,
-			  json_dumps(reply, 0));
+		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		free(json_str);
 		goto out_freereply;
 	};
 

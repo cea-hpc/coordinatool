@@ -109,19 +109,26 @@ again:
 		assert(cbdata.bufoff >= cbdata.position - json_error.position);
 		cbdata.bufoff -= cbdata.position - json_error.position;
 	}
+	if (llapi_msg_get_level() >= LLAPI_MSG_DEBUG) {
+		char *json_str = json_dumps(request, 0);
+		LOG_DEBUG("Got something from fd %d: %s\n", fd, json_str);
+		free(json_str);
+	}
 
 	json_t *command_obj = json_object_get(request, "command");
 	if (!command_obj) {
+		char *json_str = json_dumps(request, 0);
 		rc = -EINVAL;
-		LOG_ERROR(rc, "Received valid json with no command: %s",
-			  json_dumps(request, 0));
+		LOG_ERROR(rc, "Received valid json with no command: %s", json_str);
+		free(json_str);
 		goto out_freereq;
 	}
 	const char *command_str = json_string_value(command_obj);
 	if (!command_str) {
+		char *json_str = json_dumps(request, 0);
 		rc = -EINVAL;
-		LOG_ERROR(rc, "Command was not a string: %s",
-			  json_dumps(command_obj, 0));
+		LOG_ERROR(rc, "Command was not a string: %s", json_str);
+		free(json_str);
 		goto out_freereq;
 	}
 	enum protocol_commands command = protocol_str2command(command_str);
@@ -196,6 +203,12 @@ int protocol_write(json_t *json, int fd, size_t flags) {
 		.fd = fd,
 	};
 	int rc;
+
+	if (llapi_msg_get_level() >= LLAPI_MSG_DEBUG) {
+		char *json_str = json_dumps(json, 0);
+		LOG_DEBUG("Sending message to fd %d: %s", fd, json_str);
+		free(json_str);
+	}
 
 	cbdata.buffer = malloc(64*1024);
 	cbdata.buflen = 64*1024;
