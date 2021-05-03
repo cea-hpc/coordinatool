@@ -103,46 +103,35 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t h
 	return 0;
 }
 
-struct hsm_action_list_unpacked {
-        __u32 hal_version;
-        __u32 hal_count;       /* number of hai's to follow */
-        __u64 hal_compound_id; /* returned by coordinator, ignored */
-        __u64 hal_flags;
-	__u32 hal_archive_id;
-};
-
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
-			     size_t hal_len) {
+			     size_t hal_len, hal_get_cb cb, void *cb_arg) {
 	struct hsm_action_item *hai;
 	unsigned int count;
 	int rc;
-	char *fsname;
+	const char *fsname;
 	size_t fsname_len, len;
 	json_t *json_list, *item;
-	struct hsm_action_list_unpacked unpack;
 
 	if (hal_len < sizeof(*hal))
 		return -EINVAL;
 	hal_len -= sizeof(*hal);
 
-	if (json_unpack(json,
-			"{si,si,sI,si,ss%,so!}",
-			"hal_version", &unpack.hal_version,
-			"hal_count", &unpack.hal_count,
-			"hal_flags", &unpack.hal_flags,
-			"hal_archive_id", &unpack.hal_archive_id,
-			"hal_fsname", &fsname, &fsname_len,
-			"list", &json_list) != 0)
-		return -EINVAL;
-	hal->hal_version = unpack.hal_version;
-	hal->hal_count = unpack.hal_count;
-	hal->hal_flags = unpack.hal_flags;
-	hal->hal_archive_id = unpack.hal_archive_id;
+	hal->hal_version = protocol_getjson_int(json, "hal_version", 0);
+	hal->hal_count = protocol_getjson_int(json, "hal_count", -1);
+	hal->hal_flags = protocol_getjson_int(json, "hal_flags", -1);
+	hal->hal_archive_id = protocol_getjson_int(json, "hal_archive_id", -1);
+	fsname = protocol_getjson_str(json, "hal_fsname", NULL, &fsname_len);
+	json_list = json_object_get(json, "list");
 
 	if (hal->hal_version != HAL_VERSION) {
 		rc = -EINVAL;
 		LOG_ERROR(rc, "hal_version was %d, expecting %d",
 			  hal->hal_version, HAL_VERSION);
+		return rc;
+	}
+	if (!json_list) {
+		rc = -EINVAL;
+		LOG_ERROR(rc, "no list?");
 		return rc;
 	}
 	len = __ALIGN_KERNEL_MASK(fsname_len + 1, 7);
@@ -156,7 +145,13 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 	json_array_foreach(json_list, count, item) {
 		if ((rc = json_hsm_action_item_get(item, hai, hal_len)) < 0)
 			return rc;
-		hai = hai_next(hai);
+		if (cb) {
+			if ((rc = cb(hal, hai, cb_arg)))
+				return rc;
+		} else {
+			hal_len -= hai->hai_len;
+			hai = hai_next(hai);
+		}
 	}
 
 	if (hal->hal_count != count) {

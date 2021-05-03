@@ -7,11 +7,19 @@
 #include "protocol.h"
 #include "utils.h"
 
+struct active_requests_state {
+	json_t *hai_list;
+	unsigned int archive_id;
+	unsigned long flags;
+	char fsname[LUSTRE_MAXFSNAME];
+};
+
 struct state {
 	// options
 	struct {
 		const char *host;
 		const char *port;
+		bool send_queue;
 		uint32_t max_archive;
 		uint32_t max_restore;
 		uint32_t max_remove;
@@ -20,6 +28,9 @@ struct state {
 	} config;
 	// states value
 	int socket_fd;
+	union {
+		struct active_requests_state active_requests;
+	};
 };
 
 
@@ -35,5 +46,7 @@ extern protocol_read_cb protocol_cbs[];
  */
 int protocol_request_status(int fd);
 int protocol_request_recv(int fd, struct state *state);
+int protocol_request_queue(int fd,
+			   struct active_requests_state *active_requests);
 
 #endif

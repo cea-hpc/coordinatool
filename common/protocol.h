@@ -225,6 +225,26 @@ static inline json_int_t protocol_getjson_int(json_t *obj, const char *key,
 	return val;
 }
 
+static inline const char *protocol_getjson_str(json_t *obj, const char *key,
+					       const char *defval, size_t *len) {
+	json_t *json_val = json_object_get(obj, key);
+	if (!json_val)
+		goto defval;
+
+	const char *val = json_string_value(json_val);
+	if (val == NULL)
+		goto defval;
+
+	if (len)
+		*len = json_string_length(json_val);
+	return val;
+
+defval:
+	if (len && defval)
+		*len = strlen(defval);
+	return defval;
+}
+
 /**
  * lustre helpers
  */
@@ -266,16 +286,24 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai);
 int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
 			     size_t hai_len);
 
+typedef int (*hal_get_cb)(struct hsm_action_list *hal,
+			  struct hsm_action_item *hai, void *arg);
 /**
  * helper to parse hsm_action_list json value
  *
  * @param json input json representing a fid
  * @param hal buffer to write to
  * @param hal_len length of the buffer we can write in
+ * @param cb optional callback to call on each item
+ *           if given, the first item of the list is repeatedly
+ *           written each time as it is assumed list will not be
+ *           required again later
+ * @param cb_arg passed as is to cb if used
  * @return positive number of items processed on success,
  *         -1 on json parsing error, or
  *         -E2BIG if we could not write everything to the hsm action list
  */
-int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal, size_t hal_len);
+int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
+			     size_t hal_len, hal_get_cb cb, void *cb_arg);
 
 #endif

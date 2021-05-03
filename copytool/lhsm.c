@@ -34,30 +34,19 @@ int handle_ct_event(struct state *state) {
 			hal->hal_fsname, hal->hal_archive_id,
 			hal->hal_count);
 
-	if (state->queues.archive_id == ARCHIVE_ID_UNINIT) {
-		// XXX we only support one archive_id, first one we sees
-		// determines what others should be.
-		state->queues.archive_id = hal->hal_archive_id;
-		state->queues.fsname = strdup(hal->hal_fsname);
-		state->queues.hal_flags = hal->hal_flags;
-	} else {
-		// XXX strcmp fsname?
-		if (state->queues.archive_id != hal->hal_archive_id) {
-			rc = -EINVAL;
-			LOG_ERROR(rc, "received action list for archive id %d but already seen %d, ignoring these",
-				  hal->hal_archive_id, state->queues.archive_id);
-			return rc;
-		}
-		if (state->queues.hal_flags != hal->hal_flags) {
-			LOG_ERROR(rc, "received action list with different flags (got %llx, expected %llx); keeping current flags anyway",
-				  hal->hal_flags, state->queues.hal_flags);
-		}
-	}
+	struct hsm_action_queues *queues =
+		hsm_action_queues_get(state,
+				      hal->hal_archive_id,
+				      hal->hal_flags,
+				      hal->hal_fsname);
+	if (!queues)
+		return -EINVAL;
 
 	struct hsm_action_item *hai = hai_first(hal);
 	unsigned int i = 0;
 	while (++i <= hal->hal_count) {
-		hsm_action_enqueue(state, hai);
+		if ((rc = hsm_action_enqueue(queues, hai) < 0))
+			return rc;
 
 		struct lu_fid fid;
 
@@ -122,6 +111,8 @@ int ct_start(struct state *state) {
 
 	while (1) {
 		nfds = epoll_wait(state->epoll_fd, events, MAX_EVENTS, -1);
+		if (nfds < 0 && errno == EINTR)
+			continue;
 		if (nfds < 0) {
 			rc = -errno;
 			LOG_ERROR(rc, "epoll_wait failed");
