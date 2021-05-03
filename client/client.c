@@ -100,13 +100,17 @@ int client(struct state *state) {
 		strcpy(state->active_requests.fsname, "testfs0");
 		rc = parse_active_requests(0, parse_hai_cb,
 					   &state->active_requests);
-		if (rc < 0)
+		if (rc < 0) {
+			json_decref(state->active_requests.hai_list);
 			return rc;
+		}
 
 		if (json_array_size(state->active_requests.hai_list) == 0) {
 			LOG_DEBUG("Nothing to enqueue, exiting");
+			json_decref(state->active_requests.hai_list);
 			return 0;
 		}
+		/* takes ownership of hai_list */
 		protocol_request_queue(state->socket_fd,
 				       &state->active_requests);
 		protocol_read_command(state->socket_fd, protocol_cbs, state);

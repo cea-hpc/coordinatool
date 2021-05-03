@@ -46,17 +46,52 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 	return &state->queues;
 }
 
+struct hsm_action_item *hsm_action_search_queue(struct cds_wfcq_head *head,
+						struct cds_wfcq_tail *tail,
+						unsigned long cookie,
+						bool pop) {
+	struct cds_wfcq_node *n, *next;
+	struct hsm_action_node *node;
+
+	__cds_wfcq_for_each_blocking_safe(head, tail, n, next) {
+		node = caa_container_of(n, struct hsm_action_node, node);
+		if (node->hai.hai_cookie != cookie)
+			continue;
+		if (pop)
+			// somehow dequeue/delete?
+			return NULL;
+		return &node->hai;
+	}
+	return NULL;
+}
+
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai) {
 	struct hsm_action_node *node;
+	struct cds_wfcq_head *head;
+	struct cds_wfcq_tail *tail;
 
-	if (hai->hai_action == HSMA_CANCEL) {
-		/* XXX look through all the lists, for now ignore */
-		// memo API: cds_wfcq_for_each_blocking_safe
-		return 0;
+	switch (hai->hai_action) {
+	case HSMA_RESTORE:
+		head = &queues->restore_head;
+		tail = &queues->restore_tail;
+		break;
+	case HSMA_ARCHIVE:
+		head = &queues->archive_head;
+		tail = &queues->archive_tail;
+		break;
+	case HSMA_REMOVE:
+		head = &queues->remove_head;
+		tail = &queues->remove_tail;
+		break;
+	default:
+		/* XXX HSMA_CANCEL: caller should try searching all queues */
+		return -EINVAL;
 	}
 
-	/* XXX check duplicate */
+	/* XXX try bloom filter first */
+	if (hsm_action_search_queue(head, tail, hai->hai_cookie, false))
+		return 0;
 
 	node = malloc(sizeof(struct hsm_action_node) +
 		      hai->hai_len - sizeof(struct hsm_action_item));
@@ -66,25 +101,11 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 	cds_wfcq_node_init(&node->node);
 	memcpy(&node->hai, hai, hai->hai_len);
 
+
 	/* are there clients waiting? */
 	// XXX
 	/* else enqueue */
-	switch (hai->hai_action) {
-	case HSMA_RESTORE:
-		cds_wfcq_enqueue(&queues->restore_head, &queues->restore_tail,
-				 &node->node);
-		break;
-	case HSMA_ARCHIVE:
-		cds_wfcq_enqueue(&queues->archive_head, &queues->archive_tail,
-				 &node->node);
-		break;
-	case HSMA_REMOVE:
-		cds_wfcq_enqueue(&queues->remove_head, &queues->remove_tail,
-				 &node->node);
-		break;
-	default:
-		return -EINVAL;
-	}
+	cds_wfcq_enqueue(head, tail, &node->node);
 	return 1;
 }
 
