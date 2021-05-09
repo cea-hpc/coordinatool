@@ -22,9 +22,8 @@ static int tree_compare(const void *a, const void *b) {
 }
 
 void queue_node_free(struct hsm_action_queues *queues,
-		     struct hsm_action_item *hai) {
-	struct hsm_action_node *node = caa_container_of(hai, struct hsm_action_node, hai);
-	if (!tdelete(&hai->hai_cookie, &queues->actions_tree, tree_compare))
+		     struct hsm_action_node *node) {
+	if (!tdelete(&node->hai.hai_cookie, &queues->actions_tree, tree_compare))
 		abort();
 	free(node);
 }
@@ -77,13 +76,11 @@ struct hsm_action_item *hsm_action_search_queue(struct hsm_action_queues *queues
 	return caa_container_of(key, struct hsm_action_item, hai_cookie);
 }
 
-int hsm_action_enqueue(struct hsm_action_queues *queues,
-		       struct hsm_action_item *hai) {
-	struct hsm_action_node *node;
+int hsm_action_requeue(struct hsm_action_queues *queues,
+		       struct hsm_action_node *node) {
 	struct cds_list_head *head;
-	__u64 **tree_key;
 
-	switch (hai->hai_action) {
+	switch (node->hai.hai_action) {
 	case HSMA_RESTORE:
 		head = &queues->waiting_restore;
 		break;
@@ -94,7 +91,32 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		head = &queues->waiting_remove;
 		break;
 	default:
-		/* XXX HSMA_CANCEL: caller should try searching all queues w/ pop and free */
+		queue_node_free(queues, node);
+		return -EINVAL;
+	}
+
+	/* are there clients waiting? */
+	// XXX
+	/* else enqueue */
+	cds_list_add_tail(&node->node, head);
+	return 1;
+}
+
+int hsm_action_enqueue(struct hsm_action_queues *queues,
+		       struct hsm_action_item *hai) {
+	struct hsm_action_node *node;
+	__u64 **tree_key;
+
+	if (hai->hai_action == HSMA_CANCEL) {
+		// XXX tfind + remove from waiting queue or signal client
+		return 0;
+	}
+	switch (hai->hai_action) {
+	case HSMA_RESTORE:
+	case HSMA_ARCHIVE:
+	case HSMA_REMOVE:
+		break;
+	default:
 		return -EINVAL;
 	}
 
@@ -115,14 +137,10 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		return 0;
 	}
 
-	/* are there clients waiting? */
-	// XXX
-	/* else enqueue */
-	cds_list_add_tail(&node->node, head);
-	return 1;
+	return hsm_action_requeue(queues, node);
 }
 
-struct hsm_action_item *hsm_action_dequeue(struct hsm_action_queues *queues,
+struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
 					   enum hsm_copytool_action action) {
 	struct cds_list_head *node = NULL;
 
@@ -149,5 +167,5 @@ struct hsm_action_item *hsm_action_dequeue(struct hsm_action_queues *queues,
 	}
 
 	cds_list_del(node);
-	return &caa_container_of(node, struct hsm_action_node, node)->hai;
+	return caa_container_of(node, struct hsm_action_node, node);
 }

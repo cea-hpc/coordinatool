@@ -61,7 +61,7 @@ out_freereply:
 static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
-	struct hsm_action_item *hai;
+	struct hsm_action_node *han;
 	size_t bytes_left = protocol_getjson_int(json, "max_bytes", 1024*1024);
 	int restore_left = protocol_getjson_int(json, "max_restore", -1);
 	int archive_left = protocol_getjson_int(json, "max_archive", -1);
@@ -77,22 +77,25 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 		HSMA_RESTORE, HSMA_REMOVE, HSMA_ARCHIVE,
 	};
 	int left_count[] = { restore_left, remove_left, archive_left };
+	unsigned int *client_current[] = { &client->current_restore,
+		&client->current_remove, &client->current_archive };
 	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
 		while (bytes_left > HAI_SIZE_MARGIN && left_count[i] != 0) {
-			hai = hsm_action_dequeue(&state->queues, actions[i]);
-			if (!hai)
+			han = hsm_action_dequeue(&state->queues, actions[i]);
+			if (!han)
 				break;
-			if (bytes_left < sizeof(*hai) + hai->hai_len) {
+			if (bytes_left < sizeof(han->hai) + han->hai.hai_len) {
 				/* did not fit, requeue - this also makes a new copy */
-				hsm_action_enqueue(&state->queues, hai);
-				queue_node_free(&state->queues, hai);
+				hsm_action_requeue(&state->queues, han);
 				break;
 			}
-			json_array_append_new(hai_list, json_hsm_action_item(hai));
+			json_array_append_new(hai_list, json_hsm_action_item(&han->hai));
+			han->client = client;
+			(*client_current[i])++;
 			enqueued_items++;
 			if (left_count[i] > 0)
 				left_count[i]--;
-			queue_node_free(&state->queues, hai);
+
 		}
 	}
 

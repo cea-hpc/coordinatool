@@ -121,15 +121,17 @@ void free_client(struct state *state, struct client *client);
 /* queue */
 
 void queue_node_free(struct hsm_action_queues *queues,
-		     struct hsm_action_item *hai);
+		     struct hsm_action_node *node);
 struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 						unsigned int archive_id,
 						unsigned long long flags,
 						const char *fsname);
 void hsm_action_queues_init(struct hsm_action_queues *queues);
+int hsm_action_requeue(struct hsm_action_queues *queues,
+		       struct hsm_action_node *node);
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai);
-struct hsm_action_item *hsm_action_dequeue(struct hsm_action_queues *queues,
+struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
 					   enum hsm_copytool_action action);
 
 /* common */
