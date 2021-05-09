@@ -86,12 +86,13 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 				break;
 			if (bytes_left < sizeof(han->hai) + han->hai.hai_len) {
 				/* did not fit, requeue - this also makes a new copy */
-				hsm_action_requeue(&state->queues, han);
+				hsm_action_requeue(han);
 				break;
 			}
 			json_array_append_new(hai_list, json_hsm_action_item(&han->hai));
 			han->client = client;
 			(*client_current[i])++;
+			cds_list_add(&han->node, &client->active_requests);
 			enqueued_items++;
 			if (left_count[i] > 0)
 				left_count[i]--;

@@ -24,6 +24,7 @@ struct hsm_action_node {
 	/* list is used to track order of requests in waiting list,
 	 * or dump requests assigned to a client */
 	struct cds_list_head node;
+	struct hsm_action_queues *queues;
 	/* if sent to a client, remember who for eventual cancel */
 	struct client *client;
 	/* hsm_action_item is variable length and MUST be last */
@@ -120,15 +121,13 @@ void free_client(struct state *state, struct client *client);
 
 /* queue */
 
-void queue_node_free(struct hsm_action_queues *queues,
-		     struct hsm_action_node *node);
+void queue_node_free(struct hsm_action_node *node);
 struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 						unsigned int archive_id,
 						unsigned long long flags,
 						const char *fsname);
 void hsm_action_queues_init(struct hsm_action_queues *queues);
-int hsm_action_requeue(struct hsm_action_queues *queues,
-		       struct hsm_action_node *node);
+int hsm_action_requeue(struct hsm_action_node *node);
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai);
 struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,

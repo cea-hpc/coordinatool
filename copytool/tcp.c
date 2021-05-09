@@ -81,7 +81,15 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
 }
 
 void free_client(struct state *state, struct client *client) {
+	struct cds_list_head *n, *next;
 	LOG_INFO("Disconnecting %d\n", client->fd);
+	// reassign any request that would be lost
+	cds_list_for_each_safe(n, next, &client->active_requests) {
+		struct hsm_action_node *node =
+			caa_container_of(n, struct hsm_action_node, node);
+		cds_list_del(n);
+		hsm_action_requeue(node);
+	}
 	epoll_delfd(state->epoll_fd, client->fd);
 	cds_list_del(&client->node);
 	state->stats.clients_connected--;
@@ -108,6 +116,7 @@ int handle_client_connect(struct state *state) {
 	client->fd = fd;
 	client->addr = sockaddr2str(&peer_addr, peer_addr_len);
 	cds_list_add(&client->node, &state->stats.clients);
+	CDS_INIT_LIST_HEAD(&client->active_requests);
 	state->stats.clients_connected++;
 
 	LOG_DEBUG("Got client connection from %s", client->addr);

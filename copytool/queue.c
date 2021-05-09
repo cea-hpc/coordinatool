@@ -21,9 +21,9 @@ static int tree_compare(const void *a, const void *b) {
 	return 1;
 }
 
-void queue_node_free(struct hsm_action_queues *queues,
-		     struct hsm_action_node *node) {
-	if (!tdelete(&node->hai.hai_cookie, &queues->actions_tree, tree_compare))
+void queue_node_free(struct hsm_action_node *node) {
+	if (!tdelete(&node->hai.hai_cookie, &node->queues->actions_tree,
+		     tree_compare))
 		abort();
 	free(node);
 }
@@ -76,9 +76,9 @@ struct hsm_action_item *hsm_action_search_queue(struct hsm_action_queues *queues
 	return caa_container_of(key, struct hsm_action_item, hai_cookie);
 }
 
-int hsm_action_requeue(struct hsm_action_queues *queues,
-		       struct hsm_action_node *node) {
+int hsm_action_requeue(struct hsm_action_node *node) {
 	struct cds_list_head *head;
+	struct hsm_action_queues *queues = node->queues;
 
 	switch (node->hai.hai_action) {
 	case HSMA_RESTORE:
@@ -91,7 +91,7 @@ int hsm_action_requeue(struct hsm_action_queues *queues,
 		head = &queues->waiting_remove;
 		break;
 	default:
-		queue_node_free(queues, node);
+		queue_node_free(node);
 		return -EINVAL;
 	}
 
@@ -126,6 +126,7 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		abort();
 	}
 	memcpy(&node->hai, hai, hai->hai_len);
+	node->queues = queues;
 
 	tree_key = tsearch(&node->hai.hai_cookie, &queues->actions_tree,
 			   tree_compare);
@@ -137,7 +138,7 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		return 0;
 	}
 
-	return hsm_action_requeue(queues, node);
+	return hsm_action_requeue(node);
 }
 
 struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
