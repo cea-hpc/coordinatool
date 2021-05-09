@@ -78,7 +78,7 @@ static size_t json_load_cb(void *buffer, size_t buflen, void *data) {
 	return buflen;
 }
 
-int protocol_read_command(int fd, protocol_read_cb *cbs, void *cb_arg) {
+int protocol_read_command(int fd, void *fd_arg, protocol_read_cb *cbs, void *cb_arg) {
 	json_t *request;
 	json_error_t json_error;
 	int rc = 0;
@@ -143,7 +143,7 @@ again:
 		LOG_ERROR(rc, "command %s not implemented", command_str);
 		goto out_freereq;
 	}
-	cbs[command](fd, request, cb_arg);
+	cbs[command](fd_arg, request, cb_arg);
 
 out_freereq:
 	json_decref(request);

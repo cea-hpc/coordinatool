@@ -21,7 +21,11 @@
 /* queue types */
 
 struct hsm_action_node {
+	/* list is used to track order of requests in waiting list,
+	 * or dump requests assigned to a client */
 	struct cds_list_head node;
+	/* if sent to a client, remember who for eventual cancel */
+	struct client *client;
 	/* hsm_action_item is variable length and MUST be last */
 	struct hsm_action_item hai;
 };
@@ -31,6 +35,7 @@ struct hsm_action_queues {
 	struct cds_list_head waiting_restore;
 	struct cds_list_head waiting_archive;
 	struct cds_list_head waiting_remove;
+	void *actions_tree;
 	char *fsname;
 	unsigned long long hal_flags;
 	unsigned int archive_id;
@@ -40,7 +45,7 @@ struct hsm_action_queues {
 struct client {
 	char *addr; /* for logs etc */
 	int fd;
-	struct cds_list_head clients_list_node;
+	struct cds_list_head node;
 	unsigned int current_restore;
 	unsigned int current_archive;
 	unsigned int current_remove;
@@ -111,10 +116,12 @@ int protocol_reply_queue(int fd, int enqueued, int status, char *error);
 int tcp_listen(struct state *state);
 char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
 int handle_client_connect(struct state *state);
+void free_client(struct state *state, struct client *client);
 
 /* queue */
 
-void queue_node_free(struct hsm_action_item *hai);
+void queue_node_free(struct hsm_action_queues *queues,
+		     struct hsm_action_item *hai);
 struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 						unsigned int archive_id,
 						unsigned long long flags,
@@ -127,7 +134,7 @@ struct hsm_action_item *hsm_action_dequeue(struct hsm_action_queues *queues,
 
 /* common */
 
-int epoll_addfd(int epoll_fd, int fd);
+int epoll_addfd(int epoll_fd, int fd, void *data);
 int epoll_delfd(int epoll_fd, int fd);
 
 #endif

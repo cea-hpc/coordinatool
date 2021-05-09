@@ -14,10 +14,11 @@
  *  callbacks *
  **************/
 
-static int status_cb(int fd, json_t *json UNUSED, void *arg) {
+static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg) {
+	struct client *client = fd_arg;
 	struct state *state = arg;
 
-	return protocol_reply_status(fd, &state->stats, 0, NULL);
+	return protocol_reply_status(client->fd, &state->stats, 0, NULL);
 }
 
 int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
@@ -57,7 +58,8 @@ out_freereply:
 }
 
 
-static int recv_cb(int fd, json_t *json, void *arg) {
+static int recv_cb(void *fd_arg, json_t *json, void *arg) {
+	struct client *client = fd_arg;
 	struct state *state = arg;
 	struct hsm_action_item *hai;
 	size_t bytes_left = protocol_getjson_int(json, "max_bytes", 1024*1024);
@@ -83,14 +85,14 @@ static int recv_cb(int fd, json_t *json, void *arg) {
 			if (bytes_left < sizeof(*hai) + hai->hai_len) {
 				/* did not fit, requeue - this also makes a new copy */
 				hsm_action_enqueue(&state->queues, hai);
-				queue_node_free(hai);
+				queue_node_free(&state->queues, hai);
 				break;
 			}
 			json_array_append_new(hai_list, json_hsm_action_item(hai));
 			enqueued_items++;
 			if (left_count[i] > 0)
 				left_count[i]--;
-			queue_node_free(hai);
+			queue_node_free(&state->queues, hai);
 		}
 	}
 
@@ -107,10 +109,11 @@ static int recv_cb(int fd, json_t *json, void *arg) {
 		    protocol_setjson(hal, "list", hai_list))
 			abort();
 		// frees hal
-		return protocol_reply_recv(fd, hal, 0, NULL);
+		return protocol_reply_recv(client->fd, hal, 0, NULL);
 	}
 	/* register as waiting client */
-	return protocol_reply_recv(fd, NULL, ENOTSUP, "Wait not implemented yet");
+	return protocol_reply_recv(client->fd, NULL, ENOTSUP,
+				   "Wait not implemented yet");
 }
 
 int protocol_reply_recv(int fd, json_t *hal, int status, char *error) {
@@ -163,14 +166,16 @@ static int queue_cb_enqueue(struct hsm_action_list *hal UNUSED,
 	return 0;
 }
 
-static int queue_cb(int fd, json_t *json, void *arg) {
+static int queue_cb(void *fd_arg, json_t *json, void *arg) {
+	struct client *client = fd_arg;
 	struct state *state = arg;
 	struct enqueue_state enqueue_state;
 	int rc;
 
 	json_t *json_hal = json_object_get(json, "hsm_action_list");
 	if (!json_hal)
-		return protocol_reply_queue(fd, 0, EINVAL, "No hsm_action_list set");
+		return protocol_reply_queue(client->fd, 0, EINVAL,
+					    "No hsm_action_list set");
 
 	enqueue_state.queues =
 		hsm_action_queues_get(state,
@@ -179,17 +184,19 @@ static int queue_cb(int fd, json_t *json, void *arg) {
 			protocol_getjson_int(json_hal, "hal_flags", 0),
 			protocol_getjson_str(json_hal, "hal_fsname", NULL, NULL));
 	if (!enqueue_state.queues)
-		return protocol_reply_queue(fd, 0, EINVAL, "No queue found");
+		return protocol_reply_queue(client->fd, 0, EINVAL,
+					    "No queue found");
 	enqueue_state.enqueued = 0;
 
 	rc = json_hsm_action_list_get(json_hal, &enqueue_state.hal,
 		sizeof(enqueue_state) - offsetof(struct enqueue_state, hal),
 		queue_cb_enqueue, &enqueue_state);
 	if (rc < 0)
-		return protocol_reply_queue(fd, enqueue_state.enqueued, rc,
+		return protocol_reply_queue(client->fd,
+				enqueue_state.enqueued, rc,
 				"Error while parsing hsm action list");
 
-	return protocol_reply_queue(fd, enqueue_state.enqueued, 0, NULL);
+	return protocol_reply_queue(client->fd, enqueue_state.enqueued, 0, NULL);
 }
 
 int protocol_reply_queue(int fd, int enqueued, int status, char *error) {

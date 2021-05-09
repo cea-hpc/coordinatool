@@ -8,12 +8,12 @@
 
 #include "coordinatool.h"
 
-int epoll_addfd(int epoll_fd, int fd) {
+int epoll_addfd(int epoll_fd, int fd, void *data) {
 	struct epoll_event ev;
 	int rc;
 
 	ev.events = EPOLLIN;
-	ev.data.fd = fd;
+	ev.data.ptr = data;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) < 0) {
 		rc = -errno;
 		LOG_ERROR(rc, "Could not add fd to epoll watches");
@@ -67,6 +67,7 @@ int main(int argc, char *argv[]) {
 		.port = "5123",
 		.queues.archive_id = ARCHIVE_ID_UNINIT,
 	};
+	CDS_INIT_LIST_HEAD(&state.stats.clients);
 
 	while ((rc = getopt_long(argc, argv, "vqA:H:p:",
 			         long_opts, NULL)) != -1) {

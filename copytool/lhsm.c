@@ -77,7 +77,7 @@ int ct_register(struct state *state) {
 		return state->hsm_fd;
 	}
 
-	rc = epoll_addfd(state->epoll_fd, state->hsm_fd);
+	rc = epoll_addfd(state->epoll_fd, state->hsm_fd, (void*)(uintptr_t)state->hsm_fd);
 	if (rc < 0) {
 		LOG_ERROR(rc, "could not add hsm fd to epoll");
 		return rc;
@@ -128,10 +128,10 @@ int ct_start(struct state *state) {
 			} else if (events[n].data.fd == state->listen_fd) {
 				handle_client_connect(state);
 			} else {
-				if (protocol_read_command(events[n].data.fd, protocol_cbs, state) < 0) {
-					LOG_INFO("Disconnecting %d\n", events[n].data.fd);
-					epoll_delfd(state->epoll_fd, events[n].data.fd);
-					state->stats.clients_connected--;
+				struct client *client = events[n].data.ptr;
+				if (protocol_read_command(client->fd, client,
+							  protocol_cbs, state) < 0) {
+					free_client(state, client);
 				}
 			}
 		}

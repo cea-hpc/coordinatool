@@ -1,15 +1,31 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <search.h>
+
 #include "coordinatool.h"
 
 void hsm_action_queues_init(struct hsm_action_queues *queues) {
 	CDS_INIT_LIST_HEAD(&queues->waiting_restore);
 	CDS_INIT_LIST_HEAD(&queues->waiting_archive);
 	CDS_INIT_LIST_HEAD(&queues->waiting_remove);
+	queues->actions_tree = NULL;
 }
 
-void queue_node_free(struct hsm_action_item *hai) {
+static int tree_compare(const void *a, const void *b) {
+	__u64 va = *(__u64*)a, vb = *(__u64*)b;
+
+	if (va < vb)
+		return -1;
+	else if (va == vb)
+		return 0;
+	return 1;
+}
+
+void queue_node_free(struct hsm_action_queues *queues,
+		     struct hsm_action_item *hai) {
 	struct hsm_action_node *node = caa_container_of(hai, struct hsm_action_node, hai);
+	if (!tdelete(&hai->hai_cookie, &queues->actions_tree, tree_compare))
+		abort();
 	free(node);
 }
 
@@ -46,28 +62,26 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 	return &state->queues;
 }
 
-struct hsm_action_item *hsm_action_search_queue(struct cds_list_head *head,
+struct hsm_action_item *hsm_action_search_queue(struct hsm_action_queues *queues,
 						unsigned long cookie,
 						bool pop) {
-	struct cds_list_head *n, *next;
-	struct hsm_action_node *node;
+	void *key;
+	if (pop)
+		key = tdelete(&cookie, &queues->actions_tree, tree_compare);
+	else
+		key = tfind(&cookie, &queues->actions_tree, tree_compare);
 
-	cds_list_for_each_safe(n, next, head) {
-		node = caa_container_of(n, struct hsm_action_node, node);
-		if (node->hai.hai_cookie != cookie)
-			continue;
-		if (pop) {
-			cds_list_del(n);
-		}
-		return &node->hai;
-	}
-	return NULL;
+	if (!key)
+		return NULL;
+
+	return caa_container_of(key, struct hsm_action_item, hai_cookie);
 }
 
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai) {
 	struct hsm_action_node *node;
 	struct cds_list_head *head;
+	__u64 **tree_key;
 
 	switch (hai->hai_action) {
 	case HSMA_RESTORE:
@@ -84,10 +98,6 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		return -EINVAL;
 	}
 
-	/* XXX try bloom filter first, or hash table? */
-	if (hsm_action_search_queue(head, hai->hai_cookie, false))
-		return 0;
-
 	node = malloc(sizeof(struct hsm_action_node) +
 		      hai->hai_len - sizeof(struct hsm_action_item));
 	if (!node) {
@@ -95,6 +105,15 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 	}
 	memcpy(&node->hai, hai, hai->hai_len);
 
+	tree_key = tsearch(&node->hai.hai_cookie, &queues->actions_tree,
+			   tree_compare);
+	if (!tree_key)
+		abort();
+	if (*tree_key != &node->hai.hai_cookie) {
+		/* duplicate */
+		free(node);
+		return 0;
+	}
 
 	/* are there clients waiting? */
 	// XXX

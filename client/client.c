@@ -79,7 +79,7 @@ int parse_hai_cb(struct hsm_action_item *hai, unsigned int archive_id,
 	if (json_array_size(active_requests->hai_list) >= 10000) {
 		struct state *state = containers_of(active_requests...)
 		protocol_request_queue(state->socket_fd, active_requests);
-		protocol_read_command(state->socket_fd, protocol_cbs, state);
+		protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
 	}
 #endif
 	return 0;
@@ -113,14 +113,14 @@ int client(struct state *state) {
 		/* takes ownership of hai_list */
 		protocol_request_queue(state->socket_fd,
 				       &state->active_requests);
-		protocol_read_command(state->socket_fd, protocol_cbs, state);
+		protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
 		return 0;
 	}
 
 	protocol_request_status(state->socket_fd);
 	protocol_request_recv(state->socket_fd, state);
-	protocol_read_command(state->socket_fd, protocol_cbs, state);
-	protocol_read_command(state->socket_fd, protocol_cbs, state);
+	protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
+	protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
 
 	return 0;
 }
