@@ -3,9 +3,9 @@
 #include "coordinatool.h"
 
 void hsm_action_queues_init(struct hsm_action_queues *queues) {
-	cds_wfcq_init(&queues->restore_head, &queues->restore_tail);
-	cds_wfcq_init(&queues->archive_head, &queues->archive_tail);
-	cds_wfcq_init(&queues->remove_head, &queues->remove_tail);
+	CDS_INIT_LIST_HEAD(&queues->waiting_restore);
+	CDS_INIT_LIST_HEAD(&queues->waiting_archive);
+	CDS_INIT_LIST_HEAD(&queues->waiting_remove);
 }
 
 void queue_node_free(struct hsm_action_item *hai) {
@@ -46,20 +46,19 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 	return &state->queues;
 }
 
-struct hsm_action_item *hsm_action_search_queue(struct cds_wfcq_head *head,
-						struct cds_wfcq_tail *tail,
+struct hsm_action_item *hsm_action_search_queue(struct cds_list_head *head,
 						unsigned long cookie,
 						bool pop) {
-	struct cds_wfcq_node *n, *next;
+	struct cds_list_head *n, *next;
 	struct hsm_action_node *node;
 
-	__cds_wfcq_for_each_blocking_safe(head, tail, n, next) {
+	cds_list_for_each_safe(n, next, head) {
 		node = caa_container_of(n, struct hsm_action_node, node);
 		if (node->hai.hai_cookie != cookie)
 			continue;
-		if (pop)
-			// somehow dequeue/delete?
-			return NULL;
+		if (pop) {
+			cds_list_del(n);
+		}
 		return &node->hai;
 	}
 	return NULL;
@@ -68,29 +67,25 @@ struct hsm_action_item *hsm_action_search_queue(struct cds_wfcq_head *head,
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai) {
 	struct hsm_action_node *node;
-	struct cds_wfcq_head *head;
-	struct cds_wfcq_tail *tail;
+	struct cds_list_head *head;
 
 	switch (hai->hai_action) {
 	case HSMA_RESTORE:
-		head = &queues->restore_head;
-		tail = &queues->restore_tail;
+		head = &queues->waiting_restore;
 		break;
 	case HSMA_ARCHIVE:
-		head = &queues->archive_head;
-		tail = &queues->archive_tail;
+		head = &queues->waiting_archive;
 		break;
 	case HSMA_REMOVE:
-		head = &queues->remove_head;
-		tail = &queues->remove_tail;
+		head = &queues->waiting_remove;
 		break;
 	default:
-		/* XXX HSMA_CANCEL: caller should try searching all queues */
+		/* XXX HSMA_CANCEL: caller should try searching all queues w/ pop and free */
 		return -EINVAL;
 	}
 
-	/* XXX try bloom filter first */
-	if (hsm_action_search_queue(head, tail, hai->hai_cookie, false))
+	/* XXX try bloom filter first, or hash table? */
+	if (hsm_action_search_queue(head, hai->hai_cookie, false))
 		return 0;
 
 	node = malloc(sizeof(struct hsm_action_node) +
@@ -98,33 +93,35 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 	if (!node) {
 		abort();
 	}
-	cds_wfcq_node_init(&node->node);
 	memcpy(&node->hai, hai, hai->hai_len);
 
 
 	/* are there clients waiting? */
 	// XXX
 	/* else enqueue */
-	cds_wfcq_enqueue(head, tail, &node->node);
+	cds_list_add_tail(&node->node, head);
 	return 1;
 }
 
 struct hsm_action_item *hsm_action_dequeue(struct hsm_action_queues *queues,
 					   enum hsm_copytool_action action) {
-	struct cds_wfcq_node *node;
+	struct cds_list_head *node = NULL;
 
 	switch (action) {
 	case HSMA_RESTORE:
-		node = __cds_wfcq_dequeue_nonblocking(&queues->restore_head,
-						    &queues->restore_tail);
+		if (cds_list_empty(&queues->waiting_restore))
+			return NULL;
+		node = queues->waiting_restore.next;
 		break;
 	case HSMA_ARCHIVE:
-		node = __cds_wfcq_dequeue_nonblocking(&queues->archive_head,
-						    &queues->archive_tail);
+		if (cds_list_empty(&queues->waiting_archive))
+			return NULL;
+		node = queues->waiting_archive.next;
 		break;
 	case HSMA_REMOVE:
-		node = __cds_wfcq_dequeue_nonblocking(&queues->remove_head,
-						    &queues->remove_tail);
+		if (cds_list_empty(&queues->waiting_remove))
+			return NULL;
+		node = queues->waiting_remove.next;
 		break;
 	default:
 		LOG_ERROR(-EINVAL, "requested to dequeue %s",
@@ -132,15 +129,6 @@ struct hsm_action_item *hsm_action_dequeue(struct hsm_action_queues *queues,
 		return NULL;
 	}
 
-	if (!node)
-		return NULL;
-	/* blocking case should never happen for us (single thread),
-	 * warn and return null */
-	if (node == CDS_WFCQ_WOULDBLOCK) {
-		LOG_INFO("dequeueing action %s would block, assuming empty",
-			 ct_action2str(action));
-		return NULL;
-	}
-
+	cds_list_del(node);
 	return &caa_container_of(node, struct hsm_action_node, node)->hai;
 }

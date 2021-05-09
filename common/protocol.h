@@ -72,19 +72,6 @@ int protocol_write(json_t *json, int fd, size_t flags);
  */
 int protocol_request_status(int fd);
 
-struct ct_stats {
-	unsigned int running_archive;
-	unsigned int running_restore;
-	unsigned int running_remove;
-	unsigned int pending_archive;
-	unsigned int pending_restore;
-	unsigned int pending_remove;
-	long unsigned int done_archive;
-	long unsigned int done_restore;
-	long unsigned int done_remove;
-	unsigned int clients_connected;
-};
-
 /**
  * - RECV command
  *   request properties:

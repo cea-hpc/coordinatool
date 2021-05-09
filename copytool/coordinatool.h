@@ -10,7 +10,8 @@
 #include <linux/lustre/lustre_idl.h>
 #include <lustre/lustreapi.h>
 #include <sys/socket.h>
-#include <urcu/wfcqueue.h>
+#include <urcu/compiler.h>
+#include <urcu/list.h>
 
 #include "logs.h"
 #include "protocol.h"
@@ -20,27 +21,49 @@
 /* queue types */
 
 struct hsm_action_node {
-	struct cds_wfcq_node node;
+	struct cds_list_head node;
 	/* hsm_action_item is variable length and MUST be last */
 	struct hsm_action_item hai;
 };
 
 #define ARCHIVE_ID_UNINIT ((unsigned int)-1)
 struct hsm_action_queues {
-	struct cds_wfcq_head restore_head;
-	struct cds_wfcq_tail restore_tail;
-	struct cds_wfcq_head archive_head;
-	struct cds_wfcq_tail archive_tail;
-	struct cds_wfcq_head remove_head;
-	struct cds_wfcq_tail remove_tail;
-	struct cds_wfcq_head running_head;
-	struct cds_wfcq_tail running_tail;
+	struct cds_list_head waiting_restore;
+	struct cds_list_head waiting_archive;
+	struct cds_list_head waiting_remove;
 	char *fsname;
 	unsigned long long hal_flags;
 	unsigned int archive_id;
 };
 
 /* common types */
+struct client {
+	char *addr; /* for logs etc */
+	int fd;
+	struct cds_list_head clients_list_node;
+	unsigned int current_restore;
+	unsigned int current_archive;
+	unsigned int current_remove;
+	bool waiting;
+	unsigned int max_restore;
+	unsigned int max_archive;
+	unsigned int max_remove;
+	struct cds_list_head active_requests;
+};
+
+struct ct_stats {
+	unsigned int running_restore;
+	unsigned int running_archive;
+	unsigned int running_remove;
+	unsigned int pending_restore;
+	unsigned int pending_archive;
+	unsigned int pending_remove;
+	long unsigned int done_restore;
+	long unsigned int done_archive;
+	long unsigned int done_remove;
+	unsigned int clients_connected;
+	struct cds_list_head clients;
+};
 
 struct state {
 	// options
