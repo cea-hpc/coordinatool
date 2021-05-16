@@ -124,6 +124,7 @@ int protocol_request_status(int fd);
  * - DONE command
  *   request properties:
  *     command = "done"
+ *     archive_id = integer (u32) for the cookies
  *     cookies = array of integers (u64), cookies from hsm action items
  *   reply properties:
  *     command = "done"

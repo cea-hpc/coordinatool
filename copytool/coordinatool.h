@@ -118,6 +118,7 @@ int protocol_reply_recv_single(struct client *client,
 			       struct hsm_action_node *han);
 int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
 			json_t *hal, int status, char *error);
+int protocol_reply_done(int fd, int status, char *error);
 int protocol_reply_queue(int fd, int enqueued, int status, char *error);
 
 
@@ -142,6 +143,9 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai);
 struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
 					   enum hsm_copytool_action action);
+struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
+                                                unsigned long cookie,
+                                                bool pop);
 
 /* common */
 

@@ -13,15 +13,49 @@ static int status_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 	return 0;
 }
 
-static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+static int recv_cb(void *fd_arg, json_t *json, void *arg UNUSED) {
+	int fd = *(int*)fd_arg;
 	printf("Got recv reply:\n");
+	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
+	printf("\n");
+
+	json_t *hal = json_object_get(json, "hsm_action_list");
+	if (!hal) {
+		printf("no hal\n");
+		return -EINVAL;
+	}
+	unsigned int archive_id =
+		protocol_getjson_int(hal, "hal_archive_id", 0);
+	json_t *hai_list = json_object_get(hal, "list");
+	if (!hai_list) {
+		printf("no hal->list\n");
+		return -EINVAL;
+	}
+	size_t i;
+	json_t *hai;
+	json_t *cookies = json_array();
+	if (!cookies)
+		abort();
+	json_array_foreach(hai_list, i, hai) {
+		json_t *cookie = json_object_get(hai, "hai_cookie");
+		if (!cookie) {
+			printf("cookie not set?\n");
+			return -EINVAL;
+		}
+		json_array_append(cookies, cookie);
+	}
+	return protocol_request_done(fd, archive_id, cookies);
+}
+
+static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+	printf("Got done reply:\n");
 	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
 	printf("\n");
 	return 0;
 }
 
 static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
-	printf("Got recv reply:\n");
+	printf("Got queue reply:\n");
 	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
 	printf("\n");
 	return 0;
@@ -30,6 +64,7 @@ static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 protocol_read_cb protocol_cbs[PROTOCOL_COMMANDS_MAX] = {
 	[STATUS] = status_cb,
 	[RECV] = recv_cb,
+	[DONE] = done_cb,
 	[QUEUE] = queue_cb,
 };
 
@@ -80,6 +115,31 @@ int protocol_request_recv(int fd, struct state *state) {
 	if (protocol_write(request, fd, 0)) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write recv request to %d", fd);
+		goto out_free;
+	}
+
+out_free:
+	json_decref(request);
+	return rc;
+}
+
+int protocol_request_done(int fd, unsigned int archive_id, json_t *cookies) {
+	json_t *request;
+	int rc = 0;
+
+	request = json_pack("{ss,si,so}",
+			    "command", "done",
+			    "archive_id", archive_id,
+			    "cookies", cookies);
+	if (!request) {
+		rc = -ENOMEM;
+		LOG_ERROR(rc, "Could not pack recv request");
+		return rc;
+	}
+	LOG_INFO("Sending done request to %d", fd);
+	if (protocol_write(request, fd, 0)) {
+		rc = -EIO;
+		LOG_ERROR(rc, "Could not write done request to %d", fd);
 		goto out_free;
 	}
 

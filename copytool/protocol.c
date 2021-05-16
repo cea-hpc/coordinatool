@@ -14,6 +14,11 @@
  *  callbacks *
  **************/
 
+
+/**
+ * STATUS
+ */
+
 static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
@@ -57,6 +62,10 @@ out_freereply:
 	return rc;
 }
 
+
+/**
+ * RECV
+ */
 
 static int recv_enqueue(struct client *client, json_t *hai_list,
 			struct hsm_action_node *han) {
@@ -213,6 +222,78 @@ out_freereply:
 }
 
 
+/**
+ * DONE
+ */
+static int done_cb(void *fd_arg, json_t *json, void *arg) {
+	struct client *client = fd_arg;
+	struct state *state = arg;
+
+	json_t *cookies = json_object_get(json, "cookies");
+	if (!cookies)
+		return protocol_reply_done(client->fd, EINVAL,
+					   "Nothing done?");
+	unsigned int archive_id =
+		protocol_getjson_int(json, "archive_id", ARCHIVE_ID_UNINIT);
+	if (archive_id == ARCHIVE_ID_UNINIT)
+		return protocol_reply_done(client->fd, EINVAL,
+					   "No or invalid archive_id");
+	struct hsm_action_queues *queues =
+		hsm_action_queues_get(state, archive_id, 0, NULL);
+	if (!queues)
+		return protocol_reply_done(client->fd, EINVAL,
+					   "Do not know archive id");
+
+	size_t i;
+	json_t *json_cookie;
+	json_array_foreach(cookies, i, json_cookie) {
+		json_int_t cookie = json_integer_value(json_cookie);
+		if (!cookie && !json_is_integer(json_cookie)) {
+			return protocol_reply_done(client->fd, EINVAL,
+						   "Cookie wasn't integer!");
+		}
+		struct hsm_action_node *han =
+			hsm_action_search_queue(queues, cookie, false);
+		if (!han)
+			return protocol_reply_done(client->fd, EINVAL,
+						   "Unknown cookie sent");
+		cds_list_del(&han->node);
+		queue_node_free(han);
+	}
+
+	return protocol_reply_done(client->fd, 0, NULL);
+}
+
+int protocol_reply_done(int fd, int status, char *error) {
+	json_t *reply;
+	int rc;
+
+	reply = json_object();
+	if (!reply)
+		abort();
+	if ((rc = protocol_setjson_str(reply, "command", "status")) ||
+	    (rc = protocol_setjson_int(reply, "status", status)) ||
+	    (rc = protocol_setjson_str(reply, "error", error)))
+		goto out_freereply;
+
+	if (protocol_write(reply, fd, 0) != 0) {
+		char *json_str = json_dumps(reply, 0);
+		rc = -EIO;
+		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		free(json_str);
+		goto out_freereply;
+	};
+
+out_freereply:
+	json_decref(reply);
+	return rc;
+}
+
+
+/**
+ * QUEUE
+ */
+
 struct enqueue_state {
 	int enqueued;
 	struct hsm_action_queues *queues;
@@ -297,5 +378,6 @@ out_freereply:
 protocol_read_cb protocol_cbs[PROTOCOL_COMMANDS_MAX] = {
 	[STATUS] = status_cb,
 	[RECV] = recv_cb,
+	[DONE] = done_cb,
 	[QUEUE] = queue_cb,
 };

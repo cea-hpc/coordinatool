@@ -119,8 +119,9 @@ int client(struct state *state) {
 
 	protocol_request_status(state->socket_fd);
 	protocol_request_recv(state->socket_fd, state);
-	protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
-	protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
+	protocol_read_command(state->socket_fd, &state->socket_fd, protocol_cbs, state);
+	protocol_read_command(state->socket_fd, &state->socket_fd, protocol_cbs, state);
+	protocol_read_command(state->socket_fd, &state->socket_fd, protocol_cbs, state);
 
 	return 0;
 }

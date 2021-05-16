@@ -46,6 +46,8 @@ extern protocol_read_cb protocol_cbs[];
  */
 int protocol_request_status(int fd);
 int protocol_request_recv(int fd, struct state *state);
+int protocol_request_done(int fd, unsigned int archive_id,
+			  json_t *cookies);
 int protocol_request_queue(int fd,
 			   struct active_requests_state *active_requests);
 

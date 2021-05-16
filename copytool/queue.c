@@ -30,52 +30,60 @@ void queue_node_free(struct hsm_action_node *node) {
 	free(node);
 }
 
-
 struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 						unsigned int archive_id,
 						unsigned long long flags,
 						const char *fsname) {
-	if (archive_id == ARCHIVE_ID_UNINIT || !fsname) {
-		LOG_ERROR(-EINVAL, "No archive_id or fsname received");
+	if (archive_id == ARCHIVE_ID_UNINIT) {
+		LOG_ERROR(-EINVAL, "No archive_id given");
 		return NULL;
 	}
 
 	if (state->queues.archive_id == ARCHIVE_ID_UNINIT) {
+		if (!fsname) {
+			LOG_ERROR(-EINVAL, "Tried to get queues for %d before it was set",
+				  archive_id);
+			return NULL;
+		}
 		// XXX we only support one archive_id, first one we sees
 		// determines what others should be.
 		state->queues.archive_id = archive_id;
 		state->queues.fsname = strdup(fsname);
 		state->queues.hal_flags = flags;
 	} else {
-		// XXX strcmp fsname?
 		if (state->queues.archive_id != archive_id) {
 			LOG_ERROR(-EINVAL, "received action list for archive id %d but already seen %d, ignoring these",
 				  archive_id, state->queues.archive_id);
 			return NULL;
 		}
-		if (state->queues.hal_flags != flags) {
-			LOG_ERROR(-EINVAL, "received action list with different flags (got %llx, expected %llx); keeping current flags anyway",
-				  flags, state->queues.hal_flags);
-			return NULL;
+		if (fsname) {
+			// XXX strcmp fsname?
+			if (state->queues.hal_flags != flags) {
+				LOG_ERROR(-EINVAL, "received action list with different flags (got %llx, expected %llx); keeping current flags anyway",
+					  flags, state->queues.hal_flags);
+				return NULL;
+			}
 		}
 	}
 
 	return &state->queues;
 }
 
-struct hsm_action_item *hsm_action_search_queue(struct hsm_action_queues *queues,
+struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
 						unsigned long cookie,
 						bool pop) {
-	void *key;
-	if (pop)
-		key = tdelete(&cookie, &queues->actions_tree, tree_compare);
-	else
-		key = tfind(&cookie, &queues->actions_tree, tree_compare);
+	void *key = tfind(&cookie, &queues->actions_tree, tree_compare);
 
 	if (!key)
 		return NULL;
 
-	return caa_container_of(key, struct hsm_action_item, hai_cookie);
+	key = *(void **)key;
+	if (pop)
+		tdelete(&cookie, &queues->actions_tree, tree_compare);
+
+	struct hsm_action_item *hai =
+		caa_container_of(key, struct hsm_action_item, hai_cookie);
+	return caa_container_of(hai, struct hsm_action_node, hai);
 }
 
 int hsm_action_requeue(struct hsm_action_node *node) {
