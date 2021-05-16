@@ -61,3 +61,13 @@ executable(
 	link_with: [common],
 	install: true,
 )
+
+library(
+	'coordinatool_client',
+	sources: files(
+		'preload/preload.c',
+	),
+	include_directories: include_directories('common'),
+	link_with: [common],
+	install: true,
+)
