@@ -99,7 +99,7 @@ int ct_start(struct state *state) {
 		return rc;
 	}
 
-	hsm_action_queues_init(&state->queues);
+	hsm_action_queues_init(state, &state->queues);
 
 	rc = tcp_listen(state);
 	if (rc < 0)

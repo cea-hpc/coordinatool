@@ -40,20 +40,23 @@ struct hsm_action_queues {
 	char *fsname;
 	unsigned long long hal_flags;
 	unsigned int archive_id;
+	struct state *state;
 };
 
 /* common types */
 struct client {
 	char *addr; /* for logs etc */
 	int fd;
-	struct cds_list_head node;
-	unsigned int current_restore;
-	unsigned int current_archive;
-	unsigned int current_remove;
+	struct cds_list_head node_clients;
+	struct cds_list_head node_waiting;
+	int current_restore;
+	int current_archive;
+	int current_remove;
 	bool waiting;
-	unsigned int max_restore;
-	unsigned int max_archive;
-	unsigned int max_remove;
+	int max_restore;
+	int max_archive;
+	int max_remove;
+	size_t max_bytes;
 	struct cds_list_head active_requests;
 };
 
@@ -84,6 +87,7 @@ struct state {
 	int hsm_fd;
 	int listen_fd;
 	struct hsm_action_queues queues;
+	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
 };
 
@@ -107,8 +111,13 @@ extern protocol_read_cb protocol_cbs[];
  * @param error nul-terminated error string, can be NULL
  * @return 0 on success, -errno on error
  */
-int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status, char *error);
-int protocol_reply_recv(int fd, json_t *hal, int status, char *error);
+int protocol_reply_status(int fd, struct ct_stats *ct_stats,
+			  int status, char *error);
+int protocol_reply_recv_single(struct client *client,
+			       struct hsm_action_queues *queues,
+			       struct hsm_action_node *han);
+int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
+			json_t *hal, int status, char *error);
 int protocol_reply_queue(int fd, int enqueued, int status, char *error);
 
 
@@ -126,7 +135,8 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 						unsigned int archive_id,
 						unsigned long long flags,
 						const char *fsname);
-void hsm_action_queues_init(struct hsm_action_queues *queues);
+void hsm_action_queues_init(struct state *state,
+			    struct hsm_action_queues *queues);
 int hsm_action_requeue(struct hsm_action_node *node);
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai);

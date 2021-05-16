@@ -4,11 +4,13 @@
 
 #include "coordinatool.h"
 
-void hsm_action_queues_init(struct hsm_action_queues *queues) {
+void hsm_action_queues_init(struct state *state,
+			    struct hsm_action_queues *queues) {
 	CDS_INIT_LIST_HEAD(&queues->waiting_restore);
 	CDS_INIT_LIST_HEAD(&queues->waiting_archive);
 	CDS_INIT_LIST_HEAD(&queues->waiting_remove);
 	queues->actions_tree = NULL;
+	queues->state = state;
 }
 
 static int tree_compare(const void *a, const void *b) {
@@ -95,9 +97,16 @@ int hsm_action_requeue(struct hsm_action_node *node) {
 		return -EINVAL;
 	}
 
-	/* are there clients waiting? */
-	// XXX
-	/* else enqueue */
+	struct cds_list_head *n;
+	cds_list_for_each(n, &queues->state->waiting_clients) {
+		struct client *client = caa_container_of(n, struct client,
+							 node_waiting);
+		if (protocol_reply_recv_single(client, queues, node) == 0) {
+			cds_list_del_init(n);
+			return 1;
+		}
+	}
+
 	cds_list_add_tail(&node->node, head);
 	return 1;
 }

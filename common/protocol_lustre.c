@@ -117,7 +117,6 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 	hal_len -= sizeof(*hal);
 
 	hal->hal_version = protocol_getjson_int(json, "hal_version", 0);
-	hal->hal_count = protocol_getjson_int(json, "hal_count", -1);
 	hal->hal_flags = protocol_getjson_int(json, "hal_flags", -1);
 	hal->hal_archive_id = protocol_getjson_int(json, "hal_archive_id", -1);
 	fsname = protocol_getjson_str(json, "hal_fsname", NULL, &fsname_len);
@@ -153,13 +152,7 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 			hai = hai_next(hai);
 		}
 	}
-
-	if (hal->hal_count != count) {
-		rc = -EINVAL;
-		LOG_ERROR(rc, "Expected %u items got %u in hsm action list",
-			  hal->hal_count, count);
-		return rc;
-	}
+	hal->hal_count = count;
 
 	return count;
 }

@@ -58,15 +58,73 @@ out_freereply:
 }
 
 
+static int recv_enqueue(struct client *client, json_t *hai_list,
+			struct hsm_action_node *han) {
+	int max_action;
+	int *current_count;
+
+	if (client->max_bytes < sizeof(han->hai) + han->hai.hai_len) {
+		return -ERANGE;
+	}
+	switch (han->hai.hai_action) {
+	case HSMA_RESTORE:
+		max_action = client->max_restore;
+		current_count = &client->current_restore;
+		break;
+	case HSMA_ARCHIVE:
+		max_action = client->max_archive;
+		current_count = &client->current_archive;
+		break;
+	case HSMA_REMOVE:
+		max_action = client->max_remove;
+		current_count = &client->current_remove;
+		break;
+	default:
+		return -EINVAL;
+	}
+	if (max_action >= 0 && max_action <= *current_count)
+		return -ERANGE;
+
+	json_array_append_new(hai_list, json_hsm_action_item(&han->hai));
+	han->client = client;
+	(*current_count)++;
+	cds_list_add(&han->node, &client->active_requests);
+
+	return 0;
+}
+
+int protocol_reply_recv_single(struct client *client,
+			       struct hsm_action_queues *queues,
+			       struct hsm_action_node *han) {
+	int rc;
+
+	json_t *hai_list = json_array();
+	if (!hai_list)
+		abort();
+
+	if ((rc = recv_enqueue(client, hai_list, han))) {
+		json_decref(hai_list);
+		return rc;
+	}
+
+	// frees hai_list
+	return protocol_reply_recv(client->fd, queues, hai_list, 0, NULL);
+}
+
 static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
 	struct hsm_action_node *han;
-	size_t bytes_left = protocol_getjson_int(json, "max_bytes", 1024*1024);
-	int restore_left = protocol_getjson_int(json, "max_restore", -1);
-	int archive_left = protocol_getjson_int(json, "max_archive", -1);
-	int remove_left = protocol_getjson_int(json, "max_remove", -1);
+	client->max_bytes = protocol_getjson_int(json, "max_bytes", 1024*1024);
+	client->max_restore = protocol_getjson_int(json, "max_restore", -1);
+	client->max_archive = protocol_getjson_int(json, "max_archive", -1);
+	client->max_remove = protocol_getjson_int(json, "max_remove", -1);
 	int enqueued_items = 0;
+
+	if (client->max_bytes < HAI_SIZE_MARGIN)
+		return protocol_reply_recv(client->fd, NULL, NULL, EINVAL,
+					   "Buffer too small");
+
 	json_t *hai_list = json_array();
 	if (!hai_list)
 		abort();
@@ -76,51 +134,40 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	enum hsm_copytool_action actions[] = {
 		HSMA_RESTORE, HSMA_REMOVE, HSMA_ARCHIVE,
 	};
-	int left_count[] = { restore_left, remove_left, archive_left };
-	unsigned int *client_current[] = { &client->current_restore,
+	int *max_action[] = { &client->max_restore, &client->max_remove,
+		&client->max_archive };
+	int *current_count[] = { &client->current_restore,
 		&client->current_remove, &client->current_archive };
 	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
-		while (bytes_left > HAI_SIZE_MARGIN && left_count[i] != 0) {
+		while (client->max_bytes > HAI_SIZE_MARGIN) {
+			if (*max_action[i] >= 0 &&
+			    *max_action[i] <= *current_count[i]) {
+				break;
+			}
 			han = hsm_action_dequeue(&state->queues, actions[i]);
 			if (!han)
 				break;
-			if (bytes_left < sizeof(han->hai) + han->hai.hai_len) {
+			if (recv_enqueue(client, hai_list, han)) {
 				/* did not fit, requeue - this also makes a new copy */
 				hsm_action_requeue(han);
 				break;
 			}
-			json_array_append_new(hai_list, json_hsm_action_item(&han->hai));
-			han->client = client;
-			(*client_current[i])++;
-			cds_list_add(&han->node, &client->active_requests);
 			enqueued_items++;
-			if (left_count[i] > 0)
-				left_count[i]--;
-
 		}
 	}
 
-	if (enqueued_items) {
-		json_t *hal = json_object();
-
-		/* XXX common fields are assumed to be the same for now */
-		if (!hal ||
-		    protocol_setjson_int(hal, "hal_version", HAL_VERSION) ||
-		    protocol_setjson_int(hal, "hal_count", enqueued_items) ||
-		    protocol_setjson_int(hal, "hal_archive_id", state->queues.archive_id) ||
-		    protocol_setjson_int(hal, "hal_flags", state->queues.hal_flags) ||
-		    protocol_setjson_str(hal, "hal_fsname", state->queues.fsname) ||
-		    protocol_setjson(hal, "list", hai_list))
-			abort();
-		// frees hal
-		return protocol_reply_recv(client->fd, hal, 0, NULL);
+	if (!enqueued_items) {
+		/* register as waiting client */
+		cds_list_add(&client->node_waiting, &state->waiting_clients);
+		return 0;
 	}
-	/* register as waiting client */
-	return protocol_reply_recv(client->fd, NULL, ENOTSUP,
-				   "Wait not implemented yet");
+
+	// frees hai_list
+	return protocol_reply_recv(client->fd, &state->queues, hai_list, 0, NULL);
 }
 
-int protocol_reply_recv(int fd, json_t *hal, int status, char *error) {
+int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
+			json_t *hai_list, int status, char *error) {
 	json_t *reply;
 	int rc;
 
@@ -128,8 +175,24 @@ int protocol_reply_recv(int fd, json_t *hal, int status, char *error) {
 	if (!reply)
 		abort();
 
-	if (hal && (rc = protocol_setjson(reply, "hsm_action_list", hal)))
-		goto out_freereply;
+	if (hai_list) {
+		if (!queues)
+			abort();
+
+		json_t *hal = json_object();
+
+		/* XXX common fields are assumed to be the same for now */
+		if (!hal ||
+		    protocol_setjson_int(hal, "hal_version", HAL_VERSION) ||
+		    protocol_setjson_int(hal, "hal_archive_id", queues->archive_id) ||
+		    protocol_setjson_int(hal, "hal_flags", queues->hal_flags) ||
+		    protocol_setjson_str(hal, "hal_fsname", queues->fsname) ||
+		    protocol_setjson(hal, "list", hai_list))
+			abort();
+
+		if (hal && (rc = protocol_setjson(reply, "hsm_action_list", hal)))
+			goto out_freereply;
+	}
 
 	if ((rc = protocol_setjson_str(reply, "command", "recv")) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
@@ -162,6 +225,7 @@ static int queue_cb_enqueue(struct hsm_action_list *hal UNUSED,
 	struct enqueue_state *enqueue_state = arg;
 	int rc;
 
+	// XXX get correct queues from hal
 	rc = hsm_action_enqueue(enqueue_state->queues, hai);
 	if (rc < 0)
 		return rc;

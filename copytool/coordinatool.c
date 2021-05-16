@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
 		.queues.archive_id = ARCHIVE_ID_UNINIT,
 	};
 	CDS_INIT_LIST_HEAD(&state.stats.clients);
+	CDS_INIT_LIST_HEAD(&state.waiting_clients);
 
 	while ((rc = getopt_long(argc, argv, "vqA:H:p:",
 			         long_opts, NULL)) != -1) {
