@@ -74,9 +74,6 @@
 #include <sys/types.h>
 #include <lustre/lustreapi.h>
 
-//# include <jansson.h>
-#include <resolv.h>
-
 #include <glib.h>
 
 
@@ -128,7 +125,6 @@ struct options {
 	char			*o_config;
 	char			*o_event_fifo;
 	char			*o_mnt;
-	char			*o_work;
 	int			 o_mnt_fd;
 };
 
@@ -220,7 +216,6 @@ static int ct_parseopts(int argc, char * const *argv)
 		{"update-interval", required_argument,	NULL,		   'u'},
 		{"update_interval", required_argument,	NULL,		   'u'},
 		{"verbose",	   no_argument,	      NULL,		   'v'},
-		{"work", required_argument, NULL, 2},
 		{0, 0, 0, 0}
 	};
 	int			 c;
@@ -272,9 +267,6 @@ static int ct_parseopts(int argc, char * const *argv)
 			break;
 		case 'v':
 			opt.o_verbose++;
-			break;
-		case 2:
-			opt.o_work = optarg;
 			break;
 		case 0:
 			break;
@@ -666,79 +658,11 @@ static void handler(int signal)
 	 * mtab entry remains. So this just makes mtab happier. */
 	llapi_hsm_copytool_unregister(&ctdata);
 
+	/* Also remove fifo upon signal as during normal/error exit */
+	if (opt.o_event_fifo != NULL)
+		llapi_hsm_unregister_event_fifo(opt.o_event_fifo);
 	_exit(1);
 }
-
-#define CT_PRIV_MAGIC 0xC0BE2001
-struct hsm_copytool_private {
-        int                              magic;
-        char                            *mnt;
-        struct kuc_hdr                  *kuch;
-        int                              mnt_fd;
-        int                              open_by_fid_fd;
-        struct lustre_kernelcomm        *kuc;
-};
-
-#define CP_PRIV_MAGIC 0x19880429
-struct hsm_copyaction_private {
-        __u32                                    magic;
-        __u32                                    source_fd;
-        __s32                                    data_fd;
-        const struct hsm_copytool_private       *ct_priv;
-        struct hsm_copy                          copy;
-        lstatx_t                                 statx;
-};
-#define OPEN_BY_FID_PATH ".lustre/fid"
-
-int fake_register(struct hsm_copytool_private **priv,
-		  const char *mnt, int archive_count,
-		  int *archives, int rfd_flags)
-{
-	int rc = 0;
-        struct hsm_copytool_private     *ct;
-
-
-        ct = calloc(1, sizeof(*ct));
-        if (ct == NULL)
-                return -ENOMEM;
-
-        ct->magic = CT_PRIV_MAGIC;
-        ct->mnt_fd = -1;
-        ct->open_by_fid_fd = -1;
-
-        ct->mnt = strdup(mnt);
-        if (ct->mnt == NULL) {
-                rc = -ENOMEM;
-                goto out_err;
-        }
-
-        ct->mnt_fd = open(ct->mnt, O_RDONLY);
-        if (ct->mnt_fd < 0) {
-                rc = -errno;
-                goto out_err;
-        }
-
-        ct->open_by_fid_fd = openat(ct->mnt_fd, OPEN_BY_FID_PATH, O_RDONLY);
-        if (ct->open_by_fid_fd < 0) {
-                rc = -errno;
-                goto out_err;
-        }
-
-	*priv = ct;
-	return 0;
-
-out_err:
-        if (!(ct->mnt_fd < 0))
-                close(ct->mnt_fd);
-
-        if (!(ct->open_by_fid_fd < 0))
-                close(ct->open_by_fid_fd);
-
-	free(ct->mnt);
-	free(ct);
-	return rc;
-}
-
 
 /* Daemon waits for messages from the kernel; run it in the background. */
 static int ct_run(void)
@@ -755,13 +679,18 @@ static int ct_run(void)
 		}
 	}
 
-	if (!opt.o_work)
-		rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt,
-						 opt.o_archive_cnt,
-						 opt.o_archive_id, 0);
-	else
-		rc = fake_register(&ctdata, opt.o_mnt, opt.o_archive_cnt, opt.o_archive_id, 0);
+	if (opt.o_event_fifo != NULL) {
+		rc = llapi_hsm_register_event_fifo(opt.o_event_fifo);
+		if (rc < 0) {
+			LOG_ERROR(rc, "failed to register event fifo");
+			return rc;
+		}
+		llapi_error_callback_set(llapi_hsm_log_error);
+	}
 
+	rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt,
+					 opt.o_archive_cnt,
+					 opt.o_archive_id, 0);
 	if (rc < 0) {
 		LOG_ERROR(rc, "cannot start copytool interface");
 		return rc;
@@ -782,7 +711,7 @@ static int ct_run(void)
 		return rc;
 	}
 
-	if (opt.o_work == NULL) while (1) {
+	while (1) {
 		struct hsm_action_list	*hal;
 		struct hsm_action_item	*hai;
 		int			 msgsize;
@@ -843,14 +772,7 @@ static int ct_run(void)
 			hd->hd_datalen = hai->hai_len;
 			memcpy(hd->hd_data, hai, hai->hai_len);
 
-			// g_async_queue_push(mqueue, hd);
-			char target[10240];
-			if (b64_ntop(hd, hd->hd_datalen + sizeof(*hd), target, sizeof(target)) < 0) {
-				LOG_ERROR(ERANGE, "could not encode to base64");
-				break;
-			}
-			printf("%s\n", target);
-
+			g_async_queue_push(mqueue, hd);
 			hai = hai_next(hai);
 		}
 
@@ -858,49 +780,12 @@ static int ct_run(void)
 			LOG_DEBUG("copytool aborting on error");
 			break;
 		}
-	} else {
-		struct hai_desc *hd;
-		struct hsm_action_item	*hai;
-		char buffer[10240];
-		if (b64_pton(opt.o_work, buffer, sizeof(buffer)) < 0) {
-			LOG_ERROR(EINVAL, "could not decode base64");
-			goto out;
-		}
-		hd = (struct hai_desc *)buffer;
-
-		if (hd->hd_datalen < sizeof(*hai)) {
-			LOG_ERROR(EPROTO, "Invalid record (ignoring)");
-			goto out;
-		}
-
-		hai = (struct hsm_action_item *)hd->hd_data;
-		switch (hai->hai_action) {
-		case HSMA_ARCHIVE:
-		case HSMA_RESTORE:
-		case HSMA_REMOVE:
-			{
-			GMainContext	*mctx;
-			GMainLoop	*loop;
-
-			mctx = g_main_context_new();
-			g_main_context_push_thread_default(mctx);
-
-			loop = g_main_loop_new(mctx, false);
-			ct_hsm_io_cmd(hai->hai_action, loop, hai, hd->hd_flags);
-			};
-			break;
-		case HSMA_CANCEL:
-			hai->hai_action = HSMA_RESTORE;
-			ct_fini(NULL, hai, 0, 0);
-			//LOG_ERROR(ENOTSUP, "Operation not implemented");
-			break;
-		}
 	}
-out:
 
 	stop = true;
-	if (!opt.o_work)
-		llapi_hsm_copytool_unregister(&ctdata);
+	llapi_hsm_copytool_unregister(&ctdata);
+	if (opt.o_event_fifo != NULL)
+		llapi_hsm_unregister_event_fifo(opt.o_event_fifo);
 
 	return rc;
 }
