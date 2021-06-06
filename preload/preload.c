@@ -1,6 +1,9 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
 #include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "protocol.h"
 #include "client_common.h"
@@ -9,10 +12,17 @@
 
 /* lustre has a magic check for these two -- keep the magic, but make
  * it different on purpose to make sure we don't mix calls.
+ * keep start of struct in sync with lustre's to use as is with llapi
+ * action helpers
  */
 #define CT_PRIV_MAGIC 0xC52C9B6F
 struct hsm_copytool_private {
         unsigned int magic;
+	char *mnt;
+        void *kuch;
+        int mnt_fd;
+        int open_by_fid_fd;
+        void *kuc;
 	struct cds_list_head actions;
         struct ct_state state;
 	struct hsm_action_list *hal;
@@ -21,40 +31,56 @@ struct hsm_copytool_private {
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-int llapi_hsm_register_event_fifo(const char *path) {
-	/* blatantly lie -- can be implemented later if required by
-	 * just copying lustre's, unfortunately we can't just get
-	 * llapi_hsm_event_fd out of it...
-	 * We'll also need llapi_hsm_log_error and
-	 * llapi_hsm_unregister_event_fifo at this point
-	 * (noop if this is skipped)
-	 */
-	return 0;
-}
-
-
 int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
                                 const char *mnt, int archive_count,
                                 int *archives, int rfd_flags) {
 	struct hsm_copytool_private *ct = calloc(sizeof(*ct), 1);
+	int rc = 0;
 	if (!ct)
 		return -ENOMEM;
 
 	ct->magic = CT_PRIV_MAGIC;
 	CDS_INIT_LIST_HEAD(&ct->actions);
+	ct->mnt_fd = ct->open_by_fid_fd = -1;
 
-	int rc = ct_connect(&ct->state, mnt, archive_count, archives,
-			    rfd_flags);
-	if (rc) {
-		free(ct);
-		return rc;
+	ct->mnt = strdup(mnt);
+	if (!ct->mnt) {
+		rc = -ENOMEM;
+		goto err_out;
 	}
+
+	ct->mnt_fd = open(mnt, O_RDONLY);
+	if (ct->mnt_fd < 0) {
+		rc = -errno;
+		goto err_out;
+	}
+
+	ct->open_by_fid_fd = openat(ct->mnt_fd, ".lustre/fid", O_RDONLY);
+	if (ct->open_by_fid_fd < 0) {
+		rc = -errno;
+		goto err_out;
+	}
+
+	rc = ct_connect(&ct->state, mnt, archive_count, archives,
+			rfd_flags);
+	if (rc)
+		goto err_out;
 
 	*priv = ct;
 	return 0;
+
+err_out:
+	if (ct->mnt_fd >= 0)
+		close(ct->mnt_fd);
+	if (ct->open_by_fid_fd)
+		close(ct->open_by_fid_fd);
+	free(ct->mnt);
+	free(ct);
+	return rc;
 }
 
 int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
+	int rc;
 	if (!priv)
 		return -EINVAL;
 
@@ -63,7 +89,12 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 		return -EINVAL;
 
 	free(ct->hal);
-	return ct_disconnect(&ct->state);
+	close(ct->mnt_fd);
+	close(ct->open_by_fid_fd);
+	free(ct->mnt);
+	rc = ct_disconnect(&ct->state);
+	free(ct);
+	return rc;
 }
 
 int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
