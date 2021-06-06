@@ -229,10 +229,10 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
 
-	json_t *cookies = json_object_get(json, "cookies");
-	if (!cookies)
+	uint64_t cookie = protocol_getjson_int(json, "cookie", 0);
+	if (!cookie)
 		return protocol_reply_done(client->fd, EINVAL,
-					   "Nothing done?");
+					   "Cookie not set?");
 	unsigned int archive_id =
 		protocol_getjson_int(json, "archive_id", ARCHIVE_ID_UNINIT);
 	if (archive_id == ARCHIVE_ID_UNINIT)
@@ -244,22 +244,13 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_done(client->fd, EINVAL,
 					   "Do not know archive id");
 
-	size_t i;
-	json_t *json_cookie;
-	json_array_foreach(cookies, i, json_cookie) {
-		json_int_t cookie = json_integer_value(json_cookie);
-		if (!cookie && !json_is_integer(json_cookie)) {
-			return protocol_reply_done(client->fd, EINVAL,
-						   "Cookie wasn't integer!");
-		}
-		struct hsm_action_node *han =
-			hsm_action_search_queue(queues, cookie, false);
-		if (!han)
-			return protocol_reply_done(client->fd, EINVAL,
-						   "Unknown cookie sent");
-		cds_list_del(&han->node);
-		queue_node_free(han);
-	}
+	struct hsm_action_node *han =
+		hsm_action_search_queue(queues, cookie, false);
+	if (!han)
+		return protocol_reply_done(client->fd, EINVAL,
+					   "Unknown cookie sent");
+	cds_list_del(&han->node);
+	queue_node_free(han);
 
 	return protocol_reply_done(client->fd, 0, NULL);
 }

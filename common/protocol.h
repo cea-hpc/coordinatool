@@ -66,13 +66,6 @@ int protocol_write(json_t *json, int fd, size_t flags);
  * CLIENT: { "command": "status" }
  * SERVER: { "command": "status", "pending_archive": 2, "running_restore": 3 }
  */
-/**
- * send status request
- *
- * @param fd socket to write on
- * @return 0 on success, -errno on error
- */
-int protocol_request_status(int fd);
 
 /**
  * - RECV command
@@ -124,8 +117,8 @@ int protocol_request_status(int fd);
  * - DONE command
  *   request properties:
  *     command = "done"
- *     archive_id = integer (u32) for the cookies
- *     cookies = array of integers (u64), cookies from hsm action items
+ *     archive_id = integer (u32), archive_id of the cookie
+ *     cookie = integers (u64), cookie of the hsm action items being acknowledged
  *   reply properties:
  *     command = "done"
  *     status = int (0 on success, errno on failure)

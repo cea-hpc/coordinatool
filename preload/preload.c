@@ -61,8 +61,11 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 		goto err_out;
 	}
 
-	rc = ct_connect(&ct->state, mnt, archive_count, archives,
-			rfd_flags);
+	rc = ct_config_init(&ct->state.config);
+	if (rc)
+		goto err_out;
+
+	rc = tcp_connect(&ct->state);
 	if (rc)
 		goto err_out;
 
@@ -80,7 +83,6 @@ err_out:
 }
 
 int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
-	int rc;
 	if (!priv)
 		return -EINVAL;
 
@@ -91,10 +93,10 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 	free(ct->hal);
 	close(ct->mnt_fd);
 	close(ct->open_by_fid_fd);
+	close(ct->state.socket_fd);
 	free(ct->mnt);
-	rc = ct_disconnect(&ct->state);
 	free(ct);
-	return rc;
+	return 0;
 }
 
 int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
@@ -104,14 +106,16 @@ int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 	if (!ct || ct->magic != CT_PRIV_MAGIC || !halh || !msgsize)
 		return -EINVAL;
 
-	rc = ct_request_recv(&ct->state);
+	rc = protocol_request_recv(&ct->state);
 	if (rc)
 		return rc;
 
 	ct->msgsize = -1;
-	rc = ct_read_command(&ct->state, copytool_cbs, ct, &ct->msgsize);
-	if (rc)
-		return rc;
+	while (ct->msgsize == -1) {
+		rc = protocol_read_command(ct->state.socket_fd, ct, copytool_cbs, NULL);
+		if (rc)
+			return rc;
+	}
 
 	*halh = ct->hal;
 	*msgsize = ct->msgsize;

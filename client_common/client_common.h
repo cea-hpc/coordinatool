@@ -6,24 +6,43 @@
 #include "protocol.h"
 
 struct ct_state {
-	int fd;
-	// config etc
-	// fsname
+	// opitons
+	struct ct_state_config {
+                const char *host;
+                const char *port;
+                uint32_t max_archive;
+                uint32_t max_restore;
+                uint32_t max_remove;
+                uint32_t hsm_action_list_size;
+                uint32_t archive_id;
+        } config;
+	// state values
+	int socket_fd;
+	char *fsname;
 	// locks etc..
 };
 
-int ct_connect(struct ct_state *state, const char *path, int archive_count,
-	       int *archives, int rfd_flags);
 
-int ct_disconnect(struct ct_state *state);
+/* client.c */
+int ct_config_init(struct ct_state_config *config);
 
-int ct_request_recv(struct ct_state *state);
-int ct_request_start(struct ct_state *state, unsigned long long cookie,
-		     int restore_mdt_index, int restore_open_flags, bool is_error);
-int ct_request_done(struct ct_state *state, unsigned long long cookie,
-		    const struct hsm_extent *he, int hp_flags, int errval);
+/* tcp.c */
+int tcp_connect(struct ct_state *state);
 
-/* wraps protocol_read_command but allow parallel polling */
-int ct_read_command(struct ct_state *state, void *cbs, void *arg, int *until);
+/* protocol.c */
+
+/**
+ * send status request
+ *
+ * @param fd socket to write on
+ * @return 0 on success, -errno on error
+ */
+int protocol_request_status(struct ct_state *state);
+int protocol_request_recv(struct ct_state *state);
+int protocol_request_done(struct ct_state *state, uint32_t archive_id,
+			  uint64_t cookie);
+int protocol_request_queue(struct ct_state *state,
+			   uint32_t archive_id, uint64_t flags,
+			   json_t *hai_list);
 
 #endif

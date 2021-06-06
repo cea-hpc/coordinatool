@@ -36,6 +36,8 @@ common = static_library(
 client_common = static_library(
 	'coordinatool_client_common',
 	files(
+		'client_common/client.c',
+		'client_common/tcp.c',
 		'client_common/protocol.c',
 	),
 	include_directories: include_directories('common'),
