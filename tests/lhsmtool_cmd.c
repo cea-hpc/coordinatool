@@ -641,7 +641,8 @@ out:
 	rc = ct_fini(&cb_args->hcp, hai, 0,
 		     cb_args ? cb_args->retcode : -ENOMEM);
 
-	close(cb_args->fd);
+	if (cb_args)
+		close(cb_args->fd);
 
 	free(cb_args);
 
