@@ -128,6 +128,11 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 			  hal->hal_version, HAL_VERSION);
 		return rc;
 	}
+	if (!fsname) {
+		rc = -EINVAL;
+		LOG_ERROR(rc, "no fsname");
+		return rc;
+	}
 	if (!json_list) {
 		rc = -EINVAL;
 		LOG_ERROR(rc, "no list?");
