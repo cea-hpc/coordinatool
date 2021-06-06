@@ -33,6 +33,15 @@ common = static_library(
 	dependencies: [lustre, jansson],
 )
 
+client_common = static_library(
+	'coordinatool_client_common',
+	files(
+		'client_common/protocol.c',
+	),
+	include_directories: include_directories('common'),
+	link_with: [common],
+)
+
 subdir('tests')
 
 
@@ -57,17 +66,18 @@ executable(
 		'client/protocol.c',
 		'client/client.c',
 	),
-	include_directories: include_directories('common'),
-	link_with: [common],
+	include_directories: include_directories(['common', 'client_common']),
+	link_with: [client_common],
 	install: true,
 )
 
 library(
 	'coordinatool_client',
 	sources: files(
+		'preload/protocol.c',
 		'preload/preload.c',
 	),
-	include_directories: include_directories('common'),
-	link_with: [common],
+	include_directories: include_directories(['common', 'client_common']),
+	link_with: [client_common],
 	install: true,
 )
