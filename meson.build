@@ -21,6 +21,7 @@ add_project_arguments(global_arguments, language: 'c')
 jansson = dependency('jansson')
 lustre = cc.find_library('lustreapi')
 urcu = dependency('liburcu')
+libdl = cc.find_library('dl')
 
 common = static_library(
 	'coordinatool_common',
@@ -81,5 +82,6 @@ library(
 	),
 	include_directories: include_directories(['common', 'client_common']),
 	link_with: [client_common],
+	dependencies: [libdl],
 	install: true,
 )

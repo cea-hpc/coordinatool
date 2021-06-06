@@ -262,7 +262,7 @@ int protocol_reply_done(int fd, int status, char *error) {
 	reply = json_object();
 	if (!reply)
 		abort();
-	if ((rc = protocol_setjson_str(reply, "command", "status")) ||
+	if ((rc = protocol_setjson_str(reply, "command", "done")) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
 	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;

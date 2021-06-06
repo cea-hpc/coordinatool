@@ -2,7 +2,7 @@
 
 #include "client_common.h"
 
-int protocol_request_status(struct ct_state *state) {
+int protocol_request_status(const struct ct_state *state) {
 	json_t *request;
 	int rc = 0;
 
@@ -25,7 +25,7 @@ out_free:
 	return rc;
 }
 
-int protocol_request_recv(struct ct_state *state) {
+int protocol_request_recv(const struct ct_state *state) {
 	json_t *request;
 	int rc = 0;
 
@@ -53,15 +53,16 @@ out_free:
 	return rc;
 }
 
-int protocol_request_done(struct ct_state *state, uint32_t archive_id,
-			  uint64_t cookie) {
+int protocol_request_done(const struct ct_state *state, uint32_t archive_id,
+			  uint64_t cookie, int status) {
 	json_t *request;
 	int rc = 0;
 
-	request = json_pack("{ss,si,si}",
+	request = json_pack("{ss,si,si,si}",
 			    "command", "done",
 			    "archive_id", archive_id,
-			    "cookie", cookie);
+			    "cookie", cookie,
+			    "status", status);
 	if (!request) {
 		rc = -ENOMEM;
 		LOG_ERROR(rc, "Could not pack recv request");
@@ -79,7 +80,7 @@ out_free:
 	return rc;
 }
 
-int protocol_request_queue(struct ct_state *state,
+int protocol_request_queue(const struct ct_state *state,
 			   uint32_t archive_id, uint64_t flags,
 			   json_t *hai_list) {
 	int rc;

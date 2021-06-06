@@ -5,7 +5,46 @@
 
 #include <urcu/list.h>
 #include "protocol.h"
+#include "client_common.h"
+#include "utils.h"
 
+/* preload.c */
+/* lustre has a magic check for these two -- keep the magic, but make
+ * it different on purpose to make sure we don't mix calls.
+ * keep start of struct in sync with lustre's to use as is with llapi
+ * action helpers
+ */
+#define CT_PRIV_MAGIC 0xC52C9B6F
+struct hsm_copytool_private {
+        unsigned int magic;
+	char *mnt;
+        void *kuch;
+        int mnt_fd;
+        int open_by_fid_fd;
+        void *kuc;
+	struct cds_list_head actions;
+        struct ct_state state;
+	struct hsm_action_list *hal;
+	int msgsize;
+};
+
+/* this one is used as is by llapi so keep the same magic,
+ * but happend our cookie at the end for ourselves
+ */
+#define CP_PRIV_MAGIC 0x19880429
+struct hsm_copyaction_private {
+	__u32 magic;
+	__u32 source_fd;
+	__s32 data_fd;
+	const struct hsm_copytool_private *ct_priv;
+	struct hsm_copy copy;
+	lstatx_t statx;
+	uint32_t archive_id;
+	uint64_t cookie;
+};
+
+
+/* protocol.c */
 extern protocol_read_cb copytool_cbs[];
 
 #endif

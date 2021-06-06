@@ -36,7 +36,7 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 			printf("cookie not set?\n");
 			return -EINVAL;
 		}
-		rc = protocol_request_done(state, archive_id, cookie);
+		rc = protocol_request_done(state, archive_id, cookie, 0);
 		if (rc)
 			return rc;
 	}

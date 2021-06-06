@@ -1,39 +1,19 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "protocol.h"
-#include "client_common.h"
 #include "preload.h"
 
-
-/* lustre has a magic check for these two -- keep the magic, but make
- * it different on purpose to make sure we don't mix calls.
- * keep start of struct in sync with lustre's to use as is with llapi
- * action helpers
- */
-#define CT_PRIV_MAGIC 0xC52C9B6F
-struct hsm_copytool_private {
-        unsigned int magic;
-	char *mnt;
-        void *kuch;
-        int mnt_fd;
-        int open_by_fid_fd;
-        void *kuc;
-	struct cds_list_head actions;
-        struct ct_state state;
-	struct hsm_action_list *hal;
-	int msgsize;
-};
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
-                                const char *mnt, int archive_count,
-                                int *archives, int rfd_flags) {
+				const char *mnt, int archive_count,
+				int *archives, int rfd_flags) {
 	struct hsm_copytool_private *ct = calloc(sizeof(*ct), 1);
 	int rc = 0;
 	if (!ct)
@@ -65,6 +45,12 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	if (rc)
 		goto err_out;
 
+	ct->hal = malloc(ct->state.config.hsm_action_list_size);
+	if (!ct->hal) {
+		rc = -ENOMEM;
+		goto err_out;
+	}
+
 	rc = tcp_connect(&ct->state);
 	if (rc)
 		goto err_out;
@@ -73,6 +59,7 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	return 0;
 
 err_out:
+	free(ct->hal);
 	if (ct->mnt_fd >= 0)
 		close(ct->mnt_fd);
 	if (ct->open_by_fid_fd)
@@ -100,7 +87,7 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 }
 
 int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
-                            struct hsm_action_list **halh, int *msgsize) {
+			    struct hsm_action_list **halh, int *msgsize) {
 	int rc;
 
 	if (!ct || ct->magic != CT_PRIV_MAGIC || !halh || !msgsize)
@@ -112,12 +99,80 @@ int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 
 	ct->msgsize = -1;
 	while (ct->msgsize == -1) {
-		rc = protocol_read_command(ct->state.socket_fd, ct, copytool_cbs, NULL);
-		if (rc)
+		rc = protocol_read_command(ct->state.socket_fd, NULL, copytool_cbs, ct);
+		if (rc) {
+			// XXX reconnect or wait or retry anyway
+			// nothing should be fatal (clients can't handle it well)
 			return rc;
+		}
 	}
 
 	*halh = ct->hal;
 	*msgsize = ct->msgsize;
 	return 0;
+}
+
+int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
+			   const struct hsm_copytool_private *ct,
+			   const struct hsm_action_item *hai,
+			   int restore_mdt_index, int restore_open_flags,
+			   bool is_error) {
+	static int (*real_action_begin)(struct hsm_copyaction_private **, 
+					 const struct hsm_copytool_private *,
+					 const struct hsm_action_item *,
+					 int, int, bool);
+	if (!real_action_begin) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+		real_action_begin = dlsym(RTLD_NEXT, "llapi_hsm_action_begin");
+#pragma GCC diagnostic pop
+		if (!real_action_begin)
+			return -EIO;
+	}
+	int rc = real_action_begin(phcp, ct, hai, restore_mdt_index,
+				   restore_open_flags, is_error);
+
+	if (rc == 0) {
+		struct hsm_copyaction_private *hcp;
+		hcp = realloc(*phcp, sizeof(*hcp));
+		if (!hcp)
+			abort();
+		/* XXX archive_id */
+		hcp->archive_id = ct->state.config.archive_id;
+		hcp->cookie = hai->hai_cookie;
+		*phcp = hcp;
+	}
+	return rc;
+}
+
+ 
+int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
+			 const struct hsm_extent *he, int hp_flags,
+			 int errval) {
+	static int (*real_action_end)(struct hsm_copyaction_private **, 
+				       const struct hsm_extent *, int, int);
+	if (!real_action_end) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+		real_action_end = dlsym(RTLD_NEXT, "llapi_hsm_action_end");
+#pragma GCC diagnostic pop
+		if (!real_action_end)
+			return -EIO;
+	}
+
+	if (!phcp)
+		return -EINVAL;
+
+	struct hsm_copyaction_private *hcp = *phcp;
+	const struct hsm_copytool_private *ct = hcp->ct_priv;
+	uint32_t archive_id = hcp->archive_id;
+	uint64_t cookie = hcp->cookie;
+	int rc, rc_done;
+
+	rc = real_action_end(phcp, he, hp_flags, errval);
+	
+	rc_done = protocol_request_done(&ct->state, archive_id,
+					cookie, rc);
+
+	return rc || rc_done;
 }

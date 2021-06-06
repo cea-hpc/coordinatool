@@ -37,11 +37,11 @@ int tcp_connect(struct ct_state *state);
  * @param fd socket to write on
  * @return 0 on success, -errno on error
  */
-int protocol_request_status(struct ct_state *state);
-int protocol_request_recv(struct ct_state *state);
-int protocol_request_done(struct ct_state *state, uint32_t archive_id,
-			  uint64_t cookie);
-int protocol_request_queue(struct ct_state *state,
+int protocol_request_status(const struct ct_state *state);
+int protocol_request_recv(const struct ct_state *state);
+int protocol_request_done(const struct ct_state *state, uint32_t archive_id,
+			  uint64_t cookie, int status);
+int protocol_request_queue(const struct ct_state *state,
 			   uint32_t archive_id, uint64_t flags,
 			   json_t *hai_list);
 

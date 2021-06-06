@@ -154,5 +154,5 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 	}
 	hal->hal_count = count;
 
-	return count;
+	return (uintptr_t)hai - (uintptr_t)hal;
 }
