@@ -13,7 +13,7 @@ cc = meson.get_compiler('c')
 
 global_arguments = cc.get_supported_arguments([
 		'-D_GNU_SOURCE',
-		'-Wno-gnu-zero-variadic-macro-arguments',
+		'-Wno-pedantic',
 		'-Wno-unknown-pragmas',
 	])
 
