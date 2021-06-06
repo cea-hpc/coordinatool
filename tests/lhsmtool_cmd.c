@@ -150,15 +150,6 @@ static int err_major;
 static char cmd_name[PATH_MAX];
 static char fs_name[MAX_OBD_NAME + 1];
 
-struct hsm_copytool_private {
-        int                              magic;
-        char                            *mnt;
-        struct kuc_hdr                  *kuch;
-        int                              mnt_fd;
-        int                              open_by_fid_fd;
-        struct lustre_kernelcomm        *kuc;
-};
-
 static struct hsm_copytool_private *ctdata;
 
 static GAsyncQueue	*mqueue;
@@ -302,7 +293,6 @@ static int ct_path_lustre(char *buf, int sz, const char *mnt,
 	return snprintf(buf, sz, "%s/%s/fid/"DFID_NOBRACE, mnt,
 			dot_lustre_name, PFID(fid));
 }
-
 
 static int ct_begin_restore(struct hsm_copyaction_private **phcp,
 			    const struct hsm_action_item *hai,
@@ -704,20 +694,6 @@ static int ct_run(void)
 	if (rc < 0) {
 		LOG_ERROR(rc, "cannot start copytool interface");
 		return rc;
-	}
-	close(ctdata->mnt_fd);
-	close(ctdata->open_by_fid_fd);
-	free(ctdata->mnt);
-	ctdata->mnt = strdup("/mnt/lustre2");
-	ctdata->mnt_fd = open("/mnt/lustre2", O_RDONLY);
-	if (ctdata->mnt_fd < 0) {
-		LOG_ERROR(errno, "reopen failed");
-		return -errno;
-	}
-	ctdata->open_by_fid_fd = open("/mnt/lustre2/.lustre/fid", O_RDONLY);
-	if (ctdata->open_by_fid_fd < 0) {
-		LOG_ERROR(errno, "reopen2 failed");
-		return -errno;
 	}
 
 	memset (&act, 0, sizeof(act));
