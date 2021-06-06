@@ -19,15 +19,6 @@ struct hsm_copytool_private {
 	int msgsize;
 };
 
-#define CP_PRIV_MAGIC 0x3DA10D41
-struct hsm_copyaction_private {
-        unsigned int magic;
-	struct hsm_copytool_private *ct;
-	unsigned long long cookie;
-	int fd;
-	struct cds_list_head list;
-};
-
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 int llapi_hsm_register_event_fifo(const char *path) {
@@ -94,66 +85,4 @@ int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 	*halh = ct->hal;
 	*msgsize = ct->msgsize;
 	return 0;
-}
-
-int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
-                           const struct hsm_copytool_private *const_ct,
-                           const struct hsm_action_item *hai,
-                           int restore_mdt_index, int restore_open_flags,
-                           bool is_error) {
-        struct hsm_copytool_private *ct = (struct hsm_copytool_private *)const_ct;
-	int rc;
-
-	if (!ct || ct->magic != CT_PRIV_MAGIC || !hai)
-		return -EINVAL;
-
-	struct hsm_copyaction_private *hcp = calloc(sizeof(*hcp), 1);
-	hcp->magic = CP_PRIV_MAGIC;
-	hcp->ct = ct;
-	hcp->cookie = hai->hai_cookie;
-
-	cds_list_add(&hcp->list, &ct->actions);
-	rc = ct_request_start(&ct->state, hcp->cookie, restore_mdt_index,
-			      restore_open_flags, is_error);
-	if (rc)
-		goto err;
-
-	rc = ct_read_command(&ct->state, copytool_cbs, ct, &hcp->fd);
-	if (rc)
-		goto err;
-	if (hcp->fd < 0) {
-		rc = hcp->fd;
-		goto err;
-	}
-
-	return 0;
-err:
-	free(hcp);
-	return rc;
-}
-
-int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
-                         const struct hsm_extent *he, int hp_flags, int errval) {
-	if (!phcp)
-		return -EINVAL;
-	struct hsm_copyaction_private *hcp = *phcp;
-	if (!hcp || hcp->magic != CP_PRIV_MAGIC)
-		return -EINVAL;
-
-	return ct_request_done(&hcp->ct->state, hcp->cookie,
-			       he, hp_flags, errval);
-}
-
-int llapi_hsm_action_progress(struct hsm_copyaction_private *hcp,
-                              const struct hsm_extent *he, __u64 total,
-                              int hp_flags) {
-	/* lie here too -- XXX later */
-	return 0;
-}
-
-int llapi_hsm_action_get_fd(const struct hsm_copyaction_private *hcp) {
-	if (!hcp || hcp->magic != CP_PRIV_MAGIC)
-		return -EINVAL;
-
-	return hcp->fd;
 }
