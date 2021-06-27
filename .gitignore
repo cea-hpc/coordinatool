@@ -2,3 +2,4 @@ build*
 *.swo
 *.swp
 cscope.*
+*.tar.xz
