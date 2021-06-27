@@ -75,7 +75,8 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
 	}
 
 	char *addrstring;
-	asprintf(&addrstring, "%s:%s", host, service);
+	if (asprintf(&addrstring, "%s:%s", host, service) < 0)
+		return NULL;
 
 	return addrstring;
 }
