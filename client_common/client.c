@@ -115,18 +115,18 @@ static int getenv_verbose(const char *name, int *val) {
 }
 
 
-static int config_parse(const char *confpath, struct ct_state_config *config, int fail_enoent) {
+static int config_parse(struct ct_state_config *config, int fail_enoent) {
 	int rc = 0;
-	FILE *conffile = fopen(confpath, "r");
+	FILE *conffile = fopen(config->confpath, "r");
 	if (!conffile) {
 		if (errno == ENOENT && !fail_enoent) {
 			LOG_INFO("Config file %s not found, skipping",
-				 confpath);
+				 config->confpath);
 			return 0;
 		}
 		rc = -errno;
 		LOG_ERROR(rc, "Could not open config file %s, aborting",
-			  confpath);
+			  config->confpath);
 		return rc;
 	}
 
@@ -160,7 +160,7 @@ static int config_parse(const char *confpath, struct ct_state_config *config, in
 		if (i >= n - 1) {
 			rc = -EINVAL;
 			LOG_ERROR(rc, "%s in %s (line %zd) not in 'key value' format",
-				  line, confpath, linenum);
+				  line, config->confpath, linenum);
 			goto out;
 		}
 		key[i] = 0;
@@ -173,7 +173,7 @@ static int config_parse(const char *confpath, struct ct_state_config *config, in
 		if (n == 0) {
 			rc = -EINVAL;
 			LOG_ERROR(rc, "%s in %s (line %zd) not in 'key value' format",
-				  line, confpath, linenum);
+				  line, config->confpath, linenum);
 			goto out;
 		}
 
@@ -270,7 +270,7 @@ static int config_parse(const char *confpath, struct ct_state_config *config, in
 
 		rc = -EINVAL;
 		LOG_ERROR(rc, "unknown key %s in %s (line %zd)",
-			  key, confpath, linenum);
+			  key, config->confpath, linenum);
 		goto out;
 
 	}
@@ -285,7 +285,6 @@ out:
 
 
 int ct_config_init(struct ct_state_config *config) {
-	const char *confpath = "/etc/coordinatool.conf";
 	int rc;
 	
 	/* first set defaults */
@@ -305,8 +304,12 @@ int ct_config_init(struct ct_state_config *config) {
 		return rc;
 
 	/* then parse config */
-	int fail_enoent = getenv_str("COORDINATOOL_CONF", &confpath);
-	rc = config_parse(confpath, config, fail_enoent);
+	int fail_enoent = false;
+	if (!config->confpath) {
+		config->confpath = "/etc/coordinatool.conf";
+		fail_enoent = getenv_str("COORDINATOOL_CONF", &config->confpath);
+	}
+	rc = config_parse(config, fail_enoent);
 	if (rc)
 		return rc;
 

@@ -122,6 +122,13 @@ int main(int argc, char *argv[]) {
 		.mode = MODE_STATUS,
 		.iters = 1,
 	};
+
+	/* slight hack: if first arg is --config use it to overwrite
+	 * conf file... This is mostly for fuzzing parser
+	 */
+	if (argc > 2 && !strcmp(argv[1], "--config"))
+		client.state.config.confpath = argv[2];
+
 	rc = ct_config_init(&client.state.config);
 	if (rc) {
 		LOG_ERROR(rc, "Could not init config");
