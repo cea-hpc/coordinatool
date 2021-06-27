@@ -97,7 +97,6 @@ int main(int argc, char *argv[]) {
 	int rc;
 
 	// default options
-	int verbose = LLAPI_MSG_INFO;
 	struct client client = { 0 };
 	rc = ct_config_init(&client.state.config);
 	if (rc) {
@@ -109,10 +108,12 @@ int main(int argc, char *argv[]) {
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
 		case 'v':
-			verbose++;
+			client.state.config.verbose++;
+			llapi_msg_set_level(client.state.config.verbose);
 			break;
 		case 'q':
-			verbose--;
+			client.state.config.verbose--;
+			llapi_msg_set_level(client.state.config.verbose);
 			break;
 		case 'H':
 			client.state.config.host = optarg;
@@ -132,7 +133,6 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	llapi_msg_set_level(verbose);
 
 	rc = client_run(&client);
 	if (rc)
