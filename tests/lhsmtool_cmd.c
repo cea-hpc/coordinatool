@@ -587,11 +587,11 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 	cb_args->fd = llapi_hsm_action_get_fd(cb_args->hcp);
 
 	rc = ct_build_cmd(hsma, &cmd, hai, cb_args->fd);
-	LOG_DEBUG("Running %s command: '%s'", hsma_name, cmd);
 	if (opt.o_dry_run || rc == -ENOSYS) {
 		err_major++;
 		goto out;
 	}
+	LOG_DEBUG("Running %s command: '%s'", hsma_name, cmd);
 
 	ok = g_shell_parse_argv(cmd, &ac, &av, &err);
 	if (!ok) {
@@ -641,7 +641,7 @@ out:
 	rc = ct_fini(&cb_args->hcp, hai, 0,
 		     cb_args ? cb_args->retcode : -ENOMEM);
 
-	if (cb_args)
+	if (cb_args && cb_args->fd >= 0)
 		close(cb_args->fd);
 
 	free(cb_args);
