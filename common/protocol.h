@@ -80,6 +80,7 @@ int protocol_write(json_t *json, int fd, size_t flags);
  *         buffer for kuc in lustre code)
  *     archive_id = integer (u32)
  *      ^ defaults to any if unset or 0
+ *     XXX fsname
  *   reply properties:
  *     command = "recv"
  *     status = int (0 on success, errno on failure)
