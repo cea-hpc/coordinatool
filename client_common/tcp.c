@@ -18,7 +18,7 @@ int tcp_connect(struct ct_state *state) {
 	s = getaddrinfo(state->config.host, state->config.port, &hints, &result);
 	if (s != 0) {
 		/* getaddrinfo does not use errno, cheat with debug */
-		LOG_DEBUG("ERROR getaddrinfo: %s", gai_strerror(s));
+		LOG_ERROR(-EIO, "getaddrinfo: %s", gai_strerror(s));
 		return -EIO;
 	}
 
@@ -33,6 +33,7 @@ int tcp_connect(struct ct_state *state) {
 
 		close(sfd);
 	}
+	freeaddrinfo(result);
 
 	if (rp == NULL) {
 		rc = -errno;
@@ -40,7 +41,6 @@ int tcp_connect(struct ct_state *state) {
 		return rc;
 	}
 
-	freeaddrinfo(result);
 	state->socket_fd = sfd;
 
 	return 0;

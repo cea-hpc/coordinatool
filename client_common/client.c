@@ -10,6 +10,7 @@ static int getenv_str(const char *name, const char **val) {
 	if (!env)
 		return 0;
 	*val = env;
+	LOG_INFO("env setting %s to %s\n", name, env);
 	return 1;
 }
 
@@ -25,23 +26,26 @@ static long long str_suffix_to_u32(const char *str, const char *error_hint) {
 	case 0:
 		
 		break;
+	case 'g':
 	case 'G':
 		multiplier *= 1024;
 		// fallthrough
+	case 'm':
 	case 'M':
 		multiplier *= 1024;
 		// fallthrough
+	case 'k':
 	case 'K':
 		multiplier *= 1024;
 		if (endptr[1] != 0) {
-			LOG_ERROR(-EINVAL, "trailing data after size prefix: %s, continuing anyway",
+			LOG_WARN("trailing data after size prefix: %s, continuing anyway",
 				  endptr + 1);
 		}
 		break;
 	default:
-		LOG_ERROR(-EINVAL, "%s was set to %s, which has trailing %s -- ignoring",
+		LOG_ERROR(-EINVAL, "%s was set to %s, which has trailing %s",
 			  error_hint, str, endptr);
-		return -1;
+		return -EINVAL;
 	}
 
 	/* allow -1 as max */
@@ -49,21 +53,25 @@ static long long str_suffix_to_u32(const char *str, const char *error_hint) {
 		return UINT32_MAX;
 
 	if (val > UINT32_MAX / multiplier || val < 0) {
-		LOG_ERROR(-EINVAL, "%s was set to %s, which would overflow -- ignoring",
+		LOG_ERROR(-EINVAL, "%s was set to %s, which would overflow",
 			  error_hint, str);
-		return -1;
+		return -EINVAL;
 	}
 	return val * multiplier;
 }
 
-static void getenv_u32(const char *name, uint32_t *val) {
+static int getenv_u32(const char *name, uint32_t *val) {
 	const char *env = getenv(name);
 	if (!env)
-		return;
+		return 0;
 	
 	long long envval = str_suffix_to_u32(env, name);
-	if (envval >= 0)
-		*val = envval;
+	if (envval < 0)
+		return envval;
+
+	*val = envval;
+	LOG_INFO("env setting %s to %u\n", name, *val);
+	return 1;
 }
 
 static int str_to_verbose(const char *str) {
@@ -92,14 +100,18 @@ static int str_to_verbose(const char *str) {
 	return -1;
 }
 
-static void getenv_verbose(const char *name, int *val) {
+static int getenv_verbose(const char *name, int *val) {
 	const char *env = getenv(name);
 	if (!env)
-		return;
+		return 0;
 
 	int verbose = str_to_verbose(env);
-	if (verbose >= 0)
-		*val = verbose;
+	if (verbose < 0)
+		return verbose;
+
+	*val = verbose;
+	llapi_msg_set_level(verbose);
+	return 1;
 }
 
 
@@ -166,47 +178,93 @@ static int config_parse(const char *confpath, struct ct_state_config *config, in
 		}
 
 		if (!strcasecmp(key, "host")) {
-			config->host = strdup(val);
+			static char config_host[256];
+			if ((size_t)n >= sizeof(config_host)) {
+				rc = -ERANGE;
+				LOG_ERROR(rc, "hostname %s too big to fit in static string",
+					  val);
+				goto out;
+			}
+			memcpy(config_host, val, n+1);
+			config->host = config_host;
+			LOG_INFO("config setting host to %s\n", config_host);
 			continue;
 		}
 		if (!strcasecmp(key, "port")) {
-			config->port = strdup(val);
+			static char config_port[6];
+			if ((size_t)n >= sizeof(config_port)) {
+				rc = -ERANGE;
+				LOG_ERROR(rc, "port %s too big to fit in static string",
+					  val);
+				goto out;
+			}
+			memcpy(config_port, val, n+1);
+			config->port = config_port;
+			LOG_INFO("config setting port to %s\n", config_port);
 			continue;
 		}
 		if (!strcasecmp(key, "max_restore")) {
 			long long intval = str_suffix_to_u32(val, "max_restore");
-			if (intval >= 0)
-				config->max_restore = intval;
+			if (intval < 0) {
+				rc = intval;
+				goto out;
+			}
+			config->max_restore = intval;
+			LOG_INFO("config setting max_restore to %u\n",
+				 config->max_restore);
 			continue;
 		}
 		if (!strcasecmp(key, "max_archive")) {
 			long long intval = str_suffix_to_u32(val, "max_archive");
-			if (intval >= 0)
-				config->max_archive = intval;
+			if (intval < 0) {
+				rc = intval;
+				goto out;
+			}
+			config->max_archive = intval;
+			LOG_INFO("config setting max_archive to %u\n",
+				 config->max_archive);
 			continue;
 		}
 		if (!strcasecmp(key, "max_remove")) {
 			long long intval = str_suffix_to_u32(val, "max_remove");
-			if (intval >= 0)
-				config->max_remove = intval;
+			if (intval < 0) {
+				rc = intval;
+				goto out;
+			}
+			config->max_remove = intval;
+			LOG_INFO("config setting max_remove to %u\n",
+				 config->max_remove);
 			continue;
 		}
 		if (!strcasecmp(key, "hal_size")) {
 			long long intval = str_suffix_to_u32(val, "hal_size");
-			if (intval >= 0)
-				config->hsm_action_list_size = intval;
+			if (intval < 0) {
+				rc = intval;
+				goto out;
+			}
+			config->hsm_action_list_size = intval;
+			LOG_INFO("config setting hal_size to %u\n",
+				 config->hsm_action_list_size);
 			continue;
 		}
 		if (!strcasecmp(key, "archive_id")) {
 			long long intval = str_suffix_to_u32(val, "archive_id");
-			if (intval >= 0)
-				config->archive_id = intval;
+			if (intval < 0) {
+				rc = intval;
+				goto out;
+			}
+			config->archive_id = intval;
+			LOG_INFO("config setting archive_id to %u\n",
+				 config->archive_id);
 			continue;
 		}
 		if (!strcasecmp(key, "verbose")) {
 			int intval = str_to_verbose(val);
-			if (intval >= 0)
-				config->verbose = intval;
+			if (intval < 0) {
+				rc = intval;
+				goto out;
+			}
+			config->verbose = intval;
 			continue;
 		}
 
@@ -238,9 +296,13 @@ int ct_config_init(struct ct_state_config *config) {
 	config->max_remove = -1;
 	config->hsm_action_list_size = 1024 * 1024;
 	config->archive_id = 0;
-	config->verbose = LLAPI_MSG_INFO;
+	config->verbose = LLAPI_MSG_NORMAL;
+	llapi_msg_set_level(config->verbose);
+
 	/* verbose from env once first to debug config.. */
-	getenv_verbose("COORDINATOOL_VERBOSE", &config->verbose);
+	rc = getenv_verbose("COORDINATOOL_VERBOSE", &config->verbose);
+	if (rc < 0)
+		return rc;
 
 	/* then parse config */
 	int fail_enoent = getenv_str("COORDINATOOL_CONF", &confpath);
@@ -251,12 +313,24 @@ int ct_config_init(struct ct_state_config *config) {
 	/* then overwrite with env */
 	getenv_str("COORDINATOOL_HOST", &config->host);
 	getenv_str("COORDINATOOL_PORT", &config->port);
-	getenv_u32("COORDINATOOL_MAX_RESTORE", &config->max_restore);
-	getenv_u32("COORDINATOOL_MAX_ARCHIVE", &config->max_archive);
-	getenv_u32("COORDINATOOL_MAX_REMOVE", &config->max_remove);
-	getenv_u32("COORDINATOOL_HAL_SIZE", &config->hsm_action_list_size);
-	getenv_u32("COORDINATOOL_ARCHIVE_ID", &config->archive_id);
-	getenv_verbose("COORDINATOOL_VERBOSE", &config->verbose);
+	rc = getenv_u32("COORDINATOOL_MAX_RESTORE", &config->max_restore);
+	if (rc < 0)
+		return rc;
+	rc = getenv_u32("COORDINATOOL_MAX_ARCHIVE", &config->max_archive);
+	if (rc < 0)
+		return rc;
+	rc = getenv_u32("COORDINATOOL_MAX_REMOVE", &config->max_remove);
+	if (rc < 0)
+		return rc;
+	rc = getenv_u32("COORDINATOOL_HAL_SIZE", &config->hsm_action_list_size);
+	if (rc < 0)
+		return rc;
+	rc = getenv_u32("COORDINATOOL_ARCHIVE_ID", &config->archive_id);
+	if (rc < 0)
+		return rc;
+	rc = getenv_verbose("COORDINATOOL_VERBOSE", &config->verbose);
+	if (rc < 0)
+		return rc;
 
 	return 0;
 }
