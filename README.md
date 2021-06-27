@@ -78,7 +78,15 @@ knobs:
  - `verbose`: loglevel, can be one of DEBUG, INFO, NORMAL, WARN, ERROR.
 
 
+## standalone client
 
+The standalone client also abides by config file and environment
+variables, then:
+
+- default just prints status and exist
+- `--queue`/`-Q` parse stdin for `active_requests` and send these to
+coordinatool
+- other options for debug are listed in `--help`
 
 
 # TODO

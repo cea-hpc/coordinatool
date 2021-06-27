@@ -8,6 +8,12 @@
 #include "utils.h"
 #include "client_common.h"
 
+enum client_mode {
+	MODE_STATUS,
+	MODE_QUEUE,
+	MODE_RECV,
+};
+
 struct active_requests_state {
 	json_t *hai_list;
 	unsigned int archive_id;
@@ -17,7 +23,8 @@ struct active_requests_state {
 
 struct client {
 	struct ct_state state;
-	bool send_queue;
+	int iters;
+	enum client_mode mode;
 	union {
 		struct active_requests_state active_requests;
 	};

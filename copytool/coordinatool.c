@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 	int rc;
 
 	// default options
-	int verbose = LLAPI_MSG_INFO;
+	int verbose = LLAPI_MSG_NORMAL;
 	struct state state = {
 		.host = "::",
 		.port = "5123",

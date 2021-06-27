@@ -83,6 +83,7 @@ int ct_register(struct state *state) {
 		return rc;
 	}
 
+	LOG_INFO("Registered lustre copytool");
 	return 0;
 }
 
@@ -109,6 +110,7 @@ int ct_start(struct state *state) {
 	if (rc < 0)
 		return rc;
 
+	LOG_NORMAL("Starting main loop");
 	while (1) {
 		nfds = epoll_wait(state->epoll_fd, events, MAX_EVENTS, -1);
 		if (nfds < 0 && errno == EINTR)

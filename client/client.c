@@ -10,6 +10,18 @@
 #include "client.h"
 #include "lustre.h"
 
+void print_help(char *argv[]) {
+	printf("Usage: %s [options]\n\n", argv[0]);
+	printf("common client options are shared with lib (see config file and env var\n");
+	printf("defaults to printing status\n");
+	printf("options:\n");
+	printf("--queue/-Q: queue active_requests from stdin\n");
+	printf("--recv/-R: (debug tool) ask for receiving work\n");
+	printf("           note the work will be reclaimed when client disconnects\n");
+	printf("--iters/-i: number of replies to expect (can be used to wait after\n");
+	printf("            receiving work, negative number loops forever)");
+}
+
 int parse_hai_cb(struct hsm_action_item *hai, unsigned int archive_id,
 		 unsigned long flags, void *arg) {
 	struct active_requests_state *active_requests = arg;
@@ -50,7 +62,11 @@ int client_run(struct client *client) {
 	if (rc < 0)
 		return rc;
 
-	if (client->send_queue) {
+	switch (client->mode) {
+	case MODE_STATUS:
+		protocol_request_status(state);
+		break;
+	case MODE_QUEUE:
 		client->active_requests.hai_list = json_array();
 		if (!client->active_requests.hai_list)
 			abort();
@@ -73,16 +89,18 @@ int client_run(struct client *client) {
 		protocol_request_queue(state, client->active_requests.archive_id,
 				       client->active_requests.flags,
 				       client->active_requests.hai_list);
-		protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
-		return 0;
+		break;
+	case MODE_RECV:
+		protocol_request_recv(state);
+		break;
+	default:
+		LOG_ERROR(-EINVAL, "Unkonwn mode %d", client->mode);
+		return -EINVAL;
 	}
 
-	protocol_request_status(state);
-	protocol_request_recv(state);
-	while(true) {
+	while (client->iters < 0 || client->iters-- > 0) {
 		protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
 	}
-
 	return 0;
 }
 
@@ -92,19 +110,25 @@ int main(int argc, char *argv[]) {
 		{ "quiet",   no_argument, NULL, 'q' },
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
+		{ "queue", no_argument, NULL, 'Q' },
+		{ "recv", no_argument, NULL, 'R' },
+		{ "iters", required_argument, NULL, 'i' },
 		{ 0 },
 	};
 	int rc;
 
 	// default options
-	struct client client = { 0 };
+	struct client client = {
+		.mode = MODE_STATUS,
+		.iters = 1,
+	};
 	rc = ct_config_init(&client.state.config);
 	if (rc) {
 		LOG_ERROR(rc, "Could not init config");
 		return EXIT_FAILURE;
 	}
 
-	while ((rc = getopt_long(argc, argv, "vqH:p:Q",
+	while ((rc = getopt_long(argc, argv, "vqH:p:QRi:h",
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
 		case 'v':
@@ -122,7 +146,16 @@ int main(int argc, char *argv[]) {
 			client.state.config.port = optarg;
 			break;
 		case 'Q':
-			client.send_queue = true;
+			client.mode = MODE_QUEUE;
+			break;
+		case 'R':
+			client.mode = MODE_RECV;
+			break;
+		case 'i':
+			client.iters = atoi(optarg);
+			break;
+		case 'h':
+			print_help(argv);
 			break;
 		default:
 			return EXIT_FAILURE;

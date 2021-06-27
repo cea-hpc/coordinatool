@@ -57,6 +57,7 @@ int tcp_listen(struct state *state) {
 		LOG_ERROR(rc, "Could not add listen socket to epoll");
 		return rc;
 	}
+	LOG_INFO("Listening on %s:%s\n", state->host, state->port);
 
 	return 0;
 }

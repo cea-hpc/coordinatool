@@ -40,6 +40,7 @@ int tcp_connect(struct ct_state *state) {
 		LOG_ERROR(rc, "Could not connect to %s:%s", state->config.host, state->config.port);
 		return rc;
 	}
+	LOG_INFO("Connected to %s", state->config.host);
 
 	state->socket_fd = sfd;
 
