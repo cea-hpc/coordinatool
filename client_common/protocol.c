@@ -2,6 +2,13 @@
 
 #include "client_common.h"
 
+
+static int protocol_write_lock(json_t *request, const struct ct_state *state,
+			int flags) {
+	// XXX lock
+	return protocol_write(request, state->socket_fd, flags);
+}
+
 int protocol_request_status(const struct ct_state *state) {
 	json_t *request;
 	int rc = 0;
@@ -14,7 +21,7 @@ int protocol_request_status(const struct ct_state *state) {
 	}
 
 	LOG_INFO("Sending status request to %d", state->socket_fd);
-	if (protocol_write(request, state->socket_fd, 0)) {
+	if (protocol_write_lock(request, state, 0)) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write status request");
 		goto out_free;
@@ -42,7 +49,7 @@ int protocol_request_recv(const struct ct_state *state) {
 		return rc;
 	}
 	LOG_INFO("Sending recv request to %d", state->socket_fd);
-	if (protocol_write(request, state->socket_fd, 0)) {
+	if (protocol_write_lock(request, state, 0)) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write recv request");
 		goto out_free;
@@ -69,7 +76,7 @@ int protocol_request_done(const struct ct_state *state, uint32_t archive_id,
 		return rc;
 	}
 	LOG_INFO("Sending done request to %d", state->socket_fd);
-	if (protocol_write(request, state->socket_fd, 0)) {
+	if (protocol_write_lock(request, state, 0)) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write done request");
 		goto out_free;
@@ -109,7 +116,7 @@ int protocol_request_queue(const struct ct_state *state,
 		goto out_free;
 
 	LOG_INFO("Sending queue request to %d", state->socket_fd);
-	if (protocol_write(request, state->socket_fd, 0)) {
+	if (protocol_write_lock(request, state, 0)) {
 		rc = -EIO;
 		LOG_ERROR(rc, "Could not write queue request");
 		goto out_free;
