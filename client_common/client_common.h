@@ -8,14 +8,15 @@
 struct ct_state {
 	// opitons
 	struct ct_state_config {
-                const char *host;
-                const char *port;
-                uint32_t max_archive;
-                uint32_t max_restore;
-                uint32_t max_remove;
-                uint32_t hsm_action_list_size;
-                uint32_t archive_id;
-        } config;
+		const char *host;
+		const char *port;
+		uint32_t max_archive;
+		uint32_t max_restore;
+		uint32_t max_remove;
+		uint32_t hsm_action_list_size;
+		uint32_t archive_id;
+		int verbose;
+	} config;
 	// state values
 	int socket_fd;
 	char *fsname;
