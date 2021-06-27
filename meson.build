@@ -22,6 +22,25 @@ jansson = dependency('jansson')
 lustre = cc.find_library('lustreapi')
 urcu = dependency('liburcu')
 libdl = cc.find_library('dl')
+systemd = dependency('systemd', required: false)
+systemd_system_unit_dir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
+
+if systemd.found()
+	configure_file(
+		copy: true,
+		input: 'systemd/coordinatool@.service',
+		install: true,
+		install_dir: systemd_system_unit_dir,
+		output: 'coordinatool@.service',
+	)
+	configure_file(
+		copy: true,
+		input: 'systemd/coordinatool.sysconfig',
+		install: true,
+		install_dir: '/etc/sysconfig',
+		output: 'coordinatool',
+	)
+endif
 
 common = static_library(
 	'coordinatool_common',
@@ -49,7 +68,7 @@ subdir('tests')
 
 
 executable(
-	'coordinatool',
+	'lhsmd_coordinatool',
 	sources: files(
 		'copytool/queue.c',
 		'copytool/tcp.c',
@@ -64,7 +83,7 @@ executable(
 )
 
 executable(
-	'client',
+	'coordinatool-client',
 	sources: files(
 		'client/protocol.c',
 		'client/client.c',

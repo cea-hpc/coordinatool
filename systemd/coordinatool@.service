@@ -1,0 +1,15 @@
+[Unit]
+Description=Lustre HSM coordinatool agent for %I
+After=%i.mount
+Require=%i.mount
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/coordinatool
+# service-specific config e.g. coordinatool.mnt-lustre
+EnvironmentFile=-/etc/sysconfig/coordinatool.%i
+# use with e.g. coordinatool@mnt-lustre
+ExecStart=/usr/bin/lhsmd_coordinatool $COORDINATOOL_OPTS /%I
+
+[Install]
+WantedBy=multi-user.target
+

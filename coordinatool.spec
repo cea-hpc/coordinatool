@@ -43,10 +43,12 @@ standalone coordinatool client to interact with the server
 %meson_test
 
 %files
-%{_bindir}/coordinatool
+%{_bindir}/lhsmd_coordinatool
+%{_unitdir}/coordinatool@.service
+%config(noreplace) /etc/sysconfig/coordinatool
 
 %files client
-%{_bindir}/client
+%{_bindir}/coordinatool-client
 
 %files lib
 %{_libdir}/libcoordinatool_client.so
