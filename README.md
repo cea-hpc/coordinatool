@@ -89,6 +89,11 @@ coordinatool
 - other options for debug are listed in `--help`
 
 
+# Tests
+
+see [tests' readme](./tests/README.md)
+
+
 # TODO
 
 - systemd post-start action to ssh to mds and get a client to feed server?
