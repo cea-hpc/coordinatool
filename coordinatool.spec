@@ -33,7 +33,7 @@ standalone coordinatool client to interact with the server
 %autosetup
 
 %build
-%meson
+%meson -Dwerror=false
 %meson_build
 
 %install
