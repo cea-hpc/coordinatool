@@ -107,6 +107,7 @@ int client_run(struct client *client) {
 int main(int argc, char *argv[]) {
 	struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
+		{ "help", no_argument, NULL, 'h'},
 		{ "quiet",   no_argument, NULL, 'q' },
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
@@ -163,7 +164,7 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'h':
 			print_help(argv);
-			break;
+			return EXIT_SUCCESS;
 		default:
 			return EXIT_FAILURE;
 		}
