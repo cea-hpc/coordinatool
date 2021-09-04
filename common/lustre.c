@@ -89,7 +89,7 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 		hai->hai_action = HSMA_RESTORE;
 	} else if (strncmp(item, "ARCHIVE ", 8) == 0) {
 		hai->hai_action = HSMA_ARCHIVE;
-	} else if (strncmp(item, "REMOVE ", 8) == 0) {
+	} else if (strncmp(item, "REMOVE ", 7) == 0) {
 		hai->hai_action = HSMA_REMOVE;
 	} else {
 		LOG_ERROR(rc, "Unknown action %s in \"%s\"", item, line);
