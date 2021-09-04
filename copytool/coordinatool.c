@@ -49,6 +49,23 @@ long parse_int(const char *arg, long max) {
 	return rc;
 }
 
+void print_help(char *argv0) {
+	printf("Usage: %s [options] mountpoint\n", argv0);
+	printf("\n");
+	printf("Options:\n");
+	printf("    -v, --verbose: increase verbosity (repeatable)\n");
+	printf("    -q, --quiet: decrease verbosity\n");
+	printf("    -A, --archive: set which archive id to handle\n");
+	printf("    -p, --port: select port to listen to\n");
+	printf("    -H, --host: select address to listen to\n");
+	printf("    -V, --version: print version info\n");
+	printf("    -h, --help: this help\n");
+}
+
+void print_version(void) {
+	printf("Coordinatool version 0.0\n");
+}
+
 int main(int argc, char *argv[]) {
 	struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
@@ -56,6 +73,8 @@ int main(int argc, char *argv[]) {
 		{ "archive", required_argument, NULL, 'A' },
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
+		{ "help", no_argument, NULL, 'h' },
+		{ "version", no_argument, NULL, 'V' },
 		{ 0 },
 	};
 	int rc;
@@ -96,7 +115,14 @@ int main(int argc, char *argv[]) {
 		case 'p':
 			state.port = optarg;
 			break;
+		case 'V':
+			print_version();
+			return EXIT_SUCCESS;
+		case 'h':
+			print_help(argv[0]);
+			return EXIT_SUCCESS;
 		default:
+			fprintf(stderr, "Unknown option %c, see --help\n", rc);
 			return EXIT_FAILURE;
 		}
 	}
