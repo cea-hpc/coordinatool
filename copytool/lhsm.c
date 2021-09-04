@@ -52,7 +52,7 @@ int handle_ct_event(struct state *state) {
 
 		/* memcpy to avoid unaligned accesses */
 		memcpy(&fid, &hai->hai_fid, sizeof(fid));
-		LOG_DEBUG("item %d: %s on "DFID ,
+		LOG_INFO("enqueued (%d): %s on "DFID ,
 				i, ct_action2str(hai->hai_action),
 				PFID(&fid));
 		hai = hai_next(hai);

@@ -116,6 +116,8 @@ int protocol_reply_recv_single(struct client *client,
 		return rc;
 	}
 
+	LOG_INFO("Sending "DFID" to %d directly\n" ,
+		 PFID(&han->hai.hai_dfid), client->fd);
 	// frees hai_list
 	return protocol_reply_recv(client->fd, queues, hai_list, 0, NULL);
 }
@@ -161,6 +163,8 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 				hsm_action_requeue(han);
 				break;
 			}
+			LOG_INFO("Sending "DFID" to %d from queues\n" ,
+				 PFID(&han->hai.hai_dfid), client->fd);
 			enqueued_items++;
 		}
 	}
@@ -249,6 +253,11 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 	if (!han)
 		return protocol_reply_done(client->fd, EINVAL,
 					   "Unknown cookie sent");
+
+	int status = protocol_getjson_int(json, "status", 0);
+	LOG_INFO("%d processed "DFID": %d\n" ,
+		  client->fd, PFID(&han->hai.hai_dfid), status);
+
 	cds_list_del(&han->node);
 	queue_node_free(han);
 

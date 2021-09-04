@@ -137,7 +137,7 @@ again:
 		goto out_freereq;
 	}
 
-	LOG_INFO("Got command %s from %d", command_str, fd);
+	LOG_DEBUG("Got command %s from %d", command_str, fd);
 	if (!cbs || !cbs[command]) {
 		rc = -ENOTSUP;
 		LOG_ERROR(rc, "command %s not implemented", command_str);
