@@ -207,6 +207,11 @@ int parse_active_requests(int fd, parse_request_cb cb, void *cb_arg) {
 		*end = 0;
 		while ((newline = strchr(line, '\n'))) {
 			*newline = 0;
+			/* skip lines like mdt.[...]= from lctl get_param */
+			if (strncmp(line, "mdt.", 4) == 0 && newline[-1] == '=') {
+				line = newline + 1;
+				continue;
+			}
 			n = parse_active_request_line(line, cb, cb_arg);
 			if (n < 0)
 				return n;
