@@ -45,7 +45,7 @@ struct hsm_action_queues {
 
 /* common types */
 struct client {
-	char *addr; /* for logs etc */
+	char *host;
 	int fd;
 	struct cds_list_head node_clients;
 	struct cds_list_head node_waiting;
@@ -77,6 +77,7 @@ struct ct_stats {
 struct state {
 	// options
 	const char *mntpath;
+	char *hostname;
 	int archive_cnt;
 	int archive_id[LL_HSM_MAX_ARCHIVES_PER_AGENT];
 	const char *host;
