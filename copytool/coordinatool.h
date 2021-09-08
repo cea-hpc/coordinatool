@@ -78,6 +78,7 @@ struct ct_stats {
 struct state {
 	// options
 	const char *mntpath;
+	char *hostname;
 	int archive_cnt;
 	int archive_id[LL_HSM_MAX_ARCHIVES_PER_AGENT];
 	const char *host;

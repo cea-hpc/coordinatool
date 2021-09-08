@@ -1,8 +1,26 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
 #include <netdb.h>
+#include <sys/utsname.h>
 
 #include "coordinatool.h"
+
+static char *get_hostname()
+{
+	struct utsname host_info;
+	char *dot;
+
+	if (uname(&host_info) != 0) {
+		LOG_ERROR(-errno, "Failed to get hostname");
+		return NULL;
+	}
+
+	dot = strchr(host_info.nodename, '.');
+	if (dot)
+		*dot = '\0';
+
+	return strdup(host_info.nodename);
+}
 
 int tcp_listen(struct state *state) {
 	struct addrinfo hints;
@@ -22,6 +40,10 @@ int tcp_listen(struct state *state) {
 		return -EIO;
 	}
 
+	state->hostname = get_hostname();
+	if (!state->hostname)
+		return -errno;
+
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
 		sfd = socket(rp->ai_family, rp->ai_socktype,
 				rp->ai_protocol);
@@ -40,6 +62,7 @@ int tcp_listen(struct state *state) {
 	if (rp == NULL) {
 		rc = -errno;
 		LOG_ERROR(rc, "Could not bind tcp server");
+		free(state->hostname);
 		return rc;
 	}
 
@@ -49,12 +72,14 @@ int tcp_listen(struct state *state) {
 	if (rc < 0) {
 		rc = -errno;
 		LOG_ERROR(rc, "Could not listen");
+		free(state->hostname);
 		return rc;
 	}
 	state->listen_fd = sfd;
 	rc = epoll_addfd(state->epoll_fd, sfd, (void*)(uintptr_t)sfd);
 	if (rc < 0) {
 		LOG_ERROR(rc, "Could not add listen socket to epoll");
+		free(state->hostname);
 		return rc;
 	}
 	LOG_INFO("Listening on %s:%s\n", state->host, state->port);
