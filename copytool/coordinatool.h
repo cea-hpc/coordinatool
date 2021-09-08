@@ -45,7 +45,7 @@ struct hsm_action_queues {
 
 /* common types */
 struct client {
-	char *addr; /* for logs etc */
+	char *host;
 	int fd;
 	struct cds_list_head node_clients;
 	struct cds_list_head node_waiting;
@@ -89,6 +89,7 @@ struct state {
 	struct hsm_action_queues queues;
 	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
+	char *hostname; /* Used for phobos integration */
 };
 
 
