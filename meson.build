@@ -20,8 +20,10 @@ add_project_arguments(global_arguments, language: 'c')
 
 jansson = dependency('jansson')
 lustre = cc.find_library('lustreapi')
+phobos = cc.find_library('phobos_store')
 urcu = dependency('liburcu')
 libdl = cc.find_library('dl')
+glib = dependency('glib-2.0')
 systemd = dependency('systemd', required: false)
 systemd_system_unit_dir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
 
@@ -83,7 +85,7 @@ executable(
 		'copytool/protocol.c',
 		'copytool/coordinatool.c',
 	),
-	dependencies: [urcu],
+	dependencies: [urcu, glib, phobos],
 	include_directories: include_directories('common'),
 	link_with: [common],
 	install: true,

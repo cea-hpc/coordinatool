@@ -2,6 +2,12 @@
 
 #include "coordinatool.h"
 
+#include <fcntl.h>
+#include <sys/types.h>
+#include <attr/xattr.h>
+
+#include <phobos_store.h>
+
 /* stop enqueuing new hasm action items if we cannot enqueue at least
  * HAI_SIZE_MARGIN more.
  * That is because item is variable size depending on its data.
@@ -122,6 +128,39 @@ int protocol_reply_recv_single(struct client *client,
 	return protocol_reply_recv(client->fd, queues, hai_list, 0, NULL);
 }
 
+bool can_send_to_client(struct state *state, struct client *client,
+			struct hsm_action_item *hai)
+{
+	char oid[XATTR_SIZE_MAX+1];
+	int rc, save_errno, fd;
+	ssize_t oidlen;
+	char *hostname;
+
+	fd = llapi_open_by_fid(state->mntpath, &hai->hai_fid, O_RDONLY);
+	if (fd < 0)
+		return false;
+
+	oidlen = fgetxattr(fd, "trusted.hsm_fuid", oid, XATTR_SIZE_MAX);
+	save_errno = errno;
+	close(fd);
+	errno = save_errno;
+	if (oidlen < 0) {
+		/* ENOATTR seems to be returned if the attribute doesn't exist
+		 * but it is not defined on Linux.
+		 * ENODATA seems to be equivalent on Linux.
+		 */
+		return (errno == ENODATA || errno == ENOTSUP)
+	}
+	oid[oidlen] = '\0';
+
+	rc = phobos_locate(oid, NULL, 0, &hostname);
+	if (rc)
+		/* not on a phobos backend ? */
+		return true;
+
+	return hostname == NULL || !strcmp(hostname, client->id);
+}
+
 static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
@@ -149,16 +188,24 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 		&client->max_archive };
 	int *current_count[] = { &client->current_restore,
 		&client->current_remove, &client->current_archive };
+
 	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
 		while (client->max_bytes > HAI_SIZE_MARGIN) {
+			bool requeue;
+
 			if (*max_action[i] >= 0 &&
-			    *max_action[i] <= *current_count[i]) {
+			    *max_action[i] <= *current_count[i])
 				break;
-			}
+
 			han = hsm_action_dequeue(&state->queues, actions[i]);
 			if (!han)
 				break;
-			if (recv_enqueue(client, hai_list, han)) {
+
+			requeue = (actions[i] != HSMA_ARCHIVE)
+				&& !can_send_to_client(state, client,
+						       &han->hai);
+
+			if (requeue || recv_enqueue(client, hai_list, han)) {
 				/* did not fit, requeue - this also makes a new copy */
 				hsm_action_requeue(han);
 				break;
@@ -256,7 +303,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 
 	int status = protocol_getjson_int(json, "status", 0);
 	LOG_INFO("%d processed "DFID": %d\n" ,
-		  client->fd, PFID(&han->hai.hai_dfid), status);
+		 client->fd, PFID(&han->hai.hai_dfid), status);
 
 	cds_list_del(&han->node);
 	queue_node_free(han);
@@ -271,6 +318,7 @@ int protocol_reply_done(int fd, int status, char *error) {
 	reply = json_object();
 	if (!reply)
 		abort();
+
 	if ((rc = protocol_setjson_str(reply, "command", "done")) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
 	    (rc = protocol_setjson_str(reply, "error", error)))
