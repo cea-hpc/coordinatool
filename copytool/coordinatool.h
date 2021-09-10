@@ -102,6 +102,8 @@ int ct_start(struct state *state);
 
 /* protocol */
 extern protocol_read_cb protocol_cbs[];
+bool can_send_to_client(struct state *state, struct client *client,
+			struct hsm_action_item *hai);
 
 /**
  * send status reply
