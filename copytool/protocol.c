@@ -6,7 +6,6 @@
  *  callbacks *
  **************/
 
-
 /**
  * STATUS
  */
@@ -185,7 +184,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 
 	int status = protocol_getjson_int(json, "status", 0);
 	LOG_INFO("%d processed "DFID": %d\n" ,
-		  client->fd, PFID(&han->hai.hai_dfid), status);
+		 client->fd, PFID(&han->hai.hai_dfid), status);
 
 	cds_list_del(&han->node);
 	queue_node_free(han);
@@ -228,6 +227,7 @@ int protocol_reply_done(struct client *client, int status, char *error) {
 	reply = json_object();
 	if (!reply)
 		abort();
+
 	if ((rc = protocol_setjson_str(reply, "command", "done")) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
 	    (rc = protocol_setjson_str(reply, "error", error)))

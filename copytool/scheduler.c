@@ -2,6 +2,45 @@
 
 #include "coordinatool.h"
 
+#include <fcntl.h>
+#include <sys/types.h>
+#include <attr/xattr.h>
+
+#include <phobos_store.h>
+
+static bool can_send_to_client(struct state *state, struct client *client,
+			       struct hsm_action_item *hai)
+{
+	char oid[XATTR_SIZE_MAX+1];
+	int rc, save_errno, fd;
+	ssize_t oidlen;
+	char *hostname;
+
+	fd = llapi_open_by_fid(state->mntpath, &hai->hai_fid, O_RDONLY);
+	if (fd < 0)
+		return false;
+
+	oidlen = fgetxattr(fd, "trusted.hsm_fuid", oid, XATTR_SIZE_MAX);
+	save_errno = errno;
+	close(fd);
+	errno = save_errno;
+	if (oidlen < 0) {
+		/* ENOATTR seems to be returned if the attribute doesn't exist
+		 * but it is not defined on Linux.
+		 * ENODATA seems to be equivalent on Linux.
+		 */
+		return (errno == ENODATA || errno == ENOTSUP);
+	}
+	oid[oidlen] = '\0';
+
+	rc = phobos_locate(oid, NULL, 0, &hostname);
+	if (rc)
+		/* not on a phobos backend ? */
+		return true;
+
+	return hostname == NULL || !strcmp(hostname, client->id);
+}
+
 static int recv_enqueue(struct client *client, json_t *hai_list,
 			struct hsm_action_node *han) {
 	int max_action;
@@ -60,25 +99,31 @@ void ct_schedule_client(struct state *state,
 		&state->stats.running_remove, &state->stats.running_archive };
 	unsigned int *pending_count[] = { &state->stats.pending_restore,
 		&state->stats.pending_remove, &state->stats.pending_archive };
+
 	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
 		unsigned int enqueued_pass = 0, pending_pass = *pending_count[i];
 		while (client->max_bytes > HAI_SIZE_MARGIN) {
-			if (*max_action[i] >= 0 &&
-			    *max_action[i] <= *current_count[i]) {
-				break;
-			}
-
 			struct hsm_action_node *han;
+			bool requeue;
+
+			if (*max_action[i] >= 0 &&
+			    *max_action[i] <= *current_count[i])
+				break;
+
 			han = hsm_action_dequeue(&state->queues, actions[i]);
 			if (!han)
 				break;
-			if (recv_enqueue(client, hai_list, han)) {
+
+			requeue = (actions[i] != HSMA_ARCHIVE)
+				&& !can_send_to_client(state, client,
+						       &han->hai);
+			if (requeue || recv_enqueue(client, hai_list, han)) {
 				/* did not fit, requeue - this also makes a new copy */
 				hsm_action_requeue(han);
 				break;
 			}
-			LOG_INFO("Sending "DFID" to %d from queues\n" ,
-				 PFID(&han->hai.hai_dfid), client->fd);
+			LOG_INFO("Sending "DFID" to %s from queues\n",
+				 PFID(&han->hai.hai_dfid), client->id);
 			enqueued_items++;
 			(*running_count[i])++;
 			enqueued_pass++;

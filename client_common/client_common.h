@@ -8,7 +8,7 @@
 #include "protocol.h"
 
 struct ct_state {
-	// opitons
+	// options
 	struct ct_state_config {
 		const char *confpath;
 		const char *host;
