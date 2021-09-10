@@ -109,6 +109,11 @@ int hsm_action_requeue(struct hsm_action_node *node) {
 	cds_list_for_each(n, &queues->state->waiting_clients) {
 		struct client *client = caa_container_of(n, struct client,
 							 node_waiting);
+
+		if (node->hai.hai_action != HSMA_ARCHIVE &&
+		    !can_send_to_client(queues->state, client, &node->hai))
+			continue;
+
 		if (protocol_reply_recv_single(client, queues, node) == 0) {
 			cds_list_del_init(n);
 			return 1;
