@@ -139,7 +139,5 @@ int ct_start(struct state *state) {
 				}
 			}
 		}
-
-
 	}
 }
