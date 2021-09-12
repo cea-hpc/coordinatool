@@ -384,20 +384,20 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 
 	id = protocol_getjson_str(json, "id", NULL, NULL);
 	if (!id) {
-		// new client, assign id
-		return protocol_reply_ehlo(client->fd, "whatever", 0, NULL);
+		// no id: no special treatment
+		return protocol_reply_ehlo(client->fd, 0, NULL);
 	}
-	if (strcmp(id, "CLI") == 0) {
-		// CLI client, just return id as is
-		return protocol_reply_ehlo(client->fd, id, 0, NULL);
+	if (!protocol_getjson_bool(json, "reconnect")) {
+		// new client, ok. remember id for logs?
+		return protocol_reply_ehlo(client->fd, 0, NULL);
 	}
 	// reconnecting client
 	// XXX check filesystem for runnning xfers
 	(void) state;
-	return protocol_reply_ehlo(client->fd, id, 0, NULL);
+	return protocol_reply_ehlo(client->fd, 0, NULL);
 }
 
-int protocol_reply_ehlo(int fd, const char *id, int status, char *error) {
+int protocol_reply_ehlo(int fd, int status, char *error) {
 	json_t *reply;
 	int rc;
 
@@ -406,8 +406,7 @@ int protocol_reply_ehlo(int fd, const char *id, int status, char *error) {
 		abort();
 	if ((rc = protocol_setjson_str(reply, "command", "ehlo")) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
-	    (rc = protocol_setjson_str(reply, "error", error)) ||
-	    (rc = protocol_setjson_str(reply, "id", id)))
+	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;
 
 	if (protocol_write(reply, fd, 0) != 0) {
