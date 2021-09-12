@@ -184,6 +184,8 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	client.state.client_id = strdup("CLI");
+
 	rc = client_run(&client);
 	if (rc)
 		return EXIT_FAILURE;

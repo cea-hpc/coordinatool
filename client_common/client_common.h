@@ -21,6 +21,7 @@ struct ct_state {
 	// state values
 	int socket_fd;
 	char *fsname;
+	char *client_id;
 	// locks etc..
 };
 
@@ -46,5 +47,7 @@ int protocol_request_done(const struct ct_state *state, uint32_t archive_id,
 int protocol_request_queue(const struct ct_state *state,
 			   uint32_t archive_id, uint64_t flags,
 			   json_t *hai_list);
+int protocol_request_ehlo(const struct ct_state *state);
+extern protocol_read_cb protocol_ehlo_cbs[];
 
 #endif
