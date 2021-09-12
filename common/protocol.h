@@ -23,6 +23,7 @@ enum protocol_commands {
 	RECV,
 	DONE,
 	QUEUE,
+	EHLO,
 	PROTOCOL_COMMANDS_MAX,
 };
 
@@ -51,7 +52,7 @@ int protocol_read_command(int fd, void *fd_arg, protocol_read_cb *cbs, void *cb_
 int protocol_write(json_t *json, int fd, size_t flags);
 
 /**
- * - STATUS command
+ * - STATUS command: query runtime information
  *   request properties:
  *     command = "status"
  *   reply properties (any omitted integer means 0):
@@ -68,7 +69,7 @@ int protocol_write(json_t *json, int fd, size_t flags);
  */
 
 /**
- * - RECV command
+ * - RECV command: request work
  *   request properties:
  *     command = "recv"
  *     max_{archive,restore,remove} = integer (s32)
@@ -115,7 +116,7 @@ int protocol_write(json_t *json, int fd, size_t flags);
  */
 
 /**
- * - DONE command
+ * - DONE command: report xfer status
  *   request properties:
  *     command = "done"
  *     archive_id = integer (u32), archive_id of the cookie
@@ -127,13 +128,25 @@ int protocol_write(json_t *json, int fd, size_t flags);
  */
 
 /**
- * - QUEUE command
+ * - QUEUE command: add hsm action items to the server
  *   request properties:
  *     command = "queue"
- *     in_progress = boolean, set if the request comes from a client reconnecting
  *     hsm_action_list = hsm_action_list object
  *   reply properties:
  *     command = "queue"
+ *     status = int (0 on success, errno on failure)
+ *     error = string (extra error message)
+ */
+
+/**
+ * - EHLO command: initial greeting handshake.
+ *   Intended for recovery and capabilities negotiation.
+ *   request properties:
+ *     command = "ehlo"
+ *     id = string, optional, only set if client reconnects
+ *   reply properties:
+ *     command = "ehlo"
+ *     id = string
  *     status = int (0 on success, errno on failure)
  *     error = string (extra error message)
  */

@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
 #include "client_common.h"
+#include "utils.h"
 
 
 static int protocol_write_lock(json_t *request, const struct ct_state *state,
@@ -125,3 +126,53 @@ out_free:
 	json_decref(request);
 	return rc;
 }
+
+
+int protocol_request_ehlo(const struct ct_state *state) {
+	int rc;
+
+	json_t *request = json_object();
+	if (!request)
+		abort();
+
+	if ((rc = protocol_setjson_str(request, "command", "ehlo")))
+		goto out_free;
+
+	if (state->client_id
+	    && (rc = protocol_setjson_str(request, "id", state->client_id)))
+		goto out_free;
+
+	LOG_INFO("Sending elho request to %d", state->socket_fd);
+	if (protocol_write_lock(request, state, 0)) {
+		rc = -EIO;
+		LOG_ERROR(rc, "Could not write queue request");
+		goto out_free;
+	}
+out_free:
+	json_decref(request);
+	return rc;
+}
+
+static int ehlo_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
+	struct ct_state *state = arg;
+
+	const char *id = protocol_getjson_str(json, "id", NULL, NULL);
+	if (!state->client_id) {
+		state->client_id = strdup(id);
+		if (!state->client_id)
+			abort();
+		return 0;
+	}
+
+	if (strcmp(state->client_id, id) != 0) {
+		LOG_ERROR(-EIO, "got id from server (%s) different from ours (%s)?",
+			  id, state->client_id);
+		return -EIO;
+	}
+
+	return 0;
+}
+
+protocol_read_cb protocol_ehlo_cbs[PROTOCOL_COMMANDS_MAX] = {
+	[EHLO] = ehlo_cb,
+};
