@@ -172,7 +172,7 @@ static inline int protocol_setjson(json_t *obj, const char *key, json_t *val) {
 }
 
 static inline int protocol_setjson_str(json_t *obj, const char *key,
-				       char *val) {
+				       const char *val) {
 	// skip if no value
 	if (val == NULL || val[0] == '\0')
 		return 0;
