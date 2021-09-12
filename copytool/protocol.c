@@ -380,13 +380,24 @@ out_freereply:
 static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
+	const char *id;
+
+	id = protocol_getjson_str(json, "id", NULL, NULL);
+	if (!id) {
+		// new client, assign id
+		return protocol_reply_ehlo(client->fd, "whatever", 0, NULL);
+	}
+	if (strcmp(id, "CLI") == 0) {
+		// CLI client, just return id as is
+		return protocol_reply_ehlo(client->fd, id, 0, NULL);
+	}
+	// reconnecting client
+	// XXX check filesystem for runnning xfers
 	(void) state;
-	(void) json;
-	// XXX check client in fs if id is set, otherwise assign one and let it cleanup fs
-	return protocol_reply_ehlo(client->fd, "whatever", 0, NULL);
+	return protocol_reply_ehlo(client->fd, id, 0, NULL);
 }
 
-int protocol_reply_ehlo(int fd, char *id, int status, char *error) {
+int protocol_reply_ehlo(int fd, const char *id, int status, char *error) {
 	json_t *reply;
 	int rc;
 
