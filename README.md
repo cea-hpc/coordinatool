@@ -41,7 +41,7 @@ whenever the server is restarted. For example:
 
 ```sh
 cat /sys/kernel/debug/lustre/mdt/lustre0-MDT*/hsm/active_requests |
-    coordinatool_client -Q
+    coordinatool-client -Q
 ```
 
 Also, if many requests are queued and a request times out the original
