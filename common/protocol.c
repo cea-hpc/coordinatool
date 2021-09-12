@@ -20,6 +20,9 @@ enum protocol_commands protocol_str2command(const char *str) {
 	if (strcmp(str, "queue") == 0) {
 		return QUEUE;
 	}
+	if (strcmp(str, "ehlo") == 0) {
+		return EHLO;
+	}
 	LOG_ERROR(-EINVAL, "%s is not a valid command", str);
 	return PROTOCOL_COMMANDS_MAX;
 }
@@ -32,6 +35,7 @@ const char *protocol_command2str(enum protocol_commands command) {
 	case RECV: return "recv";
 	case DONE: return "done";
 	case QUEUE: return "queue";
+	case EHLO: return "ehlo";
 	default:
 		LOG_ERROR(-EINVAL, "invalid command: %d", command);
 		snprintf(buf, sizeof(buf), "%d", command);
@@ -143,7 +147,7 @@ again:
 		LOG_ERROR(rc, "command %s not implemented", command_str);
 		goto out_freereq;
 	}
-	cbs[command](fd_arg, request, cb_arg);
+	rc = cbs[command](fd_arg, request, cb_arg);
 
 out_freereq:
 	json_decref(request);
