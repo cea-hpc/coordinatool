@@ -22,6 +22,7 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	ct->magic = CT_PRIV_MAGIC;
 	CDS_INIT_LIST_HEAD(&ct->actions);
 	ct->mnt_fd = ct->open_by_fid_fd = -1;
+	ct->state.socket_fd = -1;
 
 	ct->mnt = strdup(mnt);
 	if (!ct->mnt) {
