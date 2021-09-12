@@ -9,6 +9,7 @@
 
 #include "client.h"
 #include "lustre.h"
+#include "version.h"
 
 void print_help(char *argv[]) {
 	printf("Usage: %s [options]\n\n", argv[0]);
@@ -20,6 +21,10 @@ void print_help(char *argv[]) {
 	printf("           note the work will be reclaimed when client disconnects\n");
 	printf("--iters/-i: number of replies to expect (can be used to wait after\n");
 	printf("            receiving work, negative number loops forever)");
+}
+
+void print_version(void) {
+	printf("Coordinatool client version %s\n", VERSION);
 }
 
 int parse_hai_cb(struct hsm_action_item *hai, unsigned int archive_id,
@@ -107,6 +112,7 @@ int client_run(struct client *client) {
 int main(int argc, char *argv[]) {
 	struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
+		{ "version", no_argument, NULL, 'V' },
 		{ "help", no_argument, NULL, 'h'},
 		{ "quiet",   no_argument, NULL, 'q' },
 		{ "port", required_argument, NULL, 'p' },
@@ -162,6 +168,9 @@ int main(int argc, char *argv[]) {
 		case 'i':
 			client.iters = atoi(optarg);
 			break;
+		case 'V':
+			print_version();
+			return EXIT_SUCCESS;
 		case 'h':
 			print_help(argv);
 			return EXIT_SUCCESS;
