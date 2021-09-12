@@ -42,6 +42,13 @@ if systemd.found()
 	)
 endif
 
+vcs_tag(
+	command: [ 'git', 'describe', '--always', ],
+	input: 'common/version.h.in',
+	output: 'version.h',
+	replace_string: '@VERSION@'
+)
+
 common = static_library(
 	'coordinatool_common',
 	files(

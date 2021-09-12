@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "coordinatool.h"
+#include "version.h"
 
 int epoll_addfd(int epoll_fd, int fd, void *data) {
 	struct epoll_event ev;
@@ -63,7 +64,7 @@ void print_help(char *argv0) {
 }
 
 void print_version(void) {
-	printf("Coordinatool version 0.0\n");
+	printf("Coordinatool version %s\n", VERSION);
 }
 
 int main(int argc, char *argv[]) {
