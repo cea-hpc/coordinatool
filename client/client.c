@@ -128,6 +128,7 @@ int main(int argc, char *argv[]) {
 	struct client client = {
 		.mode = MODE_STATUS,
 		.iters = 1,
+		.state.socket_fd = -1,
 	};
 
 	/* slight hack: if first arg is --config use it to overwrite
@@ -182,7 +183,6 @@ int main(int argc, char *argv[]) {
 		LOG_ERROR(-EINVAL, "extra argument specified");
 		return EXIT_FAILURE;
 	}
-
 
 	rc = client_run(&client);
 	if (rc)
