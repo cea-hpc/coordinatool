@@ -23,6 +23,7 @@ enum protocol_commands {
 	RECV,
 	DONE,
 	QUEUE,
+	EHLO,
 	PROTOCOL_COMMANDS_MAX,
 };
 
@@ -130,10 +131,21 @@ int protocol_write(json_t *json, int fd, size_t flags);
  * - QUEUE command
  *   request properties:
  *     command = "queue"
- *     in_progress = boolean, set if the request comes from a client reconnecting
  *     hsm_action_list = hsm_action_list object
  *   reply properties:
  *     command = "queue"
+ *     status = int (0 on success, errno on failure)
+ *     error = string (extra error message)
+ */
+
+/**
+ * - EHLO command
+ *   request properties:
+ *     command = "ehlo"
+ *     id = string, optional, only set if client reconnects
+ *   reply properties:
+ *     command = "ehlo"
+ *     id = string
  *     status = int (0 on success, errno on failure)
  *     error = string (extra error message)
  */

@@ -51,5 +51,19 @@ again:
 
 	state->socket_fd = sfd;
 
+	rc = protocol_request_ehlo(state);
+	if (rc) {
+		LOG_WARN("Just connected but could not send request? %d. reconnecting", rc);
+		sleep(5);
+		goto again;
+	}
+	rc = protocol_read_command(state->socket_fd, NULL,
+				   protocol_ehlo_cbs, state);
+	if (rc) {
+		LOG_WARN("Just connected but did not get correct ehlo? %d. reconnecting", rc);
+		sleep(5);
+		goto again;
+	}
+
 	return 0;
 }
