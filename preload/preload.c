@@ -32,12 +32,14 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	ct->mnt_fd = open(mnt, O_RDONLY);
 	if (ct->mnt_fd < 0) {
 		rc = -errno;
+		LOG_ERROR(rc, "Could not open fs root");
 		goto err_out;
 	}
 
 	ct->open_by_fid_fd = openat(ct->mnt_fd, ".lustre/fid", O_RDONLY);
 	if (ct->open_by_fid_fd < 0) {
 		rc = -errno;
+		LOG_ERROR(rc, "Could not open .lustre/fid");
 		goto err_out;
 	}
 
@@ -52,8 +54,10 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	}
 
 	rc = tcp_connect(&ct->state);
-	if (rc)
+	if (rc) {
+		LOG_ERROR(rc, "Could not connect to server");
 		goto err_out;
+	}
 
 	*priv = ct;
 	return 0;
@@ -93,23 +97,34 @@ int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 	if (!ct || ct->magic != CT_PRIV_MAGIC || !halh || !msgsize)
 		return -EINVAL;
 
+again:
 	rc = protocol_request_recv(&ct->state);
-	if (rc)
-		return rc;
+	if (rc) {
+		LOG_WARN("Sending recv request to server failed with %d. Reconnecting.", rc);
+		goto reconnect;
+	}
+
 
 	ct->msgsize = -1;
 	while (ct->msgsize == -1) {
 		rc = protocol_read_command(ct->state.socket_fd, NULL, copytool_cbs, ct);
 		if (rc) {
-			// XXX reconnect or wait or retry anyway
-			// nothing should be fatal (clients can't handle it well)
-			return rc;
+			LOG_WARN("read from server failed with %d. Reconnecting.", rc);
+			goto reconnect;
 		}
 	}
 
 	*halh = ct->hal;
 	*msgsize = ct->msgsize;
 	return 0;
+
+reconnect:
+	rc = tcp_connect(&ct->state);
+	if (rc) {
+		LOG_ERROR(rc, "Could not reconnect to server");
+		return rc;
+	}
+	goto again;
 }
 
 int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
