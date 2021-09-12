@@ -42,6 +42,13 @@ if systemd.found()
 	)
 endif
 
+version_h = vcs_tag(
+	command: [ 'git', 'describe', '--always', ],
+	input: 'common/version.h.in',
+	output: 'version.h',
+	replace_string: '@VERSION@'
+)
+
 common = static_library(
 	'coordinatool_common',
 	files(
@@ -75,7 +82,7 @@ executable(
 		'copytool/lhsm.c',
 		'copytool/protocol.c',
 		'copytool/coordinatool.c',
-	),
+	) + [ version_h ],
 	dependencies: [urcu],
 	include_directories: include_directories('common'),
 	link_with: [common],
@@ -87,7 +94,7 @@ executable(
 	sources: files(
 		'client/protocol.c',
 		'client/client.c',
-	),
+	) + [ version_h ],
 	include_directories: include_directories(['common', 'client_common']),
 	link_with: [client_common],
 	install: true,
