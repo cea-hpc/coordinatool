@@ -6,6 +6,10 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	struct hsm_copytool_private *priv = arg;
 	int rc;
 
+	rc = protocol_checkerror(json);
+	if (rc)
+		return rc;
+
 	json_t *hal = json_object_get(json, "hsm_action_list");
 	if (!hal) {
 		printf("no hal\n");
@@ -27,9 +31,8 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	return 0;
 }
 
-static int done_cb(void *fd_arg UNUSED, json_t *json UNUSED, void *arg UNUSED) {
-	// nothing to do
-	return 0;
+static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+	return protocol_checkerror(json);
 }
 
 protocol_read_cb copytool_cbs[PROTOCOL_COMMANDS_MAX] = {

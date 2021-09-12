@@ -142,10 +142,11 @@ int protocol_write(json_t *json, int fd, size_t flags);
  * - EHLO command
  *   request properties:
  *     command = "ehlo"
- *     id = string, optional, only set if client reconnects
+ *     id = string, optional requested id, should be unique per client
+ *          if not set reconnection will not be supported
+ *     reconnect = boolean, set if this is a reconnection
  *   reply properties:
  *     command = "ehlo"
- *     id = string
  *     status = int (0 on success, errno on failure)
  *     error = string (extra error message)
  */
@@ -199,6 +200,20 @@ static inline int protocol_setjson_int(json_t *obj, const char *key,
 	return protocol_setjson(obj, key, json_val);
 }
 
+static inline int protocol_setjson_bool(json_t *obj, const char *key,
+					bool val) {
+	// skip if false
+	if (!val)
+		return 0;
+	json_t *json_val = json_true();
+	if (!json_val) {
+		LOG_ERROR(-ENOMEM, "Could not instanciate true boolean for %s",
+			  key);
+		return -ENOMEM;
+	}
+	return protocol_setjson(obj, key, json_val);
+}
+
 
 /**
  * helpers for getting, with default values
@@ -220,6 +235,16 @@ static inline json_int_t protocol_getjson_int(json_t *obj, const char *key,
 		return defval;
 	}
 	return val;
+}
+
+static inline bool protocol_getjson_bool(json_t *obj, const char *key) {
+	json_t *json_val = json_object_get(obj, key);
+	if (!json_val)
+		return false;
+
+	if (!json_is_boolean(json_val))
+		return false;
+	return json_is_true(json_val);
 }
 
 static inline const char *protocol_getjson_str(json_t *obj, const char *key,

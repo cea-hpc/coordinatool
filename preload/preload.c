@@ -24,6 +24,13 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	ct->mnt_fd = ct->open_by_fid_fd = -1;
 	ct->state.socket_fd = -1;
 
+	rc = gethostname(ct->state.client_id, sizeof(ct->state.client_id));
+	if (rc) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not get hostname!");
+		goto err_out;
+	}
+
 	ct->mnt = strdup(mnt);
 	if (!ct->mnt) {
 		rc = -ENOMEM;

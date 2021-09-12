@@ -10,6 +10,17 @@ static int protocol_write_lock(json_t *request, const struct ct_state *state,
 	return protocol_write(request, state->socket_fd, flags);
 }
 
+int protocol_checkerror(json_t *reply) {
+	int rc = protocol_getjson_int(reply, "status", 0);
+	if (rc) {
+		const char *error = protocol_getjson_str(reply, "error",
+							 NULL, NULL);
+		LOG_ERROR(rc, "error: %s",
+			  error ? error : "(no detail)");
+	}
+	return rc;
+}
+
 int protocol_request_status(const struct ct_state *state) {
 	json_t *request;
 	int rc = 0;
@@ -128,14 +139,15 @@ out_free:
 }
 
 
-int protocol_request_ehlo(const struct ct_state *state) {
+int protocol_request_ehlo(const struct ct_state *state, bool reconnecting) {
 	int rc;
 
 	json_t *request = json_object();
 	if (!request)
 		abort();
 
-	if ((rc = protocol_setjson_str(request, "command", "ehlo")))
+	if ((rc = protocol_setjson_str(request, "command", "ehlo")) ||
+	    (rc = protocol_setjson_bool(request, "reconnect", reconnecting)))
 		goto out_free;
 
 	if (state->client_id
@@ -153,22 +165,8 @@ out_free:
 	return rc;
 }
 
-static int ehlo_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
-	struct ct_state *state = arg;
-
-	const char *id = protocol_getjson_str(json, "id", NULL, NULL);
-	if (!state->client_id) {
-		state->client_id = strdup(id);
-		return 0;
-	}
-
-	if (strcmp(state->client_id, id) != 0) {
-		LOG_ERROR(-EIO, "got id from server (%s) different from our's (%s)?",
-			  id, state->client_id);
-		return -EIO;
-	}
-
-	return 0;
+static int ehlo_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+	return protocol_checkerror(json);
 }
 
 protocol_read_cb protocol_ehlo_cbs[PROTOCOL_COMMANDS_MAX] = {

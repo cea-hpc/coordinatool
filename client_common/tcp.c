@@ -10,11 +10,13 @@ int tcp_connect(struct ct_state *state) {
 	struct addrinfo *result, *rp;
 	int sfd, s;
 	int rc;
+	bool reconnect = false;
 
 again:
 	if (state->socket_fd != -1) {
 		close(state->socket_fd);
 		state->socket_fd = -1;
+		reconnect = true;
 	}
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
@@ -51,7 +53,7 @@ again:
 
 	state->socket_fd = sfd;
 
-	rc = protocol_request_ehlo(state);
+	rc = protocol_request_ehlo(state, reconnect);
 	if (rc) {
 		LOG_WARN("Just connected but could not send request? %d. reconnecting", rc);
 		sleep(5);

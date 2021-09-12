@@ -183,7 +183,6 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	client.state.client_id = strdup("CLI");
 	client.state.socket_fd = -1;
 
 	rc = client_run(&client);
