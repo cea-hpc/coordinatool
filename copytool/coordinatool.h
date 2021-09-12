@@ -120,6 +120,7 @@ int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
 			json_t *hal, int status, char *error);
 int protocol_reply_done(int fd, int status, char *error);
 int protocol_reply_queue(int fd, int enqueued, int status, char *error);
+int protocol_reply_ehlo(int fd, char *id, int status, char *error);
 
 
 /* tcp */
