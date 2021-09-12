@@ -377,10 +377,46 @@ out_freereply:
 	return rc;
 }
 
+static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
+	struct client *client = fd_arg;
+	struct state *state = arg;
+	(void) state;
+	(void) json;
+	// XXX check client in fs if id is set, otherwise assign one and let it cleanup fs
+	return protocol_reply_ehlo(client->fd, "whatever", 0, NULL);
+}
+
+int protocol_reply_ehlo(int fd, char *id, int status, char *error) {
+	json_t *reply;
+	int rc;
+
+	reply = json_object();
+	if (!reply)
+		abort();
+	if ((rc = protocol_setjson_str(reply, "command", "ehlo")) ||
+	    (rc = protocol_setjson_int(reply, "status", status)) ||
+	    (rc = protocol_setjson_str(reply, "error", error)) ||
+	    (rc = protocol_setjson_str(reply, "id", id)))
+		goto out_freereply;
+
+	if (protocol_write(reply, fd, 0) != 0) {
+		char *json_str = json_dumps(reply, 0);
+		rc = -EIO;
+		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		free(json_str);
+		goto out_freereply;
+	};
+
+out_freereply:
+	json_decref(reply);
+	return rc;
+}
+
 
 protocol_read_cb protocol_cbs[PROTOCOL_COMMANDS_MAX] = {
 	[STATUS] = status_cb,
 	[RECV] = recv_cb,
 	[DONE] = done_cb,
 	[QUEUE] = queue_cb,
+	[EHLO] = ehlo_cb,
 };
