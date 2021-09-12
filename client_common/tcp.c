@@ -12,6 +12,10 @@ int tcp_connect(struct ct_state *state) {
 	int rc;
 
 again:
+	if (state->socket_fd != -1) {
+		close(state->socket_fd);
+		state->socket_fd = -1;
+	}
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
