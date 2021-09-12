@@ -3,6 +3,8 @@
 #ifndef CLIENT_COMMON_H
 #define CLIENT_COMMON_H
 
+#include <asm/param.h>
+
 #include "protocol.h"
 
 struct ct_state {
@@ -21,7 +23,7 @@ struct ct_state {
 	// state values
 	int socket_fd;
 	char *fsname;
-	char *client_id;
+	char client_id[MAXHOSTNAMELEN];
 	// locks etc..
 };
 
@@ -34,6 +36,7 @@ int tcp_connect(struct ct_state *state);
 
 /* protocol.c */
 
+int protocol_checkerror(json_t *json);
 /**
  * send status request
  *
@@ -47,7 +50,7 @@ int protocol_request_done(const struct ct_state *state, uint32_t archive_id,
 int protocol_request_queue(const struct ct_state *state,
 			   uint32_t archive_id, uint64_t flags,
 			   json_t *hai_list);
-int protocol_request_ehlo(const struct ct_state *state);
+int protocol_request_ehlo(const struct ct_state *state, bool reconnecting);
 extern protocol_read_cb protocol_ehlo_cbs[];
 
 #endif
