@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0b0faa6_1f461da9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-16T23:27:08Z",
+      "side": 1,
+      "message": "Haven\u0027t read in details yet but I\u0027d like to keep the phobos dependency optional.\n\nI can think of two ways:\n - easiest way is just making it optional in meson and adding #if HAVE_PHOBOS guards around the part of the code that need this, it\u0027s a bit ugly but we can use most of the code you wrote as is with very small changes. (Also needs a meson option to explicitly disable compiling phobos bits even if the dependency is present for tests... iirc meson has a feature option type for that which is easy to use and will just pretend the dependency hasn\u0027t been found)\n - harder way would be to make it some sort of policy plugin or callback by config. I think it\u0027d be worth it ultimately if we want others to use the coordinatool, but it\u0027s quite a bit more of a pain (modules mean defining an api, adding dlopen code etc)\n\nAt this stage of development hardcoding can make sense - I\u0027m deferring to others for this decision, we\u0027ve been using modules with robinhood (v3) and ganesha so Thomas will know what it implies and brings.\nHappy to help with modules if we go that way as time allows.",
+      "revId": "90601399c1c5d613d56c677f570d5b66d4123615",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
