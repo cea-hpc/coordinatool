@@ -88,6 +88,24 @@
       "parentUuid": "b639c6fd_41b53f85",
       "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77b85263_69c7cf27",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-17T11:26:57Z",
+      "side": 1,
+      "message": "The main difference between assuming that the coordinatool\u0027s host can do phobos operations or not is that, in the first case, you will send requests to a client that will never execute them, whereas in the second one, you could send commands to the coordinatool\u0027s host but you don\u0027t. So you\u0027re not as efficient as you can be but at least it works.\n\nIf you want, I think I can implement this in a following patch using the ping feature which would try to contact the LRS and fail if it is not up. This could set a boolean option in the state struct and return true in can_send_to_client() if this ping failed. This ping could later be put in a library alongside locate.\nThis solution is not complete because there could be a LRS with no devices which I guess is an admin issue, not a developper one.\n\nAlso, after thinking about it, I think, if we want to support phobos we have to be able to do so dynamically because we don\u0027t know until runtime if a client will be a phobos one.\n\nSo I think we have to use a custom library for that and probably a new protocol message which would send the client\u0027s type (e.g. which library to use on the server side if necessary). It may be better to discuss it before removing phobos code at compile time (which I think can only be a temporary fix unfortunatly).",
+      "parentUuid": "d401be26_fe541ce8",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
