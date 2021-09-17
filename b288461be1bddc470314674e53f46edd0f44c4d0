@@ -144,6 +144,41 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "759b7412_3936ba35",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-17T23:25:21Z",
+      "side": 1,
+      "message": "o",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c808c12d_35d9dad7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-17T23:25:21Z",
+      "side": 1,
+      "message": "\u003e \u003e new patches\n\u003e \n\u003e Ok, pushing to gerrit.\n\nah, hm, I should have checked first -- it\u0027s actually already in cea-hpc\u0027s github and gerrit as master.\nI also notice while checking that i Had left a test commit when checking meson\u0027s version generation from git describe :/ so tried force pushing to cleanup, and I don\u0027t have access to either cea-hpc/coordinatool github or gerrit for that.\n\nWell, that settles it - can\u0027t push things to gerrit without a force push. I fixed the stray commit on my tree but I guess we can leave it here if it\u0027s easier.\nre: permissions, I don\u0027t mind not having access for force push, but I probably should have +2/verify? I\u0027d like at least compile/static analysis test like rbhv4 for now, happy to do it on my end until someone at cea can set it up.\nI don\u0027t know who has permission (probably whoever set the gerrithub repo up), but I\u0027d suggest mimicking librobinhood\u0027s that I fixed for Quentin recently. It has the cea-hpc gerrithub group as admin.",
+      "parentUuid": "daedf7a5_c0daec99",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90b2b4c7_ecfaff7b",
