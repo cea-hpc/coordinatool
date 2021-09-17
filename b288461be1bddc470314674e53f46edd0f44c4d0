@@ -124,6 +124,41 @@
       "parentUuid": "77b85263_69c7cf27",
       "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "daedf7a5_c0daec99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-17T22:58:52Z",
+      "side": 1,
+      "message": "\u003e probe if the local host is a phobos client\n\nThat makes sense; happy if it\u0027s added later if CEA has no need for it.\n\n\u003e send client types\n\nplease use ehlo for that if you need to negotiate such things. I named it ehlo because it\u0027s a fun name but we can rename it \"capabilities\" or similar, it\u0027s already something I had in mind. If something the server replies expects yet another reply we can use the same ehlo and it\u0027ll keep working as we track client states.\nThe easiest approach would be to feed the whole json to plugins so you can just extend it as you like (e.g. add `\u0027phobos\u0027: true` to the request for example)\n\nHmm. That does mean we also need the LD_PRELOAD client to support plugins on its own to know what it needs to announce though, I hadn\u0027t thought of that...\nSimpler ideas: just expose in the server config a list or nodeset pattern of client hostnames that support phobos? Or even simpler just a bool that says all clients support it unconditionally, that\u0027s likely enough at start.\n\n\u003e new patches\n\nOk, pushing to gerrit.\nwrt. this patch it\u0027s a bit more than rebasing, but sure, that can and has to be done after the other patches are merged, which is why I had asked what to do.\n\n\u003e comment for struct item\n\ndone",
+      "parentUuid": "d3849cad_8138639a",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90b2b4c7_ecfaff7b",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-17T22:58:52Z",
+      "side": 1,
+      "message": "this is not an option so should go below in the \u0027states\u0027 part of the struct.\nAs it\u0027s only intended to use for phobos, having a comment saying what it\u0027s for will help cleanup later.\n(I intended to document all non-obvious fields but haven\u0027t got around to it yet... I\u0027ll convert to whatever style required for documentation (e.g. doxygen comment) when I get there)",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
