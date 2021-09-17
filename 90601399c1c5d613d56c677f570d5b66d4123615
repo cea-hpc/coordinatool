@@ -16,6 +16,24 @@
       "message": "Haven\u0027t read in details yet but I\u0027d like to keep the phobos dependency optional.\n\nI can think of two ways:\n - easiest way is just making it optional in meson and adding #if HAVE_PHOBOS guards around the part of the code that need this, it\u0027s a bit ugly but we can use most of the code you wrote as is with very small changes. (Also needs a meson option to explicitly disable compiling phobos bits even if the dependency is present for tests... iirc meson has a feature option type for that which is easy to use and will just pretend the dependency hasn\u0027t been found)\n - harder way would be to make it some sort of policy plugin or callback by config. I think it\u0027d be worth it ultimately if we want others to use the coordinatool, but it\u0027s quite a bit more of a pain (modules mean defining an api, adding dlopen code etc)\n\nAt this stage of development hardcoding can make sense - I\u0027m deferring to others for this decision, we\u0027ve been using modules with robinhood (v3) and ganesha so Thomas will know what it implies and brings.\nHappy to help with modules if we go that way as time allows.",
       "revId": "90601399c1c5d613d56c677f570d5b66d4123615",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4f8dc30_c05da3e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-17T07:19:17Z",
+      "side": 1,
+      "message": "The aim of this patch is only to make the integration with phobos possible and test the stack Lustre/Coordinatool/Copytool/Phobos. There\u0027s a lot more to be done for this integration to work properly which will probably change when we have proper scheduling strategies.\n\nI agree that having a hard dependency is problematic and a small module library would be a better integration but is something that definitely needs more thinking and probably needs to be more aligned with the scheduling strategies as well.\n\nMaybe we can leave this branch like this right now and come back to it when we have a clear strategy for these kind of operations?",
+      "parentUuid": "b0b0faa6_1f461da9",
+      "revId": "90601399c1c5d613d56c677f570d5b66d4123615",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
