@@ -70,6 +70,24 @@
       "parentUuid": "4632b946_40ffcae8",
       "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d401be26_fe541ce8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-17T07:39:54Z",
+      "side": 1,
+      "message": "hm, I don\u0027t see why it\u0027s safe to assume the coordinatool won\u0027t run on a node with a phobos client (just as it was proven the assumption that there always is at least one drive wasn\u0027t correct either :D), but I won\u0027t comment on phobos high level logic as I don\u0027t know how its deployment is planned.\nI don\u0027t mind adding the info even if it\u0027s just for phobos, but that illustrates we\u0027ll need to think about having room for plugin data somewhere plugins can do whatever they want. A comment indicating what it\u0027s for would be appreciated so it can be cleaned up more easily later™\n(also, it\u0027s not an lhsmd_coordinatool option, so it needs to be moved down the \u0027state\u0027 section of the state struct)\n\nFor the client hostname, what shall we do? If you are ok with my patches I\u0027ll just push them to the cea-hpc repo, stop using mine and start using gerrit from now on. If you want more discussions I\u0027ll push the patches to gerrit now.",
+      "parentUuid": "b639c6fd_41b53f85",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
