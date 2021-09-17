@@ -106,6 +106,24 @@
       "parentUuid": "d401be26_fe541ce8",
       "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3849cad_8138639a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-17T11:53:12Z",
+      "side": 1,
+      "message": "Regarding your new patches, I think you can push them to gerrithub for review?\n\nCould you be more precise regarding the comment you want me to add and the thing that you want me to move?\n\nAs for the client\u0027s hostname, I\u0027d have to read the code but I don\u0027t mind using yours at all. It\u0027s just a matter of rebasing the phobos patch on your stack.\nAnd when the recovery is validated in the master branch of cea-hpc, we can rebase and update with your changes as well. By then, we will maybe have a better view of the way we want to handle phobos integration.",
+      "parentUuid": "77b85263_69c7cf27",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
