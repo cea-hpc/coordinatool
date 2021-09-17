@@ -52,6 +52,24 @@
       "parentUuid": "8187dd65_3c8e7dc0",
       "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b639c6fd_41b53f85",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-17T07:25:36Z",
+      "side": 1,
+      "message": "The coordinatool hostname is necessary because of how the phobos_locate call works.\n\nIf it finds no suitable hostname to use, it will send back the current hostname. The assumption in the design of locate was that it would only be done on servers with an LRS and at least one drive thus capable of doing phobos operations. The use of it in the context of the coordinatool was not taken into account.\n\nKnowing the hostname of the coordinatool allows to make sure that we don\u0027t try to send remove or restore requests to the coordinatool\u0027s hostname as there is no phobos client there.",
+      "parentUuid": "4632b946_40ffcae8",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
