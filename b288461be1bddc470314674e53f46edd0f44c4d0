@@ -16,6 +16,24 @@
       "message": "ah, sorry I\u0027ve added a similar commit recently for client recovery\nhttps://github.com/martinetd/coordinatool/commit/cdcc2194e88f73a219762cb6b3144cccef27495f\n\n\nI hadn\u0027t realized the repo had been cloned to cea-hpc, I\u0027m happy to send new patches to gerrithub from now, just need to decide what to do with this",
       "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8187dd65_3c8e7dc0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-17T06:59:19Z",
+      "side": 1,
+      "message": "As far as I understand, you\u0027ve added the hostname in ct_state.client_id in this patch. But this struct is related to client side code. This patch is for server side hostname handling. Am I wrong somewhere?",
+      "parentUuid": "734e3282_0926b0b6",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
