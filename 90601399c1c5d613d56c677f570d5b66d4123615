@@ -34,6 +34,24 @@
       "parentUuid": "b0b0faa6_1f461da9",
       "revId": "90601399c1c5d613d56c677f570d5b66d4123615",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "456526e6_5011df13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-17T07:30:28Z",
+      "side": 1,
+      "message": "I don\u0027t mind keeping this branch separate, but that\u0027ll make things difficult for you if there are further evolutions (the leftover works should not touch this too much so it\u0027s probably fine in the short term, but it\u0027ll still be more work than 0).\n\nI think ultimately coordinatool will need some plugin/hooks but I agree it doesn\u0027t have to be now, as I said I\u0027m happy with just #ifdefs -- please discuss what you think is best at next meeting and I\u0027ll go along as long as there is no hard dependency added :)",
+      "parentUuid": "f4f8dc30_c05da3e0",
+      "revId": "90601399c1c5d613d56c677f570d5b66d4123615",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
