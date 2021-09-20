@@ -179,6 +179,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ee5953f_a626cbfb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-20T13:03:25Z",
+      "side": 1,
+      "message": "I think I am the only one with permissions as I created the repository. I will add the permissions to others.\n\nI will also remove the last patches that you\u0027ve added so that you can push them (basically going back to the same base as the phobos-integration branch)",
+      "parentUuid": "c808c12d_35d9dad7",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90b2b4c7_ecfaff7b",
@@ -192,6 +210,24 @@
       "writtenOn": "2021-09-17T22:58:52Z",
       "side": 1,
       "message": "this is not an option so should go below in the \u0027states\u0027 part of the struct.\nAs it\u0027s only intended to use for phobos, having a comment saying what it\u0027s for will help cleanup later.\n(I intended to document all non-obvious fields but haven\u0027t got around to it yet... I\u0027ll convert to whatever style required for documentation (e.g. doxygen comment) when I get there)",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f663f279_939000fb",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-20T13:03:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90b2b4c7_ecfaff7b",
       "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
