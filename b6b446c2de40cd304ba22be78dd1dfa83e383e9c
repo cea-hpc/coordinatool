@@ -22,6 +22,30 @@
       },
       "revId": "b6b446c2de40cd304ba22be78dd1dfa83e383e9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cff01a25_0de07ac5",
+        "filename": "common/lustre.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:05:27Z",
+      "side": 1,
+      "message": "yes, that will occur if the file does not finish with a newline.\nCould  let the n \u003d\u003d 0 break exit the loop, and move this check as if (!rc \u0026\u0026 line !\u003d end) after the while (true) loop if that\u0027s what you meant?\nbut I don\u0027t think that helps much with code readability, so not sure why you\u0027re suggesting that?\n\nparsing the last line without a trailing \\n won\u0027t happen with the current code because of the strchr, would need to rework the inner loop a bit.\nIt\u0027s definitely possible but we can just request input to be formatted properly, and deal with it if we ever see lustre generate such output.",
+      "parentUuid": "a5ee722e_8a99cb79",
+      "range": {
+        "startLine": 191,
+        "startChar": 5,
+        "endLine": 191,
+        "endChar": 27
+      },
+      "revId": "b6b446c2de40cd304ba22be78dd1dfa83e383e9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
