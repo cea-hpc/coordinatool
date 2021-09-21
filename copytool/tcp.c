@@ -87,6 +87,7 @@ void free_client(struct state *state, struct client *client) {
 	LOG_INFO("Disconnecting %d\n", client->fd);
 	epoll_delfd(state->epoll_fd, client->fd);
 	close(client->fd);
+	free(client->addr);
 	cds_list_del(&client->node_clients);
 	cds_list_del(&client->node_waiting);
 	state->stats.clients_connected--;
