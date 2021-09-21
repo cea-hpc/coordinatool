@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc9eb011_b65b9d8e",
+        "filename": "client_common/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T12:23:31Z",
+      "side": 1,
+      "message": "nit: since rc is not used anymore, you could remove the line above and use errno here directly.",
+      "range": {
+        "startLine": 42,
+        "startChar": 44,
+        "endLine": 42,
+        "endChar": 47
+      },
+      "revId": "7685450bf14ade0125dbcfd3bd771feb12728022",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
