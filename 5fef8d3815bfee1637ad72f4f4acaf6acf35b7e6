@@ -46,6 +46,30 @@
       },
       "revId": "5fef8d3815bfee1637ad72f4f4acaf6acf35b7e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f9470a2_3b273de0",
+        "filename": "copytool/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:05:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c708d08b_2f3668fe",
+      "range": {
+        "startLine": 85,
+        "startChar": 5,
+        "endLine": 85,
+        "endChar": 16
+      },
+      "revId": "5fef8d3815bfee1637ad72f4f4acaf6acf35b7e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
