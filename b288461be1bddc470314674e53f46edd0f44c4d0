@@ -197,6 +197,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4677f52_7568f831",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T09:25:09Z",
+      "side": 1,
+      "message": "\u003e I think I am the only one with permissions as I created the repository. I will add the permissions to others.\n\nYou weren\u0027t in the cea-hpc group on gerrithub, I\u0027ve added you there so you can now fetch refs/meta/config for librobinhood if you want an example.\n\n\u003e I will also remove the last patches that you\u0027ve added so that you can push them (basically going back to the same base as the phobos-integration branch)\n\ncea-hpc\u0027s github repo has been updated, but gerrit\u0027s master branch still contains the old patches so also needs updating",
+      "parentUuid": "3ee5953f_a626cbfb",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90b2b4c7_ecfaff7b",
