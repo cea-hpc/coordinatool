@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e810d8f3_74da3717",
+        "filename": "client_common/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:18:20Z",
+      "side": 1,
+      "message": "hmm, fair enough. I was expecting gai_strerror to take care of this for us but it doesn\u0027t seem to (at least for glibc), will add check",
+      "parentUuid": "3c7b7a0f_10b4abfc",
+      "range": {
+        "startLine": 21,
+        "startChar": 17,
+        "endLine": 21,
+        "endChar": 35
+      },
+      "revId": "7685450bf14ade0125dbcfd3bd771feb12728022",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7cbf25b_004a1573",
         "filename": "client_common/tcp.c",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2021-09-21T12:38:59Z",
       "side": 1,
       "message": "suggest: maybe we could filter EAI_AGAIN errors and return EGAIN here? This would allow the clients to retry in this case.",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 23,
+        "endChar": 14
+      },
+      "revId": "7685450bf14ade0125dbcfd3bd771feb12728022",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba52127d_4b753f16",
+        "filename": "client_common/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:18:20Z",
+      "side": 1,
+      "message": "makes sense. will do in another commit.",
+      "parentUuid": "e7cbf25b_004a1573",
       "range": {
         "startLine": 23,
         "startChar": 2,
