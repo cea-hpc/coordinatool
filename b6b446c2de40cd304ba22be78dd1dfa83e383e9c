@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5ee722e_8a99cb79",
+        "filename": "common/lustre.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T12:19:19Z",
+      "side": 1,
+      "message": "question: this case only occures if the last character of the output is not \u0027\\n\u0027, right? I think moving this condition just after the \"parsing\" while loop, is enough to handle this case properly, no? You could then just try to parse the end.\n\nObviously, for this to work, you have to use another variable inside the while loop for the result of `parse_active_request_line`.",
+      "range": {
+        "startLine": 191,
+        "startChar": 5,
+        "endLine": 191,
+        "endChar": 27
+      },
+      "revId": "b6b446c2de40cd304ba22be78dd1dfa83e383e9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
