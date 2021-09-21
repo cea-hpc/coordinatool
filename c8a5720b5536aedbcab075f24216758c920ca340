@@ -72,6 +72,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77621edf_0278dcfc",
+        "filename": "client_common/client_common.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T15:17:03Z",
+      "side": 1,
+      "message": "ok.",
+      "parentUuid": "3a10ebc5_7b9a9d3e",
+      "range": {
+        "startLine": 50,
+        "startChar": 21,
+        "endLine": 50,
+        "endChar": 25
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "831c0e79_a3470f06",
@@ -133,6 +157,30 @@
       "side": 1,
       "message": "What do you mean by easy to debug? I was going to say the opposit and suggest at least to print some debug information before aborting. Is there a way to get a stack trace after an abort?",
       "parentUuid": "af5f51fd_21999e01",
+      "range": {
+        "startLine": 136,
+        "startChar": 2,
+        "endLine": 136,
+        "endChar": 10
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db20984c_59768585",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T15:17:03Z",
+      "side": 1,
+      "message": "production machines have coredumpctl or abrt setup so we will have a full backtrace.\nI agree printing it would be nicer, but I\u0027m not aware of any way of doing that without relying on external tools",
+      "parentUuid": "c0c9b0d0_6c265b1e",
       "range": {
         "startLine": 136,
         "startChar": 2,
