@@ -70,6 +70,30 @@
       },
       "revId": "b6b446c2de40cd304ba22be78dd1dfa83e383e9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4032311a_8ddc3e29",
+        "filename": "common/lustre.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T15:28:12Z",
+      "side": 1,
+      "message": "That moves usage of \u0027n\u0027 way too late after its assignment - you can just keep it where it is, replacing the error with parse_active_request_line() and stopping there.\nThe n \u003d\u003d 0 check guarantees that there won\u0027t be any other line to parse so there is no need for the loop in that iteration.\n\nI don\u0027t really mind either way, as I said I think it\u0027d be enough taking care of it when/if lustre ever outputs such message, but I also agree being tolerant in the input we accept doesn\u0027t hurt.\nFeel free to send the patch :)",
+      "parentUuid": "1c270813_49ad4d70",
+      "range": {
+        "startLine": 191,
+        "startChar": 5,
+        "endLine": 191,
+        "endChar": 27
+      },
+      "revId": "b6b446c2de40cd304ba22be78dd1dfa83e383e9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
