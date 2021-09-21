@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2d5ebf5_7fe359a0",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T13:22:19Z",
+      "side": 1,
+      "message": "nit: error could be const aswell I think",
+      "range": {
+        "startLine": 123,
+        "startChar": 60,
+        "endLine": 123,
+        "endChar": 64
+      },
+      "revId": "9ac4a64292ebaa40fab422807a16fe2e1253031a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "169bc3e8_704e6029",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T13:22:19Z",
+      "side": 1,
+      "message": "nit: currently both branches are the same, the if is unecessary",
+      "range": {
+        "startLine": 390,
+        "startChar": 1,
+        "endLine": 390,
+        "endChar": 30
+      },
+      "revId": "9ac4a64292ebaa40fab422807a16fe2e1253031a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
