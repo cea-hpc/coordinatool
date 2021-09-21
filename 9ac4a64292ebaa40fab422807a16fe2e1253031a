@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13e110a6_4ca7190b",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:06:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6c4e9a86_70b5b054",
+      "range": {
+        "startLine": 123,
+        "startChar": 60,
+        "endLine": 123,
+        "endChar": 64
+      },
+      "revId": "9ac4a64292ebaa40fab422807a16fe2e1253031a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "169bc3e8_704e6029",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "Will be different later, let\u0027s keep this.",
       "parentUuid": "169bc3e8_704e6029",
+      "range": {
+        "startLine": 390,
+        "startChar": 1,
+        "endLine": 390,
+        "endChar": 30
+      },
+      "revId": "9ac4a64292ebaa40fab422807a16fe2e1253031a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebb08f98_079a7645",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:06:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "180a6e37_de53773f",
       "range": {
         "startLine": 390,
         "startChar": 1,
