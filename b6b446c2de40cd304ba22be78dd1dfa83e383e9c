@@ -46,6 +46,30 @@
       },
       "revId": "b6b446c2de40cd304ba22be78dd1dfa83e383e9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c270813_49ad4d70",
+        "filename": "common/lustre.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:26:23Z",
+      "side": 1,
+      "message": "Yes, I missed the \"n\u003d\u003d0 \u003d\u003e break\" below. My point was that we can easily parse the last line as well instead of ignoring it. I was not talking about the code readability here.\n\nI may be wrong but I think something like the following would parse the last line correctly:\n\nmove both ifs: `(n \u003d\u003d 0 \u0026\u0026 line !\u003d end)` and `(n \u003d\u003d 0)` after the while loop.\n\n```\nwhile (strchr) {\n    ...\n}\n\nif (n \u003d\u003d 0 \u0026\u0026 line !\u003d end)\n   parse_active_request_line(line, ...); // \u003c\u003c not complete\nelse if (n \u003d\u003d 0)\n   break;\n```",
+      "parentUuid": "cff01a25_0de07ac5",
+      "range": {
+        "startLine": 191,
+        "startChar": 5,
+        "endLine": 191,
+        "endChar": 27
+      },
+      "revId": "b6b446c2de40cd304ba22be78dd1dfa83e383e9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
