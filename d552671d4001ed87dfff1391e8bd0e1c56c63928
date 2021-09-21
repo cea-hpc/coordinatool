@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d19972e6_339b8ef6",
+        "filename": "client/client.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:14:32Z",
+      "side": 1,
+      "message": "good point. Since it\u0027s missing more options I\u0027ll add them in a later commit",
+      "parentUuid": "3134fdfb_c9408126",
+      "range": {
+        "startLine": 14,
+        "startChar": 5,
+        "endLine": 14,
+        "endChar": 15
+      },
+      "revId": "d552671d4001ed87dfff1391e8bd0e1c56c63928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "61ba28a0_6e039948",
         "filename": "meson.build",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2021-09-21T12:45:51Z",
       "side": 1,
       "message": "question: shouldn\u0027t this be \u0027common/version.h\u0027?",
+      "range": {
+        "startLine": 48,
+        "startChar": 1,
+        "endLine": 48,
+        "endChar": 20
+      },
+      "revId": "d552671d4001ed87dfff1391e8bd0e1c56c63928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdb26749_6918ee9d",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:14:32Z",
+      "side": 1,
+      "message": "This goes in the generated build directory -- build/common isn\u0027t in include path so it\u0027s easier this way",
+      "parentUuid": "61ba28a0_6e039948",
       "range": {
         "startLine": 48,
         "startChar": 1,
