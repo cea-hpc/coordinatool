@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a650173a_24a48324",
+        "filename": "preload/preload.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T12:37:37Z",
+      "side": 1,
+      "message": "nit: Sending recv request",
+      "range": {
+        "startLine": 103,
+        "startChar": 20,
+        "endLine": 103,
+        "endChar": 27
+      },
+      "revId": "178a0f42905354d4b667ed32bdb53fd0eceba8f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
