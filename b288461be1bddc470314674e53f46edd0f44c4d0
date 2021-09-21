@@ -215,6 +215,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a47a6c1c_7ad44d15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T10:18:31Z",
+      "side": 1,
+      "message": "Thanks for adding me to cea-hpc. I\u0027ve added the same permissions for cea-hpc as in librobinhood. This should be fine.\n\nRegarding the branch master in gerrithub. I had the same issue at the begining. I pushed the two patches on the phobos-integration branch of cea-hpc and then removed them. I could then push my 2 patches on gerrithub for review. Did you try to push them? Otherwise, I\u0027ll try to find a way to sync cea-hpc and gerrithub.",
+      "parentUuid": "b4677f52_7568f831",
+      "revId": "b288461be1bddc470314674e53f46edd0f44c4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90b2b4c7_ecfaff7b",
