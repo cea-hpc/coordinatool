@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a10ebc5_7b9a9d3e",
+        "filename": "client_common/client_common.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:15:42Z",
+      "side": 1,
+      "message": "I don\u0027t mind the name. Maybe just a description of its purpose would be great in \u0027common/protocol.h\u0027.",
+      "parentUuid": "e2feff65_196db2b0",
+      "range": {
+        "startLine": 50,
+        "startChar": 21,
+        "endLine": 50,
+        "endChar": 25
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "831c0e79_a3470f06",
         "filename": "client_common/protocol.c",
         "patchSetId": 1
@@ -97,6 +121,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0c9b0d0_6c265b1e",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:15:42Z",
+      "side": 1,
+      "message": "What do you mean by easy to debug? I was going to say the opposit and suggest at least to print some debug information before aborting. Is there a way to get a stack trace after an abort?",
+      "parentUuid": "af5f51fd_21999e01",
+      "range": {
+        "startLine": 136,
+        "startChar": 2,
+        "endLine": 136,
+        "endChar": 10
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "01287776_58d90b46",
         "filename": "client_common/protocol.c",
         "patchSetId": 1
@@ -132,6 +180,30 @@
       "side": 1,
       "message": "This is intentional for when code is added, I generally try to keep error cases this way even if not strictly required",
       "parentUuid": "01287776_58d90b46",
+      "range": {
+        "startLine": 149,
+        "startChar": 2,
+        "endLine": 149,
+        "endChar": 16
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "faf142cb_48ce5c3d",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:15:42Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "491fe260_9b4f236c",
       "range": {
         "startLine": 149,
         "startChar": 2,
