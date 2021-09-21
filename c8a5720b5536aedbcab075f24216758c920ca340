@@ -217,6 +217,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d2ef66fa_24f3c8db",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T15:37:14Z",
+      "side": 1,
+      "message": "I\u0027m explicitly not using assert() because I do not want these checks disabled for production builds. That\u0027s really a behavior of assert that I can\u0027t agree with.\n\nI don\u0027t mind defining our own assert macro that would stay valid and print file/line/failing check, that is definitely better than the current code, but once again these can\u0027t fail so arguing is a waste of time. I\u0027ve added it to my todo but that is really low priority for me.\n\nwrt. your logging system, please don\u0027t -- we don\u0027t need such things in 2021. If you ever need something like this uprobe allows you to log when you enter which function and prints backtraces etc:\nhttps://github.com/iovisor/bpftrace/blob/master/docs/reference_guide.md#3-uprobeuretprobe-dynamic-tracing-user-level\nLet\u0027s not add code churn for something that can be done easily.",
+      "parentUuid": "da563fc4_c0390b81",
+      "range": {
+        "startLine": 136,
+        "startChar": 2,
+        "endLine": 136,
+        "endChar": 10
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "01287776_58d90b46",
         "filename": "client_common/protocol.c",
         "patchSetId": 1
