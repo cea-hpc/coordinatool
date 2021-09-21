@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "af1b9e48_b56c431d",
+        "filename": "client_common/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:17:35Z",
+      "side": 1,
+      "message": "My point was more about the return value of the function. If errno gives us more information than EIO, I think we should return it.",
+      "parentUuid": "e810d8f3_74da3717",
+      "range": {
+        "startLine": 21,
+        "startChar": 17,
+        "endLine": 21,
+        "endChar": 35
+      },
+      "revId": "7685450bf14ade0125dbcfd3bd771feb12728022",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7cbf25b_004a1573",
         "filename": "client_common/tcp.c",
         "patchSetId": 1
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "makes sense. will do in another commit.",
       "parentUuid": "e7cbf25b_004a1573",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 23,
+        "endChar": 14
+      },
+      "revId": "7685450bf14ade0125dbcfd3bd771feb12728022",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f5fbc09_b4b19f6d",
+        "filename": "client_common/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T14:17:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ba52127d_4b753f16",
       "range": {
         "startLine": 23,
         "startChar": 2,
