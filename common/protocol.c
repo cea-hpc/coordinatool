@@ -185,7 +185,7 @@ static int json_dump_cb(const char *buffer, size_t _size, void *data) {
 	struct load_cb_data *cbdata = data;
 	int rc;
 	ssize_t size = _size;
-	
+
 	if (size > cbdata->buflen - cbdata->bufread) {
 		rc = write_full(cbdata->fd, cbdata->buffer, cbdata->bufread);
 		cbdata->bufread = 0;
