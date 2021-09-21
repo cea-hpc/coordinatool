@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6c4e9a86_70b5b054",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:30:44Z",
+      "side": 1,
+      "message": "Fair enough, I had to make id const because of where it comes from but error can definitely be const as well.\nThat\u0027s true for all of these and should be done later",
+      "parentUuid": "a2d5ebf5_7fe359a0",
+      "range": {
+        "startLine": 123,
+        "startChar": 60,
+        "endLine": 123,
+        "endChar": 64
+      },
+      "revId": "9ac4a64292ebaa40fab422807a16fe2e1253031a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "169bc3e8_704e6029",
         "filename": "copytool/protocol.c",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2021-09-21T13:22:19Z",
       "side": 1,
       "message": "nit: currently both branches are the same, the if is unecessary",
+      "range": {
+        "startLine": 390,
+        "startChar": 1,
+        "endLine": 390,
+        "endChar": 30
+      },
+      "revId": "9ac4a64292ebaa40fab422807a16fe2e1253031a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "180a6e37_de53773f",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:30:44Z",
+      "side": 1,
+      "message": "Will be different later, let\u0027s keep this.",
+      "parentUuid": "169bc3e8_704e6029",
       "range": {
         "startLine": 390,
         "startChar": 1,
