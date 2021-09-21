@@ -193,6 +193,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "da563fc4_c0390b81",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-09-21T15:24:35Z",
+      "side": 1,
+      "message": "You mean printing the backtrace?\n\nI was thinking about printing a debug log in stderr before aborting (I think stderr is not buffered so this should be fine). Maybe we can replace abort() calls by an ABORT() macro which would at least display the filename and position of the abort for debug purposes? It could be disabled at compile time by a \u0027#define/undef DEBUG\u0027.\n\nIf we think long term, we can imagine having a complete logging system which would record function entries and protocol events making the debugging of aborts easier.",
+      "parentUuid": "db20984c_59768585",
+      "range": {
+        "startLine": 136,
+        "startChar": 2,
+        "endLine": 136,
+        "endChar": 10
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "01287776_58d90b46",
         "filename": "client_common/protocol.c",
         "patchSetId": 1
