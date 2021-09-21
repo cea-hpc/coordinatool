@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e2feff65_196db2b0",
+        "filename": "client_common/client_common.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:24:58Z",
+      "side": 1,
+      "message": "This is the greeting keyword used in smtp (it accepts both helo and ehlo)\nHappy to rename it to capabilities or something less controvertial",
+      "parentUuid": "8bafbcfe_4b7f1751",
+      "range": {
+        "startLine": 50,
+        "startChar": 21,
+        "endLine": 50,
+        "endChar": 25
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "831c0e79_a3470f06",
         "filename": "client_common/protocol.c",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2021-09-21T13:15:57Z",
       "side": 1,
       "message": "minor: why use abort and not return an error which would be handled by callers?",
+      "range": {
+        "startLine": 136,
+        "startChar": 2,
+        "endLine": 136,
+        "endChar": 10
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af5f51fd_21999e01",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:24:58Z",
+      "side": 1,
+      "message": "The only reason this would fail is a memory allocation failure, the code in coordinatool doesn\u0027t deal with such errors.\nThis is purely a design decision but I find it much easier to abort and have systemd or whatever restart the daemon in the rare chance that occurs (on linux with glibc, I don\u0027t think it can actually happen: malloc will happily provide a pointer to use, and the failure will happen when the program tries to access that memory space)\n\nabort also has the advantage of being easy to debug if I need to be proved wrong later",
+      "parentUuid": "831c0e79_a3470f06",
       "range": {
         "startLine": 136,
         "startChar": 2,
@@ -72,6 +120,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "491fe260_9b4f236c",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:24:58Z",
+      "side": 1,
+      "message": "This is intentional for when code is added, I generally try to keep error cases this way even if not strictly required",
+      "parentUuid": "01287776_58d90b46",
+      "range": {
+        "startLine": 149,
+        "startChar": 2,
+        "endLine": 149,
+        "endChar": 16
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b854a92_eaa44337",
         "filename": "client_common/protocol.c",
         "patchSetId": 1
@@ -83,6 +155,30 @@
       "writtenOn": "2021-09-21T13:15:57Z",
       "side": 1,
       "message": "defect: you must check id as strdup(NULL) creates a segfault",
+      "range": {
+        "startLine": 161,
+        "startChar": 21,
+        "endLine": 161,
+        "endChar": 31
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aaf11bad_fc5dddcf",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:24:58Z",
+      "side": 1,
+      "message": "hmm, that\u0027s kind of the same argument as earlier, but I agree it\u0027s best to add a check here. Adding an abort.",
+      "parentUuid": "6b854a92_eaa44337",
       "range": {
         "startLine": 161,
         "startChar": 21,
@@ -129,6 +225,30 @@
       "writtenOn": "2021-09-21T13:15:57Z",
       "side": 1,
       "message": "typo: ours",
+      "range": {
+        "startLine": 166,
+        "startChar": 58,
+        "endLine": 166,
+        "endChar": 63
+      },
+      "revId": "c8a5720b5536aedbcab075f24216758c920ca340",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32ea1326_8c7efe10",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-09-21T13:24:58Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "642e36bb_63fb410e",
       "range": {
         "startLine": 166,
         "startChar": 58,
