@@ -140,7 +140,7 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 			   const struct hsm_action_item *hai,
 			   int restore_mdt_index, int restore_open_flags,
 			   bool is_error) {
-	static int (*real_action_begin)(struct hsm_copyaction_private **, 
+	static int (*real_action_begin)(struct hsm_copyaction_private **,
 					 const struct hsm_copytool_private *,
 					 const struct hsm_action_item *,
 					 int, int, bool);
@@ -168,11 +168,11 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 	return rc;
 }
 
- 
+
 int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 			 const struct hsm_extent *he, int hp_flags,
 			 int errval) {
-	static int (*real_action_end)(struct hsm_copyaction_private **, 
+	static int (*real_action_end)(struct hsm_copyaction_private **,
 				       const struct hsm_extent *, int, int);
 	if (!real_action_end) {
 #pragma GCC diagnostic push
@@ -193,7 +193,7 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	int rc, rc_done;
 
 	rc = real_action_end(phcp, he, hp_flags, errval);
-	
+
 	rc_done = protocol_request_done(&ct->state, archive_id,
 					cookie, rc);
 

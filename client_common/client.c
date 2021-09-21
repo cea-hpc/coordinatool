@@ -24,7 +24,6 @@ static long long str_suffix_to_u32(const char *str, const char *error_hint) {
 		abort();
 	switch (*endptr) {
 	case 0:
-		
 		break;
 	case 'g':
 	case 'G':
@@ -64,7 +63,7 @@ static int getenv_u32(const char *name, uint32_t *val) {
 	const char *env = getenv(name);
 	if (!env)
 		return 0;
-	
+
 	long long envval = str_suffix_to_u32(env, name);
 	if (envval < 0)
 		return envval;
@@ -286,7 +285,7 @@ out:
 
 int ct_config_init(struct ct_state_config *config) {
 	int rc;
-	
+
 	/* first set defaults */
 	config->host = "coordinatool";
 	config->port = "5123";
