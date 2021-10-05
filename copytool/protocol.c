@@ -380,13 +380,22 @@ out_freereply:
 static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
-	const char *id;
+	const char *id, *dot;
+	size_t hostsize;
 
 	id = protocol_getjson_str(json, "id", NULL, NULL);
 	if (!id) {
 		// no id: no special treatment
 		return protocol_reply_ehlo(client->fd, 0, NULL);
 	}
+
+	dot = strchr(id, '.');
+	if (dot)
+		*dot = '\0';
+	client->id = strdup(id);
+	if (!client->id)
+		abort();
+
 	if (!protocol_getjson_bool(json, "reconnect")) {
 		// new client, ok. remember id for logs?
 		return protocol_reply_ehlo(client->fd, 0, NULL);
