@@ -106,6 +106,7 @@ void free_client(struct state *state, struct client *client) {
 		cds_list_del(n);
 		hsm_action_requeue(node);
 	}
+	free(client->id);
 	free(client);
 }
 
