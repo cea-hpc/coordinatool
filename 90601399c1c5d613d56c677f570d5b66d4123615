@@ -52,6 +52,24 @@
       "parentUuid": "f4f8dc30_c05da3e0",
       "revId": "90601399c1c5d613d56c677f570d5b66d4123615",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4701e7ec_14072382",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-10-05T08:32:44Z",
+      "side": 1,
+      "message": "Ok, after some discussions about this, the goal right now is to have a prototype which can support phobos. So the idea is to have a seperate branch so than there is no hard dependency with phobos on the master branch.\n\nI will rebase my last patch on your stack so that I can use the elho request for the hostname. And I think we can then move forward after you validate the changes.",
+      "parentUuid": "456526e6_5011df13",
+      "revId": "90601399c1c5d613d56c677f570d5b66d4123615",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
