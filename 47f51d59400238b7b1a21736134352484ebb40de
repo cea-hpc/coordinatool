@@ -45,6 +45,29 @@
       },
       "revId": "47f51d59400238b7b1a21736134352484ebb40de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c9552b6_36541508",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2021-10-14T11:47:04Z",
+      "side": 1,
+      "message": "question: will it need an adjustment with phobos_locate() returning NULL in case there is no a perfect match?",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 6
+      },
+      "revId": "47f51d59400238b7b1a21736134352484ebb40de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
