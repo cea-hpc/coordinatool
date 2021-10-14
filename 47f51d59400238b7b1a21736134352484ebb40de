@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ceee0ddc_f1dbf858",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-10-14T09:11:51Z",
+      "side": 1,
+      "message": "question: why mention ENOATTR in the above comment if ENOTSUP is checked ?",
+      "range": {
+        "startLine": 152,
+        "startChar": 35,
+        "endLine": 152,
+        "endChar": 42
+      },
+      "revId": "47f51d59400238b7b1a21736134352484ebb40de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "530782b2_483dad3e",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-10-14T09:11:51Z",
+      "side": 1,
+      "message": "minor: \"return errno \u003d\u003d ENODATA || errno \u003d\u003d ENOTSUP;\"",
+      "range": {
+        "startLine": 152,
+        "startChar": 2,
+        "endLine": 155,
+        "endChar": 16
+      },
+      "revId": "47f51d59400238b7b1a21736134352484ebb40de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
