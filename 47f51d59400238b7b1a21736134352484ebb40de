@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5ff23e4b_89eb63bc",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-10-14T13:12:11Z",
+      "side": 1,
+      "message": "The comment is about ENOATTR and ENODATA. ENOATTR means that the file does not contain the attribute but it is not available on Linux. Which is why I check ENODATA here.",
+      "parentUuid": "ceee0ddc_f1dbf858",
+      "range": {
+        "startLine": 152,
+        "startChar": 35,
+        "endLine": 152,
+        "endChar": 42
+      },
+      "revId": "47f51d59400238b7b1a21736134352484ebb40de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "530782b2_483dad3e",
         "filename": "copytool/protocol.c",
         "patchSetId": 2
@@ -60,6 +84,30 @@
       "writtenOn": "2021-10-14T11:47:04Z",
       "side": 1,
       "message": "question: will it need an adjustment with phobos_locate() returning NULL in case there is no a perfect match?",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 6
+      },
+      "revId": "47f51d59400238b7b1a21736134352484ebb40de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f7d2fcc_5b0376e7",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-10-14T13:12:11Z",
+      "side": 1,
+      "message": "Yes, I think, strcmp doesn\u0027t support NULL pointers. And the comparison with state-\u003ehostname will not be necessary either.",
+      "parentUuid": "7c9552b6_36541508",
       "range": {
         "startLine": 159,
         "startChar": 0,
