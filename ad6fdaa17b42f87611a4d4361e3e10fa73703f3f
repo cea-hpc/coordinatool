@@ -52,6 +52,24 @@
       "parentUuid": "c7d1d87c_d2728f29",
       "revId": "ad6fdaa17b42f87611a4d4361e3e10fa73703f3f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49170f2d_466cf19d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-14T12:01:14Z",
+      "side": 1,
+      "message": "Yes, but it\u0027s the same really: there\u0027s no way out of the main loop, so no point in freeing things.\n\nThe other char* for the server come straight from argv[i] so don\u0027t actually need to be freed, but we\u0027re actually leaking ctdata, so when a way out of the main loop is added we\u0027ll need to add llapi_hsm_copytool_unregister for it. There\u0027s also the epoll fd to close etc.. quite a bit of cleanup is missing.\n\n\nFor the client I was a bit more careful, there also are char* but I cheated with either passing directly argv[i] or static char config_host[256] / static char config_port[6] or client.active_requests.fsname so they wouldn\u0027t need to be freed. I guess these should be converted to strdup and free if we ever add really dynamic variables, but there has been no need for it for now.",
+      "parentUuid": "72a90234_5907a99f",
+      "revId": "ad6fdaa17b42f87611a4d4361e3e10fa73703f3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
