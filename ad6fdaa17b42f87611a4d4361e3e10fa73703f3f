@@ -16,6 +16,24 @@
       "message": "Is there a hidden way to release the state structure? I think that there is not any because there was yet no need for it.",
       "revId": "ad6fdaa17b42f87611a4d4361e3e10fa73703f3f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7d1d87c_d2728f29",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-14T11:27:12Z",
+      "side": 1,
+      "message": "struct state itself is on the stack (as part of copytool private, `struct client client` in clients or directly `struct state state` on coordinatool), so never freed for itself.\n\nIts members should be freed if dynamically allocated though and I probably missed some.\nIf you spot some in clients it should be added in common code and hooked before free(ct) in preload/preload.c and before normal exit for client/client.c\n\nFor server the main loop has no normal exit, but it would be useful for debugging memory leaks eventually -- it would make sense to add either a sigterm handler to properly exit or a terminate message from client for that.",
+      "parentUuid": "a9cdd169_3d5fe546",
+      "revId": "ad6fdaa17b42f87611a4d4361e3e10fa73703f3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
