@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9cdd169_3d5fe546",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2021-10-14T11:11:56Z",
+      "side": 1,
+      "message": "Is there a hidden way to release the state structure? I think that there is not any because there was yet no need for it.",
+      "revId": "ad6fdaa17b42f87611a4d4361e3e10fa73703f3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
