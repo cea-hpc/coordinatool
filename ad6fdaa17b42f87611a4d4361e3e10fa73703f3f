@@ -34,6 +34,24 @@
       "parentUuid": "a9cdd169_3d5fe546",
       "revId": "ad6fdaa17b42f87611a4d4361e3e10fa73703f3f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72a90234_5907a99f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2021-10-14T11:49:59Z",
+      "side": 1,
+      "message": "My bad, I wanted to say state structure contents, and I figured that for now, none of its fields needed to be released. But I do not think this is the case for this new hostname field.",
+      "parentUuid": "c7d1d87c_d2728f29",
+      "revId": "ad6fdaa17b42f87611a4d4361e3e10fa73703f3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
