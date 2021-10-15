@@ -71,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8a01c9c_b57f32a5",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-10-15T09:28:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "530782b2_483dad3e",
+      "range": {
+        "startLine": 152,
+        "startChar": 2,
+        "endLine": 155,
+        "endChar": 16
+      },
+      "revId": "47f51d59400238b7b1a21736134352484ebb40de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c9552b6_36541508",
