@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "018ad8e7_c0806e3f",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-10-25T11:41:20Z",
+      "side": 1,
+      "message": "defect: missing \u0027;\u0027",
+      "range": {
+        "startLine": 152,
+        "startChar": 46,
+        "endLine": 152,
+        "endChar": 47
+      },
+      "revId": "93cf5828c14d1a8a2d32e821958c671eba46bd36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

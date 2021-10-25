@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce365189_53e8aaff",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-10-25T11:41:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "5ff23e4b_89eb63bc",
+      "range": {
+        "startLine": 152,
+        "startChar": 35,
+        "endLine": 152,
+        "endChar": 42
+      },
+      "revId": "47f51d59400238b7b1a21736134352484ebb40de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "530782b2_483dad3e",
