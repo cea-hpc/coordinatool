@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "645b3658_a542e059",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2021-10-29T11:33:51Z",
+      "side": 1,
+      "message": "It should works, but it does not look optimal to requeue get operations at the tail of the list.",
+      "revId": "b93e460f2d95056abf0d9e693b844302e45bc1b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c3bd11e_16f7d325",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2021-10-29T11:33:51Z",
+      "side": 1,
+      "message": "Sending back the request to the tail of the list may not be the best behavior.",
+      "revId": "b93e460f2d95056abf0d9e693b844302e45bc1b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94aadfb8_a88927d9",
+        "filename": "copytool/queue.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2021-10-29T11:33:51Z",
+      "side": 1,
+      "message": "@Dominique, if you pass by there... What is the interest of this mechanism? Why not pushing all to the queue and then let the waiting copytools dequeue them in the common path of code? It would avoid 2 differents paths of scheduling.",
+      "range": {
+        "startLine": 117,
+        "startChar": 6,
+        "endLine": 117,
+        "endChar": 54
+      },
+      "revId": "b93e460f2d95056abf0d9e693b844302e45bc1b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
