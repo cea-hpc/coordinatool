@@ -80,6 +80,30 @@
       },
       "revId": "b93e460f2d95056abf0d9e693b844302e45bc1b2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e37eded6_d6b84414",
+        "filename": "copytool/queue.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2021-10-29T12:31:16Z",
+      "side": 1,
+      "message": "OK I understand. Thank you for clarifying.",
+      "parentUuid": "62194e5e_1d261446",
+      "range": {
+        "startLine": 117,
+        "startChar": 6,
+        "endLine": 117,
+        "endChar": 54
+      },
+      "revId": "b93e460f2d95056abf0d9e693b844302e45bc1b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
