@@ -56,6 +56,30 @@
       },
       "revId": "b93e460f2d95056abf0d9e693b844302e45bc1b2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62194e5e_1d261446",
+        "filename": "copytool/queue.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-29T12:17:03Z",
+      "side": 1,
+      "message": "If there is a waiting client we have to send any new request immediately to a client because there is no scheduling at all currently: there is nothing that will periodically look at queues, waiting client and intelligently distribute the work.\n\nI agree that the current behaviour is suboptimal:\n - if clients are waiting, new requests are sent one by one until all clients are busy then requests are queued\n - at this point the first client that comes back will get as many requests as it can accept, potentially all requests, leaving other clients without any work\n\nThe second point can be easily improved by limiting the amount of parallel requests to \u003ctotal number of request\u003e / \u003cnumber of connected clients\u003e at a time, effectively distributing the work to all clients in practice, but the first point (this loop here) cannot be improved without adding a mechanism for work to send... Adding a timerfd to wake at regular interval could work but I don\u0027t really like that \"loop interval\" mechanism in current coordinator; perhaps something like handling all the requests in a given hsm action list (handle_ct_event) then doing one pass of scheduling?\n\nIn practice though I don\u0027t think that\u0027s critical, copytools we care about all spawn workers in the background and immediately send a recv request again, so it\u0027s actually more efficient to send one request as early as we can so copytool start working then get more work once the first item has been started... If anything it might help once more clever scheduling is involved limiting max transfer per user or something.\n\n\n(oh, writing all this made me realize a bug.. if all clients are full and ask for recv with 0 restore but we have restore pending, we\u0027ll never use the \u0027done\u0027 request as a signal to send a new restore again. That\u0027s an easy fix though, but would have been interesting to debug in production...)",
+      "parentUuid": "94aadfb8_a88927d9",
+      "range": {
+        "startLine": 117,
+        "startChar": 6,
+        "endLine": 117,
+        "endChar": 54
+      },
+      "revId": "b93e460f2d95056abf0d9e693b844302e45bc1b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
