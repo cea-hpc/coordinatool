@@ -1,6 +1,9 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <fcntl.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "lustre.h"
 #include "logs.h"
@@ -23,10 +26,19 @@ int parse_hai_cb(struct hsm_action_item *hai, unsigned int archive_id,
 	return 0;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	int rc;
+	int fd = 0;
 
-	rc = parse_active_requests(0, parse_hai_cb, NULL);
+	if (argc == 2) {
+		fd = open(argv[1], O_RDONLY);
+		if (fd < 0) {
+			fprintf(stderr, "Could not open %s: %d\n", argv[1], errno);
+			return 1;
+		}
+	}
+
+	rc = parse_active_requests(fd, parse_hai_cb, NULL);
 	printf("got %d items\n", rc);
 
 	return 0;
