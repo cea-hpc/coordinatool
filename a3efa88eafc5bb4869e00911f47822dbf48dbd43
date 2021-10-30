@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cdadaa9_8e967e61",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-30T05:25:47Z",
+      "side": 1,
+      "message": "re: process: I\u0027ve reopened https://review.gerrithub.io/c/cea-hpc/coordinatool/+/525670 to have this patch on master branch\n\nI actually wanted to \"merge the mergable\" (at the very least this patch could be useful for log messages instead of logging client address.. .well logs likely will need another fixup pass anyway)\n\nGerrit has annoyed me quite a bit with my own older patches I didn\u0027t expect to see on gerrit in the first place (no change id etc...), but it also seems quite horrible when it comes to target branches -- instead of a branch I think it\u0027d be easier to deal with \u0027topic\u0027 e.g. push with `git push gerrit HEAD:refs/for/master%topic\u003dphobos` instead",
+      "revId": "a3efa88eafc5bb4869e00911f47822dbf48dbd43",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4aed87b7_1d0a5de1",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-30T05:25:47Z",
+      "side": 1,
+      "message": "(I think this makes more sense to have clients send what we want (e.g. short hostname) rather than try to cut the id here in general; but this does not really matter to me so rolling with it)",
+      "revId": "a3efa88eafc5bb4869e00911f47822dbf48dbd43",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
