@@ -852,6 +852,8 @@ static int ct_producer_setup(void)
 		return rc;
 	}
 
+	// please scan-build: this actually can't be null here
+	assert(opt.o_mnt);
 	opt.o_mnt_fd = open(opt.o_mnt, O_RDONLY);
 	if (opt.o_mnt_fd < 0) {
 		rc = -errno;
