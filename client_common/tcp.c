@@ -9,8 +9,8 @@ int tcp_connect(struct ct_state *state) {
 	struct addrinfo hints;
 	struct addrinfo *result, *rp;
 	int sfd, s;
-	int rc;
 
+again:
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -36,9 +36,10 @@ int tcp_connect(struct ct_state *state) {
 	freeaddrinfo(result);
 
 	if (rp == NULL) {
-		rc = -errno;
-		LOG_ERROR(rc, "Could not connect to %s:%s", state->config.host, state->config.port);
-		return rc;
+		LOG_WARN("Could not connect to %s:%s: %d. Retrying.",
+			 state->config.host, state->config.port, errno);
+		sleep(5);
+		goto again;
 	}
 	LOG_INFO("Connected to %s", state->config.host);
 
