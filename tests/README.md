@@ -1,17 +1,29 @@
 # Tests
 
 There are three categories of tests:
-- Unit tests, ran through meson with ninja -C tests
-- Integration tests, ran manually here somehow when it's done
+- Unit tests, ran through meson with `ninja -C <builddir> test`
+- Integration tests, ran manually here through `./tests/run_tests.sh`
 - Fuzzing
 
 ## Unit tests
 
-XXX describe briefly
+- `parse_active_requests`: checks basic parsing works
+- XXX add protocol primitives tests
 
 ## Integration tests
 
-XXX ditto
+tests assume:
+ - sudo available
+ - `tests_config.sh` has been filled, in particular:
+   * CLIENT/MNTPATH are arrays with available clients (node, mount point)
+     if CLIENT is set to something other than localhost, ssh key must be configured
+   * MDS/MDT are set to mds node and mdt name (e.g. testfs0-MDT0000)
+   * SOURCEDIR/BUILDDIR must be accessible from all nodes (shared mount)
+   * ARCHIVEDIR junk directory that can be used on clients for `lhsmtool_cmd` backend
+   * TESTDIR junk directory inside lustre, use MNTPATH if multiple mountpoints
+ - no other agent running for that lustre
+
+Given that, they start a coordinatool and lhsmtool agents and run basic tests
 
 ## Fuzzing
 
