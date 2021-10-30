@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c36922c5_a935d497",
+        "filename": "client/client.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-30T04:15:35Z",
+      "side": 1,
+      "message": "I can agree to this, moved to client initialization\n\n         struct client client \u003d {\n                 .mode \u003d MODE_STATUS,\n                 .iters \u003d 1,\n +               .state.socket_fd \u003d -1,\n         };",
+      "parentUuid": "c549e7ba_711d89c4",
+      "range": {
+        "startLine": 186,
+        "startChar": 1,
+        "endLine": 186,
+        "endChar": 29
+      },
+      "revId": "4155825eb52418daca1e727eed1460d7aa192925",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9df70b35_9b8599b1",
@@ -37,6 +61,24 @@
       "writtenOn": "2021-09-21T12:57:29Z",
       "side": 1,
       "message": "question: couldn\u0027t we just assume that the file descriptor of the socket is not opened when tcp_connect is called and set it to -1 before \u0027again:\u0027 instead of modifying it in the caller?\n\nThe only issue I see is if a copytool tries to register multiple times but that\u0027s not how it\u0027s suppose to work.",
+      "revId": "4155825eb52418daca1e727eed1460d7aa192925",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "209a8651_7c2e6fb9",
+        "filename": "client_common/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-30T04:15:35Z",
+      "side": 1,
+      "message": "Sorry for the delay; tcp_connect is called again when the client reconnects e.g. in preload/preload.c llapi_hsm_copytool_recv we try to reconnect if the connection to the server dropped",
+      "parentUuid": "9df70b35_9b8599b1",
       "revId": "4155825eb52418daca1e727eed1460d7aa192925",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
