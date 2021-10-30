@@ -22,7 +22,7 @@ executable(
 	]),
 )
 
-executable(
+parse_active_requests = executable(
 	'parse_active_requests',
 	sources: [
 		'parse_active_requests.c',
@@ -30,6 +30,7 @@ executable(
 	include_directories: include_directories('../common'),
 	link_with: [common],
 )
+test('parse_active_requests', parse_active_requests, args: [meson.current_source_dir() / 'active_requests'])
 
 executable(
 	'json',
