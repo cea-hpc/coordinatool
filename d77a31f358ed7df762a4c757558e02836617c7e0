@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e4bfcf7_f40dc75d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-30T04:54:22Z",
+      "side": 1,
+      "message": "oh, $#@$# waste of time, all of these changes have no change id and gerrit does not refuse pushing without change ids.\nabandonning all of this stuff and merging the new ones before I make the same mistake again, sorry but let\u0027s fix things in new proper commits with change ids...",
+      "revId": "d77a31f358ed7df762a4c757558e02836617c7e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
