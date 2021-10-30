@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d91a5cf7_b69f3436",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-10-30T04:40:59Z",
+      "side": 1,
+      "message": "grmbl a race in the build system perhaps... no code change so forcing verify +1 as lazy",
+      "revId": "93a9de90415f4f84ba5f7f98244ce1ba1fae4995",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
