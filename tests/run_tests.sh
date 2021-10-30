@@ -80,8 +80,8 @@ sanity() {
 			|| error "$BUILDDIR not a build dir or not accessible on client $i"
 		do_client $i "stat ${SOURCEDIR@Q}/tests/lhsm_cmd.conf > /dev/null" \
 			|| error "$SOURCEDIR not a source dir or not accessible on client $i"
-		do_client $i "pkill [l]hsmd_coordinatool" || :
-		do_client $i "pkill [l]hsmtool_cmd" || :
+		do_client $i "systemctl stop coordinatool.service
+			      systemctl stop lhsmtool_cmd@*.service" || :
 	done
 
 
@@ -100,9 +100,11 @@ sanity() {
 
 
 normal_requests() {
-	do_client 0 "${BUILDDIR@Q}/lhsmd_coordinatool -vv MNTPATH" &
+	do_client 0 "systemd-run -P -G --unit=coordinatool.service \
+		${BUILDDIR@Q}/lhsmd_coordinatool -vv MNTPATH" &
 	do_client 1 "rm -rf ${ARCHIVEDIR@Q} && mkdir ${ARCHIVEDIR@Q}"
-	do_client 1 "LD_PRELOAD=${BUILDDIR@Q}/libcoordinatool_client.so \
+	do_client 1 "systemd-run -P -G --unit=lhsmtool_cmd@1.service \
+		-E LD_PRELOAD=${BUILDDIR@Q}/libcoordinatool_client.so \
 	       ${BUILDDIR@Q}/tests/lhsmtool_cmd -vv --config ${SOURCEDIR@Q}/tests/lhsm_cmd.conf MNTPATH" &
 
 	do_client 2 "rm -rf ${TESTDIR@Q}
@@ -123,8 +125,8 @@ normal_requests() {
 		if ! ((TMOUT)); then echo 'Failed to remove'; exit 1; fi
 		"
 
-	do_client 1 "pkill [l]hsmtool" || :
-	do_client 0 "pkill [l]hsmd" || :
+	do_client 1 "systemctl stop lhsmtool_cmd@1.service" || :
+	do_client 0 "systemctl stop coordinatool.service" || :
 	wait
 }
 
