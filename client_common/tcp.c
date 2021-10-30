@@ -24,9 +24,16 @@ again:
 
 	s = getaddrinfo(state->config.host, state->config.port, &hints, &result);
 	if (s != 0) {
-		/* getaddrinfo does not use errno, cheat with debug */
-		LOG_ERROR(-EIO, "getaddrinfo: %s", gai_strerror(s));
-		return -EIO;
+		if (s == EAI_AGAIN)
+			goto again;
+		if (s == EAI_SYSTEM) {
+			rc = -errno;
+			LOG_ERROR(rc, "ERROR getaddrinfo");
+		} else {
+			rc = -EIO;
+			LOG_ERROR(rc, "ERROR getaddrinfo: %s", gai_strerror(s));
+		}
+		return rc;
 	}
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
