@@ -310,6 +310,9 @@ static int queue_cb_enqueue(struct hsm_action_list *hal UNUSED,
 	rc = hsm_action_enqueue(enqueue_state->queues, hai);
 	if (rc < 0)
 		return rc;
+	if (rc > 0)
+		LOG_INFO("Enqueued a request for "DFID" from QUEUE\n" ,
+			 PFID(&hai->hai_dfid));
 	enqueue_state->enqueued += rc;
 
 	return 0;
