@@ -14,13 +14,19 @@
 void print_help(char *argv[]) {
 	printf("Usage: %s [options]\n\n", argv[0]);
 	printf("common client options are shared with lib (see config file and env var\n");
-	printf("defaults to printing status\n");
+	printf("defaults to printing status\n\n");
 	printf("options:\n");
+	printf("--host/-H: server to connect to\n");
+	printf("--port/-p: port to connect to\n");
 	printf("--queue/-Q: queue active_requests from stdin\n");
 	printf("--recv/-R: (debug tool) ask for receiving work\n");
 	printf("           note the work will be reclaimed when client disconnects\n");
 	printf("--iters/-i: number of replies to expect (can be used to wait after\n");
-	printf("            receiving work, negative number loops forever)");
+	printf("            receiving work, negative number loops forever)\n");
+	printf("--verbose/-v: Increase log level (can repeat)\n");
+	printf("--quiet/-q: Decreate log level\n");
+	printf("--version/-V: show version\n");
+	printf("--help/-h: This help\n");
 }
 
 void print_version(void) {
