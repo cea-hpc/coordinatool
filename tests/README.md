@@ -25,6 +25,9 @@ tests assume:
 
 Given that, they start a coordinatool and lhsmtool agents and run basic tests
 
+Can set ONLY to a regex identifying test number (e.g. ONLY=0[01]) to only run
+specified tests.
+
 ## Fuzzing
 
 Fuzzing has been performed with afl for:
