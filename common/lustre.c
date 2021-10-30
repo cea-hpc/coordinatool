@@ -187,7 +187,7 @@ int parse_active_requests(int fd, parse_request_cb cb, void *cb_arg) {
 			line = buffer;
 			end = line + n;
 		}
-		n = read(fd, end, READ_CHUNK - (end - buffer));
+		n = read(fd, end, READ_CHUNK - (end - buffer) - 1);
 		if (n == 0 && line != end) {
 			rc = -EINVAL;
 			LOG_ERROR(rc, "trailing text at end of file: %s",
