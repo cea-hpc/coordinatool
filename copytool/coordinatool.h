@@ -113,6 +113,14 @@ int ct_start(struct state *state);
 
 /* protocol */
 
+/* stop enqueuing new hasm action items if we cannot enqueue at least
+ * HAI_SIZE_MARGIN more.
+ * That is because item is variable size depending on its data.
+ * This is mere optimisation, if element didn't fit it is just put back
+ * in waiting list -- at the end, so needs avoiding in general.
+ */
+#define HAI_SIZE_MARGIN (sizeof(struct hsm_action_item) + 100)
+
 extern protocol_read_cb protocol_cbs[];
 
 /**
@@ -160,6 +168,12 @@ struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
                                                 unsigned long cookie,
                                                 bool pop);
+
+/* scheduler */
+void ct_schedule(struct state *state);
+void ct_schedule_client(struct state *state,
+			struct client *client);
+
 
 /* common */
 
