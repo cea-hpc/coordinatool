@@ -22,10 +22,12 @@ again:
 			goto again;
 		if (s == EAI_SYSTEM) {
 			rc = -errno;
-			LOG_ERROR(rc, "ERROR getaddrinfo");
+			LOG_ERROR(rc, "ERROR getaddrinfo for %s:%s",
+				  state->host, state->port);
 		} else {
 			rc = -EIO;
-			LOG_ERROR(rc, "ERROR getaddrinfo: %s", gai_strerror(s));
+			LOG_ERROR(rc, "ERROR getaddrinfo for %s:%s: %s",
+				  state->host, state->port, gai_strerror(s));
 		}
 		return rc;
 	}

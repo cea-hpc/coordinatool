@@ -28,10 +28,13 @@ again:
 			goto again;
 		if (s == EAI_SYSTEM) {
 			rc = -errno;
-			LOG_ERROR(rc, "ERROR getaddrinfo");
+			LOG_ERROR(rc, "ERROR getaddrinfo for %s:%s",
+				  state->config.host, state->config.port);
 		} else {
 			rc = -EIO;
-			LOG_ERROR(rc, "ERROR getaddrinfo: %s", gai_strerror(s));
+			LOG_ERROR(rc, "ERROR getaddrinfo for %s:%s: %s",
+				  state->config.host, state->config.port,
+				  gai_strerror(s));
 		}
 		return rc;
 	}
