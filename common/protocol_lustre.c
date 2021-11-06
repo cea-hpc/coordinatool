@@ -104,7 +104,8 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t h
 }
 
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
-			     size_t hal_len, hal_get_cb cb, void *cb_arg) {
+			     size_t hal_len, bool advance,
+			     hal_get_cb cb, void *cb_arg) {
 	struct hsm_action_item *hai;
 	unsigned int count;
 	int rc;
@@ -150,9 +151,10 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 		if ((rc = json_hsm_action_item_get(item, hai, hal_len)) < 0)
 			return rc;
 		if (cb) {
-			if ((rc = cb(hal, hai, cb_arg)))
+			if ((rc = cb(hal, hai, item, cb_arg)))
 				return rc;
-		} else {
+		}
+		if (advance) {
 			hal_len -= hai->hai_len;
 			hai = hai_next(hai);
 		}
