@@ -80,15 +80,14 @@ int main(int argc, char *argv[]) {
 	};
 	int rc;
 
-	// default options
-	int verbose = LLAPI_MSG_NORMAL;
+	// state init
 	struct state state = {
-		.host = "::",
-		.port = "5123",
 		.queues.archive_id = ARCHIVE_ID_UNINIT,
 	};
 	CDS_INIT_LIST_HEAD(&state.stats.clients);
 	CDS_INIT_LIST_HEAD(&state.waiting_clients);
+
+	config_init(&state.config);
 
 	while ((rc = getopt_long(argc, argv, "vqA:H:p:",
 			         long_opts, NULL)) != -1) {
@@ -96,47 +95,58 @@ int main(int argc, char *argv[]) {
 		case 'A':
 			if (state.archive_cnt >= LL_HSM_MAX_ARCHIVES_PER_AGENT) {
 				LOG_ERROR(-E2BIG, "too many archive id given");
-				return EXIT_FAILURE;
+				rc = EXIT_FAILURE;
+				goto out;
 			}
 			state.archive_id[state.archive_cnt] =
 				parse_int(optarg, INT_MAX);
-			if (state.archive_id[state.archive_cnt] < 0)
-				return EXIT_FAILURE;
+			if (state.archive_id[state.archive_cnt] < 0) {
+				rc = EXIT_FAILURE;
+				goto out;
+			}
 			state.archive_cnt++;
 			break;
 		case 'v':
-			verbose++;
+			state.config.verbose++;
+			llapi_msg_set_level(state.config.verbose);
 			break;
 		case 'q':
-			verbose--;
+			state.config.verbose--;
+			llapi_msg_set_level(state.config.verbose);
 			break;
 		case 'H':
-			state.host = optarg;
+			free((void*)state.config.host);
+			state.config.host = xstrdup(optarg);
 			break;
 		case 'p':
-			state.port = optarg;
+			free((void*)state.config.port);
+			state.config.port = xstrdup(optarg);
 			break;
 		case 'V':
 			print_version();
-			return EXIT_SUCCESS;
+			rc = EXIT_SUCCESS;
+			goto out;
 		case 'h':
 			print_help(argv[0]);
-			return EXIT_SUCCESS;
+			rc = EXIT_SUCCESS;
+			goto out;
 		default:
 			fprintf(stderr, "Unknown option %c, see --help\n", rc);
-			return EXIT_FAILURE;
+			rc = EXIT_FAILURE;
+			goto out;
 		}
 	}
 	if (argc != optind + 1) {
 		LOG_ERROR(-EINVAL, "no mount point specified");
-		return EXIT_FAILURE;
+		rc = EXIT_FAILURE;
+		goto out;
 	}
 	state.mntpath = argv[optind];
 
-	llapi_msg_set_level(verbose);
-
 	rc = ct_start(&state);
-	if (rc)
-		return EXIT_FAILURE;
-	return EXIT_SUCCESS;
+	rc = rc ? EXIT_FAILURE : EXIT_SUCCESS;
+
+out:
+	config_free(&state.config);
+	return rc;
 }

@@ -78,6 +78,7 @@ subdir('tests')
 executable(
 	'lhsmd_coordinatool',
 	sources: files(
+		'copytool/config.c',
 		'copytool/queue.c',
 		'copytool/tcp.c',
 		'copytool/lhsm.c',
