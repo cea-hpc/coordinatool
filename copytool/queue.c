@@ -48,7 +48,7 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 		// XXX we only support one archive_id, first one we sees
 		// determines what others should be.
 		state->queues.archive_id = archive_id;
-		state->queues.fsname = strdup(fsname);
+		state->queues.fsname = xstrdup(fsname);
 		state->queues.hal_flags = flags;
 	} else {
 		if (state->queues.archive_id != archive_id) {
@@ -137,11 +137,8 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		return -EINVAL;
 	}
 
-	node = malloc(sizeof(struct hsm_action_node) +
+	node = xmalloc(sizeof(struct hsm_action_node) +
 		      hai->hai_len - sizeof(struct hsm_action_item));
-	if (!node) {
-		abort();
-	}
 	memcpy(&node->hai, hai, hai->hai_len);
 	node->queues = queues;
 

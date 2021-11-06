@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #include "client_common.h"
+#include "utils.h"
 
 static int getenv_str(const char *name, const char **val) {
 	const char *env = getenv(name);

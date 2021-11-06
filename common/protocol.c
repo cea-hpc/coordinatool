@@ -6,6 +6,7 @@
 
 #include "protocol.h"
 #include "logs.h"
+#include "utils.h"
 
 enum protocol_commands protocol_str2command(const char *str) {
 	if (strcmp(str, "status") == 0) {
@@ -89,7 +90,7 @@ int protocol_read_command(int fd, void *fd_arg, protocol_read_cb *cbs, void *cb_
 	struct load_cb_data cbdata = {
 		.fd = fd,
 	};
-	cbdata.buffer = malloc(1024*1024);
+	cbdata.buffer = xmalloc(1024*1024);
 	cbdata.buflen = 1024*1024;
 
 again:
@@ -214,7 +215,7 @@ int protocol_write(json_t *json, int fd, size_t flags) {
 		free(json_str);
 	}
 
-	cbdata.buffer = malloc(64*1024);
+	cbdata.buffer = xmalloc(64*1024);
 	cbdata.buflen = 64*1024;
 	rc = json_dump_callback(json, json_dump_cb, &cbdata, flags);
 	if (rc == 0 && cbdata.bufread)
