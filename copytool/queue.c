@@ -93,26 +93,19 @@ int hsm_action_requeue(struct hsm_action_node *node) {
 	switch (node->hai.hai_action) {
 	case HSMA_RESTORE:
 		head = &queues->waiting_restore;
+		queues->state->stats.pending_restore++;
 		break;
 	case HSMA_ARCHIVE:
 		head = &queues->waiting_archive;
+		queues->state->stats.pending_archive++;
 		break;
 	case HSMA_REMOVE:
 		head = &queues->waiting_remove;
+		queues->state->stats.pending_remove++;
 		break;
 	default:
 		queue_node_free(node);
 		return -EINVAL;
-	}
-
-	struct cds_list_head *n;
-	cds_list_for_each(n, &queues->state->waiting_clients) {
-		struct client *client = caa_container_of(n, struct client,
-							 node_waiting);
-		if (protocol_reply_recv_single(client, queues, node) == 0) {
-			cds_list_del_init(n);
-			return 1;
-		}
 	}
 
 	cds_list_add_tail(&node->node, head);
@@ -164,16 +157,19 @@ struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
 		if (cds_list_empty(&queues->waiting_restore))
 			return NULL;
 		node = queues->waiting_restore.next;
+		queues->state->stats.pending_restore--;
 		break;
 	case HSMA_ARCHIVE:
 		if (cds_list_empty(&queues->waiting_archive))
 			return NULL;
 		node = queues->waiting_archive.next;
+		queues->state->stats.pending_archive--;
 		break;
 	case HSMA_REMOVE:
 		if (cds_list_empty(&queues->waiting_remove))
 			return NULL;
 		node = queues->waiting_remove.next;
+		queues->state->stats.pending_remove--;
 		break;
 	default:
 		LOG_ERROR(-EINVAL, "requested to dequeue %s",

@@ -99,7 +99,8 @@ void free_client(struct state *state, struct client *client) {
 	close(client->fd);
 	free(client->addr);
 	cds_list_del(&client->node_clients);
-	cds_list_del(&client->node_waiting);
+	if (client->waiting)
+		cds_list_del(&client->node_waiting);
 	state->stats.clients_connected--;
 	// reassign any request that would be lost
 	cds_list_for_each_safe(n, next, &client->active_requests) {
@@ -108,6 +109,7 @@ void free_client(struct state *state, struct client *client) {
 		cds_list_del(n);
 		hsm_action_requeue(node);
 	}
+	ct_schedule(state);
 	free(client->id);
 	free(client);
 }
