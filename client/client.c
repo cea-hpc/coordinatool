@@ -149,6 +149,10 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	/* we don't want an id for debug client */
+	free((void*)client.state.config.client_id);
+	client.state.config.client_id = NULL;
+
 	while ((rc = getopt_long(argc, argv, "vqH:p:QRi:h",
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
@@ -191,6 +195,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	rc = client_run(&client);
+	ct_config_free(&client.state.config);
 	if (rc)
 		return EXIT_FAILURE;
 	return EXIT_SUCCESS;

@@ -11,9 +11,10 @@ struct ct_state {
 	// opitons
 	struct ct_state_config {
 		const char *confpath;
-		const char *state_dir_prefix;
 		const char *host;
 		const char *port;
+		const char *client_id;
+		const char *state_dir_prefix;
 		uint32_t max_archive;
 		uint32_t max_restore;
 		uint32_t max_remove;
@@ -24,13 +25,13 @@ struct ct_state {
 	// state values
 	int socket_fd;
 	char *fsname;
-	char client_id[MAXHOSTNAMELEN];
 	// locks etc..
 };
 
 
 /* client.c */
 int ct_config_init(struct ct_state_config *config);
+void ct_config_free(struct ct_state_config *config);
 
 /* tcp.c */
 int tcp_connect(struct ct_state *state);
