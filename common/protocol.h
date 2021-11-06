@@ -302,6 +302,7 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai);
  *
  * @param json input representing hsm_action_item
  * @param hai output hsm_action_item, must have been preallocated
+ * @param action_item json representation of the hai
  * @param hai_len size of hai we can write on
  *
  * @return 0 on success, -1 if json isn't correct
@@ -310,13 +311,15 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
 			     size_t hai_len);
 
 typedef int (*hal_get_cb)(struct hsm_action_list *hal,
-			  struct hsm_action_item *hai, void *arg);
+			  struct hsm_action_item *hai,
+			  json_t *action_item, void *arg);
 /**
  * helper to parse hsm_action_list json value
  *
  * @param json input json representing a fid
  * @param hal buffer to write to
  * @param hal_len length of the buffer we can write in
+ * @param advance whether the step in the hal list or operate in place
  * @param cb optional callback to call on each item
  *           if given, the first item of the list is repeatedly
  *           written each time as it is assumed list will not be
@@ -327,6 +330,7 @@ typedef int (*hal_get_cb)(struct hsm_action_list *hal,
  *         -E2BIG if we could not write everything to the hsm action list
  */
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
-			     size_t hal_len, hal_get_cb cb, void *cb_arg);
+			     size_t hal_len, bool advance,
+			     hal_get_cb cb, void *cb_arg);
 
 #endif

@@ -11,6 +11,7 @@ struct ct_state {
 	// opitons
 	struct ct_state_config {
 		const char *confpath;
+		const char *state_dir_prefix;
 		const char *host;
 		const char *port;
 		uint32_t max_archive;

@@ -302,7 +302,8 @@ struct enqueue_state {
 };
 
 static int queue_cb_enqueue(struct hsm_action_list *hal UNUSED,
-			    struct hsm_action_item *hai, void *arg) {
+			    struct hsm_action_item *hai,
+			    json_t *action_item UNUSED, void *arg) {
 	struct enqueue_state *enqueue_state = arg;
 	int rc;
 
@@ -342,7 +343,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 
 	rc = json_hsm_action_list_get(json_hal, &enqueue_state.hal,
 		sizeof(enqueue_state) - offsetof(struct enqueue_state, hal),
-		queue_cb_enqueue, &enqueue_state);
+		false, queue_cb_enqueue, &enqueue_state);
 	if (rc < 0)
 		return protocol_reply_queue(client->fd,
 				enqueue_state.enqueued, rc,
