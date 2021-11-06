@@ -16,18 +16,18 @@ int tcp_listen(struct state *state) {
 	hints.ai_flags = AI_PASSIVE;
 
 again:
-	s = getaddrinfo(state->host, state->port, &hints, &result);
+	s = getaddrinfo(state->config.host, state->config.port, &hints, &result);
 	if (s != 0) {
 		if (s == EAI_AGAIN)
 			goto again;
 		if (s == EAI_SYSTEM) {
 			rc = -errno;
 			LOG_ERROR(rc, "ERROR getaddrinfo for %s:%s",
-				  state->host, state->port);
+				  state->config.host, state->config.port);
 		} else {
 			rc = -EIO;
 			LOG_ERROR(rc, "ERROR getaddrinfo for %s:%s: %s",
-				  state->host, state->port, gai_strerror(s));
+				  state->config.host, state->config.port, gai_strerror(s));
 		}
 		return rc;
 	}
@@ -67,7 +67,7 @@ again:
 		LOG_ERROR(rc, "Could not add listen socket to epoll");
 		return rc;
 	}
-	LOG_INFO("Listening on %s:%s\n", state->host, state->port);
+	LOG_INFO("Listening on %s:%s\n", state->config.host, state->config.port);
 
 	return 0;
 }

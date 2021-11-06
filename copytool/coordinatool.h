@@ -76,13 +76,19 @@ struct ct_stats {
 };
 
 struct state {
-	// options
-	const char *mntpath;
+	/* config: option, config file or env var */
+	struct state_config {
+		const char *confpath;
+		const char *host;
+		const char *port;
+		const char *state_dir_prefix;
+		enum llapi_message_level verbose;
+	} config;
+	/* options: command line switches only */
 	int archive_cnt;
 	int archive_id[LL_HSM_MAX_ARCHIVES_PER_AGENT];
-	const char *host;
-	const char *port;
-	// states value
+	const char *mntpath;
+	/* state values */
 	struct hsm_copytool_private *ctdata;
 	int epoll_fd;
 	int hsm_fd;
@@ -93,6 +99,11 @@ struct state {
 };
 
 
+/* config */
+
+int config_init(struct state_config *config);
+void config_free(struct state_config *config);
+
 
 /* lhsm */
 
@@ -101,6 +112,7 @@ int ct_register(struct state *state);
 int ct_start(struct state *state);
 
 /* protocol */
+
 extern protocol_read_cb protocol_cbs[];
 
 /**
