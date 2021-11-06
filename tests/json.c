@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include "protocol.h"
+#include "utils.h"
 
 
 int main() {
@@ -29,8 +30,8 @@ int main() {
 
 
 	struct hsm_action_item *hai, *newhai;
-	hai = calloc(sizeof(*hai)+16, 1);
-	newhai = calloc(sizeof(*hai)+16, 1);
+	hai = xcalloc(sizeof(*hai)+16, 1);
+	newhai = xcalloc(sizeof(*hai)+16, 1);
 	hai->hai_action = HSMA_RESTORE;
 	hai->hai_fid.f_seq = 0x4200000000L;;
 	hai->hai_fid.f_oid = 1;
