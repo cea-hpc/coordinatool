@@ -7,6 +7,7 @@
 
 #include "lustre.h"
 #include "logs.h"
+#include "utils.h"
 
 #define READ_CHUNK 10240
 
@@ -68,7 +69,7 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 	}
 	len = (end-item)/2;
 	n = __ALIGN_KERNEL_MASK(sizeof(*hai) + len, 7);
-	hai = malloc(n);
+	hai = xmalloc(n);
 	hai->hai_len = n;
 	for (i=0; i < len; i++) {
 		n = sscanf(item, "%2hhX", (unsigned char*)&hai->hai_data[i]);

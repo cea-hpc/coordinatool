@@ -14,10 +14,10 @@
 int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 				const char *mnt, int archive_count,
 				int *archives, int rfd_flags) {
-	struct hsm_copytool_private *ct = calloc(sizeof(*ct), 1);
+	struct hsm_copytool_private *ct;
 	int rc = 0;
-	if (!ct)
-		return -ENOMEM;
+
+	ct = xcalloc(sizeof(*ct), 1);
 
 	ct->magic = CT_PRIV_MAGIC;
 	CDS_INIT_LIST_HEAD(&ct->actions);
@@ -31,11 +31,7 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 		goto err_out;
 	}
 
-	ct->mnt = strdup(mnt);
-	if (!ct->mnt) {
-		rc = -ENOMEM;
-		goto err_out;
-	}
+	ct->mnt = xstrdup(mnt);
 
 	ct->mnt_fd = open(mnt, O_RDONLY);
 	if (ct->mnt_fd < 0) {
@@ -55,15 +51,11 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	if (rc)
 		goto err_out;
 
-	ct->hal = malloc(ct->state.config.hsm_action_list_size);
-	if (!ct->hal) {
-		rc = -ENOMEM;
-		goto err_out;
-	}
-
 	rc = state_init(ct);
 	if (rc)
 		goto err_out;
+
+	ct->hal = xmalloc(ct->state.config.hsm_action_list_size);
 
 	rc = tcp_connect(&ct->state);
 	if (rc) {

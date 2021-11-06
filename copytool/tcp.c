@@ -125,9 +125,7 @@ int handle_client_connect(struct state *state) {
 		return rc;
 	}
 
-	struct client *client = calloc(sizeof(*client), 1);
-	if (!client)
-		abort();
+	struct client *client = xcalloc(sizeof(*client), 1);
 
 	client->fd = fd;
 	client->addr = sockaddr2str(&peer_addr, peer_addr_len);
