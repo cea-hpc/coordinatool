@@ -52,6 +52,7 @@ version_h = vcs_tag(
 common = static_library(
 	'coordinatool_common',
 	files(
+		'common/config.c',
 		'common/protocol.c',
 		'common/protocol_lustre.c',
 		'common/lustre.c',
