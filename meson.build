@@ -83,6 +83,7 @@ executable(
 		'copytool/tcp.c',
 		'copytool/lhsm.c',
 		'copytool/protocol.c',
+		'copytool/scheduler.c',
 		'copytool/coordinatool.c',
 	) + [ version_h ],
 	dependencies: [urcu],

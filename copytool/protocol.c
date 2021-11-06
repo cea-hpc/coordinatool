@@ -2,14 +2,6 @@
 
 #include "coordinatool.h"
 
-/* stop enqueuing new hasm action items if we cannot enqueue at least
- * HAI_SIZE_MARGIN more.
- * That is because item is variable size depending on its data.
- * This is mere optimisation, if element didn't fit it is just put back
- * in waiting list -- at the end, so needs avoiding in general.
- */
-#define HAI_SIZE_MARGIN (sizeof(struct hsm_action_item) + 100)
-
 /**************
  *  callbacks *
  **************/
@@ -67,116 +59,23 @@ out_freereply:
  * RECV
  */
 
-static int recv_enqueue(struct client *client, json_t *hai_list,
-			struct hsm_action_node *han) {
-	int max_action;
-	int *current_count;
-
-	if (client->max_bytes < sizeof(han->hai) + han->hai.hai_len) {
-		return -ERANGE;
-	}
-	switch (han->hai.hai_action) {
-	case HSMA_RESTORE:
-		max_action = client->max_restore;
-		current_count = &client->current_restore;
-		break;
-	case HSMA_ARCHIVE:
-		max_action = client->max_archive;
-		current_count = &client->current_archive;
-		break;
-	case HSMA_REMOVE:
-		max_action = client->max_remove;
-		current_count = &client->current_remove;
-		break;
-	default:
-		return -EINVAL;
-	}
-	if (max_action >= 0 && max_action <= *current_count)
-		return -ERANGE;
-
-	json_array_append_new(hai_list, json_hsm_action_item(&han->hai));
-	han->client = client;
-	(*current_count)++;
-	cds_list_add(&han->node, &client->active_requests);
-
-	return 0;
-}
-
-int protocol_reply_recv_single(struct client *client,
-			       struct hsm_action_queues *queues,
-			       struct hsm_action_node *han) {
-	int rc;
-
-	json_t *hai_list = json_array();
-	if (!hai_list)
-		abort();
-
-	if ((rc = recv_enqueue(client, hai_list, han))) {
-		json_decref(hai_list);
-		return rc;
-	}
-
-	LOG_INFO("Sending "DFID" to %d directly\n" ,
-		 PFID(&han->hai.hai_dfid), client->fd);
-	// frees hai_list
-	return protocol_reply_recv(client->fd, queues, hai_list, 0, NULL);
-}
-
 static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
-	struct hsm_action_node *han;
 	client->max_bytes = protocol_getjson_int(json, "max_bytes", 1024*1024);
 	client->max_restore = protocol_getjson_int(json, "max_restore", -1);
 	client->max_archive = protocol_getjson_int(json, "max_archive", -1);
 	client->max_remove = protocol_getjson_int(json, "max_remove", -1);
-	int enqueued_items = 0;
 
 	if (client->max_bytes < HAI_SIZE_MARGIN)
 		return protocol_reply_recv(client->fd, NULL, NULL, EINVAL,
 					   "Buffer too small");
 
-	json_t *hai_list = json_array();
-	if (!hai_list)
-		abort();
-
-	/* check if there are pending requests
-	 * priority restore > remove > archive is hardcoded for now */
-	enum hsm_copytool_action actions[] = {
-		HSMA_RESTORE, HSMA_REMOVE, HSMA_ARCHIVE,
-	};
-	int *max_action[] = { &client->max_restore, &client->max_remove,
-		&client->max_archive };
-	int *current_count[] = { &client->current_restore,
-		&client->current_remove, &client->current_archive };
-	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
-		while (client->max_bytes > HAI_SIZE_MARGIN) {
-			if (*max_action[i] >= 0 &&
-			    *max_action[i] <= *current_count[i]) {
-				break;
-			}
-			han = hsm_action_dequeue(&state->queues, actions[i]);
-			if (!han)
-				break;
-			if (recv_enqueue(client, hai_list, han)) {
-				/* did not fit, requeue - this also makes a new copy */
-				hsm_action_requeue(han);
-				break;
-			}
-			LOG_INFO("Sending "DFID" to %d from queues\n" ,
-				 PFID(&han->hai.hai_dfid), client->fd);
-			enqueued_items++;
-		}
-	}
-
-	if (!enqueued_items) {
-		/* register as waiting client */
-		cds_list_add(&client->node_waiting, &state->waiting_clients);
-		return 0;
-	}
-
-	// frees hai_list
-	return protocol_reply_recv(client->fd, &state->queues, hai_list, 0, NULL);
+	cds_list_add(&client->node_waiting, &state->waiting_clients);
+	client->waiting = true;
+	/* schedule immediately in case work is available */
+	ct_schedule_client(state, client);
+	return 0;
 }
 
 int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
@@ -260,6 +159,31 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 
 	cds_list_del(&han->node);
 	queue_node_free(han);
+
+	/* adjust running action count */
+	switch (han->hai.hai_action) {
+	case HSMA_RESTORE:
+		client->current_restore--;
+		state->stats.running_restore--;
+		state->stats.done_restore++;
+		break;
+	case HSMA_ARCHIVE:
+		client->current_archive--;
+		state->stats.running_archive--;
+		state->stats.done_archive++;
+		break;
+	case HSMA_REMOVE:
+		client->current_remove--;
+		state->stats.running_remove--;
+		state->stats.done_remove++;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	if (client->waiting) {
+		ct_schedule_client(state, client);
+	}
 
 	return protocol_reply_done(client->fd, 0, NULL);
 }

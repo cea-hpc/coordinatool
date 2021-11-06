@@ -57,6 +57,8 @@ int handle_ct_event(struct state *state) {
 				PFID(&fid));
 		hai = hai_next(hai);
 	}
+	ct_schedule(state);
+
 	return hal->hal_count;
 }
 
