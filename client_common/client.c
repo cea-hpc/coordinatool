@@ -202,6 +202,19 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			LOG_INFO("config setting port to %s\n", config_port);
 			continue;
 		}
+		if (!strcasecmp(key, "state_dir_prefix")) {
+			static char state_dir_prefix[NAME_MAX];
+			if ((size_t)n >= sizeof(state_dir_prefix)) {
+				rc = -ERANGE;
+				LOG_ERROR(rc, "state dir prefix %s too big to fit in static string",
+					  val);
+				goto out;
+			}
+			memcpy(state_dir_prefix, val, n+1);
+			config->port = state_dir_prefix;
+			LOG_INFO("config setting state dir prefix to %s\n", state_dir_prefix);
+			continue;
+		}
 		if (!strcasecmp(key, "max_restore")) {
 			long long intval = str_suffix_to_u32(val, "max_restore");
 			if (intval < 0) {
@@ -289,6 +302,7 @@ int ct_config_init(struct ct_state_config *config) {
 	/* first set defaults */
 	config->host = "coordinatool";
 	config->port = "5123";
+	config->state_dir_prefix = ".coordinatool";
 	config->max_restore = -1;
 	config->max_archive = -1;
 	config->max_remove = -1;
@@ -315,6 +329,7 @@ int ct_config_init(struct ct_state_config *config) {
 	/* then overwrite with env */
 	getenv_str("COORDINATOOL_HOST", &config->host);
 	getenv_str("COORDINATOOL_PORT", &config->port);
+	getenv_str("COORDINATOOL_STATE_DIR_PREFIX", &config->state_dir_prefix);
 	rc = getenv_u32("COORDINATOOL_MAX_RESTORE", &config->max_restore);
 	if (rc < 0)
 		return rc;
