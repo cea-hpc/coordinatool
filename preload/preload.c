@@ -8,7 +8,6 @@
 
 #include "preload.h"
 
-
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
@@ -23,13 +22,6 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	CDS_INIT_LIST_HEAD(&ct->actions);
 	ct->mnt_fd = ct->open_by_fid_fd = -1;
 	ct->state.socket_fd = -1;
-
-	rc = gethostname(ct->state.client_id, sizeof(ct->state.client_id));
-	if (rc) {
-		rc = -errno;
-		LOG_ERROR(rc, "Could not get hostname!");
-		goto err_out;
-	}
 
 	ct->mnt = xstrdup(mnt);
 
@@ -92,6 +84,7 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 	close(ct->open_by_fid_fd);
 	close(ct->state.socket_fd);
 	free(ct->mnt);
+	ct_config_free(&ct->state.config);
 	free(ct);
 	return 0;
 }

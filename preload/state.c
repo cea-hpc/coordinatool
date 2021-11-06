@@ -46,16 +46,19 @@ int state_init(struct hsm_copytool_private *ct) {
 	char state_path[PATH_MAX];
 	int rc;
 
-	if (!ct->mnt || !ct->state.config.state_dir_prefix || !ct->state.client_id[0])
+	if (!ct->mnt || !ct->state.config.state_dir_prefix
+	    || !ct->state.config.client_id)
 		return -EINVAL;
 
 	rc = snprintf(state_path, sizeof(state_path),
 			"%s/%s/%s", ct->mnt,
-			ct->state.config.state_dir_prefix, ct->state.client_id);
+			ct->state.config.state_dir_prefix,
+			ct->state.config.client_id);
 	if (rc >= (int)sizeof(state_path)) {
 		rc = -ERANGE;
 		LOG_ERROR(rc, "Could not fit %s/%s/%s in state path",
-			  ct->mnt, ct->state.config.state_dir_prefix, ct->state.client_id);
+			  ct->mnt, ct->state.config.state_dir_prefix,
+			  ct->state.config.client_id);
 		return rc;
 	}
 
@@ -104,7 +107,8 @@ void state_cleanup(struct hsm_copytool_private *ct,
 		 * to unlink something that doesn't exist. */
 		snprintf(state_path, sizeof(state_path),
 			 "%s/%s/%s", ct->mnt,
-			 ct->state.config.state_dir_prefix, ct->state.client_id);
+			 ct->state.config.state_dir_prefix,
+			 ct->state.config.client_id);
 		rmdir(state_path);
 
 		closedir(ct->client_dir);

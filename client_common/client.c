@@ -178,42 +178,27 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 		}
 
 		if (!strcasecmp(key, "host")) {
-			static char config_host[256];
-			if ((size_t)n >= sizeof(config_host)) {
-				rc = -ERANGE;
-				LOG_ERROR(rc, "hostname %s too big to fit in static string",
-					  val);
-				goto out;
-			}
-			memcpy(config_host, val, n+1);
-			config->host = config_host;
-			LOG_INFO("config setting host to %s\n", config_host);
+			free((void*)config->host);
+			config->host = xstrdup(val);
+			LOG_INFO("config setting host to %s\n", config->host);
 			continue;
 		}
 		if (!strcasecmp(key, "port")) {
-			static char config_port[6];
-			if ((size_t)n >= sizeof(config_port)) {
-				rc = -ERANGE;
-				LOG_ERROR(rc, "port %s too big to fit in static string",
-					  val);
-				goto out;
-			}
-			memcpy(config_port, val, n+1);
-			config->port = config_port;
-			LOG_INFO("config setting port to %s\n", config_port);
+			free((void*)config->port);
+			config->port = xstrdup(val);
+			LOG_INFO("config setting port to %s\n", config->port);
+			continue;
+		}
+		if (!strcasecmp(key, "client_id")) {
+			free((void*)config->client_id);
+			config->client_id = xstrdup(val);
+			LOG_INFO("config setting state dir prefix to %s\n", config->client_id);
 			continue;
 		}
 		if (!strcasecmp(key, "state_dir_prefix")) {
-			static char state_dir_prefix[NAME_MAX];
-			if ((size_t)n >= sizeof(state_dir_prefix)) {
-				rc = -ERANGE;
-				LOG_ERROR(rc, "state dir prefix %s too big to fit in static string",
-					  val);
-				goto out;
-			}
-			memcpy(state_dir_prefix, val, n+1);
-			config->port = state_dir_prefix;
-			LOG_INFO("config setting state dir prefix to %s\n", state_dir_prefix);
+			free((void*)config->state_dir_prefix);
+			config->state_dir_prefix = xstrdup(val);
+			LOG_INFO("config setting state dir prefix to %s\n", config->state_dir_prefix);
 			continue;
 		}
 		if (!strcasecmp(key, "max_restore")) {
@@ -296,14 +281,14 @@ out:
 
 }
 
-
 int ct_config_init(struct ct_state_config *config) {
 	int rc;
 
 	/* first set defaults */
-	config->host = "coordinatool";
-	config->port = "5123";
-	config->state_dir_prefix = ".coordinatool";
+	config->host = xstrdup("coordinatool");
+	config->port = xstrdup("5123");
+	config->client_id = NULL; /* NULL will gethostname if not set */
+	config->state_dir_prefix = xstrdup(".coordinatool");
 	config->max_restore = -1;
 	config->max_archive = -1;
 	config->max_remove = -1;
@@ -330,6 +315,7 @@ int ct_config_init(struct ct_state_config *config) {
 	/* then overwrite with env */
 	getenv_str("COORDINATOOL_HOST", &config->host);
 	getenv_str("COORDINATOOL_PORT", &config->port);
+	getenv_str("COORDINATOOL_CLIENT_ID", &config->client_id);
 	getenv_str("COORDINATOOL_STATE_DIR_PREFIX", &config->state_dir_prefix);
 	rc = getenv_u32("COORDINATOOL_MAX_RESTORE", &config->max_restore);
 	if (rc < 0)
@@ -350,5 +336,28 @@ int ct_config_init(struct ct_state_config *config) {
 	if (rc < 0)
 		return rc;
 
+	if (!config->client_id) {
+		char client_id[MAXHOSTNAMELEN];
+		char *dot;
+
+		rc = gethostname(client_id, sizeof(client_id));
+		if (rc) {
+			rc = -errno;
+			LOG_ERROR(rc, "Could not get hostname!");
+			return rc;
+		}
+		dot = strchr(client_id, '.');
+		if (dot)
+			*dot = '\0';
+		config->client_id = xstrdup(client_id);
+	}
+
 	return 0;
+}
+
+void ct_config_free(struct ct_state_config *config) {
+	free((void*)config->host);
+	free((void*)config->port);
+	free((void*)config->client_id);
+	free((void*)config->state_dir_prefix);
 }

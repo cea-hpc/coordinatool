@@ -150,8 +150,8 @@ int protocol_request_ehlo(const struct ct_state *state, bool reconnecting) {
 	    (rc = protocol_setjson_bool(request, "reconnect", reconnecting)))
 		goto out_free;
 
-	if (state->client_id[0]
-	    && (rc = protocol_setjson_str(request, "id", state->client_id)))
+	if (state->config.client_id
+	    && (rc = protocol_setjson_str(request, "id", state->config.client_id)))
 		goto out_free;
 
 	LOG_INFO("Sending elho request to %d", state->socket_fd);
