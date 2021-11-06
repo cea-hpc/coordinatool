@@ -20,7 +20,7 @@ struct ct_state {
 		uint32_t max_remove;
 		uint32_t hsm_action_list_size;
 		uint32_t archive_id;
-		int verbose;
+		enum llapi_message_level verbose;
 	} config;
 	// state values
 	int socket_fd;
