@@ -133,7 +133,7 @@ int ct_start(struct state *state) {
 				handle_client_connect(state);
 			} else {
 				struct client *client = events[n].data.ptr;
-				if (protocol_read_command(client->fd, client,
+				if (protocol_read_command(client->fd, client->id, client,
 							  protocol_cbs, state) < 0) {
 					free_client(state, client);
 				}

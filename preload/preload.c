@@ -106,7 +106,8 @@ again:
 
 	ct->msgsize = -1;
 	while (ct->msgsize == -1) {
-		rc = protocol_read_command(ct->state.socket_fd, NULL, copytool_cbs, ct);
+		rc = protocol_read_command(ct->state.socket_fd, "server", NULL,
+					   copytool_cbs, ct);
 		if (rc) {
 			LOG_WARN("read from server failed with %d. Reconnecting.", rc);
 			goto reconnect;
