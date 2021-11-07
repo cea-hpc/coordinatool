@@ -15,11 +15,11 @@ static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
 
-	return protocol_reply_status(client->fd, &state->stats, 0, NULL);
+	return protocol_reply_status(client, &state->stats, 0, NULL);
 }
 
-int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
-			  char *error) {
+int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
+			  int status, char *error) {
 	json_t *reply, *clients = NULL;
 	int rc;
 
@@ -68,10 +68,11 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 	if ((rc = protocol_setjson(reply, "clients", clients)))
 		goto out_freereply;
 
-	if (protocol_write(reply, fd, 0) != 0) {
+	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		LOG_ERROR(rc, "Could not write reply to %s: %s",
+			  client->id, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -96,7 +97,7 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	client->max_remove = protocol_getjson_int(json, "max_remove", -1);
 
 	if (client->max_bytes < HAI_SIZE_MARGIN)
-		return protocol_reply_recv(client->fd, NULL, NULL, EINVAL,
+		return protocol_reply_recv(client, NULL, NULL, EINVAL,
 					   "Buffer too small");
 
 	cds_list_add(&client->node_waiting, &state->waiting_clients);
@@ -106,7 +107,7 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	return 0;
 }
 
-int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
+int protocol_reply_recv(struct client *client, struct hsm_action_queues *queues,
 			json_t *hai_list, int status, char *error) {
 	json_t *reply;
 	int rc;
@@ -139,10 +140,11 @@ int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
 	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;
 
-	if (protocol_write(reply, fd, 0) != 0) {
+	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		LOG_ERROR(rc, "Could not write reply to %s: %s",
+			  client->id, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -162,23 +164,23 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 
 	uint64_t cookie = protocol_getjson_int(json, "cookie", 0);
 	if (!cookie)
-		return protocol_reply_done(client->fd, EINVAL,
+		return protocol_reply_done(client, EINVAL,
 					   "Cookie not set?");
 	unsigned int archive_id =
 		protocol_getjson_int(json, "archive_id", ARCHIVE_ID_UNINIT);
 	if (archive_id == ARCHIVE_ID_UNINIT)
-		return protocol_reply_done(client->fd, EINVAL,
+		return protocol_reply_done(client, EINVAL,
 					   "No or invalid archive_id");
 	struct hsm_action_queues *queues =
 		hsm_action_queues_get(state, archive_id, 0, NULL);
 	if (!queues)
-		return protocol_reply_done(client->fd, EINVAL,
+		return protocol_reply_done(client, EINVAL,
 					   "Do not know archive id");
 
 	struct hsm_action_node *han =
 		hsm_action_search_queue(queues, cookie, false);
 	if (!han)
-		return protocol_reply_done(client->fd, EINVAL,
+		return protocol_reply_done(client, EINVAL,
 					   "Unknown cookie sent");
 
 	int status = protocol_getjson_int(json, "status", 0);
@@ -216,10 +218,10 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 		ct_schedule_client(state, client);
 	}
 
-	return protocol_reply_done(client->fd, 0, NULL);
+	return protocol_reply_done(client, 0, NULL);
 }
 
-int protocol_reply_done(int fd, int status, char *error) {
+int protocol_reply_done(struct client *client, int status, char *error) {
 	json_t *reply;
 	int rc;
 
@@ -231,10 +233,11 @@ int protocol_reply_done(int fd, int status, char *error) {
 	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;
 
-	if (protocol_write(reply, fd, 0) != 0) {
+	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		LOG_ERROR(rc, "Could not write reply to %s: %s",
+			  client->id, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -282,7 +285,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 
 	json_t *json_hal = json_object_get(json, "hsm_action_list");
 	if (!json_hal)
-		return protocol_reply_queue(client->fd, 0, EINVAL,
+		return protocol_reply_queue(client, 0, EINVAL,
 					    "No hsm_action_list set");
 
 	enqueue_state.queues =
@@ -292,7 +295,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 			protocol_getjson_int(json_hal, "hal_flags", 0),
 			protocol_getjson_str(json_hal, "hal_fsname", NULL, NULL));
 	if (!enqueue_state.queues)
-		return protocol_reply_queue(client->fd, 0, EINVAL,
+		return protocol_reply_queue(client, 0, EINVAL,
 					    "No queue found");
 	enqueue_state.enqueued = 0;
 
@@ -300,14 +303,15 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 		sizeof(enqueue_state) - offsetof(struct enqueue_state, hal),
 		false, queue_cb_enqueue, &enqueue_state);
 	if (rc < 0)
-		return protocol_reply_queue(client->fd,
+		return protocol_reply_queue(client,
 				enqueue_state.enqueued, rc,
 				"Error while parsing hsm action list");
 
-	return protocol_reply_queue(client->fd, enqueue_state.enqueued, 0, NULL);
+	return protocol_reply_queue(client, enqueue_state.enqueued, 0, NULL);
 }
 
-int protocol_reply_queue(int fd, int enqueued, int status, char *error) {
+int protocol_reply_queue(struct client *client, int enqueued,
+			 int status, char *error) {
 	json_t *reply;
 	int rc;
 
@@ -320,10 +324,11 @@ int protocol_reply_queue(int fd, int enqueued, int status, char *error) {
 	    (rc = protocol_setjson_int(reply, "enqueued", enqueued)))
 		goto out_freereply;
 
-	if (protocol_write(reply, fd, 0) != 0) {
+	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		LOG_ERROR(rc, "Could not write reply to %s: %s",
+			  client->id, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -341,21 +346,22 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	id = protocol_getjson_str(json, "id", NULL, NULL);
 	if (!id) {
 		// no id: no special treatment
-		return protocol_reply_ehlo(client->fd, 0, NULL);
+		return protocol_reply_ehlo(client, 0, NULL);
 	}
+	free(client->id);
 	client->id = xstrdup(id);
 
 	if (!protocol_getjson_bool(json, "reconnect")) {
 		// new client, ok. remember id for logs?
-		return protocol_reply_ehlo(client->fd, 0, NULL);
+		return protocol_reply_ehlo(client, 0, NULL);
 	}
 	// reconnecting client
 	// XXX check filesystem for runnning xfers
 	(void) state;
-	return protocol_reply_ehlo(client->fd, 0, NULL);
+	return protocol_reply_ehlo(client, 0, NULL);
 }
 
-int protocol_reply_ehlo(int fd, int status, char *error) {
+int protocol_reply_ehlo(struct client *client, int status, char *error) {
 	json_t *reply;
 	int rc;
 
@@ -367,10 +373,11 @@ int protocol_reply_ehlo(int fd, int status, char *error) {
 	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;
 
-	if (protocol_write(reply, fd, 0) != 0) {
+	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %d: %s", fd, json_str);
+		LOG_ERROR(rc, "Could not write reply to %s: %s",
+			  client->id, json_str);
 		free(json_str);
 		goto out_freereply;
 	};

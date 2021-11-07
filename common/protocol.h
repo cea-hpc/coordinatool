@@ -41,15 +41,17 @@ typedef int (*protocol_read_cb)(void *fd_arg, json_t *json, void *arg);
  * of buffer coincides with the end of a json object for efficiency
  *
  * @param fd fd of socket to read one json object from
+ * @param id hint for logs identifying fd
  * @param fd_arg
  * @param cbs vector of callbacks, must be readable up to PROTOCOL_COMMANDS_MAX.
  * if cb is null for a given command, an error is logged and message is ignored.
  * @param cb_arg
  * @return 0 on success, -errno on error.
  */
-int protocol_read_command(int fd, void *fd_arg, protocol_read_cb *cbs, void *cb_arg);
+int protocol_read_command(int fd, const char *id, void *fd_arg,
+			  protocol_read_cb *cbs, void *cb_arg);
 
-int protocol_write(json_t *json, int fd, size_t flags);
+int protocol_write(json_t *json, int fd, const char *id, size_t flags);
 
 /**
  * - STATUS command: query runtime information

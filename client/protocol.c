@@ -4,7 +4,7 @@
 
 static int status_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 	printf("Got status reply:\n");
-	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
+	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
 	return 0;
 }
@@ -12,7 +12,7 @@ static int status_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	struct ct_state *state = arg;
 	printf("Got recv reply:\n");
-	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
+	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
 
 	json_t *hal = json_object_get(json, "hsm_action_list");
@@ -46,14 +46,14 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 
 static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 	printf("Got done reply:\n");
-	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
+	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
 	return 0;
 }
 
 static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 	printf("Got queue reply:\n");
-	protocol_write(json, STDOUT_FILENO, JSON_INDENT(2));
+	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
 	return 0;
 }
