@@ -20,7 +20,7 @@ static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg) {
 
 int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 			  char *error) {
-	json_t *reply;
+	json_t *reply, *clients = NULL;
 	int rc;
 
 	reply = json_object();
@@ -29,16 +29,43 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 	if ((rc = protocol_setjson_str(reply, "command", "status")) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
 	    (rc = protocol_setjson_str(reply, "error", error)) ||
-	    (rc = protocol_setjson_int(reply, "running_archive", ct_stats->running_archive)) ||
 	    (rc = protocol_setjson_int(reply, "running_restore", ct_stats->running_restore)) ||
+	    (rc = protocol_setjson_int(reply, "running_archive", ct_stats->running_archive)) ||
 	    (rc = protocol_setjson_int(reply, "running_remove", ct_stats->running_remove)) ||
-	    (rc = protocol_setjson_int(reply, "pending_archive", ct_stats->pending_archive)) ||
 	    (rc = protocol_setjson_int(reply, "pending_restore", ct_stats->pending_restore)) ||
+	    (rc = protocol_setjson_int(reply, "pending_archive", ct_stats->pending_archive)) ||
 	    (rc = protocol_setjson_int(reply, "pending_remove", ct_stats->pending_remove)) ||
-	    (rc = protocol_setjson_int(reply, "done_archive", ct_stats->done_archive)) ||
 	    (rc = protocol_setjson_int(reply, "done_restore", ct_stats->done_restore)) ||
+	    (rc = protocol_setjson_int(reply, "done_archive", ct_stats->done_archive)) ||
 	    (rc = protocol_setjson_int(reply, "done_remove", ct_stats->done_remove)) ||
 	    (rc = protocol_setjson_int(reply, "clients_connected", ct_stats->clients_connected)))
+		goto out_freereply;
+
+	clients = json_array();
+	if (!clients)
+		abort();
+	struct cds_list_head *n;
+	cds_list_for_each(n, &ct_stats->clients) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+		json_t *c = json_object();
+		if (!c)
+			abort();
+		if ((rc = protocol_setjson_str(c, "client_id", client->id)) ||
+		    (rc = protocol_setjson_int(c, "current_restore", client->current_restore)) ||
+		    (rc = protocol_setjson_int(c, "current_archive", client->current_archive)) ||
+		    (rc = protocol_setjson_int(c, "current_remove", client->current_remove)) ||
+		    (rc = protocol_setjson_int(c, "done_restore", client->done_restore)) ||
+		    (rc = protocol_setjson_int(c, "done_archive", client->done_archive)) ||
+		    (rc = protocol_setjson_int(c, "done_remove", client->done_remove)) ||
+		    (rc = protocol_setjson_bool(c, "waiting", client->waiting))) {
+			json_decref(c);
+			goto out_freereply;
+		}
+		json_array_append_new(clients, c);
+	}
+
+	if ((rc = protocol_setjson(reply, "clients", clients)))
 		goto out_freereply;
 
 	if (protocol_write(reply, fd, 0) != 0) {
@@ -50,6 +77,7 @@ int protocol_reply_status(int fd, struct ct_stats *ct_stats, int status,
 	};
 
 out_freereply:
+	json_decref(clients);
 	json_decref(reply);
 	return rc;
 }
@@ -164,16 +192,19 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 	switch (han->hai.hai_action) {
 	case HSMA_RESTORE:
 		client->current_restore--;
+		client->done_restore++;
 		state->stats.running_restore--;
 		state->stats.done_restore++;
 		break;
 	case HSMA_ARCHIVE:
 		client->current_archive--;
+		client->done_archive++;
 		state->stats.running_archive--;
 		state->stats.done_archive++;
 		break;
 	case HSMA_REMOVE:
 		client->current_remove--;
+		client->done_remove++;
 		state->stats.running_remove--;
 		state->stats.done_remove++;
 		break;

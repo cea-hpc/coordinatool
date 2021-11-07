@@ -50,6 +50,9 @@ struct client {
 	int fd;
 	struct cds_list_head node_clients;
 	struct cds_list_head node_waiting;
+	unsigned int done_restore;
+	unsigned int done_archive;
+	unsigned int done_remove;
 	int current_restore;
 	int current_archive;
 	int current_remove;
