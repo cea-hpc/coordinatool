@@ -68,7 +68,7 @@ again:
 		sleep(5);
 		goto again;
 	}
-	rc = protocol_read_command(state->socket_fd, NULL,
+	rc = protocol_read_command(state->socket_fd, "server", NULL,
 				   protocol_ehlo_cbs, state);
 	if (rc) {
 		LOG_WARN("Just connected but did not get correct ehlo? %d. reconnecting", rc);

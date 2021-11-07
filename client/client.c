@@ -110,7 +110,8 @@ int client_run(struct client *client) {
 	}
 
 	while (client->iters < 0 || client->iters-- > 0) {
-		protocol_read_command(state->socket_fd, NULL, protocol_cbs, state);
+		protocol_read_command(state->socket_fd, "server", NULL,
+				      protocol_cbs, state);
 	}
 	return 0;
 }

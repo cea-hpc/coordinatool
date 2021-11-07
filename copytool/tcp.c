@@ -94,10 +94,9 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
 
 void free_client(struct state *state, struct client *client) {
 	struct cds_list_head *n, *next;
-	LOG_INFO("Disconnecting %d\n", client->fd);
+	LOG_INFO("Disconnecting %s\n", client->id);
 	epoll_delfd(state->epoll_fd, client->fd);
 	close(client->fd);
-	free(client->addr);
 	cds_list_del(&client->node_clients);
 	if (client->waiting)
 		cds_list_del(&client->node_waiting);
@@ -130,18 +129,18 @@ int handle_client_connect(struct state *state) {
 	struct client *client = xcalloc(sizeof(*client), 1);
 
 	client->fd = fd;
-	client->addr = sockaddr2str(&peer_addr, peer_addr_len);
+	client->id = sockaddr2str(&peer_addr, peer_addr_len);
 	CDS_INIT_LIST_HEAD(&client->active_requests);
 	CDS_INIT_LIST_HEAD(&client->node_waiting);
 	cds_list_add(&client->node_clients, &state->stats.clients);
 	state->stats.clients_connected++;
 
-	LOG_DEBUG("Got client connection from %s", client->addr);
+	LOG_DEBUG("Got client connection from %s", client->id);
 
 	rc = epoll_addfd(state->epoll_fd, fd, client);
 	if (rc < 0) {
 		LOG_ERROR(rc, "Could not add client %s to epoll",
-			  client->addr);
+			  client->id);
 		free_client(state, client);
 	}
 

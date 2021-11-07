@@ -45,8 +45,7 @@ struct hsm_action_queues {
 
 /* common types */
 struct client {
-	char *addr; /* for logs etc */
-	char *id; /* id sent by the client during EHLO */
+	char *id; /* id sent by the client during EHLO, or addr */
 	int fd;
 	struct cds_list_head node_clients;
 	struct cds_list_head node_waiting;
@@ -135,16 +134,17 @@ extern protocol_read_cb protocol_cbs[];
  * @param error nul-terminated error string, can be NULL
  * @return 0 on success, -errno on error
  */
-int protocol_reply_status(int fd, struct ct_stats *ct_stats,
+int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 			  int status, char *error);
 int protocol_reply_recv_single(struct client *client,
 			       struct hsm_action_queues *queues,
 			       struct hsm_action_node *han);
-int protocol_reply_recv(int fd, struct hsm_action_queues *queues,
+int protocol_reply_recv(struct client *client, struct hsm_action_queues *queues,
 			json_t *hal, int status, char *error);
-int protocol_reply_done(int fd, int status, char *error);
-int protocol_reply_queue(int fd, int enqueued, int status, char *error);
-int protocol_reply_ehlo(int fd, int status, char *error);
+int protocol_reply_done(struct client *client, int status, char *error);
+int protocol_reply_queue(struct client *client, int enqueued,
+			 int status, char *error);
+int protocol_reply_ehlo(struct client *client, int status, char *error);
 
 
 /* tcp */
