@@ -7,7 +7,7 @@
 static int protocol_write_lock(json_t *request, const struct ct_state *state,
 			int flags) {
 	// XXX lock
-	return protocol_write(request, state->socket_fd, flags);
+	return protocol_write(request, state->socket_fd, "server", flags);
 }
 
 int protocol_checkerror(json_t *reply) {

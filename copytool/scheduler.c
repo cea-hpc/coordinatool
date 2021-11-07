@@ -97,9 +97,9 @@ void ct_schedule_client(struct state *state,
 	client->waiting = false;
 
 	// frees hai_list
-	int rc = protocol_reply_recv(client->fd, &state->queues, hai_list, 0, NULL);
+	int rc = protocol_reply_recv(client, &state->queues, hai_list, 0, NULL);
 	if (rc < 0) {
-		LOG_ERROR(rc, "Could not send reply to client %d\n", client->fd);
+		LOG_ERROR(rc, "Could not send reply to %s\n", client->id);
 		free_client(state, client);
 	}
 }

@@ -47,6 +47,7 @@ const char *protocol_command2str(enum protocol_commands command) {
 
 struct load_cb_data {
 	int fd;
+	const char *id;
 	char *buffer;
 	int buflen;
 	int bufoff;
@@ -64,7 +65,7 @@ static size_t json_load_cb(void *buffer, size_t buflen, void *data) {
 		int n;
 		n = read(cbdata->fd, cbdata->buffer, cbdata->buflen);
 		if (n < 0) {
-			LOG_ERROR(-errno, "Read failed for %d", cbdata->fd);
+			LOG_ERROR(-errno, "Read failed for %s", cbdata->id);
 			return (size_t)-1;
 		}
 		cbdata->bufread = n;
@@ -83,12 +84,14 @@ static size_t json_load_cb(void *buffer, size_t buflen, void *data) {
 	return buflen;
 }
 
-int protocol_read_command(int fd, void *fd_arg, protocol_read_cb *cbs, void *cb_arg) {
+int protocol_read_command(int fd, const char *id, void *fd_arg,
+			  protocol_read_cb *cbs, void *cb_arg) {
 	json_t *request;
 	json_error_t json_error;
 	int rc = 0;
 	struct load_cb_data cbdata = {
 		.fd = fd,
+		.id = id,
 	};
 	cbdata.buffer = xmalloc(1024*1024);
 	cbdata.buflen = 1024*1024;
@@ -102,8 +105,8 @@ again:
 		rc = -EINVAL;
 		/* cbdata.bufread = 0 means eof, readers will close on any error */
 		if (cbdata.bufread > 0)
-			LOG_ERROR(rc, "Invalid json while reading %d: %s", fd,
-				  json_error.text);
+			LOG_ERROR(rc, "Invalid json while reading from %s: %s",
+				  id, json_error.text);
 		goto out_freebuf;
 	}
 	/* error's position is the exact offset jansson used, while our's is
@@ -116,7 +119,7 @@ again:
 	}
 	if (llapi_msg_get_level() >= LLAPI_MSG_DEBUG) {
 		char *json_str = json_dumps(request, 0);
-		LOG_DEBUG("Got something from fd %d: %s\n", fd, json_str);
+		LOG_DEBUG("Got something from %s: %s\n", id, json_str);
 		free(json_str);
 	}
 
@@ -142,7 +145,7 @@ again:
 		goto out_freereq;
 	}
 
-	LOG_DEBUG("Got command %s from %d", command_str, fd);
+	LOG_DEBUG("Got command %s from %s", command_str, id);
 	if (!cbs || !cbs[command]) {
 		rc = -ENOTSUP;
 		LOG_ERROR(rc, "command %s not implemented", command_str);
@@ -170,12 +173,10 @@ static int write_full(int fd, const char *buf, size_t count) {
 		if (n < 0 && errno == EINTR)
 			continue;
 		if (n < 0) {
-			LOG_ERROR(-errno, "could not write to %d\n", fd);
-			return -1;
+			return -errno;
 		}
 		if ((size_t)n > count) {
-			LOG_ERROR(-ERANGE, "write returned more than we asked for?!");
-			return -1;
+			return -ERANGE;
 		}
 		count -= n;
 	}
@@ -190,12 +191,16 @@ static int json_dump_cb(const char *buffer, size_t _size, void *data) {
 	if (size > cbdata->buflen - cbdata->bufread) {
 		rc = write_full(cbdata->fd, cbdata->buffer, cbdata->bufread);
 		cbdata->bufread = 0;
-		if (rc)
+		if (rc) {
+			LOG_ERROR(rc, "write to %s failed", cbdata->id);
 			return rc;
+		}
 	}
 	if (size > cbdata->buflen) {
 		// just write directly if it's big, buffer has just been flushed
 		rc = write_full(cbdata->fd, buffer, size);
+		if (rc)
+			LOG_ERROR(rc, "write to %s failed", cbdata->id);
 		return rc;
 	}
 	memcpy(cbdata->buffer + cbdata->bufread, buffer, size);
@@ -203,7 +208,7 @@ static int json_dump_cb(const char *buffer, size_t _size, void *data) {
 	return 0;
 }
 
-int protocol_write(json_t *json, int fd, size_t flags) {
+int protocol_write(json_t *json, int fd, const char *id, size_t flags) {
 	struct load_cb_data cbdata = {
 		.fd = fd,
 	};
@@ -211,15 +216,18 @@ int protocol_write(json_t *json, int fd, size_t flags) {
 
 	if (llapi_msg_get_level() >= LLAPI_MSG_DEBUG) {
 		char *json_str = json_dumps(json, 0);
-		LOG_DEBUG("Sending message to fd %d: %s", fd, json_str);
+		LOG_DEBUG("Sending message to %s: %s", id, json_str);
 		free(json_str);
 	}
 
 	cbdata.buffer = xmalloc(64*1024);
 	cbdata.buflen = 64*1024;
 	rc = json_dump_callback(json, json_dump_cb, &cbdata, flags);
-	if (rc == 0 && cbdata.bufread)
+	if (rc == 0 && cbdata.bufread) {
 		rc = write_full(cbdata.fd, cbdata.buffer, cbdata.bufread);
+		if (rc)
+			LOG_ERROR(rc, "write to %s failed", id);
+	}
 	free(cbdata.buffer);
 	return rc;
 }
