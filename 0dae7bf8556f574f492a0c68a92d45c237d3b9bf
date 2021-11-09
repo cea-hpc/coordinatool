@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "410f52f6_eafa8a7c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T01:47:54Z",
+      "side": 1,
+      "message": "Hm I was sure I had posted a comment for these patches last week... Sorry for the belated review request, please have a look when possible.\n\nTests changed a bit from the first patch so it might be most efficient to just look at the last version. I haven\u0027t updated the test README yet but I found it useful to just source the run test script and manually run key actions manually, it helped uncover a few bugs and I plan on adding some more helpers/rename a few function names so they come more easily through tab completion this week so it might make sense to wait a bit more for this, but early comments are welcome.\n\nRest can be reviewed normally, but it\u0027s a large amount of patches so feel free to work at it a few at a time... To recap there\u0027s some fixes, a couple of reworks (how client id is stored in the client, config parsing shared with server...), added missing stats to print on status call, and finally code for the client to store running requests on the filesystem for resume as discussed.\nI\u0027ll get onto using this client state on server restarts next weekend now grounds work has been done.",
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
