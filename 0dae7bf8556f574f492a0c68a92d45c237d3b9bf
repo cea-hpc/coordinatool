@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fbd5b86_5c17c29c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T11:28:54Z",
+      "side": 1,
+      "message": "\u003e it works for me *shrugs*\n\nMy bad, this is what I had in mind but its a different issue:\n```\n#!/bin/bash                                                                      \n                                                                                 \nglob\u003d1                                                                           \n                                                                                 \nfunction update_glob()                                                           \n{                                                                                \n    ((glob++))                                                                   \n    echo $glob                                                                   \n}                                                                                \n                                                                                 \necho $(update_glob)                                                              \necho $(update_glob)                                                              \necho $(update_glob)\n```\n\n\u003e I don\u0027t use llmount.sh (never seen it work with multiple clients? although it can certainly create a server for others to mount...), but if it can be made to work together I\u0027m all for making tests easier for others.\n\nYou can use it to setup a test system either with environment variables or with a configuration script in `lustre/tests/cfg/local.sh`. You can specify the number of servers for each type and on which host they should be setup. You can also specify which device to format and mount (if not it will create a file and the device for instead).",
+      "parentUuid": "c5bd600f_5193d29a",
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b18aaa52_364dce02",
@@ -90,6 +108,30 @@
       "side": 1,
       "message": "It\u0027s unique and must be shared between the nodes, that\u0027s how the command I\u0027ve used for tests work (simple dd into that archive directory, there\u0027s not even a hash or anything, it\u0027s very basic -- so if a restore request comes to one of the tool for a file that was archived on another client then it needs to be able to be restored)\n\nI\u0027ve added a note that it needs to be shared in another patch.",
       "parentUuid": "b18aaa52_364dce02",
+      "range": {
+        "startLine": 22,
+        "startChar": 5,
+        "endLine": 22,
+        "endChar": 15
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb3beb7b_cd4f91c3",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T11:28:54Z",
+      "side": 1,
+      "message": "Just to follow up on that, why don\u0027t you use Lustre\u0027s copytool instead writing your own simpler version ?",
+      "parentUuid": "ef9e22ac_806477ff",
       "range": {
         "startLine": 22,
         "startChar": 5,
