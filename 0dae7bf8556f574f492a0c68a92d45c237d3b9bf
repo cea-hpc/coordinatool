@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5bd600f_5193d29a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "\u003e too big/other scripts rather than function\n\nI agree up to a point, at this stage I\u0027d rather just have a big file.\nIf we have something complex enough that warrants categories of tests then it\u0027ll be easy to change as the script is source-able: just source main script and do your tests.\n\n\u003e I didn\u0027t run the script yet but I doubt that it works properly.\n\nit works for me *shrugs*\n\n\u003e llmount.sh\n\nI don\u0027t use llmount.sh (never seen it work with multiple clients? although it can certainly create a server for others to mount...), but if it can be made to work together I\u0027m all for making tests easier for others.",
+      "parentUuid": "371bd4b9_de21c90c",
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b18aaa52_364dce02",
@@ -48,6 +66,30 @@
       "writtenOn": "2021-11-09T10:20:35Z",
       "side": 1,
       "message": "question: is this a list of directories for each lhsmtool_cmd or are they unique ? I assume that are local to each node running an lhsmtool_cmd ?",
+      "range": {
+        "startLine": 22,
+        "startChar": 5,
+        "endLine": 22,
+        "endChar": 15
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef9e22ac_806477ff",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "It\u0027s unique and must be shared between the nodes, that\u0027s how the command I\u0027ve used for tests work (simple dd into that archive directory, there\u0027s not even a hash or anything, it\u0027s very basic -- so if a restore request comes to one of the tool for a file that was archived on another client then it needs to be able to be restored)\n\nI\u0027ve added a note that it needs to be shared in another patch.",
+      "parentUuid": "b18aaa52_364dce02",
       "range": {
         "startLine": 22,
         "startChar": 5,
@@ -104,6 +146,54 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54d3a751_1968d7e9",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "error message needs fixing.\nchecking for ${#CLIENTS[@]} as a limit won\u0027t work if the array is defined with holes (although the next check won\u0027t catch it either), I guess the check could be made simpler by just checking if ${CLIENTS[i]} is non-empty... done",
+      "parentUuid": "dded9d9a_9608226e",
+      "range": {
+        "startLine": 21,
+        "startChar": 13,
+        "endLine": 21,
+        "endChar": 19
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "379a9cac_b92669bc",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "iirc in sanity I check for a minimum number of clients, but 4 is very much not hardcoded (except in the error message that got removed)\n\nchecks that need more than what is required in sanity are expected to add their own check and skip if not enough clients are available, kind of like lustre tests.",
+      "parentUuid": "df80ef5c_d55f5353",
+      "range": {
+        "startLine": 21,
+        "startChar": 58,
+        "endLine": 21,
+        "endChar": 59
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e5b5531_cc6dcae1",
@@ -117,6 +207,30 @@
       "writtenOn": "2021-11-09T10:20:35Z",
       "side": 1,
       "message": "question: same as above",
+      "range": {
+        "startLine": 36,
+        "startChar": 12,
+        "endLine": 36,
+        "endChar": 20
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f15aa818_ffe3503e",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e5b5531_cc6dcae1",
       "range": {
         "startLine": 36,
         "startChar": 12,
@@ -150,6 +264,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4945634_f2ad86e3",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "quotes are useless here, I\u0027ll remove the ones around SKIP and Ok instead for consistency.",
+      "parentUuid": "3a539cee_2cb7a347",
+      "range": {
+        "startLine": 59,
+        "startChar": 7,
+        "endLine": 59,
+        "endChar": 11
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec9e0057_c6498fe1",
@@ -173,6 +311,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a60bb66c_16b1b2be",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "if run_tests() is called in a subshell then yes the global variable won\u0027t be updated in the parent shell, but at this point there\u0027s nothing that\u0027ll come back up.\n\nRegarding ++ it works in bash, and this script explicitely requires bash (uses other bash features likes @Q), so I have no intention on changing this.\n\nWhat might be a problem in the future is run_tests is ran with set -e, then the first time FAILURES is updated ((FAILURES++)) will return 0 e.g. fail as an arithmetic expression, and that can end shell early, but in this case I do not plan on using -e here (-e is way too annoying)",
+      "parentUuid": "ec9e0057_c6498fe1",
+      "range": {
+        "startLine": 60,
+        "startChar": 2,
+        "endLine": 61,
+        "endChar": 16
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d3e960a_d9af63de",
@@ -186,6 +348,30 @@
       "writtenOn": "2021-11-09T10:20:35Z",
       "side": 1,
       "message": "question: it seems to me that if the size of this array is not 4, the tests will fail which is probably intended. But I find it odd to have 4 hardcoded when it seems that it should really be set to the number of clients available ?",
+      "range": {
+        "startLine": 71,
+        "startChar": 5,
+        "endLine": 71,
+        "endChar": 18
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f525a0ec_a00179a9",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "I have no idea why you\u0027re fixated on 4, this just wants to require ${MNTPATH[i]} set iff ${CLIENT[i]} is set:\nif you add clients, also set where it is mounted.\n\nThe check is not perfect (e.g. holes) and there are ways to use the value if set and fallback but seriously it\u0027s not worth it for something that\u0027s not user-facing, it\u0027s just meant to catch obvious errors.",
+      "parentUuid": "8d3e960a_d9af63de",
       "range": {
         "startLine": 71,
         "startChar": 5,
@@ -221,6 +407,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8ab7db13_d8776b1e",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "do_client will replace MNTPATH accordingly, the intention was to make do_client/do_mds easy to use by people who don\u0027t know what variables are defined, but I agree it\u0027s not really obvious and in practice we\u0027ll always know the offset here.\n\nHappy to see this changed, but for now this works so I don\u0027t plan on spending time for this.",
+      "parentUuid": "aa417564_b592a6a6",
+      "range": {
+        "startLine": 75,
+        "startChar": 29,
+        "endLine": 75,
+        "endChar": 36
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57038a1d_92efef55",
         "filename": "tests/run_tests.sh",
         "patchSetId": 1
@@ -232,6 +442,30 @@
       "writtenOn": "2021-11-09T10:20:35Z",
       "side": 1,
       "message": "question: again why not ${#MDT[@]} ?",
+      "range": {
+        "startLine": 91,
+        "startChar": 14,
+        "endLine": 91,
+        "endChar": 15
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe35cce9_81e5570d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "(resolving duplicate: this is the same as MNTPATH)",
+      "parentUuid": "57038a1d_92efef55",
       "range": {
         "startLine": 91,
         "startChar": 14,
@@ -265,6 +499,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e734bfe_260c8940",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "the obvious binaries have been wrapped in helper commands, that\u0027s good enough for me.",
+      "parentUuid": "24af45a4_83cd7013",
+      "range": {
+        "startLine": 106,
+        "startChar": 8,
+        "endLine": 106,
+        "endChar": 27
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2456881d_7dfe32dc",
@@ -288,6 +546,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ad027a2_597c4435",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "new lines are preserved so act as delimiter in the subshell.\nI don\u0027t like these big commands, it\u0027s been split and devs (people writing tests) will be more expected to compose basic blocs (eventually adding new ones or extending them) rather than writing long commands like this",
+      "parentUuid": "2456881d_7dfe32dc",
+      "range": {
+        "startLine": 108,
+        "startChar": 14,
+        "endLine": 108,
+        "endChar": 33
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e7a9980_41ce43d0",
@@ -301,6 +583,30 @@
       "writtenOn": "2021-11-09T10:20:35Z",
       "side": 1,
       "message": "major: I tested the following code:\n\n```\nFATAL\u003d1 echo $FATAL\necho $FATAL\n```\n\nIt outputs 2 empty lines, but:\n```\nFATAL\u003d1; echo $FATAL\necho $FATAL\n```\noutputs\n1\n1\n\nI don\u0027t think this works",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 24
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55c6547b_0c020bd6",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:51:37Z",
+      "side": 1,
+      "message": "I\u0027m not sure what you\u0027re testing.\n\n`FATAL\u003d1 run_test foo` will set FATAL for the duration of run_test foo, then restore its previous value -- for your particular test with echo $FATAL is expanded before echo is executed so you\u0027re basically setting FATAL for an empty \u0027echo\u0027 that doesn\u0027t use it.\n\n\nThe intent here is that sanity will be a fatal test, while the next ones are not (unless they also explicitly are set to be)\n\nThis also works™, so resolving.",
+      "parentUuid": "2e7a9980_41ce43d0",
       "range": {
         "startLine": 132,
         "startChar": 0,
