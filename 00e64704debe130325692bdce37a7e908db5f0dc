@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "633e4878_d9aac81d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T14:07:26Z",
+      "side": 1,
+      "message": "major: I don\u0027t think this works when the limit is a variable.\n```\n$ n\u003d3; for i in {1..$n}; do echo $i; done\n{1..3}\n\n$ n\u003d3; for i in $(seq $n); do echo $i; done\n1\n2\n3\n...",
+      "range": {
+        "startLine": 205,
+        "startChar": 11,
+        "endLine": 205,
+        "endChar": 18
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c90cbdf_11cd42e4",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T14:07:26Z",
+      "side": 1,
+      "message": "suggest: maybe MDTNAME would help see that this is not the real MTD name but will be replaced",
+      "range": {
+        "startLine": 313,
+        "startChar": 30,
+        "endLine": 313,
+        "endChar": 33
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c87a413c_469f5ef7",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T14:07:26Z",
+      "side": 1,
+      "message": "style: I would put the number as the first argument",
+      "range": {
+        "startLine": 324,
+        "startChar": 24,
+        "endLine": 324,
+        "endChar": 26
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
