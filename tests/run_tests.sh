@@ -2,7 +2,11 @@
 
 error() {
 	printf "%s\n" "$@" >&2
-	exit 1
+	if [[ "$-" = *i* ]]; then
+		return 1;
+	else
+		exit 1
+	fi
 }
 
 REPO_ROOT=$(git rev-parse --show-toplevel) \
@@ -22,17 +26,18 @@ do_client() {
 	local sh_opts="e"
 	shift
 
-	[[ "$i" =~ ^[0-9]+$ ]] || error "do_client: $i must be 0-4"
-	(( i < ${#CLIENT[@]} )) || error "do_client: $i must be < ${#CLIENT[@]}"
+	[[ -n "$i" ]] && [[ -n "${CLIENT[i]}" ]] \
+		|| error "do_client: CLIENT[$i] not set" \
+		|| return
 
-	set -- "${@//MNTPATH/${MNTPATH[$i]}}"
-	if [[ "$-" =~ x ]]; then
+	set -- "${@//MNTPATH/${MNTPATH[i]}}"
+	if [[ "$-" = *x* ]]; then
 		sh_opts+="x"
 	fi
-	if [[ "${CLIENT[$i]}" = localhost ]]; then
+	if [[ "${CLIENT[i]}" = localhost ]]; then
 		sudo sh -${sh_opts}c "$@"
 	else
-		ssh "${CLIENT[$i]}" sudo sh -${sh_opts}c "${@@Q}"
+		ssh "${CLIENT[i]}" sudo sh -${sh_opts}c "${@@Q}"
 	fi
 }
 
@@ -41,23 +46,25 @@ do_mds() {
 	local sh_opts="e"
 	shift
 
-	[[ "$i" =~ ^[0-9]+$ ]] || error "do_mds: $i must be 0-4"
-	(( i < ${#MDS[@]} )) || error "do_mds: $i must be < ${#CLIENT[@]}"
+	[[ -n "$i" ]] && [[ -n "${MDS[i]}" ]] \
+		|| error "do_mds: MDS[$i] not set" \
+		|| return
 
-	set -- "${@//MDT/${MDT[$i]}}"
-	if [[ "$-" =~ x ]]; then
+	set -- "${@//MDT/${MDT[i]}}"
+	if [[ "$-" = *x* ]]; then
 		sh_opts+="x"
 	fi
-	if [[ "${MDS[$i]}" = localhost ]]; then
+	if [[ "${MDS[i]}" = localhost ]]; then
 		sudo sh -${sh_opts}c "$@"
 	else
-		ssh "${MDS[$i]}" sudo sh -${sh_opts}c "${@@Q}"
+		ssh "${MDS[i]}" sudo sh -${sh_opts}c "${@@Q}"
 	fi
 }
 
 run_test() {
-	local testcase="$1" status
-	local caseno="$2"
+	local caseno="$1"
+	local testcase="$2"
+	local status
 
 	((TESTS++))
 
@@ -77,15 +84,16 @@ run_test() {
 	)
 	status="$?"
 	if ((status == SKIP_RC)); then
-		echo "SKIP"
+		echo SKIP
 		((SKIPS++))
 	elif ((status)); then
 		echo FAIL
 		((FATAL)) && exit 1
 		((FAILURES++))
 	else
-		echo "Ok"
+		echo Ok
 	fi
+	return "$status"
 }
 
 cleanup() {
@@ -105,48 +113,54 @@ cleanup() {
 	return "$ret"
 }
 
-#### service helpers
-start_coordinatool() {
+#### plain action helpers
+do_coordinatool_start() {
 	local i="$1"
 
 	do_client "$i" "
-		systemd-run -P -G --unit=coordinatool.service \
+		systemd-run -P -G --unit=ctest_coordinatool@${i}.service \
 		${BUILDDIR@Q}/lhsmd_coordinatool -vv MNTPATH
 		" &
-	CLEANUP+=( "wait $!" "service_coordinatool $i stop" )
+	CLEANUP+=( "wait $!" "do_coordinatool_service $i stop" )
 }
 
-service_coordinatool() {
+do_coordinatool_service() {
 	local i="$1"
 	local action="$2"
 
-	do_client "$i" "systemctl $action coordinatool.service" || :
+	do_client "$i" "systemctl $action ctest_coordinatool@${i}.service" || :
 }
 
-start_lhsmtool_cmd() {
+do_lhsmtoolcmd_start() {
 	local i="$1"
 
 	do_client "$i" "
 		rm -rf ${ARCHIVEDIR@Q} && mkdir ${ARCHIVEDIR@Q}
-		systemd-run -P -G --unit=lhsmtool_cmd@$i.service \
+		systemd-run -P -G --unit=ctest_lhsmtool_cmd@$i.service \
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
 				--config ${SOURCEDIR@Q}/tests/lhsm_cmd.conf \
 				MNTPATH
 		" &
-	CLEANUP+=( "wait $!" "service_lhsmtool_cmd $i stop" )
+	CLEANUP+=( "wait $!" "do_lhsmtoolcmd_service $i stop" )
 }
 
-service_lhsmtool_cmd() {
+do_lhsmtoolcmd_service() {
 	local i="$1"
 	local action="$2"
 
-	do_client "$i" "systemctl $action lhsmtool_cmd@${i}.service" || :
+	do_client "$i" "systemctl $action ctest_lhsmtool_cmd@${i}.service" || :
 }
 
+do_coordinatool_client() {
+	local i="$1"
+	shift
 
-#### client helpers
-client_setup() {
+	do_client "$i" "${BUILDDIR@Q}/coordinatool-client ${*@Q}"
+}
+
+#### complex action helpers
+client_reset() {
 	local i="$1"
 
 	do_client "$i" "
@@ -221,6 +235,7 @@ client_restore_n() {
 		done
 	"
 }
+
 client_remove_n() {
 	local i="$1"
 	local n="$2"
@@ -242,6 +257,13 @@ client_remove_n() {
 	"
 }
 
+mds_requeue_active_requests() {
+	local i="$1"
+
+	do_mds "$i" "lctl get_param mdt.MDT.hsm.active_requests | \
+			${BUILDDIR@Q}/coordinatool-client -Q"
+}
+
 # init conditional global variables
 init() {
 	ASAN=$(ldd "$BUILDDIR/tests/lhsmtool_cmd" | grep -oE '/lib.*libasan.so[.0-9]*')
@@ -256,20 +278,20 @@ sanity() {
 
 	for i in {0..4}; do
 		do_client $i "df -t lustre MNTPATH >/dev/null" \
-			|| error "${CLIENT[$i]}:${MNTPATH[$i]} not mounted"
+			|| error "${CLIENT[i]}:${MNTPATH[i]} not mounted"
 		do_client $i "touch ${TESTDIR@Q} >/dev/null" \
-			|| error "No sudo or cannot touch ${MNTPATH[$i]}/.test on ${CLIENT[$i]}"
+			|| error "No sudo or cannot touch ${MNTPATH[i]}/.test on ${CLIENT[i]}"
 		do_client $i "stat ${BUILDDIR@Q}/lhsmd_coordinatool > /dev/null" \
-			|| error "$BUILDDIR not a build dir or not accessible on client $i"
+			|| error "$BUILDDIR not a build dir or not accessible on ${CLIENT[i]}"
 		do_client $i "stat ${SOURCEDIR@Q}/tests/lhsm_cmd.conf > /dev/null" \
-			|| error "$SOURCEDIR not a source dir or not accessible on client $i"
-		do_client $i "systemctl stop coordinatool.service 2>/dev/null
-			      systemctl stop lhsmtool_cmd@*.service 2>/dev/null" || :
+			|| error "$SOURCEDIR not a source dir or not accessible on ${CLIENT[i]}"
+		do_coordinatool_service $i stop 2>/dev/null || :
+		do_lhsmtoolcmd_service $i stop 2>/dev/null || :
 	done
 
 
 	[[ "${#MDS[@]}" = "${#MDT[@]}" ]] \
-		|| error "client and mntpoints number don't match"
+		|| error "MDSs and MDTs number don't match"
 
 	for i in {0..1}; do
 		[[ "$(do_mds $i "lctl get_param mdt.MDT.hsm_control")" =~ =enabled$ ]] \
@@ -283,15 +305,15 @@ sanity() {
 
 # optimal scenario: servers all running, send requests
 normal_requests() {
-	start_coordinatool 0
-	start_lhsmtool_cmd 1
-	start_lhsmtool_cmd 2
+	do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+	do_lhsmtoolcmd_start 2
 
 	# starts all are async here so first request might come in before servers
 	# started, but later requests (restore/remove) do test the optimal server running
 	# case
 
-	client_setup 3
+	client_reset 3
 	client_archive_n 3 100
 	client_restore_n 3 100
 	client_remove_n 3 100
@@ -299,19 +321,19 @@ normal_requests() {
 
 # coordinatool restart with actions queued but no active requests on agents (no agent)
 server_restart_no_agent_active_requests() {
-	start_coordinatool 0
+	do_coordinatool_start 0
 
 	# start only coorinatool with no agent to queue a request
 
-	client_setup 3
+	client_reset 3
 	client_archive_n_req 3 100
 
-	service_coordinatool 0 restart
+	do_coordinatool_service 0 restart
 
 	# make sure service really restarted before requeueing active requests
 	sleep 1
-	do_mds 0 "lctl get_param mdt.MDT.hsm.active_requests | ${BUILDDIR@Q}/coordinatool-client -Q"
-	start_lhsmtool_cmd 1
+	mds_requeue_active_requests 0
+	do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
 }
 
@@ -321,9 +343,9 @@ init
 [[ $(caller | cut -d' ' -f1) != "0" ]] && return 0
 
 
-FATAL=1 run_test sanity 00
-run_test normal_requests 01
-run_test server_restart_no_agent_active_requests 02
+FATAL=1 run_test 00 sanity
+run_test 01 normal_requests
+run_test 02 server_restart_no_agent_active_requests
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
 
