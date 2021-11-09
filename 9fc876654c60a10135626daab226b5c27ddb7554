@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8603e278_5cf443fa",
+        "filename": "client_common/client.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T15:21:16Z",
+      "side": 1,
+      "message": "suggest: instead of saying \"to fit in static string\" maybe displaying the maximum size would be more helpful.",
+      "range": {
+        "startLine": 209,
+        "startChar": 4,
+        "endLine": 209,
+        "endChar": 13
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ced6ed74_d03176dd",
+        "filename": "common/protocol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T15:21:16Z",
+      "side": 1,
+      "message": "minor: missing documentation for this field",
+      "range": {
+        "startLine": 314,
+        "startChar": 13,
+        "endLine": 314,
+        "endChar": 24
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5406f083_7e330375",
+        "filename": "common/protocol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T15:21:16Z",
+      "side": 1,
+      "message": "minor: missing documentation for this field",
+      "range": {
+        "startLine": 331,
+        "startChar": 29,
+        "endLine": 331,
+        "endChar": 36
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "890c4105_95ed2d9e",
+        "filename": "preload/state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T15:21:16Z",
+      "side": 1,
+      "message": "suggest: maybe renaming the function to state_dump_hai or state_write_hai would better represent tis the goal",
+      "range": {
+        "startLine": 116,
+        "startChar": 10,
+        "endLine": 116,
+        "endChar": 20
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
