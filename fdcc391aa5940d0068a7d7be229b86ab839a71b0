@@ -22,6 +22,30 @@
       },
       "revId": "fdcc391aa5940d0068a7d7be229b86ab839a71b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09c496bd_6c8e1674",
+        "filename": "client_common/client.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T21:40:51Z",
+      "side": 1,
+      "message": "It\u0027s a new verb! i gethostname you gethostname...\nok, ok.\n\n diff --git a/client_common/client.c b/client_common/client.c\n index 76ea7bbd88e4..517c26e8853d 100644\n --- a/client_common/client.c\n +++ b/client_common/client.c\n @@ -179,7 +179,7 @@ int ct_config_init(struct ct_state_config *config)  {\n         /* first set defaults */\n         config-\u003ehost \u003d xstrdup(\"coordinatool\");\n         config-\u003eport \u003d xstrdup(\"5123\");\n -       config-\u003eclient_id \u003d NULL; /* NULL will gethostname if not set */\n +       config-\u003eclient_id \u003d NULL; /* NULL will call gethostname if not set */\n         config-\u003estate_dir_prefix \u003d xstrdup(\".coordinatool\");\n         config-\u003emax_restore \u003d -1;\n         config-\u003emax_archive \u003d -1;",
+      "parentUuid": "7bae1eac_224aa5b5",
+      "range": {
+        "startLine": 290,
+        "startChar": 35,
+        "endLine": 290,
+        "endChar": 39
+      },
+      "revId": "fdcc391aa5940d0068a7d7be229b86ab839a71b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
