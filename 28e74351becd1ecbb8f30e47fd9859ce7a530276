@@ -22,6 +22,30 @@
       },
       "revId": "28e74351becd1ecbb8f30e47fd9859ce7a530276",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c0aba2f_2e950ee2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:58:06Z",
+      "side": 1,
+      "message": "No, it\u0027s a real overflow: by not having a final \\0 functions that expect to be nul terminated will overflow the buffer.\n\nASAN catches it alright as such, I just hadn\u0027t tested with a large enough input.",
+      "parentUuid": "4e28b29b_8763a1f1",
+      "range": {
+        "startLine": 7,
+        "startChar": 23,
+        "endLine": 7,
+        "endChar": 42
+      },
+      "revId": "28e74351becd1ecbb8f30e47fd9859ce7a530276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
