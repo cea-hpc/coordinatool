@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4887844_b68c19b5",
+        "filename": "client_common/client.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T21:38:47Z",
+      "side": 1,
+      "message": "This code was removed later (the string is now strdup\u0027d), so leaving as is. I agree with the comment though.",
+      "parentUuid": "8603e278_5cf443fa",
+      "range": {
+        "startLine": 209,
+        "startChar": 4,
+        "endLine": 209,
+        "endChar": 13
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ced6ed74_d03176dd",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "254446e2_7471fc08",
+        "filename": "common/protocol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T21:38:47Z",
+      "side": 1,
+      "message": "Good catch. Adding this in a later commit unless rebase happens:\n\ndiff --git a/common/protocol.h b/common/protocol.h\nindex 080d473bd853..aa8b0201688f 100644\n--- a/common/protocol.h\n+++ b/common/protocol.h\n@@ -304,6 +304,7 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai);\n  *\n  * @param json input representing hsm_action_item\n  * @param hai output hsm_action_item, must have been preallocated\n+ * @param action_item json representation of the hai\n  * @param hai_len size of hai we can write on\n  *\n  * @return 0 on success, -1 if json isn\u0027t correct",
+      "parentUuid": "ced6ed74_d03176dd",
+      "range": {
+        "startLine": 314,
+        "startChar": 13,
+        "endLine": 314,
+        "endChar": 24
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5406f083_7e330375",
@@ -60,6 +108,30 @@
       "writtenOn": "2021-11-09T15:21:16Z",
       "side": 1,
       "message": "minor: missing documentation for this field",
+      "range": {
+        "startLine": 331,
+        "startChar": 29,
+        "endLine": 331,
+        "endChar": 36
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65556cbc_8e803993",
+        "filename": "common/protocol.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T21:38:47Z",
+      "side": 1,
+      "message": "@@ -320,6 +321,7 @@ typedef int (*hal_get_cb)(struct hsm_action_list *hal,\n  * @param json input json representing a fid\n  * @param hal buffer to write to\n  * @param hal_len length of the buffer we can write in\n+ * @param advance whether the step in the hal list or operate in place\n  * @param cb optional callback to call on each item\n  *           if given, the first item of the list is repeatedly\n  *           written each time as it is assumed list will not be",
+      "parentUuid": "5406f083_7e330375",
       "range": {
         "startLine": 331,
         "startChar": 29,
