@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3cb5325_3b5ea470",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:56:57Z",
+      "side": 1,
+      "message": "(not going to rebase just for this, 74 colons is fine)",
+      "parentUuid": "2afe6f18_002c0e29",
+      "revId": "94ce4d596cb437762ac2199a2e014072d25963da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bf9fbba_181a9d3e",
@@ -31,6 +49,30 @@
       "writtenOn": "2021-11-09T10:32:48Z",
       "side": 1,
       "message": "minor: this implies that the service file is copied to the right destination. This is not a big deal. I would at least add it in the test documentation in tests and maybe make the copy of the service file in a test setup script.\n\nAlso, I think there need a semi-colon at the end of line 83",
+      "range": {
+        "startLine": 83,
+        "startChar": 16,
+        "endLine": 83,
+        "endChar": 51
+      },
+      "revId": "94ce4d596cb437762ac2199a2e014072d25963da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04d9ea77_faf2f4df",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T10:56:57Z",
+      "side": 1,
+      "message": "There is no service file, it\u0027s a transient unit created by systemd-run -- but in this case it\u0027s expected to be able to fail if the service hadn\u0027t been started hence the \u0027|| true\u0027 next line.\n\nThat said, if we have a coordinatool.service file installed systemd-run will fail so I need to use another name for tests... will do later.\n\nsemi-colons are not needed.",
+      "parentUuid": "8bf9fbba_181a9d3e",
       "range": {
         "startLine": 83,
         "startChar": 16,
