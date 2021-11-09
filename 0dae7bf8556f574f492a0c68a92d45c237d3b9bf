@@ -16,6 +16,299 @@
       "message": "Hm I was sure I had posted a comment for these patches last week... Sorry for the belated review request, please have a look when possible.\n\nTests changed a bit from the first patch so it might be most efficient to just look at the last version. I haven\u0027t updated the test README yet but I found it useful to just source the run test script and manually run key actions manually, it helped uncover a few bugs and I plan on adding some more helpers/rename a few function names so they come more easily through tab completion this week so it might make sense to wait a bit more for this, but early comments are welcome.\n\nRest can be reviewed normally, but it\u0027s a large amount of patches so feel free to work at it a few at a time... To recap there\u0027s some fixes, a couple of reworks (how client id is stored in the client, config parsing shared with server...), added missing stats to print on status call, and finally code for the client to store running requests on the filesystem for resume as discussed.\nI\u0027ll get onto using this client state on server restarts next weekend now grounds work has been done.",
       "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "371bd4b9_de21c90c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "I like the way run_test.sh works, nice work :) We may have to be careful not to make it too big though. A future improvement may be to make a testcase be a file rather that a bash function.\n\nI didn\u0027t run the script yet but I doubt that it works properly. I will be able to check tomorrow.\n\nAlso, it would be nice to add a configuration script for llmount.sh which will probably use the variables defined in test_config.sh and initilialize the right variables of the script (if this is not done in a later patch).",
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b18aaa52_364dce02",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: is this a list of directories for each lhsmtool_cmd or are they unique ? I assume that are local to each node running an lhsmtool_cmd ?",
+      "range": {
+        "startLine": 22,
+        "startChar": 5,
+        "endLine": 22,
+        "endChar": 15
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dded9d9a_9608226e",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: to conform to the error message shouldn\u0027t this be \"^[0-4]$\" ? Or even: \"^[0-${#CLIENTS[@]}]$\" which would allow the next line to be removed.",
+      "range": {
+        "startLine": 21,
+        "startChar": 13,
+        "endLine": 21,
+        "endChar": 19
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df80ef5c_d55f5353",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: there are 4 hardcoded clients ? Maybe a global variable wouldn\u0027t hurt for future change (although 4 clients may be enough for regression testing)",
+      "range": {
+        "startLine": 21,
+        "startChar": 58,
+        "endLine": 21,
+        "endChar": 59
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e5b5531_cc6dcae1",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: same as above",
+      "range": {
+        "startLine": 36,
+        "startChar": 12,
+        "endLine": 36,
+        "endChar": 20
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a539cee_2cb7a347",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "nit: surround with \"\"",
+      "range": {
+        "startLine": 59,
+        "startChar": 7,
+        "endLine": 59,
+        "endChar": 11
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec9e0057_c6498fe1",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "major: I\u0027ve had issues with these kinds of global variables before. I think FAILURES will not be updated at the global scope meaning that the script will always return 0.\n\nAlso, we\u0027ve had some issues with the ++ operator not supported. I would suggest FAILURE\u003dFAILURES+1",
+      "range": {
+        "startLine": 60,
+        "startChar": 2,
+        "endLine": 61,
+        "endChar": 16
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d3e960a_d9af63de",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: it seems to me that if the size of this array is not 4, the tests will fail which is probably intended. But I find it odd to have 4 hardcoded when it seems that it should really be set to the number of clients available ?",
+      "range": {
+        "startLine": 71,
+        "startChar": 5,
+        "endLine": 71,
+        "endChar": 18
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa417564_b592a6a6",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: shouldn\u0027t this be ${MNTPATH[$i]} ? I see it in normal_requests as well.",
+      "range": {
+        "startLine": 75,
+        "startChar": 29,
+        "endLine": 75,
+        "endChar": 36
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57038a1d_92efef55",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: again why not ${#MDT[@]} ?",
+      "range": {
+        "startLine": 91,
+        "startChar": 14,
+        "endLine": 91,
+        "endChar": 15
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24af45a4_83cd7013",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "suggest: I imagine using this direcotory will be quite common in tests, maybe a variable TESTDIR would be helpfull to reduce the size of the commands.",
+      "range": {
+        "startLine": 106,
+        "startChar": 8,
+        "endLine": 106,
+        "endChar": 27
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2456881d_7dfe32dc",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "question: don\u0027t you need to put semi-colons at the end of each command ?",
+      "range": {
+        "startLine": 108,
+        "startChar": 14,
+        "endLine": 108,
+        "endChar": 33
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e7a9980_41ce43d0",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:20:35Z",
+      "side": 1,
+      "message": "major: I tested the following code:\n\n```\nFATAL\u003d1 echo $FATAL\necho $FATAL\n```\n\nIt outputs 2 empty lines, but:\n```\nFATAL\u003d1; echo $FATAL\necho $FATAL\n```\noutputs\n1\n1\n\nI don\u0027t think this works",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 24
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
