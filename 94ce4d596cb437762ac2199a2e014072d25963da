@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2afe6f18_002c0e29",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:32:48Z",
+      "side": 1,
+      "message": "style: this line is a bit long",
+      "revId": "94ce4d596cb437762ac2199a2e014072d25963da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bf9fbba_181a9d3e",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-09T10:32:48Z",
+      "side": 1,
+      "message": "minor: this implies that the service file is copied to the right destination. This is not a big deal. I would at least add it in the test documentation in tests and maybe make the copy of the service file in a test setup script.\n\nAlso, I think there need a semi-colon at the end of line 83",
+      "range": {
+        "startLine": 83,
+        "startChar": 16,
+        "endLine": 83,
+        "endChar": 51
+      },
+      "revId": "94ce4d596cb437762ac2199a2e014072d25963da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
