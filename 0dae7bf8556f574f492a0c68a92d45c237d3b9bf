@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "345293d7_18bb6dc5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T12:58:44Z",
+      "side": 1,
+      "message": "\u003e $(update_glob)\n\nyes, $() is a subshell, so that is expected behaviour.\nYou also have a subshell if you do something like\n\n  command | while read foo; do\n    update_glob\n  done\n\nso it\u0027s not always as obvious as backticks or $(), but it\u0027s still not that hard to avoid as long as you\u0027re aware of it -- and more importantly as I said there isn\u0027t really any better way of doing this, I\u0027ve seen other test frameworks store failure counts in a file but that doesn\u0027t strike me as much better...\n\n\u003e llmount.sh\n\ncool, I didn\u0027t know it handled multiple hosts setup, definitely something to look into.",
+      "parentUuid": "9fbd5b86_5c17c29c",
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b18aaa52_364dce02",
@@ -132,6 +150,30 @@
       "side": 1,
       "message": "Just to follow up on that, why don\u0027t you use Lustre\u0027s copytool instead writing your own simpler version ?",
       "parentUuid": "ef9e22ac_806477ff",
+      "range": {
+        "startLine": 22,
+        "startChar": 5,
+        "endLine": 22,
+        "endChar": 15
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad2ba6b9_b1d98c05",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T12:58:44Z",
+      "side": 1,
+      "message": "I\u0027m not sure \"simpler\" is appropriate: running arbitrary commands is very powerful. I\u0027ve used tests/command.sh (file to be renamed) as action to delay copytool operations and restart one part or another with actions queued up, I\u0027ll probably use this for tests as well (although tests can be replaced by just batching enough actions that you can be confident some will be running on an agent when you restart it, it\u0027s best if we control the actual flow for reliable tests)\n\nI don\u0027t know how to do that with the posix copytool.\n\nThat aside, it\u0027s also just a copytool we\u0027re more familiar with: this is the copytool included in rbh v3 source code. I don\u0027t think we ever used it in production, though.",
+      "parentUuid": "fb3beb7b_cd4f91c3",
       "range": {
         "startLine": 22,
         "startChar": 5,
