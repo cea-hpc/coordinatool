@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7daf41fb_03907865",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T21:35:35Z",
+      "side": 1,
+      "message": "it works! But it\u0027s kind of cheating, $n is expanded before calling do_client which will run sh -c with {1..42} as constants.",
+      "parentUuid": "633e4878_d9aac81d",
+      "range": {
+        "startLine": 205,
+        "startChar": 11,
+        "endLine": 205,
+        "endChar": 18
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c90cbdf_11cd42e4",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60e1e622_8ff7dc6a",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T21:35:35Z",
+      "side": 1,
+      "message": "same as MNTPATH: I\u0027ll be happy if this is removed altogether, but not going to do it on purpose. the logic for the name here is that it is the same variable as the name.\n(closing as kept open in another change)",
+      "parentUuid": "0c90cbdf_11cd42e4",
+      "range": {
+        "startLine": 313,
+        "startChar": 30,
+        "endLine": 313,
+        "endChar": 33
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c87a413c_469f5ef7",
@@ -60,6 +108,30 @@
       "writtenOn": "2021-11-09T14:07:26Z",
       "side": 1,
       "message": "style: I would put the number as the first argument",
+      "range": {
+        "startLine": 324,
+        "startChar": 24,
+        "endLine": 324,
+        "endChar": 26
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41a70522_fad0da03",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-09T21:35:35Z",
+      "side": 1,
+      "message": "hm, yeah, why not -- same, happy if that\u0027s done later. leaving this one open.",
+      "parentUuid": "c87a413c_469f5ef7",
       "range": {
         "startLine": 324,
         "startChar": 24,
