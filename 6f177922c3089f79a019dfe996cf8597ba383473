@@ -118,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb49e28d_63d29402",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:46:45Z",
+      "side": 1,
+      "message": "the next two loop iterations will immediately fail this test again and continue, I don\u0027t see any benefit of complicating the code to add an explicit break here.",
+      "parentUuid": "2708a9fd_835e3ab1",
+      "range": {
+        "startLine": 65,
+        "startChar": 2,
+        "endLine": 65,
+        "endChar": 47
+      },
+      "revId": "6f177922c3089f79a019dfe996cf8597ba383473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "901c1317_4da5a099",
@@ -131,6 +155,30 @@
       "writtenOn": "2021-11-10T14:48:12Z",
       "side": 1,
       "message": "question: is client connected the number of clients connected to the coordinatool or the number of clients that have issued a llapi_hsm_copytool_recv ? If its the number of connected clients then the comment above is misleading.\n\nAlso, if that\u0027s the number of connected clients, this will make the scheduler send less requests than it could.",
+      "range": {
+        "startLine": 86,
+        "startChar": 38,
+        "endLine": 86,
+        "endChar": 68
+      },
+      "revId": "6f177922c3089f79a019dfe996cf8597ba383473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b46e27a_7aa5b53e",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:46:45Z",
+      "side": 1,
+      "message": "It\u0027s the number of connected clients (so yes stuff like the CLI client will wrong this count), but as far as real clients go they all re-enter recv pretty fast and it\u0027s good enough of an approximation; in practice I don\u0027t think it\u0027s a problem. In practice the client will come back a few milliseconds later if its work queues are not full, it\u0027s just a chance to roughly even this out between clients -- it\u0027s actually better to be overly pessimistic here and send too few than too many.\n\nThe comment is both wrong and correct: the intention is for when clients are waiting, the implementation is just an approximation of that because I don\u0027t keep track of the actual number of clients waiting and I didn\u0027t want to re-count everytime or add a new counter.",
+      "parentUuid": "901c1317_4da5a099",
       "range": {
         "startLine": 86,
         "startChar": 38,
