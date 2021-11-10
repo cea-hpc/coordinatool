@@ -22,6 +22,30 @@
       },
       "revId": "541dfafa66484270507f8f1a187b713091baea09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7832c8c_32d729da",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:48:44Z",
+      "side": 1,
+      "message": "It\u0027s stats, it doesn\u0027t matter what order this is in, but structs, switchs etc in the code base always do restore, archive, remove so I\u0027m just enforcing the order here.\nThe only place where the order really matters is when we schedule requests: receive requests have priority and should be sent first.",
+      "parentUuid": "4a5a8698_661ead0d",
+      "range": {
+        "startLine": 33,
+        "startChar": 5,
+        "endLine": 33,
+        "endChar": 88
+      },
+      "revId": "541dfafa66484270507f8f1a187b713091baea09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
