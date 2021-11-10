@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6f0f096_ebe7253d",
+        "filename": "preload/preload.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:29:23Z",
+      "side": 1,
+      "message": "There\u0027s a few addresses I want zeroed and didn\u0027t want to zero fields manually; honestly calloc is safer/lazier for this kind of things e.g. when I added the state DIR* I didn\u0027t need to add a new field here for initialization",
+      "parentUuid": "a072caba_8859dea5",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 30
+      },
+      "revId": "7bb3df9ca9f8649cbe36300922a53d32167c1cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0891ec9_a6a664d3",
@@ -37,6 +61,30 @@
       "writtenOn": "2021-11-10T13:26:30Z",
       "side": 1,
       "message": "question: why did this line change position in the function ?",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 58,
+        "endChar": 58
+      },
+      "revId": "7bb3df9ca9f8649cbe36300922a53d32167c1cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f107300_7d171593",
+        "filename": "preload/preload.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:29:23Z",
+      "side": 1,
+      "message": "state_init has more chances of failure so it\u0027s better to do earlier in my opinion, but no strong meaning.",
+      "parentUuid": "a0891ec9_a6a664d3",
       "range": {
         "startLine": 58,
         "startChar": 1,
