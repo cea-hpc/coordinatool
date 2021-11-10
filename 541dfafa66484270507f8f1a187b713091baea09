@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a5a8698_661ead0d",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T14:29:51Z",
+      "side": 1,
+      "message": "question: why switch their places ? It makes more sense to me that archive is the first checked",
+      "range": {
+        "startLine": 33,
+        "startChar": 5,
+        "endLine": 33,
+        "endChar": 88
+      },
+      "revId": "541dfafa66484270507f8f1a187b713091baea09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
