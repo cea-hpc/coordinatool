@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7a98b46_82d8e109",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:41:33Z",
+      "side": 1,
+      "message": "Done (later unpublished commit for now)",
+      "parentUuid": "306fc320_785a171b",
+      "range": {
+        "startLine": 116,
+        "startChar": 22,
+        "endLine": 116,
+        "endChar": 26
+      },
+      "revId": "6f177922c3089f79a019dfe996cf8597ba383473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4c477ad_a1bb76ab",
@@ -37,6 +61,30 @@
       "writtenOn": "2021-11-10T14:27:28Z",
       "side": 1,
       "message": "question: so a client will never be used at maximum capacity ?",
+      "range": {
+        "startLine": 116,
+        "startChar": 3,
+        "endLine": 117,
+        "endChar": 24
+      },
+      "revId": "6f177922c3089f79a019dfe996cf8597ba383473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a27a8f21_e2b091c1",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:41:33Z",
+      "side": 1,
+      "message": "Yes and no, if a HAI is exactly this size it could fit max capacity, but otherwise it\u0027s not worth dequeuing an item, trying to enqueue it just to see it won\u0027t fit and enqueue it back.\nNow scheduling has been separated this opinion could be revisited, but overall I don\u0027t think this buffer will ever be full in practice with the other limits enforced.. Speaking of which that would make an interesting test to make sure I really don\u0027t overflow the buffer, you\u0027d just need to write a bunch of actions with \u003e 100 in data (lfs hsm_xxx --data .....)",
+      "parentUuid": "a4c477ad_a1bb76ab",
       "range": {
         "startLine": 116,
         "startChar": 3,
