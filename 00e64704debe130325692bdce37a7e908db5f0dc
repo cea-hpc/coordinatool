@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "880c9d1b_6a7d6c45",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T11:36:42Z",
+      "side": 1,
+      "message": "I don\u0027t get it. This command starts the service, why would it want to stop it right here?\n\ncommand filled in CLEANUP are executed when the test ends, so after the service has had time to actually process commands (it\u0027s also in reverse order, so service stops then wait makes sure the systemd-run command finished -- ideally we\u0027d want cleanup to issue all service stop commands then wait for all commands to finish but that can come later if we care...)",
+      "parentUuid": "1f16ed6b_ea4c81a5",
+      "range": {
+        "startLine": 116,
+        "startChar": 1,
+        "endLine": 116,
+        "endChar": 54
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "633e4878_d9aac81d",
         "filename": "tests/run_tests.sh",
         "patchSetId": 1
