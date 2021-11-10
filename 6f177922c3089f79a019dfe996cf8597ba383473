@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4c477ad_a1bb76ab",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T14:27:28Z",
+      "side": 1,
+      "message": "question: so a client will never be used at maximum capacity ?",
+      "range": {
+        "startLine": 116,
+        "startChar": 3,
+        "endLine": 117,
+        "endChar": 24
+      },
+      "revId": "6f177922c3089f79a019dfe996cf8597ba383473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2708a9fd_835e3ab1",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T14:27:28Z",
+      "side": 1,
+      "message": "question: if that condition is not met, why not immediately break and go to the next client ?",
+      "range": {
+        "startLine": 65,
+        "startChar": 2,
+        "endLine": 65,
+        "endChar": 47
+      },
+      "revId": "6f177922c3089f79a019dfe996cf8597ba383473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
