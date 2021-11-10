@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20febd33_ee5b1845",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:37:21Z",
+      "side": 1,
+      "message": "libini does not provide any boilerplate advantage over this here, it\u0027s too crude to be called parsing... If sections are added (e.g. different config for the coordinatool than for agents) then a switch to libini or similar would be useful, but it\u0027s not worth learning a new API for me at this point.",
+      "parentUuid": "a38339a4_8724e68b",
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d2ac3c9_dcd4e617",
@@ -31,6 +49,30 @@
       "writtenOn": "2021-11-10T14:19:58Z",
       "side": 1,
       "message": "question: I see that fatal and off are not documented in the README, is this desired ?",
+      "range": {
+        "startLine": 91,
+        "startChar": 16,
+        "endLine": 91,
+        "endChar": 30
+      },
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01006394_c97bb564",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:37:21Z",
+      "side": 1,
+      "message": "hmm, off might have some use, but I don\u0027t want to needlessly document fatal which won\u0027t make a difference in practice (probably same as off? haven\u0027t tried)\nI\u0027ll add OFF later.",
+      "parentUuid": "2d2ac3c9_dcd4e617",
       "range": {
         "startLine": 91,
         "startChar": 16,
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41d7161f_8d762409",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:37:21Z",
+      "side": 1,
+      "message": "this is in case getenv_verbose itself fails, I want errors there to be displayed.\nAlso, if the env variable is different getenv_verbose will call llapi_msg_set_level itself -- so if env had been set to NORMAL it wouldn\u0027t call it an an explicit call here is required.",
+      "parentUuid": "4289a4b9_0082c2c2",
+      "range": {
+        "startLine": 136,
+        "startChar": 1,
+        "endLine": 136,
+        "endChar": 20
+      },
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7c626be_2e3e4c8a",
@@ -77,6 +143,30 @@
       "writtenOn": "2021-11-10T14:16:13Z",
       "side": 1,
       "message": "question: why not arbitrarily set the verbose to something like LOG_ERROR before parsing the conf, to avoid a somewhat unnecessary call to getenv_verbose ?",
+      "range": {
+        "startLine": 139,
+        "startChar": 1,
+        "endLine": 139,
+        "endChar": 63
+      },
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd4dca09_cfda261c",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:37:21Z",
+      "side": 1,
+      "message": "So what do you do when you want to debug the parsing code because a value isn\u0027t set correctly? Change the constant in the code? :)",
+      "parentUuid": "f7c626be_2e3e4c8a",
       "range": {
         "startLine": 139,
         "startChar": 1,
