@@ -22,6 +22,30 @@
       },
       "revId": "d7cbc9e57cf9fe71b576d0457bd0da3198f1cb7a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9310b3f7_f9d47b6d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-10T15:44:21Z",
+      "side": 1,
+      "message": "I think this is used if error is called in interactive mode. Then error returns 1 and this return is called which will en client.",
+      "parentUuid": "59f1d58c_cf1b579f",
+      "range": {
+        "startLine": 30,
+        "startChar": 43,
+        "endLine": 31,
+        "endChar": 11
+      },
+      "revId": "d7cbc9e57cf9fe71b576d0457bd0da3198f1cb7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
