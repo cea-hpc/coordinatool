@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "47aef730_5b029e4b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:52:27Z",
+      "side": 1,
+      "message": "Thank you two for all the reviews!\nI\u0027ll give others a few more days but it\u0027s great, didn\u0027t expect this to all be done so fast.",
+      "revId": "d7cbc9e57cf9fe71b576d0457bd0da3198f1cb7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59f1d58c_cf1b579f",
@@ -38,6 +55,30 @@
       "side": 1,
       "message": "I think this is used if error is called in interactive mode. Then error returns 1 and this return is called which will en client.",
       "parentUuid": "59f1d58c_cf1b579f",
+      "range": {
+        "startLine": 30,
+        "startChar": 43,
+        "endLine": 31,
+        "endChar": 11
+      },
+      "revId": "d7cbc9e57cf9fe71b576d0457bd0da3198f1cb7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58eb8a5e_2c5bdf44",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:52:27Z",
+      "side": 1,
+      "message": "Yes, it\u0027s a bit annoying but I had to add this for interactive mode as error cannot \"burst out\" of the helper.\n\nFortunately very few helpers use error so it\u0027s only been needed in two places, but it\u0027s very much needed (see commit message)\nA comment here for the first time I do it might help though, I\u0027ll add one.",
+      "parentUuid": "9310b3f7_f9d47b6d",
       "range": {
         "startLine": 30,
         "startChar": 43,
