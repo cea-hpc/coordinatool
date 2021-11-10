@@ -163,6 +163,30 @@
       },
       "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "686746dd_65224eff",
+        "filename": "preload/state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T13:12:54Z",
+      "side": 1,
+      "message": "sorry I had missed this comment.\nI was thinking of updating the state when function starts later, so really handling this file as a state that can contain more than just the hai (distinguish between received-but-not-started hai, and actually started action)\n\nI also think algorithmically \"creating the file\" in itself has a strong meaning so I\u0027d like to keep the current name for now.",
+      "parentUuid": "890c4105_95ed2d9e",
+      "range": {
+        "startLine": 116,
+        "startChar": 10,
+        "endLine": 116,
+        "endChar": 20
+      },
+      "revId": "9fc876654c60a10135626daab226b5c27ddb7554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
