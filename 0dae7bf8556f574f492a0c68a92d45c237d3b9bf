@@ -301,6 +301,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4a89ec0_73ca90f4",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T11:08:35Z",
+      "side": 1,
+      "message": "${VAR@Q} will quote $VAR, same as printf %q \"$VAR\", it\u0027s a bash built-in operator (search for parameter@operator in the man page)",
+      "parentUuid": "1aa38cb6_1654b9f8",
+      "range": {
+        "startLine": 28,
+        "startChar": 35,
+        "endLine": 28,
+        "endChar": 41
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e5b5531_cc6dcae1",
@@ -586,6 +610,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "024e1604_8a233475",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T11:08:35Z",
+      "side": 1,
+      "message": "As I said, I\u0027m happy if someone wants to remove this replacement and use ${MNTPATH[$i]} explicitely, I just didn\u0027t do it.\nI might do it on further modifications, but I don\u0027t think it\u0027s a priority, and I certainly won\u0027t do it in this commit (code changed too much, I\u0027ve pushed other fixes to Guillaume comments in a new commit:  https://review.gerrithub.io/c/cea-hpc/coordinatool/+/527051/2 )",
+      "parentUuid": "c5008f17_9baa8886",
+      "range": {
+        "startLine": 75,
+        "startChar": 29,
+        "endLine": 75,
+        "endChar": 36
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d80bc6a_904fc595",
         "filename": "tests/run_tests.sh",
         "patchSetId": 1
@@ -597,6 +645,30 @@
       "writtenOn": "2021-11-10T10:59:16Z",
       "side": 1,
       "message": "minor: use ${CLIENT[$i]}, just like the above error messages",
+      "range": {
+        "startLine": 80,
+        "startChar": 60,
+        "endLine": 80,
+        "endChar": 69
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61f7efb0_cb009340",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T11:08:35Z",
+      "side": 1,
+      "message": "hm sure ok, fixing in later commit.",
+      "parentUuid": "4d80bc6a_904fc595",
       "range": {
         "startLine": 80,
         "startChar": 60,
@@ -630,6 +702,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d091ed8b_8aab5ee3",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T11:08:35Z",
+      "side": 1,
+      "message": "This has been removed later (systemd-run transient service), but the [l] here is here to not kill the ssh client when doing `ssh $HOSTNAME pkill foo` : it\u0027s really just a corner case that makes the command match the real process name but not itself (well, I\u0027m not using pkill -f so it\u0027s not actually required, just habits of doing it for safety)",
+      "parentUuid": "3f8f35c2_243fd19a",
+      "range": {
+        "startLine": 83,
+        "startChar": 22,
+        "endLine": 83,
+        "endChar": 25
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "04ddc99b_b1c7212b",
@@ -643,6 +739,30 @@
       "writtenOn": "2021-11-10T10:59:16Z",
       "side": 1,
       "message": "minor: wrong error message for the test",
+      "range": {
+        "startLine": 89,
+        "startChar": 12,
+        "endLine": 89,
+        "endChar": 32
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b91f6072_c62641d8",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T11:08:35Z",
+      "side": 1,
+      "message": "good catch, updating in latest commit.",
+      "parentUuid": "04ddc99b_b1c7212b",
       "range": {
         "startLine": 89,
         "startChar": 12,
@@ -713,6 +833,30 @@
       "writtenOn": "2021-11-10T10:59:16Z",
       "side": 1,
       "message": "minor: I find this even more bizarre since you know exactly which client you target",
+      "range": {
+        "startLine": 103,
+        "startChar": 51,
+        "endLine": 103,
+        "endChar": 58
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8af1ce7_6dca821c",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T11:08:35Z",
+      "side": 1,
+      "message": "(closing duplicate, but it\u0027s actually precisely for this kind of commands that use a constant that the built-in replacement makes sense: in a loop ${MNTPATH[$i]} will always be correct, but here if I decide I want to change and run coordinatool on client 2 instead of client 0 I can assure you that half the time I\u0027ll update the do_client index but not the MNTPATH index. I know I make mistakes, so I like to put myself in a position where I don\u0027t have to...)",
+      "parentUuid": "902f11e0_a753aa71",
       "range": {
         "startLine": 103,
         "startChar": 51,
