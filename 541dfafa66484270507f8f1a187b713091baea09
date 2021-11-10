@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eefbcf76_76e33fb8",
+        "filename": "common/protocol.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T14:38:20Z",
+      "side": 0,
+      "message": "question: why remove these logs ? You could also add the id for this function no ?",
+      "range": {
+        "startLine": 173,
+        "startChar": 3,
+        "endLine": 173,
+        "endChar": 52
+      },
+      "revId": "541dfafa66484270507f8f1a187b713091baea09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
