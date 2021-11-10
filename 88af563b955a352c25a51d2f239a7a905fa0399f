@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a38339a4_8724e68b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T14:16:13Z",
+      "side": 1,
+      "message": "In general, why did you develop your own parser and not use something like libini ?",
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7c626be_2e3e4c8a",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T14:16:13Z",
+      "side": 1,
+      "message": "question: why not arbitrarily set the verbose to something like LOG_ERROR before parsing the conf, to avoid a somewhat unnecessary call to getenv_verbose ?",
+      "range": {
+        "startLine": 139,
+        "startChar": 1,
+        "endLine": 139,
+        "endChar": 63
+      },
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
