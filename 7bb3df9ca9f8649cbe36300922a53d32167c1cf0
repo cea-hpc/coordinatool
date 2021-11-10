@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a072caba_8859dea5",
+        "filename": "preload/preload.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T13:26:30Z",
+      "side": 1,
+      "message": "question: is there a reason you use calloc and not malloc here ?",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 30
+      },
+      "revId": "7bb3df9ca9f8649cbe36300922a53d32167c1cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0891ec9_a6a664d3",
+        "filename": "preload/preload.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T13:26:30Z",
+      "side": 1,
+      "message": "question: why did this line change position in the function ?",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 58,
+        "endChar": 58
+      },
+      "revId": "7bb3df9ca9f8649cbe36300922a53d32167c1cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
