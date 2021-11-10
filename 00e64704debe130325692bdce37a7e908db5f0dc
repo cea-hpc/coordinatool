@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1f16ed6b_ea4c81a5",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T11:33:18Z",
+      "side": 1,
+      "message": "question: that seems really far-stretched to me, why not just call these two commands here ?",
+      "range": {
+        "startLine": 116,
+        "startChar": 1,
+        "endLine": 116,
+        "endChar": 54
+      },
+      "revId": "00e64704debe130325692bdce37a7e908db5f0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "633e4878_d9aac81d",
         "filename": "tests/run_tests.sh",
         "patchSetId": 1
