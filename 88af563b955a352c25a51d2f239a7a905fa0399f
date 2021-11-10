@@ -20,6 +20,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2d2ac3c9_dcd4e617",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-10T14:19:58Z",
+      "side": 1,
+      "message": "question: I see that fatal and off are not documented in the README, is this desired ?",
+      "range": {
+        "startLine": 91,
+        "startChar": 16,
+        "endLine": 91,
+        "endChar": 30
+      },
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4289a4b9_0082c2c2",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-10T14:19:58Z",
+      "side": 1,
+      "message": "question: shouldn\u0027t this be called after getenv ?",
+      "range": {
+        "startLine": 136,
+        "startChar": 1,
+        "endLine": 136,
+        "endChar": 20
+      },
+      "revId": "88af563b955a352c25a51d2f239a7a905fa0399f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f7c626be_2e3e4c8a",
         "filename": "copytool/config.c",
         "patchSetId": 2
