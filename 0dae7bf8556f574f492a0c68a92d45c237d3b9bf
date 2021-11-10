@@ -280,6 +280,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1aa38cb6_1654b9f8",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T10:59:16Z",
+      "side": 1,
+      "message": "question: what does this do ?",
+      "range": {
+        "startLine": 28,
+        "startChar": 35,
+        "endLine": 28,
+        "endChar": 41
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e5b5531_cc6dcae1",
         "filename": "tests/run_tests.sh",
         "patchSetId": 1
@@ -539,6 +562,99 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c5008f17_9baa8886",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T10:59:16Z",
+      "side": 1,
+      "message": "Sorry I really don\u0027t understand why you use MNTPATH and replace it in do_client, and don\u0027t just use ${MNTPATH[$i]} directly...\nIn the error message, you use ${MNTPATH[$i]}, so it makes sense to me to also use it in the actual function.\nMoreover, all the other calls to do_client give the full command to execute, so why must the one using ${MNTPATH[$i]} be different and rely on a replacement ?",
+      "parentUuid": "892d914f_e158c95c",
+      "range": {
+        "startLine": 75,
+        "startChar": 29,
+        "endLine": 75,
+        "endChar": 36
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d80bc6a_904fc595",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T10:59:16Z",
+      "side": 1,
+      "message": "minor: use ${CLIENT[$i]}, just like the above error messages",
+      "range": {
+        "startLine": 80,
+        "startChar": 60,
+        "endLine": 80,
+        "endChar": 69
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f8f35c2_243fd19a",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T10:59:16Z",
+      "side": 1,
+      "message": "question: why is this necessary ? The daemon names are not fixed ?",
+      "range": {
+        "startLine": 83,
+        "startChar": 22,
+        "endLine": 83,
+        "endChar": 25
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04ddc99b_b1c7212b",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T10:59:16Z",
+      "side": 1,
+      "message": "minor: wrong error message for the test",
+      "range": {
+        "startLine": 89,
+        "startChar": 12,
+        "endLine": 89,
+        "endChar": 32
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57038a1d_92efef55",
         "filename": "tests/run_tests.sh",
         "patchSetId": 1
@@ -579,6 +695,29 @@
         "startChar": 14,
         "endLine": 91,
         "endChar": 15
+      },
+      "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "902f11e0_a753aa71",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T10:59:16Z",
+      "side": 1,
+      "message": "minor: I find this even more bizarre since you know exactly which client you target",
+      "range": {
+        "startLine": 103,
+        "startChar": 51,
+        "endLine": 103,
+        "endChar": 58
       },
       "revId": "0dae7bf8556f574f492a0c68a92d45c237d3b9bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
