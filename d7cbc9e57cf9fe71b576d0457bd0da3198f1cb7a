@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59f1d58c_cf1b579f",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2021-11-10T14:42:11Z",
+      "side": 1,
+      "message": "minor: unnecessary since error already does this",
+      "range": {
+        "startLine": 30,
+        "startChar": 43,
+        "endLine": 31,
+        "endChar": 11
+      },
+      "revId": "d7cbc9e57cf9fe71b576d0457bd0da3198f1cb7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
