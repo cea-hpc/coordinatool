@@ -22,6 +22,30 @@
       },
       "revId": "541dfafa66484270507f8f1a187b713091baea09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39258296_52a9c5ca",
+        "filename": "common/protocol.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-10T22:50:22Z",
+      "side": 0,
+      "message": "id could have been added to the function, but the log messages were just moved up as that seemed more natural to me -- errno is still printed there and ERANGE is not a valid errno for write so no information is lost.",
+      "parentUuid": "eefbcf76_76e33fb8",
+      "range": {
+        "startLine": 173,
+        "startChar": 3,
+        "endLine": 173,
+        "endChar": 52
+      },
+      "revId": "541dfafa66484270507f8f1a187b713091baea09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
