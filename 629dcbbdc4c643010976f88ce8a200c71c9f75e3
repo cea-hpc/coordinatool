@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b11e811_c7a6f043",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2021-11-12T23:19:00Z",
+      "side": 1,
+      "message": "argh build pipeline doesn\u0027t like %m...\n\nsigh, replacing with strerror -_-\n\n../tests/parse_active_requests.c: In function ‘main’:\n../tests/parse_active_requests.c:36:41: error: ISO C does not support the ‘%m’ gnu_printf format [-Werror\u003dformat\u003d]\n   36 |    fprintf(stderr, \"Could not open %s: %m\\n\",\n      |                                         ^\n",
+      "revId": "629dcbbdc4c643010976f88ce8a200c71c9f75e3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
