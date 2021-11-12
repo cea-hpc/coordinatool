@@ -33,7 +33,8 @@ int main(int argc, char *argv[]) {
 	if (argc == 2) {
 		fd = open(argv[1], O_RDONLY);
 		if (fd < 0) {
-			fprintf(stderr, "Could not open %s: %d\n", argv[1], errno);
+			fprintf(stderr, "Could not open %s: %m\n",
+				argv[1]);
 			return 1;
 		}
 	}

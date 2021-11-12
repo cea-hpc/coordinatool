@@ -75,7 +75,7 @@ knobs:
  - `hal_size` buffer size used for internal receive buffer, defaults
    to 1MB like lustre. Accepts optional K/M/G suffix.
  - `archive_id`: archive id to request if set, default to any
- - `verbose`: loglevel, can be one of DEBUG, INFO, NORMAL, WARN, ERROR.
+ - `verbose`: loglevel, can be one of DEBUG, INFO, NORMAL, WARN, ERROR, OFF.
 
 
 ## standalone client
