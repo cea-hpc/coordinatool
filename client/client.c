@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 	free((void*)client.state.config.client_id);
 	client.state.config.client_id = NULL;
 
-	while ((rc = getopt_long(argc, argv, "vqH:p:QRi:h",
+	while ((rc = getopt_long(argc, argv, "vqH:p:QRi:Vh",
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
 		case 'v':

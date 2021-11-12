@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
 	config_init(&state.config);
 
-	while ((rc = getopt_long(argc, argv, "vqA:H:p:",
+	while ((rc = getopt_long(argc, argv, "A:vqH:p:Vh",
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
 		case 'A':
