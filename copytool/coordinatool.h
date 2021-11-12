@@ -115,7 +115,7 @@ int ct_start(struct state *state);
 
 /* protocol */
 
-/* stop enqueuing new hasm action items if we cannot enqueue at least
+/* stop enqueuing new hsm action items if we cannot enqueue at least
  * HAI_SIZE_MARGIN more.
  * That is because item is variable size depending on its data.
  * This is mere optimisation, if element didn't fit it is just put back
