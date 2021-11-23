@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1423b2a5_61be77f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-11-23T13:36:36Z",
+      "side": 1,
+      "message": "I\u0027ve rebased the patch on the current version of master to integrate the new handling of hostnames on the clients and the server. This should be the last version of the patch before landing on this branch unless some adjustments are required. I\u0027ve also abandoned the previous patches as they have been implemented on master.",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
