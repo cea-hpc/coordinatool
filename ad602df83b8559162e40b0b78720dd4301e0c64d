@@ -16,6 +16,23 @@
       "message": "I\u0027ve rebased the patch on the current version of master to integrate the new handling of hostnames on the clients and the server. This should be the last version of the patch before landing on this branch unless some adjustments are required. I\u0027ve also abandoned the previous patches as they have been implemented on master.",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c5cf03a_3edf0132",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2021-12-07T14:07:19Z",
+      "side": 1,
+      "message": "I had to abandon this patch as there were conflicts between the phobos-integration branch and master. I\u0027ve merged this patch in a new branch called phobos which is now up to date with master.",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
