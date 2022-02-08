@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06e4cb67_69b19dd5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-02-08T15:04:41Z",
+      "side": 1,
+      "message": "I see that this patch was left behind. Is this intentional or were you waiting for our approval?",
+      "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
