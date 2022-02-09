@@ -6,8 +6,12 @@ License: LGPLv3+
 
 Source0: %{name}-%{version}.tar.xz
 
+Requires: phobos
+Requires: lustre-client
+
 BuildRequires: meson
 BuildRequires: gcc
+BuildRequires: phobos-devel
 BuildRequires: pkgconfig(jansson)
 BuildRequires: pkgconfig(liburcu)
 BuildRequires: pkgconfig(glib-2.0)
