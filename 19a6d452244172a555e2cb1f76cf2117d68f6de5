@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd45864a_b981947b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-02-16T14:05:35Z",
+      "side": 1,
+      "message": "Actually, this is not what this patch does. The spec file already contains a version which is unchanged (0.1 actually, not 0.1.0), and this patch just adds requirements to the spec file.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 28
+      },
+      "revId": "19a6d452244172a555e2cb1f76cf2117d68f6de5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9162a96d_5be093a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-02-16T14:05:35Z",
+      "side": 1,
+      "message": "The commit message is does not match the content of the patch.",
+      "revId": "19a6d452244172a555e2cb1f76cf2117d68f6de5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
