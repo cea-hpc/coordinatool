@@ -4,7 +4,7 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <attr/xattr.h>
+#include <sys/xattr.h>
 
 #include <phobos_store.h>
 
@@ -76,8 +76,9 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 	return 0;
 }
 
-void ct_schedule_client(struct state *state,
-			struct client *client) {
+void ct_schedule_client(struct state *state, struct client *client) {
+	size_t i;
+
 	if (!client->waiting)
 		return;
 
@@ -100,7 +101,7 @@ void ct_schedule_client(struct state *state,
 	unsigned int *pending_count[] = { &state->stats.pending_restore,
 		&state->stats.pending_remove, &state->stats.pending_archive };
 
-	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
+	for (i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
 		unsigned int enqueued_pass = 0, pending_pass = *pending_count[i];
 		while (client->max_bytes > HAI_SIZE_MARGIN) {
 			struct hsm_action_node *han;
@@ -141,7 +142,7 @@ void ct_schedule_client(struct state *state,
 	cds_list_del(&client->node_waiting);
 	client->waiting = false;
 
-	// frees hai_list
+	/* frees hai_list */
 	int rc = protocol_reply_recv(client, &state->queues, hai_list, 0, NULL);
 	if (rc < 0) {
 		LOG_ERROR(rc, "Could not send reply to %s\n", client->id);
@@ -150,11 +151,10 @@ void ct_schedule_client(struct state *state,
 }
 
 void ct_schedule(struct state *state) {
-	struct cds_list_head *n, *nnext;
+	struct client *client, *c;
 
-	cds_list_for_each_safe(n, nnext, &state->queues.state->waiting_clients) {
-		struct client *client = caa_container_of(n, struct client,
-				node_waiting);
+	cds_list_for_each_entry_safe(client, c,
+								 &state->queues.state->waiting_clients,
+								 node_waiting)
 		ct_schedule_client(state, client);
-	}
 }
