@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <lustre/lustreapi.h>
 #include <sys/time.h>
+#include <sys/unistd.h>
 #include <sys/syscall.h>
 
 static inline double ct_now(void)

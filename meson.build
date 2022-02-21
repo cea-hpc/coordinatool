@@ -1,5 +1,5 @@
 project(
-	'coordinatool',
+	'coordinatool-phobos',
 	'c',
 	version: '0.1',
 	license: 'LGPL3.0-or-later',
@@ -14,6 +14,8 @@ cc = meson.get_compiler('c')
 global_arguments = cc.get_supported_arguments([
 		'-D_GNU_SOURCE',
 		'-Wno-gnu-zero-variadic-macro-arguments',
+		'-Wno-missing-field-initializers',
+		'-Wno-pedantic',
 	])
 
 add_project_arguments(global_arguments, language: 'c')
@@ -33,14 +35,14 @@ if systemd.found()
 		input: 'systemd/coordinatool@.service',
 		install: true,
 		install_dir: systemd_system_unit_dir,
-		output: 'coordinatool@.service',
+		output: 'coordinatool-phobos@.service',
 	)
 	configure_file(
 		copy: true,
 		input: 'systemd/coordinatool.sysconfig',
 		install: true,
 		install_dir: '/etc/sysconfig',
-		output: 'coordinatool',
+		output: 'coordinatool-phobos',
 	)
 endif
 
@@ -52,7 +54,7 @@ version_h = vcs_tag(
 )
 
 common = static_library(
-	'coordinatool_common',
+	'cdt_phobos_common',
 	files(
 		'common/config.c',
 		'common/protocol.c',
@@ -64,7 +66,7 @@ common = static_library(
 )
 
 client_common = static_library(
-	'coordinatool_client_common',
+	'cdt_phobos_client_common',
 	files(
 		'client_common/client.c',
 		'client_common/tcp.c',
@@ -78,7 +80,7 @@ subdir('tests')
 
 
 executable(
-	'lhsmd_coordinatool',
+	'lhsmd_cdt_phobos',
 	sources: files(
 		'copytool/config.c',
 		'copytool/queue.c',
@@ -95,7 +97,7 @@ executable(
 )
 
 executable(
-	'coordinatool-client',
+	'cdt-phobos-client',
 	sources: files(
 		'client/protocol.c',
 		'client/client.c',
@@ -106,7 +108,7 @@ executable(
 )
 
 library(
-	'coordinatool_client',
+	'cdt_phobos_client',
 	sources: files(
 		'preload/protocol.c',
 		'preload/preload.c',

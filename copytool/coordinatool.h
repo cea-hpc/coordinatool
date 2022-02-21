@@ -3,7 +3,7 @@
 #ifndef COORDINATOOL_H
 #define COORDINATOOL_H
 
-// for urcu slight optimization
+/* for urcu slight optimization */
 #define _LGPL_SOURCE
 
 #include <errno.h>

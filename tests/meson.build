@@ -30,7 +30,8 @@ parse_active_requests = executable(
 	include_directories: include_directories('../common'),
 	link_with: [common],
 )
-test('parse_active_requests', parse_active_requests, args: [meson.current_source_dir() / 'active_requests'])
+test('parse_active_requests', parse_active_requests,
+     args: ['/'.join([meson.current_source_dir(), 'active_requests'])])
 
 executable(
 	'json',
