@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "4da69a54_88df13b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-02T08:46:13Z",
+      "side": 1,
+      "message": "The README indicates \"OFF\".\nIs it \"NONE\", \"OFF\", or both?",
+      "range": {
+        "startLine": 9,
+        "startChar": 11,
+        "endLine": 9,
+        "endChar": 35
+      },
+      "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "06e4cb67_69b19dd5",
@@ -14,6 +37,29 @@
       "writtenOn": "2022-02-08T15:04:41Z",
       "side": 1,
       "message": "I see that this patch was left behind. Is this intentional or were you waiting for our approval?",
+      "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f0f0dfa_4d963ca6",
+        "filename": "tests/parse_active_requests.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-02T08:46:13Z",
+      "side": 1,
+      "message": "(nit, FYI) you can also use \"%m\" instead of \u0027\"%s\", strerror(errno)\u0027",
+      "range": {
+        "startLine": 36,
+        "startChar": 39,
+        "endLine": 37,
+        "endChar": 30
+      },
       "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
