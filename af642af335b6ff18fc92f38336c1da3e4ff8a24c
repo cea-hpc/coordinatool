@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d62bb192_116bb031",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-03-26T06:10:12Z",
+      "side": 1,
+      "message": "OFF in readme is correct, fixed commit message",
+      "parentUuid": "4da69a54_88df13b5",
+      "range": {
+        "startLine": 9,
+        "startChar": 11,
+        "endLine": 9,
+        "endChar": 35
+      },
+      "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "06e4cb67_69b19dd5",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -37,6 +61,24 @@
       "writtenOn": "2022-02-08T15:04:41Z",
       "side": 1,
       "message": "I see that this patch was left behind. Is this intentional or were you waiting for our approval?",
+      "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "914dac48_6c5c8ae5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-03-26T06:10:12Z",
+      "side": 1,
+      "message": "I _think_ I was waiting for a review as other merged commits had one, but honestly I forgot ;) thanks!",
+      "parentUuid": "06e4cb67_69b19dd5",
       "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +96,30 @@
       "writtenOn": "2022-03-02T08:46:13Z",
       "side": 1,
       "message": "(nit, FYI) you can also use \"%m\" instead of \u0027\"%s\", strerror(errno)\u0027",
+      "range": {
+        "startLine": 36,
+        "startChar": 39,
+        "endLine": 37,
+        "endChar": 30
+      },
+      "revId": "af642af335b6ff18fc92f38336c1da3e4ff8a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ea97d71_cc3ecaed",
+        "filename": "tests/parse_active_requests.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-03-26T06:10:12Z",
+      "side": 1,
+      "message": "First version used %m, something in test pipeline didn\u0027t like it (see warning in above comment:\nhttps://review.gerrithub.io/c/cea-hpc/coordinatool/+/527290/comments/3b11e811_c7a6f043 ; it\u0027s configured as ISO C and it was easier to use strerror than to figure how to change that in meson config)",
+      "parentUuid": "4f0f0dfa_4d963ca6",
       "range": {
         "startLine": 36,
         "startChar": 39,
