@@ -65,6 +65,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b963ad93_d9253156",
+        "filename": "common/logs.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-04-12T09:05:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6b608aff_057c2069",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "ccabb6c98f1f3b26fe98167fb9b144254d662bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfc8f32c_e7d18112",
@@ -112,6 +136,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f58dcc9_b35634dc",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-04-12T09:05:33Z",
+      "side": 1,
+      "message": "I see 9 tabulations used here, but if you don\u0027t see it on your end, then it\u0027s fine.",
+      "parentUuid": "dc278806_f2ec8081",
+      "range": {
+        "startLine": 156,
+        "startChar": 40,
+        "endLine": 157,
+        "endChar": 9
+      },
+      "revId": "ccabb6c98f1f3b26fe98167fb9b144254d662bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c8c60f7_9b0bf729",
@@ -125,6 +173,30 @@
       "writtenOn": "2022-04-12T08:30:14Z",
       "side": 1,
       "message": "minor: idem here",
+      "range": {
+        "startLine": 109,
+        "startChar": 7,
+        "endLine": 109,
+        "endChar": 8
+      },
+      "revId": "ccabb6c98f1f3b26fe98167fb9b144254d662bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18bde602_eeb23f29",
+        "filename": "copytool/tcp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-04-12T09:05:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7c8c60f7_9b0bf729",
       "range": {
         "startLine": 109,
         "startChar": 7,
