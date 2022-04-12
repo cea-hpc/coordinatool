@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6923a4a_5281498f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-04-12T07:50:02Z",
+      "side": 1,
+      "message": "A small patch to make the coordinatool compatible with CentOS 7.",
+      "revId": "ccabb6c98f1f3b26fe98167fb9b144254d662bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
