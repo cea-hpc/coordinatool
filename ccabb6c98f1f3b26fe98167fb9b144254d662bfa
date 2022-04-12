@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b608aff_057c2069",
+        "filename": "common/logs.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-04-12T08:56:07Z",
+      "side": 1,
+      "message": "Otherwise, SYS_gettid is not included. This seem to have changed in CentOS 8",
+      "parentUuid": "ed962489_13242722",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "ccabb6c98f1f3b26fe98167fb9b144254d662bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bfc8f32c_e7d18112",
         "filename": "copytool/scheduler.c",
         "patchSetId": 1
@@ -54,6 +78,30 @@
       "writtenOn": "2022-04-12T08:30:14Z",
       "side": 1,
       "message": "minor: I think there is an indentation error here",
+      "range": {
+        "startLine": 156,
+        "startChar": 40,
+        "endLine": 157,
+        "endChar": 9
+      },
+      "revId": "ccabb6c98f1f3b26fe98167fb9b144254d662bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc278806_f2ec8081",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-04-12T08:56:07Z",
+      "side": 1,
+      "message": "What do you mean ? Is it the number of tabs ? It is fine if you use 4 characters to display each tab.",
+      "parentUuid": "bfc8f32c_e7d18112",
       "range": {
         "startLine": 156,
         "startChar": 40,
