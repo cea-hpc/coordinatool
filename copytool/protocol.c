@@ -290,8 +290,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 
 	enqueue_state.queues =
 		hsm_action_queues_get(state,
-			protocol_getjson_int(json_hal, "hal_archive_id",
-					     ARCHIVE_ID_UNINIT),
+			protocol_getjson_int(json_hal, "hal_archive_id", 0),
 			protocol_getjson_int(json_hal, "hal_flags", 0),
 			protocol_getjson_str(json_hal, "hal_fsname", NULL, NULL));
 	if (!enqueue_state.queues)
