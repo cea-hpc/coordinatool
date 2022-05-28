@@ -95,12 +95,14 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
 void free_client(struct state *state, struct client *client) {
 	struct cds_list_head *n, *next;
 	LOG_INFO("Disconnecting %s (%d)", client->id, client->fd);
-	epoll_delfd(state->epoll_fd, client->fd);
-	close(client->fd);
+	if (client->fd >= 0) {
+		epoll_delfd(state->epoll_fd, client->fd);
+		close(client->fd);
+		state->stats.clients_connected--;
+	}
 	cds_list_del(&client->node_clients);
-	if (client->waiting)
+	if (client->state == CLIENT_WAITING)
 		cds_list_del(&client->node_waiting);
-	state->stats.clients_connected--;
 	// reassign any request that would be lost
 	cds_list_for_each_safe(n, next, &client->active_requests) {
 		struct hsm_action_node *node =

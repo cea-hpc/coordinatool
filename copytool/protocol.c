@@ -58,7 +58,7 @@ int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 		    (rc = protocol_setjson_int(c, "done_restore", client->done_restore)) ||
 		    (rc = protocol_setjson_int(c, "done_archive", client->done_archive)) ||
 		    (rc = protocol_setjson_int(c, "done_remove", client->done_remove)) ||
-		    (rc = protocol_setjson_bool(c, "waiting", client->waiting))) {
+		    (rc = protocol_setjson_int(c, "state", client->state))) { /* XXX convert state to string */
 			json_decref(c);
 			goto out_freereply;
 		}
@@ -101,7 +101,7 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 					   "Buffer too small");
 
 	cds_list_add(&client->node_waiting, &state->waiting_clients);
-	client->waiting = true;
+	client->state = CLIENT_WAITING;
 	/* schedule immediately in case work is available */
 	ct_schedule_client(state, client);
 	return 0;
@@ -214,7 +214,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 		return -EINVAL;
 	}
 
-	if (client->waiting) {
+	if (client->state == CLIENT_WAITING) {
 		ct_schedule_client(state, client);
 	}
 
