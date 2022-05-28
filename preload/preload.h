@@ -58,7 +58,8 @@ int state_init(struct hsm_copytool_private *ct);
 void state_cleanup(struct hsm_copytool_private *ct,
 		   bool final);
 int state_createfile(const struct hsm_copytool_private *ct,
-		     uint64_t cookie, json_t *action_item);
+		     struct hsm_action_list *hal, uint64_t cookie,
+		     json_t *action_item);
 void state_removefile(const struct hsm_copytool_private *ct,
 		      uint64_t cookie);
 
