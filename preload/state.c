@@ -118,7 +118,8 @@ void state_cleanup(struct hsm_copytool_private *ct,
 /* create file containing json format hai for reloading
  */
 int state_createfile(const struct hsm_copytool_private *ct,
-		     uint64_t cookie, json_t *action_item) {
+		     struct hsm_action_list *hal, uint64_t cookie,
+		     json_t *action_item) {
 	int dir_fd;
 	char cookie_str[22];
 	int fd, rc;
@@ -137,6 +138,12 @@ int state_createfile(const struct hsm_copytool_private *ct,
 		LOG_ERROR(rc, "Could not create state file %s", cookie_str);
 		return rc;
 	}
+
+	/* augment action item with hal archive id and flags */
+	if ((rc = protocol_setjson_int(action_item, "hal_archive_id", hal->hal_archive_id))
+	    || (rc = protocol_setjson_int(action_item, "hal_flags", hal->hal_flags)))
+		return rc;
+
 	rc = json_dumpfd(action_item, fd, 0);
 	close(fd);
 	if (rc) {

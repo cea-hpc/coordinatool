@@ -64,7 +64,7 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t h
 		return -EINVAL;
 
 	if (json_unpack(json,
-			"{si,s{sI,si,si!},s{sI,si,si!},sI,sI,sI,sI,ss%!}",
+			"{si,s{sI,si,si!},s{sI,si,si!},sI,sI,sI,sI,ss%}",
 			 "hai_action", &unpack.hai_action,
 			 "hai_fid", "f_seq", &unpack.hai_fid.f_seq,
 				    "f_oid", &unpack.hai_fid.f_oid,
