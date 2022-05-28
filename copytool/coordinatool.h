@@ -45,7 +45,7 @@ struct hsm_action_queues {
 
 /* common types */
 struct client {
-	char *id; /* id sent by the client during EHLO, or addr */
+	const char *id; /* id sent by the client during EHLO, or addr */
 	int fd;
 	struct cds_list_head node_clients;
 	struct cds_list_head node_waiting;
