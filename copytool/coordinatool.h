@@ -62,9 +62,11 @@ struct client {
 	enum client_state {
 		CLIENT_CONNECTED = 0, /* default state */
 		CLIENT_WAITING,
+		CLIENT_GRACE,
 	} state;
-	union { /* state-dependant fields */
+	union {
 		struct cds_list_head node_waiting;
+		struct timespec grace_ts;
 	};
 };
 
@@ -158,6 +160,8 @@ int tcp_listen(struct state *state);
 char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
 int handle_client_connect(struct state *state);
 void free_client(struct state *state, struct client *client);
+int create_grace_client(struct state *state, const char *id,
+			struct client **client_out);
 
 /* queue */
 

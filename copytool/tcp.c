@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
 #include <netdb.h>
+#include <time.h>
 
 #include "coordinatool.h"
 
@@ -115,6 +116,25 @@ void free_client(struct state *state, struct client *client) {
 	free(client);
 }
 
+int create_grace_client(struct state *state, const char *id,
+			struct client **client_out) {
+	struct client *client = xcalloc(sizeof(*client), 1);
+
+	client->fd = -1;
+	client->state = CLIENT_GRACE;
+	if (clock_gettime(CLOCK_MONOTONIC, &client->grace_ts)) {
+		int rc = -errno;
+		LOG_ERROR(rc, "Could not get time");
+		free(client);
+		return rc;
+	}
+	client->id = xstrdup(id);
+	CDS_INIT_LIST_HEAD(&client->active_requests);
+	cds_list_add(&client->node_clients, &state->stats.clients);
+	*client_out = client;
+	return 0;
+}
+
 int handle_client_connect(struct state *state) {
 	int fd, rc;
 	struct sockaddr_storage peer_addr;
@@ -133,7 +153,6 @@ int handle_client_connect(struct state *state) {
 	client->fd = fd;
 	client->id = sockaddr2str(&peer_addr, peer_addr_len);
 	CDS_INIT_LIST_HEAD(&client->active_requests);
-	CDS_INIT_LIST_HEAD(&client->node_waiting);
 	cds_list_add(&client->node_clients, &state->stats.clients);
 	state->stats.clients_connected++;
 
