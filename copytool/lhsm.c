@@ -125,7 +125,7 @@ int ct_start(struct state *state) {
 		int n;
 		for (n = 0; n < nfds; n++) {
 			if (events[n].events & (EPOLLERR|EPOLLHUP)) {
-				LOG_INFO("%d on error/hup\n", events[n].data.fd);
+				LOG_INFO("%d on error/hup", events[n].data.fd);
 			}
 			if (events[n].data.fd == state->hsm_fd) {
 				handle_ct_event(state);

@@ -67,7 +67,7 @@ again:
 		LOG_ERROR(rc, "Could not add listen socket to epoll");
 		return rc;
 	}
-	LOG_INFO("Listening on %s:%s\n", state->config.host, state->config.port);
+	LOG_INFO("Listening on %s:%s", state->config.host, state->config.port);
 
 	return 0;
 }
@@ -94,7 +94,7 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
 
 void free_client(struct state *state, struct client *client) {
 	struct cds_list_head *n, *next;
-	LOG_INFO("Disconnecting %s\n", client->id);
+	LOG_INFO("Disconnecting %s (%d)", client->id, client->fd);
 	epoll_delfd(state->epoll_fd, client->fd);
 	close(client->fd);
 	cds_list_del(&client->node_clients);

@@ -99,7 +99,7 @@ int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 again:
 	rc = protocol_request_recv(&ct->state);
 	if (rc) {
-		LOG_WARN("Sending recv request to server failed with %d. Reconnecting.", rc);
+		LOG_WARN(rc, "Sending recv request to server failed. Reconnecting.");
 		goto reconnect;
 	}
 
@@ -109,7 +109,7 @@ again:
 		rc = protocol_read_command(ct->state.socket_fd, "server", NULL,
 					   copytool_cbs, ct);
 		if (rc) {
-			LOG_WARN("read from server failed with %d. Reconnecting.", rc);
+			LOG_WARN(rc, "read from server failed. Reconnecting.");
 			goto reconnect;
 		}
 	}

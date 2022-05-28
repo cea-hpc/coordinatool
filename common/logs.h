@@ -21,29 +21,29 @@ static inline pid_t gettid(void)
         return syscall(SYS_gettid);
 }
 
-#define LOG_ERROR(_rc, _format, ...)                                    \
-        llapi_error(LLAPI_MSG_ERROR, _rc,                               \
-		    "ERROR %s:%d "_format, __FILE__, __LINE__,                \
+#define LOG_ERROR(_rc, _format, ...)                                   \
+        llapi_error(LLAPI_MSG_ERROR, _rc,                              \
+		    "ERROR %s:%d "_format, __FILE__, __LINE__,         \
                     ## __VA_ARGS__)
 
-#define LOG_WARN(_format, ...)                                         \
-        llapi_error(LLAPI_MSG_WARN | LLAPI_MSG_NO_ERRNO, 0,            \
-		    "WARN %s:%d "_format, __FILE__, __LINE__,                \
+#define LOG_WARN(_rc, _format, ...)                                    \
+        llapi_error(LLAPI_MSG_WARN, _rc,                               \
+		    "WARN %s:%d "_format, __FILE__, __LINE__,          \
                     ## __VA_ARGS__)
 
-#define LOG_NORMAL(_format, ...)                                         \
-        llapi_error(LLAPI_MSG_NORMAL | LLAPI_MSG_NO_ERRNO, 0,            \
-		    "NORMAL %s:%d "_format, __FILE__, __LINE__,                \
+#define LOG_NORMAL(_format, ...)                                       \
+        llapi_error(LLAPI_MSG_NORMAL | LLAPI_MSG_NO_ERRNO, 0,          \
+		    "NORMAL %s:%d "_format, __FILE__, __LINE__,        \
                     ## __VA_ARGS__)
 
 #define LOG_INFO(_format, ...)                                         \
         llapi_error(LLAPI_MSG_INFO | LLAPI_MSG_NO_ERRNO, 0,            \
-		    "INFO %s:%d "_format, __FILE__, __LINE__,                \
+		    "INFO %s:%d "_format, __FILE__, __LINE__,          \
                     ## __VA_ARGS__)
 
-#define LOG_DEBUG(_format, ...)                                         \
-        llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0,            \
-		    "DEBUG %s:%d "_format, __FILE__, __LINE__,                \
+#define LOG_DEBUG(_format, ...)                                        \
+        llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0,           \
+		    "DEBUG %s:%d "_format, __FILE__, __LINE__,         \
                     ## __VA_ARGS__)
 
 
