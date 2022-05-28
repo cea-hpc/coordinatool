@@ -347,7 +347,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		// no id: no special treatment
 		return protocol_reply_ehlo(client, 0, NULL);
 	}
-	free(client->id);
+	free((void*)client->id);
 	client->id = xstrdup(id);
 
 	if (!protocol_getjson_bool(json, "reconnect")) {

@@ -109,7 +109,7 @@ void free_client(struct state *state, struct client *client) {
 		hsm_action_requeue(node);
 	}
 	ct_schedule(state);
-	free(client->id);
+	free((void*)client->id);
 	free(client);
 }
 
