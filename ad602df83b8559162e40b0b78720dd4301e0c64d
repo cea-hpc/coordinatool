@@ -33,6 +33,40 @@
       "message": "I had to abandon this patch as there were conflicts between the phobos-integration branch and master. I\u0027ve merged this patch in a new branch called phobos which is now up to date with master.",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8979d2a1_bd4daa4e",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-28T07:57:03Z",
+      "side": 1,
+      "message": "we normally mount xfer agents with noatime, but for safety it\u0027s better to also set O_NOATIME here (noticed by comparing with llapi_hsm_action_begin, which uses O_RDONLY | O_NOATIME | O_NOFOLLOW | O_NONBLOCK -- O_NOFOLLOW can\u0027t hurt but probably doesn\u0027t matter here, and we don\u0027t care about O_NONBLOCK since we won\u0027t do IOs here)",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a69a50f6_474921d7",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-28T07:57:03Z",
+      "side": 1,
+      "message": "note: calling can_send_to_client does open+getxattr+phobos_locate which all are costly for each client in the list, we should cache the info...",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
