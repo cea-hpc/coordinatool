@@ -10,7 +10,7 @@ int getenv_str(const char *name, const char **val) {
 	if (!env)
 		return 0;
 	*val = env;
-	LOG_INFO("env setting %s to %s\n", name, env);
+	LOG_INFO("env setting %s to %s", name, env);
 	return 1;
 }
 
@@ -37,7 +37,7 @@ long long str_suffix_to_u32(const char *str, const char *error_hint) {
 	case 'K':
 		multiplier *= 1024;
 		if (endptr[1] != 0) {
-			LOG_WARN("trailing data after size prefix: %s, continuing anyway",
+			LOG_WARN(-EINVAL, "trailing data after size prefix: %s, continuing anyway",
 				  endptr + 1);
 		}
 		break;
@@ -69,7 +69,7 @@ int getenv_u32(const char *name, uint32_t *val) {
 		return envval;
 
 	*val = envval;
-	LOG_INFO("env setting %s to %u\n", name, *val);
+	LOG_INFO("env setting %s to %u", name, *val);
 	return 1;
 }
 

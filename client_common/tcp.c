@@ -53,8 +53,8 @@ again:
 	freeaddrinfo(result);
 
 	if (rp == NULL) {
-		LOG_WARN("Could not connect to %s:%s: %d. Retrying.",
-			 state->config.host, state->config.port, errno);
+		LOG_WARN(-errno, "Could not connect to %s:%s. Retrying.",
+			 state->config.host, state->config.port);
 		sleep(5);
 		goto again;
 	}
@@ -64,14 +64,14 @@ again:
 
 	rc = protocol_request_ehlo(state, reconnect);
 	if (rc) {
-		LOG_WARN("Just connected but could not send request? %d. reconnecting", rc);
+		LOG_WARN(rc, "Just connected but could not send request? reconnecting");
 		sleep(5);
 		goto again;
 	}
 	rc = protocol_read_command(state->socket_fd, "server", NULL,
 				   protocol_ehlo_cbs, state);
 	if (rc) {
-		LOG_WARN("Just connected but did not get correct ehlo? %d. reconnecting", rc);
+		LOG_WARN(rc, "Just connected but did not get correct ehlo? reconnecting");
 		sleep(5);
 		goto again;
 	}

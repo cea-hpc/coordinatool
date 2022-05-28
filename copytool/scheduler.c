@@ -77,7 +77,7 @@ void ct_schedule_client(struct state *state,
 				hsm_action_requeue(han);
 				break;
 			}
-			LOG_INFO("Sending "DFID" to %d from queues\n" ,
+			LOG_INFO("Sending "DFID" to %d from queues" ,
 				 PFID(&han->hai.hai_dfid), client->fd);
 			enqueued_items++;
 			(*running_count[i])++;
@@ -99,7 +99,7 @@ void ct_schedule_client(struct state *state,
 	// frees hai_list
 	int rc = protocol_reply_recv(client, &state->queues, hai_list, 0, NULL);
 	if (rc < 0) {
-		LOG_ERROR(rc, "Could not send reply to %s\n", client->id);
+		LOG_ERROR(rc, "Could not send reply to %s", client->id);
 		free_client(state, client);
 	}
 }

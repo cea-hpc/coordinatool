@@ -119,7 +119,7 @@ again:
 	}
 	if (llapi_msg_get_level() >= LLAPI_MSG_DEBUG) {
 		char *json_str = json_dumps(request, 0);
-		LOG_DEBUG("Got something from %s: %s\n", id, json_str);
+		LOG_DEBUG("Got something from %s: %s", id, json_str);
 		free(json_str);
 	}
 

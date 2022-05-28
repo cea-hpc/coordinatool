@@ -72,25 +72,25 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 		if (!strcasecmp(key, "host")) {
 			free((void*)config->host);
 			config->host = xstrdup(val);
-			LOG_INFO("config setting host to %s\n", config->host);
+			LOG_INFO("config setting host to %s", config->host);
 			continue;
 		}
 		if (!strcasecmp(key, "port")) {
 			free((void*)config->port);
 			config->port = xstrdup(val);
-			LOG_INFO("config setting port to %s\n", config->port);
+			LOG_INFO("config setting port to %s", config->port);
 			continue;
 		}
 		if (!strcasecmp(key, "client_id")) {
 			free((void*)config->client_id);
 			config->client_id = xstrdup(val);
-			LOG_INFO("config setting state dir prefix to %s\n", config->client_id);
+			LOG_INFO("config setting state dir prefix to %s", config->client_id);
 			continue;
 		}
 		if (!strcasecmp(key, "state_dir_prefix")) {
 			free((void*)config->state_dir_prefix);
 			config->state_dir_prefix = xstrdup(val);
-			LOG_INFO("config setting state dir prefix to %s\n", config->state_dir_prefix);
+			LOG_INFO("config setting state dir prefix to %s", config->state_dir_prefix);
 			continue;
 		}
 		if (!strcasecmp(key, "max_restore")) {
@@ -100,7 +100,7 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 				goto out;
 			}
 			config->max_restore = intval;
-			LOG_INFO("config setting max_restore to %u\n",
+			LOG_INFO("config setting max_restore to %u",
 				 config->max_restore);
 			continue;
 		}
@@ -111,7 +111,7 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 				goto out;
 			}
 			config->max_archive = intval;
-			LOG_INFO("config setting max_archive to %u\n",
+			LOG_INFO("config setting max_archive to %u",
 				 config->max_archive);
 			continue;
 		}
@@ -122,7 +122,7 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 				goto out;
 			}
 			config->max_remove = intval;
-			LOG_INFO("config setting max_remove to %u\n",
+			LOG_INFO("config setting max_remove to %u",
 				 config->max_remove);
 			continue;
 		}
@@ -133,7 +133,7 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 				goto out;
 			}
 			config->hsm_action_list_size = intval;
-			LOG_INFO("config setting hal_size to %u\n",
+			LOG_INFO("config setting hal_size to %u",
 				 config->hsm_action_list_size);
 			continue;
 		}
@@ -144,7 +144,7 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 				goto out;
 			}
 			config->archive_id = intval;
-			LOG_INFO("config setting archive_id to %u\n",
+			LOG_INFO("config setting archive_id to %u",
 				 config->archive_id);
 			continue;
 		}

@@ -72,19 +72,19 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 		if (!strcasecmp(key, "host")) {
 			free((void*)config->host);
 			config->host = xstrdup(val);
-			LOG_INFO("config setting host to %s\n", config->host);
+			LOG_INFO("config setting host to %s", config->host);
 			continue;
 		}
 		if (!strcasecmp(key, "port")) {
 			free((void*)config->port);
 			config->port = xstrdup(val);
-			LOG_INFO("config setting port to %s\n", config->port);
+			LOG_INFO("config setting port to %s", config->port);
 			continue;
 		}
 		if (!strcasecmp(key, "state_dir_prefix")) {
 			free((void*)config->state_dir_prefix);
 			config->state_dir_prefix = xstrdup(val);
-			LOG_INFO("config setting state dir prefix to %s\n", config->state_dir_prefix);
+			LOG_INFO("config setting state dir prefix to %s", config->state_dir_prefix);
 			continue;
 		}
 		if (!strcasecmp(key, "verbose")) {

@@ -184,7 +184,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 					   "Unknown cookie sent");
 
 	int status = protocol_getjson_int(json, "status", 0);
-	LOG_INFO("%d processed "DFID": %d\n" ,
+	LOG_INFO("%d processed "DFID": %d" ,
 		  client->fd, PFID(&han->hai.hai_dfid), status);
 
 	cds_list_del(&han->node);
@@ -270,7 +270,7 @@ static int queue_cb_enqueue(struct hsm_action_list *hal UNUSED,
 	if (rc < 0)
 		return rc;
 	if (rc > 0)
-		LOG_INFO("Enqueued a request for "DFID" from QUEUE\n" ,
+		LOG_INFO("Enqueued a request for "DFID" from QUEUE" ,
 			 PFID(&hai->hai_dfid));
 	enqueue_state->enqueued += rc;
 
