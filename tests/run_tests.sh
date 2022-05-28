@@ -116,9 +116,18 @@ cleanup() {
 #### plain action helpers
 do_coordinatool_start() {
 	local i="$1"
+	# This is a bit misleading, CTOOL_ENV should be a _string_ that looks
+	# like an associative array definition e.g. "( [COORDINATOOL_CONF]=/path )"
+	# This allows passing multiple arguments, with well defined escaping rules
+	declare -A CTOOL_ENV=${CTOOL_ENV:-( )}
+	local env="" var
+
+	for var in "${!CTOOL_ENV[@]}"; do
+		env+=" -E $var=${CTOOL_ENV[$var]@Q}"
+	done
 
 	do_client "$i" "
-		systemd-run -P -G --unit=ctest_coordinatool@${i}.service \
+		systemd-run -P -G --unit=ctest_coordinatool@${i}.service $env \
 		${BUILDDIR@Q}/lhsmd_coordinatool -vv MNTPATH
 		" &
 	CLEANUP+=( "wait $!" "do_coordinatool_service $i stop" )
@@ -133,13 +142,14 @@ do_coordinatool_service() {
 
 do_lhsmtoolcmd_start() {
 	local i="$1"
+	local LHSMCMD_CONF="${LHSMCMD_CONF:-${SOURCEDIR}/tests/lhsm_cmd.conf}"
 
 	do_client "$i" "
 		rm -rf ${ARCHIVEDIR@Q} && mkdir ${ARCHIVEDIR@Q}
 		systemd-run -P -G --unit=ctest_lhsmtool_cmd@$i.service \
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
-				--config ${SOURCEDIR@Q}/tests/lhsm_cmd.conf \
+				--config ${LHSMCMD_CONF@Q} \
 				MNTPATH
 		" &
 	CLEANUP+=( "wait $!" "do_lhsmtoolcmd_service $i stop" )
@@ -269,6 +279,12 @@ init() {
 	ASAN=$(ldd "$BUILDDIR/tests/lhsmtool_cmd" | grep -oE '/lib.*libasan.so[.0-9]*')
 }
 
+init
+
+# if we're being sourced, don't actually run tests
+[[ $(caller | cut -d' ' -f1) != "0" ]] && return 0
+
+
 # sanity checks before we try to run real tests
 sanity() {
 	local i
@@ -302,6 +318,7 @@ sanity() {
 		#	|| error "Other hsm agent running on mdt $i"
 	done
 }
+FATAL=1 run_test 00 sanity
 
 # optimal scenario: servers all running, send requests
 normal_requests() {
@@ -318,6 +335,7 @@ normal_requests() {
 	client_restore_n 3 100
 	client_remove_n 3 100
 }
+run_test 01 normal_requests
 
 # coordinatool restart with actions queued but no active requests on agents (no agent)
 server_restart_no_agent_active_requests() {
@@ -336,15 +354,6 @@ server_restart_no_agent_active_requests() {
 	do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
 }
-
-init
-
-# if we're being sourced, don't actually run tests
-[[ $(caller | cut -d' ' -f1) != "0" ]] && return 0
-
-
-FATAL=1 run_test 00 sanity
-run_test 01 normal_requests
 run_test 02 server_restart_no_agent_active_requests
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
