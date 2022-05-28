@@ -265,8 +265,7 @@ static int queue_cb_enqueue(struct hsm_action_list *hal UNUSED,
 	struct enqueue_state *enqueue_state = arg;
 	int rc;
 
-	// XXX get correct queues from hal
-	rc = hsm_action_enqueue(enqueue_state->queues, hai);
+	rc = hsm_action_enqueue(enqueue_state->queues, hai, NULL);
 	if (rc < 0)
 		return rc;
 	if (rc > 0)

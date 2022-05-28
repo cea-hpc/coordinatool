@@ -45,7 +45,7 @@ int handle_ct_event(struct state *state) {
 	struct hsm_action_item *hai = hai_first(hal);
 	unsigned int i = 0;
 	while (++i <= hal->hal_count) {
-		if ((rc = hsm_action_enqueue(queues, hai) < 0))
+		if ((rc = hsm_action_enqueue(queues, hai, NULL) < 0))
 			return rc;
 
 		struct lu_fid fid;

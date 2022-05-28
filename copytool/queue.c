@@ -113,7 +113,8 @@ int hsm_action_requeue(struct hsm_action_node *node) {
 }
 
 int hsm_action_enqueue(struct hsm_action_queues *queues,
-		       struct hsm_action_item *hai) {
+		       struct hsm_action_item *hai,
+		       struct hsm_action_node **node_out) {
 	struct hsm_action_node *node;
 	__u64 **tree_key;
 
@@ -142,6 +143,11 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 	if (*tree_key != &node->hai.hai_cookie) {
 		/* duplicate */
 		free(node);
+		return 0;
+	}
+
+	if (node_out) {
+		*node_out = node;
 		return 0;
 	}
 

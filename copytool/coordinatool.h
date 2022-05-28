@@ -174,7 +174,8 @@ void hsm_action_queues_init(struct state *state,
 			    struct hsm_action_queues *queues);
 int hsm_action_requeue(struct hsm_action_node *node);
 int hsm_action_enqueue(struct hsm_action_queues *queues,
-		       struct hsm_action_item *hai);
+		       struct hsm_action_item *hai,
+		       struct hsm_action_node **node);
 struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
 					   enum hsm_copytool_action action);
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
