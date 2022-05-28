@@ -39,7 +39,7 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 
 void ct_schedule_client(struct state *state,
 			struct client *client) {
-	if (!client->waiting)
+	if (client->state != CLIENT_WAITING)
 		return;
 
 	json_t *hai_list = json_array();
@@ -94,7 +94,7 @@ void ct_schedule_client(struct state *state,
 	}
 
 	cds_list_del(&client->node_waiting);
-	client->waiting = false;
+	client->state = CLIENT_CONNECTED;
 
 	// frees hai_list
 	int rc = protocol_reply_recv(client, &state->queues, hai_list, 0, NULL);

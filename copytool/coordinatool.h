@@ -48,19 +48,24 @@ struct client {
 	const char *id; /* id sent by the client during EHLO, or addr */
 	int fd;
 	struct cds_list_head node_clients;
-	struct cds_list_head node_waiting;
 	unsigned int done_restore;
 	unsigned int done_archive;
 	unsigned int done_remove;
 	int current_restore;
 	int current_archive;
 	int current_remove;
-	bool waiting;
 	int max_restore;
 	int max_archive;
 	int max_remove;
 	size_t max_bytes;
 	struct cds_list_head active_requests;
+	enum client_state {
+		CLIENT_CONNECTED = 0, /* default state */
+		CLIENT_WAITING,
+	} state;
+	union { /* state-dependant fields */
+		struct cds_list_head node_waiting;
+	};
 };
 
 struct ct_stats {
