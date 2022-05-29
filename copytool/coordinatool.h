@@ -112,10 +112,17 @@ int config_init(struct state_config *config);
 void config_free(struct state_config *config);
 
 
+/* coordinatool */
+
+int epoll_addfd(int epoll_fd, int fd, void *data);
+int epoll_delfd(int epoll_fd, int fd);
+
+
 /* lhsm */
 
 int handle_ct_event(struct state *state);
 int ct_register(struct state *state);
+
 
 /* protocol */
 
@@ -151,13 +158,6 @@ int protocol_reply_queue(struct client *client, int enqueued,
 int protocol_reply_ehlo(struct client *client, int status, char *error);
 
 
-/* tcp */
-
-int tcp_listen(struct state *state);
-char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
-int handle_client_connect(struct state *state);
-void free_client(struct state *state, struct client *client);
-
 /* queue */
 
 void queue_node_free(struct hsm_action_node *node);
@@ -176,15 +176,18 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
                                                 unsigned long cookie,
                                                 bool pop);
 
+
 /* scheduler */
 void ct_schedule(struct state *state);
 void ct_schedule_client(struct state *state,
 			struct client *client);
 
 
-/* common */
+/* tcp */
 
-int epoll_addfd(int epoll_fd, int fd, void *data);
-int epoll_delfd(int epoll_fd, int fd);
+int tcp_listen(struct state *state);
+char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
+int handle_client_connect(struct state *state);
+void free_client(struct state *state, struct client *client);
 
 #endif
