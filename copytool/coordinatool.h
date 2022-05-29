@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <urcu/compiler.h>
 #include <urcu/list.h>
+#include <hiredis/async.h>
 
 #include "logs.h"
 #include "protocol.h"
@@ -97,6 +98,7 @@ struct state {
 	const char *mntpath;
 	/* state values */
 	struct hsm_copytool_private *ctdata;
+	redisAsyncContext *redis_ac;
 	int epoll_fd;
 	int hsm_fd;
 	int listen_fd;
@@ -177,7 +179,13 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
                                                 bool pop);
 
 
+/* redis */
+
+int redis_connect(struct state *state);
+
+
 /* scheduler */
+
 void ct_schedule(struct state *state);
 void ct_schedule_client(struct state *state,
 			struct client *client);
