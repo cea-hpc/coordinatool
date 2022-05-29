@@ -359,6 +359,19 @@ server_restart_no_agent_active_requests() {
 }
 run_test 02 server_restart_no_agent_active_requests
 
+# restart coordinatool with actions queued on agent
+server_restart_agent_recovery() {
+	do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+	do_lhsmtoolcmd_start 2
+
+	client_reset 3
+
+
+}
+run_test 03 server_restart_agent_recovery
+
+
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
 
 exit $FAILURES
