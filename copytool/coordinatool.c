@@ -34,7 +34,7 @@ int epoll_delfd(int epoll_fd, int fd) {
 	return rc;
 }
 
-long parse_int(const char *arg, long max) {
+static long parse_int(const char *arg, long max) {
 	long rc;
 	char *endptr;
 
@@ -50,7 +50,7 @@ long parse_int(const char *arg, long max) {
 	return rc;
 }
 
-void print_help(char *argv0) {
+static void print_help(char *argv0) {
 	printf("Usage: %s [options] mountpoint\n", argv0);
 	printf("\n");
 	printf("Options:\n");
@@ -63,8 +63,63 @@ void print_help(char *argv0) {
 	printf("    -h, --help: this help\n");
 }
 
-void print_version(void) {
+static void print_version(void) {
 	printf("Coordinatool version %s\n", VERSION);
+}
+
+#define MAX_EVENTS 10
+static int ct_start(struct state *state) {
+	int rc;
+	struct epoll_event events[MAX_EVENTS];
+	int nfds;
+
+	state->epoll_fd = epoll_create1(0);
+	if (state->epoll_fd < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "could not create epoll fd");
+		return rc;
+	}
+
+	hsm_action_queues_init(state, &state->queues);
+
+	rc = tcp_listen(state);
+	if (rc < 0)
+		return rc;
+
+	rc = ct_register(state);
+	if (rc < 0)
+		return rc;
+
+	LOG_NORMAL("Starting main loop");
+	while (1) {
+		nfds = epoll_wait(state->epoll_fd, events, MAX_EVENTS, -1);
+		if (nfds < 0 && errno == EINTR)
+			continue;
+		if (nfds < 0) {
+			rc = -errno;
+			LOG_ERROR(rc, "epoll_wait failed");
+			return rc;
+		}
+		int n;
+		for (n = 0; n < nfds; n++) {
+			if (events[n].events & (EPOLLERR|EPOLLHUP)) {
+				LOG_INFO("%d on error/hup", events[n].data.fd);
+			}
+			if (events[n].data.fd == state->hsm_fd) {
+				handle_ct_event(state);
+			} else if (events[n].data.fd == state->listen_fd) {
+				handle_client_connect(state);
+			} else {
+				struct client *client = events[n].data.ptr;
+				if (protocol_read_command(client->fd, client->id, client,
+							  protocol_cbs, state) < 0) {
+					free_client(state, client);
+				}
+			}
+		}
+
+
+	}
 }
 
 int main(int argc, char *argv[]) {
