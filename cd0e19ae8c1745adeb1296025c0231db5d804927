@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cb6f105_30386a4d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-29T23:51:30Z",
+      "side": 1,
+      "message": "Some cleanup I had locally, removal of client state files (some commits were already merged, another three were pushed as DO NOT MERGE and immediately abandoned for archival), and preliminary work for redis, looks like it should be usable pretty fast",
+      "revId": "cd0e19ae8c1745adeb1296025c0231db5d804927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
