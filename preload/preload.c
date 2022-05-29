@@ -43,10 +43,6 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	if (rc)
 		goto err_out;
 
-	rc = state_init(ct);
-	if (rc)
-		goto err_out;
-
 	ct->hal = xmalloc(ct->state.config.hsm_action_list_size);
 
 	rc = tcp_connect(&ct->state);
@@ -59,7 +55,6 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	return 0;
 
 err_out:
-	state_cleanup(ct, true);
 	free(ct->hal);
 	if (ct->mnt_fd >= 0)
 		close(ct->mnt_fd);
@@ -78,7 +73,6 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 	if (ct->magic != CT_PRIV_MAGIC)
 		return -EINVAL;
 
-	state_cleanup(ct, true);
 	free(ct->hal);
 	close(ct->mnt_fd);
 	close(ct->open_by_fid_fd);
@@ -185,7 +179,6 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	int rc, rc_done;
 
 	rc = real_action_end(phcp, he, hp_flags, errval);
-	state_removefile(ct, cookie);
 
 	rc_done = protocol_request_done(&ct->state, archive_id,
 					cookie, rc);

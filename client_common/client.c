@@ -87,12 +87,6 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			LOG_INFO("config setting state dir prefix to %s", config->client_id);
 			continue;
 		}
-		if (!strcasecmp(key, "state_dir_prefix")) {
-			free((void*)config->state_dir_prefix);
-			config->state_dir_prefix = xstrdup(val);
-			LOG_INFO("config setting state dir prefix to %s", config->state_dir_prefix);
-			continue;
-		}
 		if (!strcasecmp(key, "max_restore")) {
 			long long intval = str_suffix_to_u32(val, "max_restore");
 			if (intval < 0) {
@@ -180,7 +174,6 @@ int ct_config_init(struct ct_state_config *config) {
 	config->host = xstrdup("coordinatool");
 	config->port = xstrdup("5123");
 	config->client_id = NULL; /* NULL will call gethostname if not set */
-	config->state_dir_prefix = xstrdup(".coordinatool");
 	config->max_restore = -1;
 	config->max_archive = -1;
 	config->max_remove = -1;
@@ -208,7 +201,6 @@ int ct_config_init(struct ct_state_config *config) {
 	getenv_str("COORDINATOOL_HOST", &config->host);
 	getenv_str("COORDINATOOL_PORT", &config->port);
 	getenv_str("COORDINATOOL_CLIENT_ID", &config->client_id);
-	getenv_str("COORDINATOOL_STATE_DIR_PREFIX", &config->state_dir_prefix);
 	rc = getenv_u32("COORDINATOOL_MAX_RESTORE", &config->max_restore);
 	if (rc < 0)
 		return rc;
