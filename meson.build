@@ -108,7 +108,6 @@ library(
 	sources: files(
 		'preload/protocol.c',
 		'preload/preload.c',
-		'preload/state.c',
 	),
 	include_directories: include_directories(['common', 'client_common']),
 	link_with: [client_common],

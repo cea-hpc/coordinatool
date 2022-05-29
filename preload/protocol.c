@@ -2,14 +2,6 @@
 
 #include "preload.h"
 
-static int hal_create_state_cb(struct hsm_action_list *hal,
-		      struct hsm_action_item *hai,
-		      json_t *action_item, void *arg) {
-	struct hsm_copytool_private *priv = arg;
-
-	return state_createfile(priv, hal, hai->hai_cookie, action_item);
-}
-
 static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	struct hsm_copytool_private *priv = arg;
 	int rc;
@@ -31,7 +23,7 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 
 	rc = json_hsm_action_list_get(hal, priv->hal,
 				      priv->state.config.hsm_action_list_size,
-				      true, hal_create_state_cb, priv);
+				      NULL, NULL);
 
 	if (rc < 0)
 		return rc;
