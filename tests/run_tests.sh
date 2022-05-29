@@ -199,7 +199,7 @@ client_archive_n_req() {
 client_archive_n_wait() {
 	local i="$1"
 	local n="$2"
-	local TMOUT="${TMOUT:-10}"
+	local TMOUT="${TMOUT:-100}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
@@ -341,13 +341,19 @@ normal_requests() {
 run_test 01 normal_requests
 
 # coordinatool restart with actions queued but no active requests on agents (no agent)
-server_restart_no_agent_active_requests() {
+server_restart_parse_active_requests() {
 	do_coordinatool_start 0
 
-	# start only coorinatool with no agent to queue a request
+	# start only coordinatool with no agent to queue a request
 
 	client_reset 3
 	client_archive_n_req 3 100
+
+	# wait for server to have processed requests, then flush cached data
+	# XXX add option to run without redis instead
+	sleep 1
+	redis-cli hdel coordinatool_requests
+	redis-cli hdel coordinatool_assigned
 
 	do_coordinatool_service 0 restart
 
@@ -357,7 +363,81 @@ server_restart_no_agent_active_requests() {
 	do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
 }
-run_test 02 server_restart_no_agent_active_requests
+run_test 02 server_restart_parse_active_requests
+
+# restart coordinatool with actions queued on agent
+server_restart_coordinatool_recovery() {
+	do_coordinatool_start 0
+
+	# start only coordinatool with no agent to queue some work,
+	# then restart it and start an agent
+
+	client_reset 3
+	client_archive_n_req 3 100
+
+	# XXX remove sleep once signal handler implemented
+	sleep 1
+
+	do_coordinatool_service 0 restart
+
+	do_lhsmtoolcmd_start 1
+	client_archive_n_wait 3 100
+}
+run_test 03 server_restart_coordinatool_recovery
+
+# restart server while agents process data
+server_restart_coordinatool_recovery_busy() {
+	do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+	do_lhsmtoolcmd_start 2
+
+	client_reset 3
+	client_archive_n_req 3 100
+
+	# XXX empirical: xfers aren't yet over in 0.5s...
+	sleep 0.5
+	do_coordinatool_service 0 restart
+
+	client_archive_n_wait 3 100
+}
+run_test 04 server_restart_coordinatool_recovery_busy
+
+# restart an agent while it processes data
+server_restart_lhsmtoolcmd_busy() {
+	do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+
+	client_reset 3
+	client_archive_n_req 3 100
+
+	# XXX empirical: xfers aren't yet over in 0.5s...
+	sleep 0.5
+	do_lhsmtoolcmd_service 1 restart
+
+	client_archive_n_wait 3 100
+}
+run_test 05 server_restart_lhsmtoolcmd_busy
+
+# stop an agent processing data and wait grace period
+server_stop_lhsmtoolcmd_busy() {
+	# grace is in ms
+	CTOOL_ENV="( [COORDINATOOL_CLIENT_GRACE]=500 )" \
+		do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+	do_lhsmtoolcmd_start 2
+
+	client_reset 3
+	client_archive_n_req 3 100
+
+	# XXX empirical: xfers aren't yet over in 0.5s...
+	sleep 0.5
+	do_lhsmtoolcmd_service 1 stop
+
+	client_archive_n_wait 3 100
+}
+
+run_test 06 server_stop_lhsmtoolcmd_busy
+
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
 

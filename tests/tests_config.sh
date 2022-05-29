@@ -31,3 +31,8 @@ BUILDDIR="$SOURCEDIR/build"
 # must match paths in $BUILDDIR/tests/lhsm_cmd*.conf
 ARCHIVEDIR=/tmp/archive
 TESTDIR=MNTPATH/.tests
+
+redis-cli() {
+	# add necessary connect options here
+	command redis-cli "$@"
+}
