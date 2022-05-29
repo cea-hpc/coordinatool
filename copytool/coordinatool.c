@@ -82,6 +82,10 @@ static int ct_start(struct state *state) {
 
 	hsm_action_queues_init(state, &state->queues);
 
+	rc = redis_connect(state);
+	if (rc < 0)
+		return rc;
+
 	rc = tcp_listen(state);
 	if (rc < 0)
 		return rc;
@@ -109,6 +113,13 @@ static int ct_start(struct state *state) {
 				handle_ct_event(state);
 			} else if (events[n].data.fd == state->listen_fd) {
 				handle_client_connect(state);
+			} else if (events[n].data.ptr == state->redis_ac) {
+				if (events[n].events & EPOLLIN)
+					redisAsyncHandleRead(state->redis_ac);
+				// EPOLLOUT is only requested when we have something
+				// to send
+				if (events[n].events & EPOLLOUT)
+					redisAsyncHandleWrite(state->redis_ac);
 			} else {
 				struct client *client = events[n].data.ptr;
 				if (protocol_read_command(client->fd, client->id, client,

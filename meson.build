@@ -18,6 +18,7 @@ global_arguments = cc.get_supported_arguments([
 
 add_project_arguments(global_arguments, language: 'c')
 
+hiredis = dependency('hiredis')
 jansson = dependency('jansson')
 libdl = cc.find_library('dl')
 lustre = cc.find_library('lustreapi')
@@ -83,10 +84,11 @@ executable(
 		'copytool/lhsm.c',
 		'copytool/protocol.c',
 		'copytool/queue.c',
+		'copytool/redis.c',
 		'copytool/scheduler.c',
 		'copytool/tcp.c',
 	) + [ version_h ],
-	dependencies: [urcu],
+	dependencies: [hiredis, urcu],
 	include_directories: include_directories('common'),
 	link_with: [common],
 	install: true,
