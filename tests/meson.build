@@ -40,3 +40,15 @@ executable(
 	include_directories: include_directories('../common'),
 	link_with: [common],
 )
+
+test_hiredis = executable(
+	'hiredis',
+	sources: [
+		'hiredis.c',
+		'../copytool/redis.c',
+	],
+	include_directories: include_directories('../common'),
+	dependencies: [hiredis],
+	link_with: [common],
+)
+test('hiredis', test_hiredis)
