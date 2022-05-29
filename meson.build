@@ -19,11 +19,11 @@ global_arguments = cc.get_supported_arguments([
 add_project_arguments(global_arguments, language: 'c')
 
 jansson = dependency('jansson')
-lustre = cc.find_library('lustreapi')
-urcu = dependency('liburcu')
 libdl = cc.find_library('dl')
+lustre = cc.find_library('lustreapi')
 systemd = dependency('systemd', required: false)
 systemd_system_unit_dir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
+urcu = dependency('liburcu')
 
 if systemd.found()
 	configure_file(
@@ -53,9 +53,9 @@ common = static_library(
 	'coordinatool_common',
 	files(
 		'common/config.c',
+		'common/lustre.c',
 		'common/protocol.c',
 		'common/protocol_lustre.c',
-		'common/lustre.c',
 	),
 	# need lustre for logs
 	dependencies: [lustre, jansson],
@@ -65,8 +65,8 @@ client_common = static_library(
 	'coordinatool_client_common',
 	files(
 		'client_common/client.c',
-		'client_common/tcp.c',
 		'client_common/protocol.c',
+		'client_common/tcp.c',
 	),
 	include_directories: include_directories('common'),
 	link_with: [common],
@@ -79,12 +79,12 @@ executable(
 	'lhsmd_coordinatool',
 	sources: files(
 		'copytool/config.c',
-		'copytool/queue.c',
-		'copytool/tcp.c',
+		'copytool/coordinatool.c',
 		'copytool/lhsm.c',
 		'copytool/protocol.c',
+		'copytool/queue.c',
 		'copytool/scheduler.c',
-		'copytool/coordinatool.c',
+		'copytool/tcp.c',
 	) + [ version_h ],
 	dependencies: [urcu],
 	include_directories: include_directories('common'),
@@ -106,8 +106,8 @@ executable(
 library(
 	'coordinatool_client',
 	sources: files(
-		'preload/protocol.c',
 		'preload/preload.c',
+		'preload/protocol.c',
 	),
 	include_directories: include_directories(['common', 'client_common']),
 	link_with: [client_common],
