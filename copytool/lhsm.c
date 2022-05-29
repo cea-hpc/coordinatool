@@ -1,6 +1,5 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
-#include <sys/epoll.h>
 #include <limits.h>
 
 #include "coordinatool.h"
@@ -87,59 +86,4 @@ int ct_register(struct state *state) {
 
 	LOG_INFO("Registered lustre copytool");
 	return 0;
-}
-
-#define MAX_EVENTS 10
-int ct_start(struct state *state) {
-	int rc;
-	struct epoll_event events[MAX_EVENTS];
-	int nfds;
-
-	state->epoll_fd = epoll_create1(0);
-	if (state->epoll_fd < 0) {
-		rc = -errno;
-		LOG_ERROR(rc, "could not create epoll fd");
-		return rc;
-	}
-
-	hsm_action_queues_init(state, &state->queues);
-
-	rc = tcp_listen(state);
-	if (rc < 0)
-		return rc;
-
-	rc = ct_register(state);
-	if (rc < 0)
-		return rc;
-
-	LOG_NORMAL("Starting main loop");
-	while (1) {
-		nfds = epoll_wait(state->epoll_fd, events, MAX_EVENTS, -1);
-		if (nfds < 0 && errno == EINTR)
-			continue;
-		if (nfds < 0) {
-			rc = -errno;
-			LOG_ERROR(rc, "epoll_wait failed");
-			return rc;
-		}
-		int n;
-		for (n = 0; n < nfds; n++) {
-			if (events[n].events & (EPOLLERR|EPOLLHUP)) {
-				LOG_INFO("%d on error/hup", events[n].data.fd);
-			}
-			if (events[n].data.fd == state->hsm_fd) {
-				handle_ct_event(state);
-			} else if (events[n].data.fd == state->listen_fd) {
-				handle_client_connect(state);
-			} else {
-				struct client *client = events[n].data.ptr;
-				if (protocol_read_command(client->fd, client->id, client,
-							  protocol_cbs, state) < 0) {
-					free_client(state, client);
-				}
-			}
-		}
-
-
-	}
 }

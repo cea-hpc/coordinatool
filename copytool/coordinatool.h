@@ -116,7 +116,6 @@ void config_free(struct state_config *config);
 
 int handle_ct_event(struct state *state);
 int ct_register(struct state *state);
-int ct_start(struct state *state);
 
 /* protocol */
 
