@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88798269_1c127b44",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b45ebdfd_146eb3d0",
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61d31bd6_f400ddcd",
@@ -48,6 +66,30 @@
       "writtenOn": "2022-05-30T14:27:09Z",
       "side": 1,
       "message": "style: the indentation in this function uses spaces instead of tabs",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 14
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f70d4741_946fef0a",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "61d31bd6_f400ddcd",
       "range": {
         "startLine": 8,
         "startChar": 0,
@@ -81,6 +123,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f96f6b57_1053b118",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "yes, if there\u0027s a problem I\u0027d expect myself or whoever debug to increase log level here and run again, but keep the test mostly quiet in normal case. I\u0027ll add a comment.",
+      "parentUuid": "161d1a52_003dfa6b",
+      "range": {
+        "startLine": 40,
+        "startChar": 6,
+        "endLine": 40,
+        "endChar": 11
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09c3dcd7_1e2593a0",
@@ -104,6 +170,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93835c70_8dbaf908",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "09c3dcd7_1e2593a0",
+      "range": {
+        "startLine": 79,
+        "startChar": 36,
+        "endLine": 79,
+        "endChar": 44
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d24e870_2986fb6e",
@@ -117,6 +207,30 @@
       "writtenOn": "2022-05-30T14:27:09Z",
       "side": 1,
       "message": "question: this is supposed to be 101 because it\u0027s the last value returned by lpush after a 100 push, right?",
+      "range": {
+        "startLine": 103,
+        "startChar": 47,
+        "endLine": 103,
+        "endChar": 68
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f1b1312_47a7a65b",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "yes, 0 to 100 included so the list will be 101 elements long.\n\nIn all honesty I just didn\u0027t think it through all that much: I made arbitrary loops and added checks from debug message after the fact. Point was just to test the async code, not looping would have worked just as well but that wouldn\u0027t let me test things like lrange later on if we need it.",
+      "parentUuid": "8d24e870_2986fb6e",
       "range": {
         "startLine": 103,
         "startChar": 47,
@@ -152,6 +266,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2b9d2b3a_cee793cd",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "yes.\nChecking for previous result at start of loop is a bit annoying, real code will likely just have different callbacks based on what\u0027s expected.... Which is something I need to test anyway so this will likely change to do the same, e.g. get rid of state enum and just have callbacks chain themselves.",
+      "parentUuid": "f8a9faf4_58b7ea5a",
+      "range": {
+        "startLine": 114,
+        "startChar": 6,
+        "endLine": 114,
+        "endChar": 16
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b2bb05b_c0fab134",
         "filename": "tests/hiredis.c",
         "patchSetId": 1
@@ -163,6 +301,30 @@
       "writtenOn": "2022-05-30T14:27:09Z",
       "side": 1,
       "message": "question: how does this relate to the callback? Is it called twice? Once for llen and once for del? Which means that each time you will take the STEP_DONE path and the switch line 143 will use the case 0 path the first time and check the result of llen and case 1 the second time and check the result of del?",
+      "range": {
+        "startLine": 126,
+        "startChar": 8,
+        "endLine": 129,
+        "endChar": 22
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b074774_ef31681e",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "Yes, that\u0027s what I wanted to test: it turns out redis is monothread and handles requests in order, so the first reply is for the first message and second reply for the next.\nWill test multiple callbacks next.",
+      "parentUuid": "5b2bb05b_c0fab134",
       "range": {
         "startLine": 126,
         "startChar": 8,
@@ -190,6 +352,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c040536_aee0baf9",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e697f495_5c4a256c",
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36a4c403_aac32b88",
@@ -203,6 +383,30 @@
       "writtenOn": "2022-05-30T14:27:09Z",
       "side": 1,
       "message": "nit: the first state is POPULATE right? We could maybe make this more clear by setting the state explicitly.",
+      "range": {
+        "startLine": 163,
+        "startChar": 17,
+        "endLine": 163,
+        "endChar": 24
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bb09cb1_28de9b08",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "I\u0027ll remove the enum",
+      "parentUuid": "36a4c403_aac32b88",
       "range": {
         "startLine": 163,
         "startChar": 17,
@@ -236,6 +440,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "806e62fa_25f6e090",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7af7f271_be5f29ce",
+      "range": {
+        "startLine": 180,
+        "startChar": 61,
+        "endLine": 180,
+        "endChar": 72
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b85f1694_8a3196a5",
@@ -249,6 +477,30 @@
       "writtenOn": "2022-05-30T14:27:09Z",
       "side": 1,
       "message": "question: so this request is the first which will trigger the callback and is referenced by your comment line 78?",
+      "range": {
+        "startLine": 183,
+        "startChar": 6,
+        "endLine": 183,
+        "endChar": 23
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0720d4aa_79994f38",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T20:45:14Z",
+      "side": 1,
+      "message": "yes, need to start callback chain. adding a comment.",
+      "parentUuid": "b85f1694_8a3196a5",
       "range": {
         "startLine": 183,
         "startChar": 6,
