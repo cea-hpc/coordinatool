@@ -103,6 +103,24 @@
       "parentUuid": "a69a50f6_474921d7",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5309bbfd_8203526f",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T08:02:11Z",
+      "side": 1,
+      "message": "Ideally we know which client we want to schedule this action with on the first phobos_locate: instead of redoing a lookup for every file for every client, we\u0027d want to do a lookup when we get the action and if the client has room assign it to the client immediately, otherwise queue it specifically for the client (and recheck phobos_locate before sending it at that point)\n\nThat\u0027d require a small architectural change but I don\u0027t think that\u0027d be impossible to accommodate.\n\n\nRe-other algorithms I have no plans right now, my focus is on restarting the server safely. That\u0027ll require some rework but I have no plan of changing the decision tree for this, it\u0027ll come on top of existing lists at this point.\nSince I\u0027ll be sending the json early to redis, I\u0027ll probably change the actual data in the lists though (keeping the archive id and json data), but I intend to keep or re-add whatever extra informations you need readily available as well (plans for scheduling included throttling users for example so if we\u0027re going to open the file we might as well get its owner uid at that point).\n\nI still really think we should merge phobos support as it\u0027ll get impossible to merge, but if we change the way we schedule requests that might be a better time...",
+      "parentUuid": "ca45ca13_a8fd406f",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
