@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2f061f3_39c18ce3",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T07:41:14Z",
+      "side": 1,
+      "message": "I will add this to our todo list, thanks.",
+      "parentUuid": "8979d2a1_bd4daa4e",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a69a50f6_474921d7",
         "filename": "copytool/scheduler.c",
         "patchSetId": 5
@@ -65,6 +83,24 @@
       "writtenOn": "2022-05-28T07:57:03Z",
       "side": 1,
       "message": "note: calling can_send_to_client does open+getxattr+phobos_locate which all are costly for each client in the list, we should cache the info...",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca45ca13_a8fd406f",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T07:41:14Z",
+      "side": 1,
+      "message": "We can cache the association between FID and object ID but phobos_locate is necessary each time (or at least each time a copytool finishes a request). We can probably do a better job than what I did. There is also a remark from Thomas who points out that the requeue is probably not very efficient either. The open+getxattr could be done when the request is first received.\n\nDo you intend to update the scheduling part of the coordinatool? I think I remember you saying that you wanted to implement more elaborate algorithms. Maybe we can think of a way to integrate phobos_locate in the scheduling in a more efficient way.\nAs well as how we can integrate Phobos in the Coordinatool in a less intrusive way.\n\nWe could recompute phobos_locate each time a copytool finishes a request because that\u0027s when the tapes are likely to be moved around. And we can maybe only recompute it for requests related to this copytool only (and probably for requests which are not yet bound to a particular client also which will probably be most of them unfortunately). Note that the locate feature may be extended to archives as well in the future.\n\nWe are in the process of improving Phobos\u0027s I/O scheduling capabilities and the Coordinatool will play an important role in the early stages as it will be the only component handling all the requests that Phobos will ultimately handle through the Copytools.",
+      "parentUuid": "a69a50f6_474921d7",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
