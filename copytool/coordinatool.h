@@ -28,6 +28,15 @@ struct hsm_action_node {
 	struct hsm_action_queues *queues;
 	/* if sent to a client, remember who for eventual cancel */
 	struct client *client;
+#ifdef PHOBOS
+	// XXX ^ struct not allowed to be empty so ifdef englobes it,
+	// but will add some mandatory infos so ifdef can be moved to fuid
+	// at that point
+	/* enriched infos to take scheduling decisions */
+	struct item_info {
+		char *hsm_fuid;
+	} info;
+#endif
 	/* hsm_action_item is variable length and MUST be last */
 	struct hsm_action_item hai;
 };
@@ -64,6 +73,8 @@ struct client {
 		CLIENT_CONNECTED = 0, /* default state */
 		CLIENT_WAITING,
 	} state;
+	/* per client queues */
+	struct hsm_action_queues queues;
 	union { /* state-dependant fields */
 		struct cds_list_head node_waiting;
 	};
@@ -186,6 +197,7 @@ int redis_connect(struct state *state);
 
 /* scheduler */
 
+void hsm_action_node_enrich(struct state *state, struct hsm_action_node *han);
 void ct_schedule(struct state *state);
 void ct_schedule_client(struct state *state,
 			struct client *client);

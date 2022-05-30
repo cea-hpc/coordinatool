@@ -135,6 +135,10 @@ int handle_client_connect(struct state *state) {
 	CDS_INIT_LIST_HEAD(&client->active_requests);
 	CDS_INIT_LIST_HEAD(&client->node_waiting);
 	cds_list_add(&client->node_clients, &state->stats.clients);
+	CDS_INIT_LIST_HEAD(&client->queues.waiting_restore);
+	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
+	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
+	client->queues.state = state;
 	state->stats.clients_connected++;
 
 	LOG_DEBUG("Got client connection from %s", client->id);
