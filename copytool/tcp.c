@@ -108,7 +108,7 @@ void free_client(struct state *state, struct client *client) {
 		struct hsm_action_node *node =
 			caa_container_of(n, struct hsm_action_node, node);
 		cds_list_del(n);
-		hsm_action_requeue(node);
+		hsm_action_requeue(node, true);
 	}
 	ct_schedule(state);
 	free((void*)client->id);
