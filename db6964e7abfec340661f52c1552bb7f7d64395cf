@@ -16,6 +16,247 @@
       "message": "(the test failure is asan leak in the test, I\u0027ll need to add some cleanup at the end)",
       "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b45ebdfd_146eb3d0",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "minor: the license header is missing",
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61d31bd6_f400ddcd",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "style: the indentation in this function uses spaces instead of tabs",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 14
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "161d1a52_003dfa6b",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "question: you set the log level a INFO at the beginning of main but use debug here. Is this intentional?",
+      "range": {
+        "startLine": 40,
+        "startChar": 6,
+        "endLine": 40,
+        "endChar": 11
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09c3dcd7_1e2593a0",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "typo: previous",
+      "range": {
+        "startLine": 79,
+        "startChar": 36,
+        "endLine": 79,
+        "endChar": 44
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d24e870_2986fb6e",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "question: this is supposed to be 101 because it\u0027s the last value returned by lpush after a 100 push, right?",
+      "range": {
+        "startLine": 103,
+        "startChar": 47,
+        "endLine": 103,
+        "endChar": 68
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8a9faf4_58b7ea5a",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "If I understand this test correctly, in the state:\n- POPULATE:\n    - you assert that you received the first del line 78\n    - push integers from 0 to 99 in testList\n    - at index 99, you switch to COUNT\n- COUNT: just run llen testList and go to CLEAN step\n- CLEAN:\n    - you start at testdata-\u003ecounter \u003d 0\n    - if counter \u003d\u003d 0, you\u0027ve just switched from COUNT state which means that\n      reply-\u003einteger contains the result from llen\n    - otherwise, reply-\u003einteger contains the result of rpop which is the\n      current size of the list\n    - when you removed every element you ask for the length, delete the list\n      and go to step done\n- DONE: check the results from the last commands and exists\n\nIs this correct?",
+      "range": {
+        "startLine": 114,
+        "startChar": 6,
+        "endLine": 114,
+        "endChar": 16
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b2bb05b_c0fab134",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "question: how does this relate to the callback? Is it called twice? Once for llen and once for del? Which means that each time you will take the STEP_DONE path and the switch line 143 will use the case 0 path the first time and check the result of llen and case 1 the second time and check the result of del?",
+      "range": {
+        "startLine": 126,
+        "startChar": 8,
+        "endLine": 129,
+        "endChar": 22
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e697f495_5c4a256c",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "style: trailing whitespace (line 165 as well)",
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36a4c403_aac32b88",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "nit: the first state is POPULATE right? We could maybe make this more clear by setting the state explicitly.",
+      "range": {
+        "startLine": 163,
+        "startChar": 17,
+        "endLine": 163,
+        "endChar": 24
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7af7f271_be5f29ce",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "typo: connection",
+      "range": {
+        "startLine": 180,
+        "startChar": 61,
+        "endLine": 180,
+        "endChar": 72
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b85f1694_8a3196a5",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T14:27:09Z",
+      "side": 1,
+      "message": "question: so this request is the first which will trigger the callback and is referenced by your comment line 78?",
+      "range": {
+        "startLine": 183,
+        "startChar": 6,
+        "endLine": 183,
+        "endChar": 23
+      },
+      "revId": "db6964e7abfec340661f52c1552bb7f7d64395cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
