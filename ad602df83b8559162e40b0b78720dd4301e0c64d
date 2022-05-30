@@ -193,6 +193,24 @@
       "parentUuid": "a0105712_56145684",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fda14a7_13b4d26c",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T21:39:32Z",
+      "side": 1,
+      "message": "Just noticed I didn\u0027t reply for the initial requeue question, we\u0027ll need to store e.g. timestamp the request was added and insert back in global list based on timestamp or something.\n\nThat\u0027s not something I\u0027m thrilled about; I think v1 will just add back at the start of the global list (so it keeps its priority status even if the tape is no longer mounted anywhere), or at the end of a client specific list (if tape mounted somewhere else already)\n\nSo if a tape keeps moving a request might take a while to get scheduled, but otherwise it shouldn\u0027t be too bad... I think.\nIt\u0027d definitely be useful to store the timestamp the request was added at for debugging and add message in logs (took x s to get scheduled), so we can monitor and adjust after the fact based on how it behaves on real workloads.",
+      "parentUuid": "5b101d6a_ddf2750f",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
