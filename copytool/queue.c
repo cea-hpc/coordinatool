@@ -87,7 +87,7 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 }
 
 /* actually inserts action node to its queue */
-int hsm_action_requeue(struct hsm_action_node *node) {
+int hsm_action_requeue(struct hsm_action_node *node, bool start) {
 	struct cds_list_head *head;
 	struct hsm_action_queues *queues = node->queues;
 
@@ -109,7 +109,10 @@ int hsm_action_requeue(struct hsm_action_node *node) {
 		return -EINVAL;
 	}
 
-	cds_list_add_tail(&node->node, head);
+	if (start)
+		cds_list_add(&node->node, head);
+	else
+		cds_list_add_tail(&node->node, head);
 	return 1;
 }
 
@@ -149,7 +152,7 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 
 	hsm_action_node_enrich(queues->state, node);
 
-	return hsm_action_requeue(node);
+	return hsm_action_requeue(node, false);
 }
 
 /* pop item from queue or NULL */
