@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fac9dab_7f9cbacd",
+        "filename": "copytool/redis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T13:45:43Z",
+      "side": 1,
+      "message": "style: I think this is a trailing whitespace",
+      "range": {
+        "startLine": 42,
+        "startChar": 19,
+        "endLine": 42,
+        "endChar": 20
+      },
+      "revId": "e3700664d374ea251ab19fd0d99a02d450329b7e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
