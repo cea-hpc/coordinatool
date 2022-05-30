@@ -180,7 +180,7 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 						const char *fsname);
 void hsm_action_queues_init(struct state *state,
 			    struct hsm_action_queues *queues);
-int hsm_action_requeue(struct hsm_action_node *node);
+int hsm_action_requeue(struct hsm_action_node *node, bool start);
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai);
 struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,

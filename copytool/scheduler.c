@@ -26,6 +26,11 @@ static bool schedule_can_send(struct client *client UNUSED,
 	// be called much later so we should recheck.
 	// to requeue in another queue, update han->queues
 	// (we have global queue in han->queues->state->queues)
+	// XXX2, also probably want to signal if we want to requeue
+	// at start or not?
+	// just adding a ts and letting it be automatic in this case would
+	// probably be ok: in most case we're inserting at start so insertion
+	// would be O(1). For very long lists it might get slow though.
 	return true;
 }
 
@@ -106,12 +111,12 @@ void ct_schedule_client(struct state *state,
 			if (!han)
 				break;
 			if (!schedule_can_send(client, han)) {
-				hsm_action_requeue(han);
+				hsm_action_requeue(han, true);
 				continue;
 			}
 			if (recv_enqueue(client, hai_list, han)) {
 				/* did not fit, requeue - this also makes a new copy */
-				hsm_action_requeue(han);
+				hsm_action_requeue(han, true);
 				break;
 			}
 			LOG_INFO("Sending "DFID" to %d from queues" ,
