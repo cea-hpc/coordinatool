@@ -121,6 +121,24 @@
       "parentUuid": "ca45ca13_a8fd406f",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4182f974_34adb394",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T09:37:41Z",
+      "side": 1,
+      "message": "I see your point, that would be a lot better to do the lookup only once, yes. I can look what I can do to make the code a bit more efficient.\n\nRegarding merging with Phobos, I have no objections. It\u0027s just that you wanted something more modular. I was thinking of some sort of optional scheduling primitives that could be compiled with the server when phobos is available. Something like calling `can_send_to_client` which would return true for a non-phobos copytools and use phobos_locate otherwise.\nThis also gives me the idea that the client could tell us which type of copytool it is and we could use the Phobos version of `can_send_to_client` or not. This also raises the question of the type of request to consider when calling this function but the type of copytool might be enough to know this.\n\nDo you have a specific idea of what you would find acceptable? Maybe you just meant having some `#ifdef USE_PHOBOS` in the code? Although, I don\u0027t know if this would work well with Phobos copytools and regular ones. I didn\u0027t test this at the time.\n\nI should be able to rewrite this part of the code in the next few weeks so that you can review it.\n\nThere is also a patch which was landed on the phobos branch which made the coordinatool compatible with CentOS 7 because phobos was not available on CentOS 8 at the time but this issue is solved now so I think we can just drop it when merging.",
+      "parentUuid": "5309bbfd_8203526f",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
