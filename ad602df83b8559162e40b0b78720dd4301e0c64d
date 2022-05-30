@@ -157,6 +157,24 @@
       "parentUuid": "4182f974_34adb394",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0105712_56145684",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-30T12:31:26Z",
+      "side": 1,
+      "message": "I can wait for you to make the changes. We are not in a hurry, you can pick whatever schedule/plan fits you time best. Since I have a better understanding of the Coordinatool\u0027s code now, I think rewriting the patch with the changes made to integrate redis will not take that long. And it can give me the time to think about how to best handle the locate. I assume that it\u0027s best to merge the phobos branch later as well?\n\nMaybe we just need to agree on the strategy as to how we want to store the requests to optimise the locate.\n\nAs far as I understand your suggestions are:\n- use the same strategy as this patch but we can store the object ID the first time to avoid the extra open+getxattr\n- have one list per client + one for every requests that are not tied to a particular client and have the server look in the client\u0027s list first when trying to send requests (this solution could involve storing the client\u0027s id in redis to avoid the query again but this might be useless in practice depending on how long the server was off)\n\nI think we can at least rewrite this code so that we only compute phobos_locate once on each file every time we call ct_schedule_client and cache the object ID. But again, probably after the rewrite for redis.\n\nWe can also rethink the locate and come up with a better way to ask Phobos for hints.\n\nOne thing that is also important and that Thomas pointed out is how we requeue a given request. This is something to take into consideration when we choose how we want to store the requests.",
+      "parentUuid": "3848f5f3_3c9e852a",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
