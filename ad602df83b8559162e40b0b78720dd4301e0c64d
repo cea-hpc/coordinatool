@@ -211,6 +211,24 @@
       "parentUuid": "5b101d6a_ddf2750f",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee77a0ed_1951bf07",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T23:39:10Z",
+      "side": 1,
+      "message": "\u003e  Yes, let\u0027s reorder things a bit: \n\nthat wasn\u0027t quite appropriate, we call ct_schedule too often will all actions, we don\u0027t want to recall phobos_locate so often on all files.\n\nNew algo would be\n- call phobos_locate first when we get an item, and stick in appropriate queue\n- call phobos_locate when we\u0027re about to send an item to either check if it\u0027s still appropriate or assign it to its node\n\nnote it\u0027s still far from perfect, we\u0027d really want tighter integration with phobos e.g. not get the node from phobos but get the tape it\u0027s on,\ngroup requests by tape, and move all items with same tape together. But I\u0027ll leave that kind of things to you, please tell me if you think the hooks are usable :)\n\nhttps://review.gerrithub.io/c/cea-hpc/coordinatool/+/539014",
+      "parentUuid": "3fda14a7_13b4d26c",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
