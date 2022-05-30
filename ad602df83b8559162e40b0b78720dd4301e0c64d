@@ -139,6 +139,24 @@
       "parentUuid": "5309bbfd_8203526f",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3848f5f3_3c9e852a",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T10:16:48Z",
+      "side": 1,
+      "message": "regarding merging: at this point I\u0027m fine with just ifdefs.\nLong term we\u0027ll probably want some abstraction but right now I don\u0027t have a clear idea of what API would be practical, that can come later.\n\nTime-wise rewriting it now will conflict with the redis work I just started, unless you won\u0027t have time later. I\u0027ll likely have less time in the next few months so I\u0027d like to make as much progress as possible now... Although I guess refactoring is also a good way of taking things in your hands. Hmm.\nWhat do you prefer?\n- give me a couple of weeks and I\u0027ll have something with phobos-shaped holes for you to re-add phobos_locate/test\n- I just finish switch to lists into redis first, and we can both work in parallel when that\u0027s done (after this I\u0027ll have some work on recovery which will need some client/server adjustment but that won\u0027t touch scheduling, so we can both work on coordinatool). Hopefully will be done by next monday.",
+      "parentUuid": "4182f974_34adb394",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
