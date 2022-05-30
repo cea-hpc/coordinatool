@@ -175,6 +175,24 @@
       "parentUuid": "3848f5f3_3c9e852a",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b101d6a_ddf2750f",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-30T21:35:04Z",
+      "side": 1,
+      "message": "\u003e One thing that is also important and that Thomas pointed out is how we requeue a given request. This is something to take into consideration when we choose how we want to store the requests.\n\nI don\u0027t understand this bit -- you mean not delaying an old request too much if phobos_locate returns something different, but putting back in the queue where it would have been without phobos if e.g. phobos_locate returns empty again?\n\nIf we start assigning clients to a request because a tape is already mounted, that request should get priority: we don\u0027t want to wait and risk getting the client umount the tape.\n\nThat means that in a bad day with many requests on the same tapes, we risk prioritizing already-mounted tapes too much and starve requests on other tapes, which would wait for already mounted tapes forever.\nThat\u0027s also not optimal wrt resources optimization: if an agent can handle 4 drives and 16 restores, having all 16 restores stuck on a single tape means the other 3 drives will be idle.\nWe\u0027ll want to cap it somehow, at which point the starving problem no longer happens and I think it\u0027s safe to just keep prioritizing known tapes (we still risk ignoring requests for unmounted tapes, but it\u0027s much less likely)\n\nscheduling is hard 😊\n\nNow that\u0027s out of the way...\n\u003e As far as I understand your suggestions are\n\nYes, let\u0027s reorder things a bit:\n- in hsm_action_enqueue, add an enriching phase where we fill in extra static infos (e.g. open+getxattr, result that won\u0027t change)\n- in ct_schedule (without specific client), iterate on requests first to use extra infos for special decisions e.g. call phobos_locate and put to client specific list first, then iterate on clients as done now.\n- in ct_schedule_client use client specific list first then global list to send things, and add another hook to limit things if desired (e.g. enforce max per client per tape)\n\nThat should do what we need for phobos, and allow other extensions to be done. I\u0027ll add empty hooks you can fill in; this is actually unrelated enough to my rework so I can just add hooks now and we can both work in parallel.",
+      "parentUuid": "a0105712_56145684",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
