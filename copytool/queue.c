@@ -86,6 +86,7 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 	return caa_container_of(hai, struct hsm_action_node, hai);
 }
 
+/* actually inserts action node to its queue */
 int hsm_action_requeue(struct hsm_action_node *node) {
 	struct cds_list_head *head;
 	struct hsm_action_queues *queues = node->queues;
@@ -112,6 +113,7 @@ int hsm_action_requeue(struct hsm_action_node *node) {
 	return 1;
 }
 
+/* checks for duplicate, and if unique enrich and insert node */
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai) {
 	struct hsm_action_node *node;
@@ -145,9 +147,12 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		return 0;
 	}
 
+	hsm_action_node_enrich(queues->state, node);
+
 	return hsm_action_requeue(node);
 }
 
+/* pop item from queue or NULL */
 struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
 					   enum hsm_copytool_action action) {
 	struct cds_list_head *node = NULL;

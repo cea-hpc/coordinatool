@@ -2,6 +2,34 @@
 
 #include "coordinatool.h"
 
+/* schedule decision helper */
+
+/* fill in static action item informations */
+void hsm_action_node_enrich(struct state *state UNUSED,
+			    struct hsm_action_node *han UNUSED) {
+	// XXX actually fill in han->info with static infos
+	// At this point we could also want to pre-assign the node to a client,
+	// this can be done by setting han->queues = &client->queues
+}
+
+/* check if we still want to schedule action to client.
+ * We can put node back in global queue or just skip it
+ * returns true if can schedule
+ * if needed later we can make this return a decision enum
+ * OK/NEXT_ACTION/NEXT_CLIENT
+ */
+static bool schedule_can_send(struct client *client UNUSED,
+			      struct hsm_action_node *han UNUSED) {
+	// XXX check things
+	// There might be a way to signal we just assigned node and
+	// phobos_locate doesn't need rechecking? but in general this can
+	// be called much later so we should recheck.
+	// to requeue in another queue, update han->queues
+	// (we have global queue in han->queues->state->queues)
+	return true;
+}
+
+/* enqueue to json list */
 static int recv_enqueue(struct client *client, json_t *hai_list,
 			struct hsm_action_node *han) {
 	int max_action;
@@ -62,6 +90,7 @@ void ct_schedule_client(struct state *state,
 		&state->stats.pending_remove, &state->stats.pending_archive };
 	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
 		unsigned int enqueued_pass = 0, pending_pass = *pending_count[i];
+		struct hsm_action_queues *queues = &client->queues;
 		while (client->max_bytes > HAI_SIZE_MARGIN) {
 			if (*max_action[i] >= 0 &&
 			    *max_action[i] <= *current_count[i]) {
@@ -69,9 +98,17 @@ void ct_schedule_client(struct state *state,
 			}
 
 			struct hsm_action_node *han;
-			han = hsm_action_dequeue(&state->queues, actions[i]);
+			han = hsm_action_dequeue(queues, actions[i]);
+			if (!han && queues == &client->queues) {
+				queues = &state->queues;
+				continue;
+			}
 			if (!han)
 				break;
+			if (!schedule_can_send(client, han)) {
+				hsm_action_requeue(han);
+				continue;
+			}
 			if (recv_enqueue(client, hai_list, han)) {
 				/* did not fit, requeue - this also makes a new copy */
 				hsm_action_requeue(han);
@@ -107,7 +144,7 @@ void ct_schedule_client(struct state *state,
 void ct_schedule(struct state *state) {
 	struct cds_list_head *n, *nnext;
 
-	cds_list_for_each_safe(n, nnext, &state->queues.state->waiting_clients) {
+	cds_list_for_each_safe(n, nnext, &state->waiting_clients) {
 		struct client *client = caa_container_of(n, struct client,
 				node_waiting);
 		ct_schedule_client(state, client);
