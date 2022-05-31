@@ -247,6 +247,24 @@
       "parentUuid": "ee77a0ed_1951bf07",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "387cb470_48be168b",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-31T20:51:18Z",
+      "side": 1,
+      "message": "\u003e I see that you\u0027ve merged the changes made in the patch 539014. I will take the time to read it some time this week. \n\nThat was a mistake, it\u0027s reopened as https://review.gerrithub.io/c/cea-hpc/coordinatool/+/539058/1 now.\nI\u0027ve \"unmerged\" (force push) all patches that didn\u0027t get a review.\n\n\u003e higher level discussion\n\nRight, we\u0027re not going to find this thread again when we need it :P \nAlso you can add a level of redundancy, when using e.g. mirrored tapes issuing reads over another agent might be faster ultimately if the system is overall idle.. (although I guess same agent could also mount the 2nd tape)\nWell, as you said it\u0027s not going to change in a day, I\u0027m leaving this part to you folks!",
+      "parentUuid": "30c26358_c4e29726",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
