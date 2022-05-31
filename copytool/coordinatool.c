@@ -133,6 +133,8 @@ static int ct_start(struct state *state) {
 	}
 }
 
+#define OPT_REDIS_HOST 257
+#define OPT_REDIS_PORT 258
 int main(int argc, char *argv[]) {
 	struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
@@ -140,6 +142,8 @@ int main(int argc, char *argv[]) {
 		{ "archive", required_argument, NULL, 'A' },
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
+		{ "redis-host", required_argument, NULL, OPT_REDIS_HOST },
+		{ "redis-port", required_argument, NULL, OPT_REDIS_PORT },
 		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0 },
@@ -187,6 +191,13 @@ int main(int argc, char *argv[]) {
 		case 'p':
 			free((void*)state.config.port);
 			state.config.port = xstrdup(optarg);
+			break;
+		case OPT_REDIS_HOST:
+			free((void*)state.config.redis_host);
+			state.config.redis_host = xstrdup(optarg);
+			break;
+		case OPT_REDIS_PORT:
+			state.config.redis_port = parse_int(optarg, 65535);
 			break;
 		case 'V':
 			print_version();
