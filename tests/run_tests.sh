@@ -19,6 +19,9 @@ SKIPS=0
 ONLY=${ONLY:-}
 ASAN=
 . "${REPO_ROOT}/tests/tests_config.sh"
+if [[ -e "${REPO_ROOT}/tests/tests_config.local.sh" ]]; then
+	. "${REPO_ROOT}/tests/tests_config.local.sh"
+fi
 
 # helpers
 do_client() {

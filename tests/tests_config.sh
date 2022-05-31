@@ -1,3 +1,7 @@
+# default test config can be overriden with tests_config.local.sh
+# instead of modifying this file: that will allow for less git
+# conflicts
+
 declare -a CLIENT=(
 	localhost
 	localhost
