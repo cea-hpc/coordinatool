@@ -24,6 +24,7 @@ static int tree_compare(const void *a, const void *b) {
 }
 
 void queue_node_free(struct hsm_action_node *node) {
+	redis_delete(node->queues->state, node->info.cookie);
 	if (!tdelete(&node->info.cookie, &node->queues->actions_tree,
 		     tree_compare))
 		abort();
@@ -157,6 +158,9 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 	}
 
 	hsm_action_node_enrich(queues->state, node);
+
+	// continue even if this errored out
+	(void)redis_insert(queues->state, node);
 
 	return hsm_action_requeue(node, false);
 }
