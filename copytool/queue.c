@@ -72,16 +72,13 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 }
 
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
-						unsigned long cookie,
-						bool pop) {
+						unsigned long cookie) {
 	void *key = tfind(&cookie, &queues->actions_tree, tree_compare);
 
 	if (!key)
 		return NULL;
 
 	key = *(void **)key;
-	if (pop)
-		tdelete(&cookie, &queues->actions_tree, tree_compare);
 
 	struct item_info *item_info =
 		caa_container_of(key, struct item_info, cookie);

@@ -178,7 +178,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 					   "Do not know archive id");
 
 	struct hsm_action_node *han =
-		hsm_action_search_queue(queues, cookie, false);
+		hsm_action_search_queue(queues, cookie);
 	if (!han)
 		return protocol_reply_done(client, EINVAL,
 					   "Unknown cookie sent");
