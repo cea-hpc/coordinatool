@@ -188,10 +188,11 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 		  client->fd, PFID(&han->hai.hai_dfid), status);
 
 	cds_list_del(&han->node);
+	int action = han->hai.hai_action;
 	queue_node_free(han);
 
 	/* adjust running action count */
-	switch (han->hai.hai_action) {
+	switch (action) {
 	case HSMA_RESTORE:
 		client->current_restore--;
 		client->done_restore++;
