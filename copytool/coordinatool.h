@@ -103,6 +103,8 @@ struct state {
 		const char *port;
 		const char *state_dir_prefix;
 		enum llapi_message_level verbose;
+		const char *redis_host;
+		int redis_port;
 	} config;
 	/* options: command line switches only */
 	int archive_cnt;
@@ -193,6 +195,8 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 /* redis */
 
 int redis_connect(struct state *state);
+int redis_insert(struct state *state, struct hsm_action_node *han);
+int redis_delete(struct state *state, uint64_t cookie);
 
 
 /* scheduler */
