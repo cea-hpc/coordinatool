@@ -229,6 +229,24 @@
       "parentUuid": "3fda14a7_13b4d26c",
       "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30c26358_c4e29726",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-31T14:46:26Z",
+      "side": 1,
+      "message": "\u003e That\u0027s also not optimal wrt resources optimization: if an agent can handle 4 drives and 16 restores, having all 16 restores stuck on a single tape means the other 3 drives will be idle.\n\nThat\u0027s true, but in practice Phobos will also do its part of the scheduling. Which means that the number of requests the agent will handle should be high enough so that Phobos can optimize its resource usage. It still doesn\u0027t make the problem simple but shifts a bit of the responsibility to Phobos.\n\nThe hard part to me seems to be: what can phobos do to give enough information to the Coordinatool so that the scheduling can be efficient? locate seems a bit too simple for the Coordinatool to make meaningful decisions. As you pointed out, it would be better to know the number of requests per drive or even which tape is on which drive and where is the file stored on the backend but this would change the purpose of the Coordinatool and the whole architecture of Phobos. :) \n\nAnd also, if locate replies nodeA for multiple files, it doesn\u0027t mean that they are on the same tape. It means that the tapes are on drives handled by the same node. But that\u0027s just a proof that locate might be too simple and maybe the Coordinatool should know on which tape a file is written. Then again, this is not how Phobos or the Coordinatool are supposed to work.\n\nExpanding on the idea of knowing on which tape a file is archived:\n\nThere are 2 competitive factors: how efficient we want to be in terms of average request completion time and how bad the max will be (e.g. request delayed because they are on a tape that\u0027s not needed by other requests). My idea on that was that we could have the coordinatool perform some sort of fair share between each copytool which means that, as you said, we would limit the number of requests for which the locate answered a specific node and try to be as balanced as possible between each copytool. Then, the more fine grained I/O scheduling would be left to Phobos.  We could also imagine that the copytool asks for work when Phobos thinks that it should receive new requests. Then the coordinatool wouldn\u0027t have to bother with this as much. But only send requests to the right client using locate without worrying about resource starvation.\n\nI realise that having this discussion over a series of comments on gerrithub is not ideal. Maybe we can leave it at that for now since this part will probably not change in the sort term. I\u0027ll take note of the ideas you\u0027ve shared and maybe we can review this later.\n\nI hope my response is clear because I wrote it while thinking... :)\n\nI see that you\u0027ve merged the changes made in the patch 539014. I will take the time to read it some time this week.",
+      "parentUuid": "ee77a0ed_1951bf07",
+      "revId": "ad602df83b8559162e40b0b78720dd4301e0c64d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
