@@ -43,6 +43,7 @@ int main() {
 	hai->hai_len = sizeof(*hai)+16;
 	memcpy(hai->hai_data, "test\0test\0", 10);
 	val = json_hsm_action_item(hai);
+	assert(protocol_setjson_int(val, "extra", 42));
 	s = json_dumps(val, JSON_INDENT(2));
 	json_decref(val);
 
@@ -51,6 +52,7 @@ int main() {
 	val = json_loads(s, JSON_ALLOW_NUL, NULL);
 	free(s);
 	assert(json_hsm_action_item_get(val, newhai, sizeof(*hai)+16) == 0);
+	assert(protocol_getjson_int(val, "extra", 0) == 42);
 	json_decref(val);
 
 	printf("memcmp: %d\n", memcmp(hai, newhai, sizeof(*hai)+16));

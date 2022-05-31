@@ -24,9 +24,11 @@ static int tree_compare(const void *a, const void *b) {
 }
 
 void queue_node_free(struct hsm_action_node *node) {
-	if (!tdelete(&node->hai.hai_cookie, &node->queues->actions_tree,
+	if (!tdelete(&node->info.cookie, &node->queues->actions_tree,
 		     tree_compare))
 		abort();
+	if (node->hai)
+		json_decref(node->hai);
 	free(node);
 }
 
@@ -81,9 +83,9 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 	if (pop)
 		tdelete(&cookie, &queues->actions_tree, tree_compare);
 
-	struct hsm_action_item *hai =
-		caa_container_of(key, struct hsm_action_item, hai_cookie);
-	return caa_container_of(hai, struct hsm_action_node, hai);
+	struct item_info *item_info =
+		caa_container_of(key, struct item_info, cookie);
+	return caa_container_of(item_info, struct hsm_action_node, info);
 }
 
 /* actually inserts action node to its queue */
@@ -91,7 +93,7 @@ int hsm_action_requeue(struct hsm_action_node *node, bool start) {
 	struct cds_list_head *head;
 	struct hsm_action_queues *queues = node->queues;
 
-	switch (node->hai.hai_action) {
+	switch (node->info.action) {
 	case HSMA_RESTORE:
 		head = &queues->waiting_restore;
 		queues->state->stats.pending_restore++;
@@ -120,7 +122,7 @@ int hsm_action_requeue(struct hsm_action_node *node, bool start) {
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai) {
 	struct hsm_action_node *node;
-	__u64 **tree_key;
+	uint64_t **tree_key;
 
 	if (hai->hai_action == HSMA_CANCEL) {
 		// XXX tfind + remove from waiting queue or signal client
@@ -135,16 +137,23 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		return -EINVAL;
 	}
 
-	node = xmalloc(sizeof(struct hsm_action_node) +
-		      hai->hai_len - sizeof(struct hsm_action_item));
-	memcpy(&node->hai, hai, hai->hai_len);
+	node = xmalloc(sizeof(struct hsm_action_node));
+	node->hai = json_hsm_action_item(hai);
+	if (!node->hai) {
+		free(node);
+		return -ENOMEM;
+	}
 	node->queues = queues;
+	node->info.cookie = hai->hai_cookie;
+	node->info.action = hai->hai_action;
+	node->info.dfid = hai->hai_dfid;
+	node->info.hai_len = hai->hai_len;
 
-	tree_key = tsearch(&node->hai.hai_cookie, &queues->actions_tree,
+	tree_key = tsearch(&node->info.cookie, &queues->actions_tree,
 			   tree_compare);
 	if (!tree_key)
 		abort();
-	if (*tree_key != &node->hai.hai_cookie) {
+	if (*tree_key != &node->info.cookie) {
 		/* duplicate */
 		free(node);
 		return 0;
