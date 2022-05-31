@@ -196,6 +196,9 @@ int main() {
 		return 1;
 	}
 
+	// XXX take from env like coordinatool config or something
+	state.config.redis_host = "localhost";
+	state.config.redis_port = 6379;
 	rc = redis_connect(&state);
 	if (rc < 0) {
 		LOG_ERROR(rc, "could not redis_connect");
