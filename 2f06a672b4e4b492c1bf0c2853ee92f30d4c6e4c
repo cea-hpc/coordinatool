@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efb524b4_0f4f9ea7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-05-31T14:02:01Z",
+      "side": 1,
+      "message": "bah, I failed and pushed everything. I\u0027ve force pushed back up to this commit\u0027s parent (had this had many questions), and repushed all changes with a different change-id since gerrit won\u0027t reopen merged changes; please follow the new thread: https://review.gerrithub.io/c/cea-hpc/coordinatool/+/539057\n\nI\u0027ve added a few more commits up to filling redis db, next is adding missing infos and actual restart!",
+      "revId": "2f06a672b4e4b492c1bf0c2853ee92f30d4c6e4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
