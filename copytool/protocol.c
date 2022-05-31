@@ -185,10 +185,10 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 
 	int status = protocol_getjson_int(json, "status", 0);
 	LOG_INFO("%d processed "DFID": %d" ,
-		  client->fd, PFID(&han->hai.hai_dfid), status);
+		  client->fd, PFID(&han->info.dfid), status);
 
 	cds_list_del(&han->node);
-	int action = han->hai.hai_action;
+	int action = han->info.action;
 	queue_node_free(han);
 
 	/* adjust running action count */
@@ -298,6 +298,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 					    "No queue found");
 	enqueue_state.enqueued = 0;
 
+	// XXX we don't actually need to convert to hai here, just extract required infos
 	rc = json_hsm_action_list_get(json_hal, &enqueue_state.hal,
 		sizeof(enqueue_state) - offsetof(struct enqueue_state, hal),
 		queue_cb_enqueue, &enqueue_state);
