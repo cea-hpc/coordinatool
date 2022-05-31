@@ -40,10 +40,10 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 	int max_action;
 	int *current_count;
 
-	if (client->max_bytes < sizeof(han->hai) + han->hai.hai_len) {
+	if (client->max_bytes < sizeof(struct hsm_action_item) + han->info.hai_len) {
 		return -ERANGE;
 	}
-	switch (han->hai.hai_action) {
+	switch (han->info.action) {
 	case HSMA_RESTORE:
 		max_action = client->max_restore;
 		current_count = &client->current_restore;
@@ -62,7 +62,7 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 	if (max_action >= 0 && max_action <= *current_count)
 		return -ERANGE;
 
-	json_array_append_new(hai_list, json_hsm_action_item(&han->hai));
+	json_array_append(hai_list, han->hai);
 	han->client = client;
 	(*current_count)++;
 	cds_list_add(&han->node, &client->active_requests);
@@ -120,7 +120,7 @@ void ct_schedule_client(struct state *state,
 				break;
 			}
 			LOG_INFO("Sending "DFID" to %d from queues" ,
-				 PFID(&han->hai.hai_dfid), client->fd);
+				 PFID(&han->info.dfid), client->fd);
 			enqueued_items++;
 			(*running_count[i])++;
 			enqueued_pass++;

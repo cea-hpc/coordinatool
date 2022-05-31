@@ -28,17 +28,18 @@ struct hsm_action_node {
 	struct hsm_action_queues *queues;
 	/* if sent to a client, remember who for eventual cancel */
 	struct client *client;
-#ifdef PHOBOS
-	// XXX ^ struct not allowed to be empty so ifdef englobes it,
-	// but will add some mandatory infos so ifdef can be moved to fuid
-	// at that point
 	/* enriched infos to take scheduling decisions */
 	struct item_info {
+		uint64_t cookie;
+		enum hsm_copytool_action action;
+		struct lu_fid dfid;
+		size_t hai_len;
+#ifdef PHOBOS
 		char *hsm_fuid;
-	} info;
 #endif
-	/* hsm_action_item is variable length and MUST be last */
-	struct hsm_action_item hai;
+	} info;
+	/* json representation of hai */
+	json_t *hai;
 };
 
 #define ARCHIVE_ID_UNINIT ((unsigned int)-1)
