@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f9a49e7_41247bc8",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T13:54:28Z",
+      "side": 1,
+      "message": "nit: put the \"do {\" on a new line",
+      "range": {
+        "startLine": 68,
+        "startChar": 50,
+        "endLine": 68,
+        "endChar": 51
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50306a6f_aa29b840",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T13:54:28Z",
+      "side": 1,
+      "message": "question: why put the functions in this order, and force yourself to declare their prototypes ahead ? Just reversing the order would work just as well",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 4
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bbce2c7_dc51ab54",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T13:54:28Z",
+      "side": 1,
+      "message": "suggest: use a macro\nquestion: isn\u0027t 100 too much ? I feel like 10 or 5 could be enough for what you\u0027re testing, but I\u0027m not sure",
+      "range": {
+        "startLine": 114,
+        "startChar": 25,
+        "endLine": 114,
+        "endChar": 28
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "233c3e3f_8ca91b9e",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T13:54:28Z",
+      "side": 1,
+      "message": "typo: element",
+      "range": {
+        "startLine": 142,
+        "startChar": 22,
+        "endLine": 142,
+        "endChar": 28
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "518ccb29_22b8db43",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T13:54:28Z",
+      "side": 1,
+      "message": "suggest: to be inserted",
+      "range": {
+        "startLine": 142,
+        "startChar": 49,
+        "endLine": 142,
+        "endChar": 55
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58878a5a_7245aca3",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T13:54:28Z",
+      "side": 1,
+      "message": "suggest: I feel like just doing \"testdata-\u003ecounter--\" here and not resetting it on line 118 is more intuitive. You populated the list with 100 values, you will pop each value, decreasing the length of the list.",
+      "range": {
+        "startLine": 145,
+        "startChar": 1,
+        "endLine": 145,
+        "endChar": 21
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c63dd0be_552ab027",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T13:54:28Z",
+      "side": 1,
+      "message": "ultra-nit: you could combine the \"cb_llen\" and \"cb_llen_final\" function, just have an assert on the type of integer, whether reply-\u003einteger is 0 or 100, and if it\u0027s 100, call rpop",
+      "range": {
+        "startLine": 157,
+        "startChar": 5,
+        "endLine": 157,
+        "endChar": 18
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
