@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c19daf2_a660da90",
+        "filename": "copytool/queue.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-01T14:33:25Z",
+      "side": 1,
+      "message": "question: it probably sounds dumb, but wouldn\u0027t we end up with an infinite loop by doing this ? Do we requeue when the action failed because it actually failed or because the environnement or the client couldn\u0027t execute it for some reason (timeout, shutdown of the client, network issue, ...) ?",
+      "range": {
+        "startLine": 113,
+        "startChar": 2,
+        "endLine": 113,
+        "endChar": 14
+      },
+      "revId": "67ec20da57232ea4d7566c4d590116adae94fc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
