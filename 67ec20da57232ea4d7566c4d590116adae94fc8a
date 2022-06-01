@@ -22,6 +22,30 @@
       },
       "revId": "67ec20da57232ea4d7566c4d590116adae94fc8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22ece5d5_5f773a56",
+        "filename": "copytool/queue.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:29:47Z",
+      "side": 1,
+      "message": "Ugh, I thought we were in a for_each_safe kind of scenario but we\u0027re not.\n\nThanks for noticing, I\u0027ll fix this by changing how we dequeue so we actually only remove from list when that worked (which also eliminates the need to re-enqueue)\nIn practice I\u0027ve only been testing recv_enqueue failure which breaks immediately so we don\u0027t loop, but the new schedule_can_send definitely has the problem -- that will require a specific test when it\u0027s filled in for phobos.",
+      "parentUuid": "4c19daf2_a660da90",
+      "range": {
+        "startLine": 113,
+        "startChar": 2,
+        "endLine": 113,
+        "endChar": 14
+      },
+      "revId": "67ec20da57232ea4d7566c4d590116adae94fc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
