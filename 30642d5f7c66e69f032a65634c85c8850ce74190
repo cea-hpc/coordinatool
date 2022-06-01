@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71614b5b_ac60a55f",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:38:03Z",
+      "side": 1,
+      "message": "I only use these for tests where I honestly don\u0027t care about style, but I prefer it here like I have function opening brace at the end of the function line",
+      "parentUuid": "8f9a49e7_41247bc8",
+      "range": {
+        "startLine": 68,
+        "startChar": 50,
+        "endLine": 68,
+        "endChar": 51
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50306a6f_aa29b840",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0cde869_4421a61b",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:38:03Z",
+      "side": 1,
+      "message": "Reversing order would work yes, I just think it\u0027s easier to read in order so you can go from one step to the next",
+      "parentUuid": "50306a6f_aa29b840",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 4
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bbce2c7_dc51ab54",
@@ -60,6 +108,30 @@
       "writtenOn": "2022-06-01T13:54:28Z",
       "side": 1,
       "message": "suggest: use a macro\nquestion: isn\u0027t 100 too much ? I feel like 10 or 5 could be enough for what you\u0027re testing, but I\u0027m not sure",
+      "range": {
+        "startLine": 114,
+        "startChar": 25,
+        "endLine": 114,
+        "endChar": 28
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ff51f4e_83e75a40",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:38:03Z",
+      "side": 1,
+      "message": "meh for macro but yes it\u0027d make sense, will update.\nFor number 100 is also tiny (test runs in 0.04s), it really doesn\u0027t matter. We\u0027re going to insert zillions of elements into redis for the production db, if this is a problem we shouldn\u0027t be using redis...",
+      "parentUuid": "5bbce2c7_dc51ab54",
       "range": {
         "startLine": 114,
         "startChar": 25,
@@ -116,6 +188,54 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f87b04ce_87070fc1",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:38:03Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "518ccb29_22b8db43",
+      "range": {
+        "startLine": 142,
+        "startChar": 49,
+        "endLine": 142,
+        "endChar": 55
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2d5f77c_20b86bbc",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:38:03Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "233c3e3f_8ca91b9e",
+      "range": {
+        "startLine": 142,
+        "startChar": 22,
+        "endLine": 142,
+        "endChar": 28
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58878a5a_7245aca3",
@@ -139,6 +259,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e975538_faede248",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:38:03Z",
+      "side": 1,
+      "message": "You\u0027ll need to test with 100 - counter above then since I\u0027m poping from the other end (using it as a queue)\nI think it\u0027s easier to just count with it, but anyway this won\u0027t stay when reworking the test to use hash instead as scan is not ordered.",
+      "parentUuid": "58878a5a_7245aca3",
+      "range": {
+        "startLine": 145,
+        "startChar": 1,
+        "endLine": 145,
+        "endChar": 21
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c63dd0be_552ab027",
@@ -152,6 +296,30 @@
       "writtenOn": "2022-06-01T13:54:28Z",
       "side": 1,
       "message": "ultra-nit: you could combine the \"cb_llen\" and \"cb_llen_final\" function, just have an assert on the type of integer, whether reply-\u003einteger is 0 or 100, and if it\u0027s 100, call rpop",
+      "range": {
+        "startLine": 157,
+        "startChar": 5,
+        "endLine": 157,
+        "endChar": 18
+      },
+      "revId": "30642d5f7c66e69f032a65634c85c8850ce74190",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86c070b4_e554611a",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-01T21:38:03Z",
+      "side": 1,
+      "message": "yeah, no :) \nThis is just a test, let\u0027s keep it simple to read/modify.",
+      "parentUuid": "c63dd0be_552ab027",
       "range": {
         "startLine": 157,
         "startChar": 5,
