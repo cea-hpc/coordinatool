@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b73e83cf_bc006f80",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T23:33:36Z",
+      "side": 1,
+      "message": "good point, thanks!",
+      "parentUuid": "8f7ec68d_ba68eeba",
+      "range": {
+        "startLine": 200,
+        "startChar": 3,
+        "endLine": 200,
+        "endChar": 31
+      },
+      "revId": "8e22870417be5b4157b96550a29ea2b71104f5ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d36d10c_abf8ca5e",
@@ -61,6 +85,30 @@
       "writtenOn": "2022-06-02T12:15:21Z",
       "side": 1,
       "message": "That\u0027s a nice trick",
+      "range": {
+        "startLine": 118,
+        "startChar": 2,
+        "endLine": 118,
+        "endChar": 28
+      },
+      "revId": "8e22870417be5b4157b96550a29ea2b71104f5ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6396d20_1b6a5513",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T23:33:36Z",
+      "side": 1,
+      "message": "Such a nice trick that it didn\u0027t work! well, it worked but it ran on first head even if list was empty.\nWe need to check for head1 in initial assignment too, so I\u0027m adding an extra define for next:\n\n #define cds_twolists_next(p, head1, head2) \\\n        ((p)-\u003enext \u003d\u003d (head1) ? (head2)-\u003enext : (p)-\u003enext)\n #define cds_twolists_for_each_safe(pos, p, head1, head2) \\\n        for (pos \u003d cds_twolists_next(head1, head1, head2), \\\n                        p \u003d cds_twolists_next(pos, head1, head2); \\\n                pos !\u003d (head2); \\\n                pos \u003d p, p \u003d cds_twolists_next(p, head1, head2))\n\nThat ought to work, but with extra rework I\u0027m still getting use after frees somewhere will update this commit when fixed...",
+      "parentUuid": "2d36d10c_abf8ca5e",
       "range": {
         "startLine": 118,
         "startChar": 2,
