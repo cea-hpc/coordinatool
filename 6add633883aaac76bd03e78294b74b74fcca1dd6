@@ -22,6 +22,30 @@
       },
       "revId": "6add633883aaac76bd03e78294b74b74fcca1dd6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6df1b632_a589059d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T12:50:51Z",
+      "side": 1,
+      "message": "we don\u0027t store the info of which request is scheduled on which client in redis -- not so much a typo as a bit too much implicit, I\u0027ll reword :)",
+      "parentUuid": "4d889d9e_5b057bed",
+      "range": {
+        "startLine": 15,
+        "startChar": 30,
+        "endLine": 15,
+        "endChar": 39
+      },
+      "revId": "6add633883aaac76bd03e78294b74b74fcca1dd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
