@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29e40518_9a5406e9",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T08:41:17Z",
+      "side": 1,
+      "message": "I checked for first version when everything was using the same callback: they said redis is monothread so will reply in the order queries come in, and tcp preserves ordering, so callbacks will be called in order because they\u0027re called in order reading from the stream.\n\nNot a great thing to rely on, but now we\u0027re using different callbacks for everything I don\u0027t think it matters -- hiredis should always guarantee that the right callbacks are used for the right replies (even if ultimately it\u0027s just a list poping callbacks one at a time, we don\u0027t need to care)",
+      "parentUuid": "c2d0601b_4c805b35",
+      "range": {
+        "startLine": 152,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 21
+      },
+      "revId": "a52479a11f3eca40c27355d58cb72b5f61fea0aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36a4fe89_a925aebd",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-06-02T08:26:06Z",
       "side": 1,
       "message": "Do you know why? I remember having issues when testing PostgreSQL\u0027s pub/sub system where, if I rememeber correctly, you couldn\u0027t receive notifications from the server if you had an open transaction or something like that. I don\u0027t know if that can be of any help in your case.",
+      "range": {
+        "startLine": 207,
+        "startChar": 21,
+        "endLine": 207,
+        "endChar": 71
+      },
+      "revId": "a52479a11f3eca40c27355d58cb72b5f61fea0aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a787d19_43e2744e",
+        "filename": "tests/hiredis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T08:41:17Z",
+      "side": 1,
+      "message": "redis just refuses to process any request once you subscribe.\n\nI first tried with pyredis and didn\u0027t notice as it opens a new socket transparently, but when trying from C you get an error:\n\n  \"Can\u0027t execute \u0027%s\u0027: only (P|S)SUBSCRIBE / (P|S)UNSUBSCRIBE / PING / QUIT / RESET are allowed in this context\"\n\nhiredis also expects this and will handle a connection differently once it\u0027s subscribed, I think it\u0027s because redis doesn\u0027t support unexpected messages from servers in normal mode.\n\nFor our case I don\u0027t plan on using subscribe at this point, but when/if we do for some reason we just need to open a second connection to the redis server. the epoll code can differentiate between the two if required.",
+      "parentUuid": "36a4fe89_a925aebd",
       "range": {
         "startLine": 207,
         "startChar": 21,
