@@ -22,6 +22,30 @@
       },
       "revId": "210b6a922949948940b54479e05a71ceaa32e518",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22ddd45e_4e3c6da9",
+        "filename": "copytool/redis.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T20:23:52Z",
+      "side": 1,
+      "message": "ack!\n\nI see a few whitespace errors too now, fixing while I\u0027m here...",
+      "parentUuid": "27f4ee8f_fb65dea5",
+      "range": {
+        "startLine": 172,
+        "startChar": 2,
+        "endLine": 172,
+        "endChar": 10
+      },
+      "revId": "210b6a922949948940b54479e05a71ceaa32e518",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
