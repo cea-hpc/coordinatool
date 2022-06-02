@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e310072d_2e89dbb1",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-02T14:43:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f7ec68d_ba68eeba",
+      "range": {
+        "startLine": 200,
+        "startChar": 3,
+        "endLine": 200,
+        "endChar": 31
+      },
+      "revId": "8e22870417be5b4157b96550a29ea2b71104f5ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d36d10c_abf8ca5e",
