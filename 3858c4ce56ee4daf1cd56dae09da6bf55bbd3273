@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8231eb64_374fcbb8",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T09:00:51Z",
+      "side": 1,
+      "message": "Yes, it\u0027s possible we just checked locate in enrich and immediately try to schedule it to its client -- but it\u0027s also possible that client was busy and we only try to schedule it much later, and we have no way of knowing which it is here, so we need to check again.\n\nMore precisely, when we do the enrich we can check if the client is waiting or not (just check client-\u003estate), but even if it\u0027s waiting there\u0027s no guarantee that we\u0027ll pile up as far as this.\n\nAdding such an optimization would require something like keeping track of scheduling iterations, writing down \"okay we enriched this in iteration X, and we\u0027re still iteration X at this point so we can trust it\" or \"we enriched this in iteration X but we\u0027re not in iteration X+3 so we need to refresh\" -- but honestly that can come later.\n\n(There\u0027s also the same problem if when we check the node changed, we assign this item to another client, and:\n- if that client was further down the list of waiting clients we\u0027ll need to check again needlessly,\n- if that client was earlier in the list of waiting clients we\u0027ll miss the chance to schedule this item!\n- if that client was earlier in the list of waiting clients and fully idle, we won\u0027t schedule this item until we receive new hsm events... so it\u0027s not suck forever but it could potentially be stuck for a long time on test/idle systems. We probably want to handle that...\n)\n\nso all in all this is far from perfect, but it\u0027s a first step and trying to cut boundaries.",
+      "parentUuid": "242a97e5_a47694f5",
+      "range": {
+        "startLine": 24,
+        "startChar": 35,
+        "endLine": 24,
+        "endChar": 56
+      },
+      "revId": "3858c4ce56ee4daf1cd56dae09da6bf55bbd3273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cda0f640_b1258f99",
         "filename": "copytool/scheduler.c",
         "patchSetId": 1
@@ -54,6 +78,30 @@
       "writtenOn": "2022-06-02T08:34:37Z",
       "side": 1,
       "message": "thank you for the hints to make the implementation easier :)",
+      "range": {
+        "startLine": 28,
+        "startChar": 29,
+        "endLine": 28,
+        "endChar": 55
+      },
+      "revId": "3858c4ce56ee4daf1cd56dae09da6bf55bbd3273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e11ee4b3_40dd46d8",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T09:00:51Z",
+      "side": 1,
+      "message": "welcome! Note way of requeuing will change due to the bug Yoann pointed at yesterday, but it shouldn\u0027t change too much and I\u0027ll update the comment in the fix patch. (won\u0027t rebase to avoid conflicts)",
+      "parentUuid": "cda0f640_b1258f99",
       "range": {
         "startLine": 28,
         "startChar": 29,
