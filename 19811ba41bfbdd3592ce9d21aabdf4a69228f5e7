@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9106088_f9663f81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T10:16:37Z",
+      "side": 1,
+      "message": "I\u0027ve addressed the problem in https://review.gerrithub.io/c/cea-hpc/coordinatool/+/539171\n\nI\u0027m not changing commit orders as there are other changes that cause a conflict, as the \u0027can_send()\u0027 check right now can\u0027t return false there is no actual risk in practice at this point of time so the fix can wait: let\u0027s save time!",
+      "revId": "19811ba41bfbdd3592ce9d21aabdf4a69228f5e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
