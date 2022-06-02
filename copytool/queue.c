@@ -23,14 +23,14 @@ static int tree_compare(const void *a, const void *b) {
 	return 1;
 }
 
-void queue_node_free(struct hsm_action_node *node) {
-	redis_delete(node->queues->state, node->info.cookie);
-	if (!tdelete(&node->info.cookie, &node->queues->actions_tree,
+void queue_node_free(struct hsm_action_node *han) {
+	redis_delete(han->queues->state, han->info.cookie);
+	if (!tdelete(&han->info.cookie, &han->queues->actions_tree,
 		     tree_compare))
 		abort();
-	if (node->hai)
-		json_decref(node->hai);
-	free(node);
+	if (han->hai)
+		json_decref(han->hai);
+	free(han);
 }
 
 struct hsm_action_queues *hsm_action_queues_get(struct state *state,
@@ -87,11 +87,11 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 }
 
 /* actually inserts action node to its queue */
-int hsm_action_requeue(struct hsm_action_node *node, bool start) {
+int hsm_action_requeue(struct hsm_action_node *han, bool start) {
 	struct cds_list_head *head;
-	struct hsm_action_queues *queues = node->queues;
+	struct hsm_action_queues *queues = han->queues;
 
-	switch (node->info.action) {
+	switch (han->info.action) {
 	case HSMA_RESTORE:
 		head = &queues->waiting_restore;
 		queues->state->stats.pending_restore++;
@@ -105,14 +105,14 @@ int hsm_action_requeue(struct hsm_action_node *node, bool start) {
 		queues->state->stats.pending_remove++;
 		break;
 	default:
-		queue_node_free(node);
+		queue_node_free(han);
 		return -EINVAL;
 	}
 
 	if (start)
-		cds_list_add(&node->node, head);
+		cds_list_add(&han->node, head);
 	else
-		cds_list_add_tail(&node->node, head);
+		cds_list_add_tail(&han->node, head);
 	return 1;
 }
 
@@ -151,7 +151,7 @@ void hsm_action_move(struct hsm_action_queues *queues,
 /* checks for duplicate, and if unique enrich and insert node */
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai) {
-	struct hsm_action_node *node;
+	struct hsm_action_node *han;
 	uint64_t **tree_key;
 
 	if (hai->hai_action == HSMA_CANCEL) {
@@ -167,34 +167,34 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 		return -EINVAL;
 	}
 
-	node = xmalloc(sizeof(struct hsm_action_node));
-	node->hai = json_hsm_action_item(hai);
-	if (!node->hai) {
-		free(node);
+	han = xmalloc(sizeof(struct hsm_action_node));
+	han->hai = json_hsm_action_item(hai);
+	if (!han->hai) {
+		free(han);
 		return -ENOMEM;
 	}
-	node->queues = queues;
-	node->info.cookie = hai->hai_cookie;
-	node->info.action = hai->hai_action;
-	node->info.dfid = hai->hai_dfid;
-	node->info.hai_len = hai->hai_len;
+	han->queues = queues;
+	han->info.cookie = hai->hai_cookie;
+	han->info.action = hai->hai_action;
+	han->info.dfid = hai->hai_dfid;
+	han->info.hai_len = hai->hai_len;
 
-	tree_key = tsearch(&node->info.cookie, &queues->actions_tree,
+	tree_key = tsearch(&han->info.cookie, &queues->actions_tree,
 			   tree_compare);
 	if (!tree_key)
 		abort();
-	if (*tree_key != &node->info.cookie) {
+	if (*tree_key != &han->info.cookie) {
 		/* duplicate */
-		free(node);
+		free(han);
 		return 0;
 	}
 
-	hsm_action_node_enrich(queues->state, node);
+	hsm_action_node_enrich(queues->state, han);
 
 	// continue even if this errored out
-	(void)redis_insert(queues->state, node);
+	(void)redis_insert(queues->state, han);
 
-	return hsm_action_requeue(node, false);
+	return hsm_action_requeue(han, false);
 }
 
 /* pop item from queue or NULL */
