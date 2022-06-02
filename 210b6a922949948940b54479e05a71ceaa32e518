@@ -46,6 +46,30 @@
       },
       "revId": "210b6a922949948940b54479e05a71ceaa32e518",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e51a2728_22904263",
+        "filename": "copytool/redis.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T20:26:14Z",
+      "side": 1,
+      "message": "ah, sorry read too fast: the callback isn\u0027t (always?) called if redisAsyncCommand fails.\nAt the very least there\u0027s early checks on connection state that would cause immediate errors in hiredis code\n\nOnly fixed whitespace issues",
+      "parentUuid": "22ddd45e_4e3c6da9",
+      "range": {
+        "startLine": 172,
+        "startChar": 2,
+        "endLine": 172,
+        "endChar": 10
+      },
+      "revId": "210b6a922949948940b54479e05a71ceaa32e518",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
