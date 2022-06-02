@@ -24,7 +24,7 @@ static bool schedule_can_send(struct client *client UNUSED,
 	// There might be a way to signal we just assigned node and
 	// phobos_locate doesn't need rechecking? but in general this can
 	// be called much later so we should recheck.
-	// to requeue in another queue, update han->queues
+	// to requeue in another queue, use hsm_action_move(newqueue, han, start)
 	// (we have global queue in han->queues->state->queues)
 	// XXX2, also probably want to signal if we want to requeue
 	// at start or not?
@@ -70,6 +70,16 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 	return 0;
 }
 
+/* scheduling would normally use cds_list_for_each_safe here but
+ * we want to chain both queues, so cheat a bit:
+ * this is cds_list_for_each_safe with starting condition from
+ * first list, end condition with second list head and
+ * a bridge from first to second list when first list ends */
+#define cds_twolists_for_each_safe(pos, p, head1, head2) \
+	for (pos = (head1)->next, p = pos->next; \
+		pos != (head2); \
+		pos = p, p = pos->next == (head1) ? (head2)->next : pos->next)
+
 void ct_schedule_client(struct state *state,
 			struct client *client) {
 	if (client->state != CLIENT_WAITING)
@@ -82,8 +92,16 @@ void ct_schedule_client(struct state *state,
 	/* check if there are pending requests
 	 * priority restore > remove > archive is hardcoded for now */
 	int enqueued_items = 0;
-	enum hsm_copytool_action actions[] = {
-		HSMA_RESTORE, HSMA_REMOVE, HSMA_ARCHIVE,
+	size_t enqueued_bytes = 0;
+	struct cds_list_head *client_waiting_lists[] = {
+		client->queues.waiting_restore.next,
+		client->queues.waiting_remove.next,
+		client->queues.waiting_archive.next,
+	};
+	struct cds_list_head *state_waiting_lists[] = {
+		state->queues.waiting_restore.next,
+		state->queues.waiting_remove.next,
+		state->queues.waiting_archive.next,
 	};
 	int *max_action[] = { &client->max_restore, &client->max_remove,
 		&client->max_archive };
@@ -93,35 +111,33 @@ void ct_schedule_client(struct state *state,
 		&state->stats.running_remove, &state->stats.running_archive };
 	unsigned int *pending_count[] = { &state->stats.pending_restore,
 		&state->stats.pending_remove, &state->stats.pending_archive };
-	for (size_t i = 0; i < sizeof(actions) / sizeof(*actions); i++) {
+	for (size_t i = 0; i < sizeof(max_action) / sizeof(*max_action); i++) {
 		unsigned int enqueued_pass = 0, pending_pass = *pending_count[i];
 		struct hsm_action_queues *queues = &client->queues;
-		while (client->max_bytes > HAI_SIZE_MARGIN) {
+		struct cds_list_head *n, *nnext;
+		cds_twolists_for_each_safe(n, nnext, client_waiting_lists[i],
+					   state_waiting_lists[i]) {
+			if (enqueued_bytes > client->max_bytes - HAI_SIZE_MARGIN) {
+				break;
+			}
 			if (*max_action[i] >= 0 &&
 			    *max_action[i] <= *current_count[i]) {
 				break;
 			}
 
-			struct hsm_action_node *han;
-			han = hsm_action_dequeue(queues, actions[i]);
-			if (!han && queues == &client->queues) {
-				queues = &state->queues;
-				continue;
-			}
-			if (!han)
-				break;
+			struct hsm_action_node *han =
+				caa_container_of(n, struct hsm_action_node, node);
 			if (!schedule_can_send(client, han)) {
-				hsm_action_requeue(han, true);
 				continue;
 			}
 			if (recv_enqueue(client, hai_list, han)) {
-				/* did not fit, requeue - this also makes a new copy */
-				hsm_action_requeue(han, true);
 				break;
 			}
 			LOG_INFO("Sending "DFID" to %d from queues" ,
 				 PFID(&han->info.dfid), client->fd);
+			hsm_action_dequeue(queues, han);
 			enqueued_items++;
+			enqueued_bytes += sizeof(struct hsm_action_item) + han->info.hai_len;
 			(*running_count[i])++;
 			enqueued_pass++;
 			/* don't hand in too much work if other clients waiting */
