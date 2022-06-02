@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f7ec68d_ba68eeba",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-02T12:15:21Z",
+      "side": 1,
+      "message": "minor: this comment is not valid anymore",
+      "range": {
+        "startLine": 200,
+        "startChar": 3,
+        "endLine": 200,
+        "endChar": 31
+      },
+      "revId": "8e22870417be5b4157b96550a29ea2b71104f5ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d36d10c_abf8ca5e",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-02T12:15:21Z",
+      "side": 1,
+      "message": "That\u0027s a nice trick",
+      "range": {
+        "startLine": 118,
+        "startChar": 2,
+        "endLine": 118,
+        "endChar": 28
+      },
+      "revId": "8e22870417be5b4157b96550a29ea2b71104f5ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
