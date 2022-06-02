@@ -65,6 +65,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a55b8d7e_8419fc66",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-02T12:26:24Z",
+      "side": 1,
+      "message": "Ok, thank you for the detailed reply.",
+      "parentUuid": "8231eb64_374fcbb8",
+      "range": {
+        "startLine": 24,
+        "startChar": 35,
+        "endLine": 24,
+        "endChar": 56
+      },
+      "revId": "3858c4ce56ee4daf1cd56dae09da6bf55bbd3273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cda0f640_b1258f99",
