@@ -22,6 +22,30 @@
       },
       "revId": "d65af5a4c5c48c6723269af9ee3f47366331512c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ea505c7_eab9646a",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-02T08:51:57Z",
+      "side": 1,
+      "message": "I normally use kernel style except for function opening braces on the same line (I never understood why if would go on same line but not function...)\n\nlinux kernel style doesn\u0027t actually say anything about having variables at the start of a block: I think it makes just as much sense to declare them when we use them.\n\nMy rule of thumb is that if the function fits in a screen (~30-40 lines) then start of the block is neater, but if the function drags on to ~50s of lines it\u0027s easier to see a variable type if done this way.\n\n(And if the function grows even longer (~70+ lines or more than 3 tabs deep) it probably should be split.)\n\nThat being said I don\u0027t care all that much as long as indentation is respected, although I think I\u0027m fairly consistent? Just sorry it\u0027s not the same as lustre or robinhood\u0027s :-D\nHappy to do a restyle pass at some point if you want to keep it homogeneous between projects",
+      "parentUuid": "0832858e_fa0efadd",
+      "range": {
+        "startLine": 191,
+        "startChar": 1,
+        "endLine": 191,
+        "endChar": 11
+      },
+      "revId": "d65af5a4c5c48c6723269af9ee3f47366331512c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
