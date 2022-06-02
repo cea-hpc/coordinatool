@@ -184,10 +184,13 @@ struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 void hsm_action_queues_init(struct state *state,
 			    struct hsm_action_queues *queues);
 int hsm_action_requeue(struct hsm_action_node *node, bool start);
+void hsm_action_move(struct hsm_action_queues *queues,
+		     struct hsm_action_node *han,
+		     bool start);
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai);
-struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
-					   enum hsm_copytool_action action);
+void hsm_action_dequeue(struct hsm_action_queues *queues,
+			struct hsm_action_node *han);
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
                                                 unsigned long cookie);
 
