@@ -176,14 +176,14 @@ int protocol_reply_ehlo(struct client *client, int status, char *error);
 
 /* queue */
 
-void queue_node_free(struct hsm_action_node *node);
+void queue_node_free(struct hsm_action_node *han);
 struct hsm_action_queues *hsm_action_queues_get(struct state *state,
 						unsigned int archive_id,
 						unsigned long long flags,
 						const char *fsname);
 void hsm_action_queues_init(struct state *state,
 			    struct hsm_action_queues *queues);
-int hsm_action_requeue(struct hsm_action_node *node, bool start);
+int hsm_action_requeue(struct hsm_action_node *han, bool start);
 void hsm_action_move(struct hsm_action_queues *queues,
 		     struct hsm_action_node *han,
 		     bool start);
