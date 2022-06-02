@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27f4ee8f_fb65dea5",
+        "filename": "copytool/redis.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-02T13:54:46Z",
+      "side": 1,
+      "message": "nit: I think you could remove this log, as cb_delete already has one",
+      "range": {
+        "startLine": 172,
+        "startChar": 2,
+        "endLine": 172,
+        "endChar": 10
+      },
+      "revId": "210b6a922949948940b54479e05a71ceaa32e518",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
