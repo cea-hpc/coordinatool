@@ -116,6 +116,38 @@ int hsm_action_requeue(struct hsm_action_node *node, bool start) {
 	return 1;
 }
 
+/* move an hsm action node to another queue */
+void hsm_action_move(struct hsm_action_queues *queues,
+		     struct hsm_action_node *han,
+		     bool start) {
+	struct cds_list_head *head;
+
+	/* we can't use requeue as we don't want to update stats... */
+	switch (han->info.action) {
+	case HSMA_RESTORE:
+		head = &queues->waiting_restore;
+		break;
+	case HSMA_ARCHIVE:
+		head = &queues->waiting_archive;
+		break;
+	case HSMA_REMOVE:
+		head = &queues->waiting_remove;
+		break;
+	default:
+		/* we got this out of another queue,
+		 * this should never happen
+		 */
+		abort();
+	}
+
+	cds_list_del(&han->node);
+	han->queues = queues;
+	if (start)
+		cds_list_add(&han->node, head);
+	else
+		cds_list_add_tail(&han->node, head);
+}
+
 /* checks for duplicate, and if unique enrich and insert node */
 int hsm_action_enqueue(struct hsm_action_queues *queues,
 		       struct hsm_action_item *hai) {
@@ -165,36 +197,23 @@ int hsm_action_enqueue(struct hsm_action_queues *queues,
 	return hsm_action_requeue(node, false);
 }
 
-/* pop item from queue or NULL */
-struct hsm_action_node *hsm_action_dequeue(struct hsm_action_queues *queues,
-					   enum hsm_copytool_action action) {
-	struct cds_list_head *node = NULL;
-
-	switch (action) {
+/* remove action node from its queue */
+void hsm_action_dequeue(struct hsm_action_queues *queues,
+			struct hsm_action_node *han) {
+	switch (han->info.action) {
 	case HSMA_RESTORE:
-		if (cds_list_empty(&queues->waiting_restore))
-			return NULL;
-		node = queues->waiting_restore.next;
 		queues->state->stats.pending_restore--;
 		break;
 	case HSMA_ARCHIVE:
-		if (cds_list_empty(&queues->waiting_archive))
-			return NULL;
-		node = queues->waiting_archive.next;
 		queues->state->stats.pending_archive--;
 		break;
 	case HSMA_REMOVE:
-		if (cds_list_empty(&queues->waiting_remove))
-			return NULL;
-		node = queues->waiting_remove.next;
 		queues->state->stats.pending_remove--;
 		break;
 	default:
 		LOG_ERROR(-EINVAL, "requested to dequeue %s",
-			  ct_action2str(action));
-		return NULL;
+			  ct_action2str(han->info.action));
 	}
 
-	cds_list_del(node);
-	return caa_container_of(node, struct hsm_action_node, node);
+	cds_list_del(&han->node);
 }
