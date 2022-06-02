@@ -46,6 +46,30 @@
       },
       "revId": "d65af5a4c5c48c6723269af9ee3f47366331512c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c2d9b17_b724691b",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-02T09:04:39Z",
+      "side": 1,
+      "message": "I don\u0027t mind, many style related rules are just cosmetic. I just wanted to know so that I can be consistent with you. I don\u0027t mind not using lustre or robinhood as I don\u0027t like some of their rules. :)",
+      "parentUuid": "3ea505c7_eab9646a",
+      "range": {
+        "startLine": 191,
+        "startChar": 1,
+        "endLine": 191,
+        "endChar": 11
+      },
+      "revId": "d65af5a4c5c48c6723269af9ee3f47366331512c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
