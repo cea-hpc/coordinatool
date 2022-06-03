@@ -152,6 +152,7 @@ void ct_schedule_client(struct state *state,
 				archive_id = han->info.archive_id;
 				hal_flags = han->info.hal_flags;
 			}
+			redis_assign_request(state, client, han);
 			hsm_action_dequeue(queues, han);
 			cds_list_add(&han->node, &client->active_requests);
 			(*running_count[i])++;

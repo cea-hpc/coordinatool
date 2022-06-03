@@ -33,22 +33,22 @@ static void redis_delwrite(void *_state) {
 static int redis_error_to_errno(int err) {
 	switch (err) {
 	case REDIS_ERR_OOM:
-		return ENOMEM;
+		return -ENOMEM;
 	case REDIS_ERR_EOF:
 	case REDIS_ERR_PROTOCOL:
-		return EPROTO;
+		return -EPROTO;
 #ifdef REDIS_ERR_TIMEOUT
 	/* timeout has been added in 1.0.0, not in epel8 yet */
 	case REDIS_ERR_TIMEOUT:
-		return ETIMEDOUT;
+		return -ETIMEDOUT;
 #endif
 	case REDIS_ERR_IO:
 		/* .h says to use errno */
 		if (errno)
-			return errno;
+			return -errno;
 		// fallthrough
 	default:
-		return EIO;
+		return -EIO;
 	}
 }
 
@@ -73,7 +73,7 @@ int redis_connect(struct state *state) {
 	if (!ac)
 	       abort(); // ENOMEM
 	if (ac->err) {
-		LOG_ERROR(-redis_error_to_errno(ac->err),
+		LOG_ERROR(redis_error_to_errno(ac->err),
 			  "redis error on connect: %s",
 			  ac->errstr[0] ? ac->errstr : "No info available");
 		return -1;
@@ -128,49 +128,84 @@ static void cb_insert(redisAsyncContext *ac, void *_reply, void *private) {
 	// but we don't really care so not checking.
 }
 
+static int redis_insert(struct state *state, const char *hash,
+			uint64_t cookie, const char *data) {
+	int rc;
+
+	if (!state->redis_ac)
+		return 0;
+
+	rc = redisAsyncCommand(state->redis_ac, cb_insert, (void*)cookie,
+			       "hset %s %lx %s", hash, cookie, data);
+	if (rc) {
+		rc = redis_error_to_errno(rc);
+		LOG_WARN(rc, "Redis error trying to set cookie %lx in %s",
+			 cookie, hash);
+		return rc;
+	}
+	return 0;
+}
+
+
 static void cb_delete(redisAsyncContext *ac, void *_reply, void *private) {
-	/* note: it'd be more user-friendly to print fid here, but by the time
-	 * callback is called the han has been freed.
-	 * It'd be possible to delay han free to this function, but it is
-	 * useful to have the coordinatool work even if redis is down
-	 */
 	uint64_t cookie = (uint64_t)private;
 	redisReply *reply = _reply;
 
 	cb_common(ac, reply, "delete", cookie);
 
-	if (reply->type != REDIS_REPLY_INTEGER || reply->integer != 1)
-		LOG_WARN(-ENOENT,
-			 "Redis did not delete key we tried to delete for cookie %lx",
-			 cookie);
+	// should be an int with 1 or 0 depending on if key was really found
+	// but in the hsm cancel case we'll try to delete from assigned table
+	// without checking if it's in: skip check
 }
 
-int redis_insert(struct state *state, struct hsm_action_node *han) {
+static int redis_delete(struct state *state, const char *hash,
+			uint64_t cookie) {
+	int rc;
+
 	if (!state->redis_ac)
 		return 0;
-	char *hai_json_str = json_dumps(han->hai, JSON_COMPACT);
-	int rc = redisAsyncCommand(state->redis_ac, cb_insert,
-				   (void*)han->info.cookie,
-				   "hset coordinatool_requests %lx %s",
-				   han->info.cookie, hai_json_str);
-	free(hai_json_str);
+
+	rc = redisAsyncCommand(state->redis_ac, cb_delete, (void*)cookie,
+			       "hdel %s %lx", hash, cookie);
 	if (rc) {
-		LOG_WARN(-EIO, "Redis error trying to set "DFID,
+		rc = redis_error_to_errno(rc);
+		LOG_WARN(rc, "Redis error trying to delete cookie %lx in %s",
+			 cookie, hash);
+		return rc;
+	}
+	return 0;
+}
+
+int redis_store_request(struct state *state,
+		        struct hsm_action_node *han) {
+	char *hai_json_str;
+	int rc;
+
+	if (!state->redis_ac)
+		return 0;
+
+	hai_json_str = json_dumps(han->hai, JSON_COMPACT);
+	if (!hai_json_str) {
+		LOG_WARN(-EINVAL, "Could not dump hsm action item to json ("DFID")",
 			 PFID(&han->info.dfid));
-		return -EIO;
 	}
-	return 0;
+
+	rc = redis_insert(state, "coordinatool_requests",
+			  han->info.cookie, hai_json_str);
+	free(hai_json_str);
+
+	return rc;
 }
 
-int redis_delete(struct state *state, uint64_t cookie) {
-	if (!state->redis_ac)
-		return 0;
-	int rc = redisAsyncCommand(state->redis_ac, cb_delete, (void*)cookie,
-				   "hdel coordinatool_requests %lx",
-				   cookie);
-	if (rc) {
-		LOG_WARN(-EIO, "Redis error trying to delete %lx", cookie);
-		return -EIO;
-	}
-	return 0;
+int redis_assign_request(struct state *state, struct client *client,
+			 struct hsm_action_node *han) {
+	return redis_insert(state, "coordinatool_assigned",
+			    han->info.cookie, client->id);
+}
+
+int redis_delete_request(struct state *state, uint64_t cookie) {
+	// note we won't bother sending second request if first failed
+	// as that likely means connection is broken
+	return redis_delete(state, "coordinatool_requests", cookie)
+		|| redis_delete(state, "coordinatool_assigned", cookie);
 }
