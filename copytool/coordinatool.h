@@ -205,8 +205,10 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 /* redis */
 
 int redis_connect(struct state *state);
-int redis_insert(struct state *state, struct hsm_action_node *han);
-int redis_delete(struct state *state, uint64_t cookie);
+int redis_store_request(struct state *state, struct hsm_action_node *han);
+int redis_assign_request(struct state *state, struct client *client,
+			 struct hsm_action_node *han);
+int redis_delete_request(struct state *state, uint64_t cookie);
 
 
 /* scheduler */

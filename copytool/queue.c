@@ -31,7 +31,7 @@ void queue_node_free(struct hsm_action_node *han) {
 #endif
 	LOG_DEBUG("freeing han for " DFID " node %p", PFID(&han->info.dfid),
 		  (void*)&han->node);
-	redis_delete(han->queues->state, han->info.cookie);
+	redis_delete_request(han->queues->state, han->info.cookie);
 	if (!tdelete(&han->info.cookie, &han->queues->actions_tree,
 		     tree_compare))
 		abort();
@@ -147,8 +147,7 @@ static int hsm_action_enqueue_common(struct state *state,
 
 	hsm_action_node_enrich(state, han);
 
-	// continue even if this errored out
-	(void)redis_insert(state, han);
+	redis_store_request(state, han);
 
 	return hsm_action_requeue(han, false);
 }
