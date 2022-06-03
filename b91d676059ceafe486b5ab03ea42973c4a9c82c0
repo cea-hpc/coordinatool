@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5915adc_5ec90a1c",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-03T12:02:54Z",
+      "side": 1,
+      "message": "I found my use-after-free: the problem is that we were doing list_del for han-\u003enode here, but the list_add was just before in recv_enqueue, meaning we were just messing up the lists... I\u0027ve moved the list_add to be after this.\n\nC sometimes sucks :(",
+      "revId": "b91d676059ceafe486b5ab03ea42973c4a9c82c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -117,6 +117,30 @@
       },
       "revId": "8e22870417be5b4157b96550a29ea2b71104f5ac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c764f226_d5b3e1c6",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-03T12:02:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6396d20_1b6a5513",
+      "range": {
+        "startLine": 118,
+        "startChar": 2,
+        "endLine": 118,
+        "endChar": 28
+      },
+      "revId": "8e22870417be5b4157b96550a29ea2b71104f5ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
