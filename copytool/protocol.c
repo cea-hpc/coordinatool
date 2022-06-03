@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <assert.h>
+
 #include "coordinatool.h"
 
 /**************
@@ -97,7 +99,7 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	client->max_remove = protocol_getjson_int(json, "max_remove", -1);
 
 	if (client->max_bytes < HAI_SIZE_MARGIN)
-		return protocol_reply_recv(client, NULL, NULL, EINVAL,
+		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
 					   "Buffer too small");
 
 	cds_list_add(&client->node_waiting, &state->waiting_clients);
@@ -107,8 +109,10 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	return 0;
 }
 
-int protocol_reply_recv(struct client *client, struct hsm_action_queues *queues,
-			json_t *hai_list, int status, char *error) {
+int protocol_reply_recv(struct client *client,
+			const char *fsname, uint32_t archive_id,
+			uint64_t hal_flags, json_t *hai_list,
+			int status, char *error) {
 	json_t *reply;
 	int rc;
 
@@ -117,17 +121,17 @@ int protocol_reply_recv(struct client *client, struct hsm_action_queues *queues,
 		abort();
 
 	if (hai_list) {
-		if (!queues)
-			abort();
+		assert(fsname);
+		assert(archive_id != 0);
 
 		json_t *hal = json_object();
 
 		/* XXX common fields are assumed to be the same for now */
 		if (!hal ||
 		    protocol_setjson_int(hal, "hal_version", HAL_VERSION) ||
-		    protocol_setjson_int(hal, "hal_archive_id", queues->archive_id) ||
-		    protocol_setjson_int(hal, "hal_flags", queues->hal_flags) ||
-		    protocol_setjson_str(hal, "hal_fsname", queues->fsname) ||
+		    protocol_setjson_int(hal, "hal_archive_id", archive_id) ||
+		    protocol_setjson_int(hal, "hal_flags", hal_flags) ||
+		    protocol_setjson_str(hal, "hal_fsname", fsname) ||
 		    protocol_setjson(hal, "list", hai_list))
 			abort();
 
@@ -140,6 +144,7 @@ int protocol_reply_recv(struct client *client, struct hsm_action_queues *queues,
 	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;
 
+	client->state = CLIENT_CONNECTED;
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
@@ -171,14 +176,8 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 	if (archive_id == ARCHIVE_ID_UNINIT)
 		return protocol_reply_done(client, EINVAL,
 					   "No or invalid archive_id");
-	struct hsm_action_queues *queues =
-		hsm_action_queues_get(state, archive_id, 0, NULL);
-	if (!queues)
-		return protocol_reply_done(client, EINVAL,
-					   "Do not know archive id");
-
 	struct hsm_action_node *han =
-		hsm_action_search_queue(queues, cookie);
+		hsm_action_search_queue(&state->queues, cookie);
 	if (!han)
 		return protocol_reply_done(client, EINVAL,
 					   "Unknown cookie sent");
@@ -253,61 +252,48 @@ out_freereply:
  * QUEUE
  */
 
-struct enqueue_state {
-	int enqueued;
-	struct hsm_action_queues *queues;
-	struct hsm_action_list hal;
-	char hal_padding[1024];
-};
-
-static int queue_cb_enqueue(struct hsm_action_list *hal UNUSED,
-			    struct hsm_action_item *hai, void *arg) {
-	struct enqueue_state *enqueue_state = arg;
-	int rc;
-
-	// XXX get correct queues from hal
-	rc = hsm_action_enqueue(enqueue_state->queues, hai);
-	if (rc < 0)
-		return rc;
-	if (rc > 0)
-		LOG_INFO("Enqueued a request for "DFID" from QUEUE" ,
-			 PFID(&hai->hai_dfid));
-	enqueue_state->enqueued += rc;
-
-	return 0;
-}
 
 static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
-	struct enqueue_state enqueue_state;
-	int rc;
+	int enqueued = 0;
+	int rc, final_rc = 0;
 
 	json_t *json_hal = json_object_get(json, "hsm_action_list");
 	if (!json_hal)
 		return protocol_reply_queue(client, 0, EINVAL,
 					    "No hsm_action_list set");
 
-	enqueue_state.queues =
-		hsm_action_queues_get(state,
-			protocol_getjson_int(json_hal, "hal_archive_id", 0),
-			protocol_getjson_int(json_hal, "hal_flags", 0),
-			protocol_getjson_str(json_hal, "hal_fsname", NULL, NULL));
-	if (!enqueue_state.queues)
-		return protocol_reply_queue(client, 0, EINVAL,
-					    "No queue found");
-	enqueue_state.enqueued = 0;
+	const char *fsname = protocol_getjson_str(json, "fsname", NULL, NULL);
+	/* fsname is optional */
+	if (fsname && strcmp(fsname, state->fsname)) {
+		LOG_WARN(-EINVAL, "client sent queue with bad fsname, expected %s got %s",
+			 state->fsname, fsname);
+		return protocol_reply_queue(client, 0, EINVAL, "Bad fsname");
+	}
 
-	// XXX we don't actually need to convert to hai here, just extract required infos
-	rc = json_hsm_action_list_get(json_hal, &enqueue_state.hal,
-		sizeof(enqueue_state) - offsetof(struct enqueue_state, hal),
-		queue_cb_enqueue, &enqueue_state);
-	if (rc < 0)
-		return protocol_reply_queue(client,
-				enqueue_state.enqueued, rc,
-				"Error while parsing hsm action list");
+	unsigned int count;
+	json_t *item;
+	int64_t timestamp = gettime_ns();
+	json_array_foreach(json_hal, count, item) {
+		/* XXX we'll get either something we get back from client to confirm
+		 * their running actions on reconnect, in which case we just check
+		 * we know about these items, otherwise it's new stuff we need to
+		 * enrich
+		 */
+		rc = hsm_action_enqueue_json(state, item, timestamp);
+		if (rc < 0) {
+			final_rc = rc;
+			continue;
+		}
 
-	return protocol_reply_queue(client, enqueue_state.enqueued, 0, NULL);
+		enqueued++;
+	}
+	if (final_rc)
+		return protocol_reply_queue(client, enqueued, final_rc,
+					    "Error while parsing hsm action list");
+
+	return protocol_reply_queue(client, enqueued, 0, NULL);
 }
 
 int protocol_reply_queue(struct client *client, int enqueued,

@@ -19,25 +19,35 @@
 #include "utils.h"
 
 
+/* uncomment to add magic checks for han */
+// #define DEBUG_ACTION_NODE 0x12349876abcd1234ULL
+
 /* queue types */
 
 struct hsm_action_node {
+#ifdef DEBUG_ACTION_NODE
+	int64_t magic;
+#endif
 	/* list is used to track order of requests in waiting list,
 	 * or dump requests assigned to a client */
 	struct cds_list_head node;
-	struct hsm_action_queues *queues;
-	/* if sent to a client, remember who for eventual cancel */
-	struct client *client;
 	/* enriched infos to take scheduling decisions */
 	struct item_info {
 		uint64_t cookie;
-		enum hsm_copytool_action action;
+		uint64_t timestamp;
 		struct lu_fid dfid;
 		size_t hai_len;
+		enum hsm_copytool_action action;
+		uint32_t archive_id;
+		uint64_t hal_flags;
 #ifdef PHOBOS
 		char *hsm_fuid;
 #endif
 	} info;
+	/* queue han will be enqueued to */
+	struct hsm_action_queues *queues;
+	/* if sent to a client, remember who for eventual cancel */
+	struct client *client;
 	/* json representation of hai */
 	json_t *hai;
 };
@@ -48,9 +58,6 @@ struct hsm_action_queues {
 	struct cds_list_head waiting_archive;
 	struct cds_list_head waiting_remove;
 	void *actions_tree;
-	char *fsname;
-	unsigned long long hal_flags;
-	unsigned int archive_id;
 	struct state *state;
 };
 
@@ -65,15 +72,15 @@ struct client {
 	int current_restore;
 	int current_archive;
 	int current_remove;
+	size_t max_bytes;
 	int max_restore;
 	int max_archive;
 	int max_remove;
-	size_t max_bytes;
-	struct cds_list_head active_requests;
 	enum client_state {
 		CLIENT_CONNECTED = 0, /* default state */
 		CLIENT_WAITING,
 	} state;
+	struct cds_list_head active_requests;
 	/* per client queues */
 	struct hsm_action_queues queues;
 	union { /* state-dependant fields */
@@ -110,6 +117,7 @@ struct state {
 	int archive_cnt;
 	int archive_id[LL_HSM_MAX_ARCHIVES_PER_AGENT];
 	const char *mntpath;
+	const char *fsname;
 	/* state values */
 	struct hsm_copytool_private *ctdata;
 	redisAsyncContext *redis_ac;
@@ -163,11 +171,10 @@ extern protocol_read_cb protocol_cbs[];
  */
 int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 			  int status, char *error);
-int protocol_reply_recv_single(struct client *client,
-			       struct hsm_action_queues *queues,
-			       struct hsm_action_node *han);
-int protocol_reply_recv(struct client *client, struct hsm_action_queues *queues,
-			json_t *hal, int status, char *error);
+int protocol_reply_recv(struct client *client,
+			const char *fsname, uint32_t archive_id,
+			uint64_t hal_flags, json_t *hai_list,
+			int status, char *error);
 int protocol_reply_done(struct client *client, int status, char *error);
 int protocol_reply_queue(struct client *client, int enqueued,
 			 int status, char *error);
@@ -177,18 +184,18 @@ int protocol_reply_ehlo(struct client *client, int status, char *error);
 /* queue */
 
 void queue_node_free(struct hsm_action_node *han);
-struct hsm_action_queues *hsm_action_queues_get(struct state *state,
-						unsigned int archive_id,
-						unsigned long long flags,
-						const char *fsname);
 void hsm_action_queues_init(struct state *state,
 			    struct hsm_action_queues *queues);
 int hsm_action_requeue(struct hsm_action_node *han, bool start);
 void hsm_action_move(struct hsm_action_queues *queues,
 		     struct hsm_action_node *han,
 		     bool start);
-int hsm_action_enqueue(struct hsm_action_queues *queues,
-		       struct hsm_action_item *hai);
+int hsm_action_enqueue_json(struct state *state, json_t *json,
+		       int64_t timestamp);
+int hsm_action_enqueue(struct state *state,
+		       struct hsm_action_item *hai,
+		       uint32_t archive_id, uint64_t hal_flags,
+		       int64_t timestamp);
 void hsm_action_dequeue(struct hsm_action_queues *queues,
 			struct hsm_action_node *han);
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,

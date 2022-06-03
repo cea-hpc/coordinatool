@@ -36,11 +36,12 @@ static bool schedule_can_send(struct client *client UNUSED,
 
 /* enqueue to json list */
 static int recv_enqueue(struct client *client, json_t *hai_list,
-			struct hsm_action_node *han) {
+			struct hsm_action_node *han, size_t *enqueued_bytes) {
 	int max_action;
 	int *current_count;
 
-	if (client->max_bytes < sizeof(struct hsm_action_item) + han->info.hai_len) {
+	if ((*enqueued_bytes) + sizeof(struct hsm_action_item) + han->info.hai_len
+			> client->max_bytes) {
 		return -ERANGE;
 	}
 	switch (han->info.action) {
@@ -65,6 +66,7 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 	json_array_append(hai_list, han->hai);
 	han->client = client;
 	(*current_count)++;
+	(*enqueued_bytes) += sizeof(struct hsm_action_item) + han->info.hai_len;
 
 	return 0;
 }
@@ -93,7 +95,6 @@ void ct_schedule_client(struct state *state,
 
 	/* check if there are pending requests
 	 * priority restore > remove > archive is hardcoded for now */
-	int enqueued_items = 0;
 	size_t enqueued_bytes = 0;
 	struct cds_list_head *client_waiting_lists[] = {
 		&client->queues.waiting_restore,
@@ -113,6 +114,9 @@ void ct_schedule_client(struct state *state,
 		&state->stats.running_remove, &state->stats.running_archive };
 	unsigned int *pending_count[] = { &state->stats.pending_restore,
 		&state->stats.pending_remove, &state->stats.pending_archive };
+	/* archive_id cannot be 0, use it as check */
+	uint32_t archive_id = 0;
+	uint64_t hal_flags;
 	for (size_t i = 0; i < sizeof(max_action) / sizeof(*max_action); i++) {
 		unsigned int enqueued_pass = 0, pending_pass = *pending_count[i];
 		struct hsm_action_queues *queues = &client->queues;
@@ -129,18 +133,27 @@ void ct_schedule_client(struct state *state,
 
 			struct hsm_action_node *han =
 				caa_container_of(n, struct hsm_action_node, node);
+			if (archive_id != 0 &&
+			    (archive_id != han->info.archive_id ||
+			     hal_flags != han->info.hal_flags)) {
+				/* can only lsend one archive id at a time */
+				continue;
+			}
 			if (!schedule_can_send(client, han)) {
 				continue;
 			}
-			if (recv_enqueue(client, hai_list, han)) {
+			if (recv_enqueue(client, hai_list, han,
+					 &enqueued_bytes)) {
 				break;
 			}
 			LOG_INFO("Sending "DFID" to %d from queues" ,
 				 PFID(&han->info.dfid), client->fd);
+			if (archive_id == 0) {
+				archive_id = han->info.archive_id;
+				hal_flags = han->info.hal_flags;
+			}
 			hsm_action_dequeue(queues, han);
 			cds_list_add(&han->node, &client->active_requests);
-			enqueued_items++;
-			enqueued_bytes += sizeof(struct hsm_action_item) + han->info.hai_len;
 			(*running_count[i])++;
 			enqueued_pass++;
 			/* don't hand in too much work if other clients waiting */
@@ -149,7 +162,7 @@ void ct_schedule_client(struct state *state,
 		}
 	}
 
-	if (!enqueued_items) {
+	if (!archive_id) {
 		json_decref(hai_list);
 		return;
 	}
@@ -158,7 +171,8 @@ void ct_schedule_client(struct state *state,
 	client->state = CLIENT_CONNECTED;
 
 	// frees hai_list
-	int rc = protocol_reply_recv(client, &state->queues, hai_list, 0, NULL);
+	int rc = protocol_reply_recv(client, state->fsname, archive_id,
+				     hal_flags, hai_list, 0, NULL);
 	if (rc < 0) {
 		LOG_ERROR(rc, "Could not send reply to %s", client->id);
 		free_client(state, client);

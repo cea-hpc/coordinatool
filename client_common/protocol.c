@@ -100,7 +100,6 @@ out_free:
 }
 
 int protocol_request_queue(const struct ct_state *state,
-			   uint32_t archive_id, uint64_t flags,
 			   json_t *hai_list) {
 	int rc;
 
@@ -108,11 +107,14 @@ int protocol_request_queue(const struct ct_state *state,
 	if (!hal)
 		abort();
 	if ((rc = protocol_setjson_int(hal, "hal_version", HAL_VERSION)) ||
-	    (rc = protocol_setjson_int(hal, "hal_count", json_array_size(hai_list))) ||
-	    (rc = protocol_setjson_int(hal, "hal_archive_id", archive_id)) ||
-	    (rc = protocol_setjson_int(hal, "hal_flags", flags)) ||
-	    (rc = protocol_setjson_str(hal, "hal_fsname", state->fsname))) {
+	    (rc = protocol_setjson_int(hal, "hal_count", json_array_size(hai_list)))) {
 		LOG_ERROR(rc, "Could not fill hsm action list");
+		json_decref(hal);
+		return rc;
+	}
+	if (state->fsname &&
+	    (rc = protocol_setjson_str(hal, "hal_fsname", state->fsname))) {
+		LOG_ERROR(rc, "Could not fill hsm action fsname");
 		json_decref(hal);
 		return rc;
 	}

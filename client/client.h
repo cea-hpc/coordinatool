@@ -16,9 +16,7 @@ enum client_mode {
 
 struct active_requests_state {
 	json_t *hai_list;
-	unsigned int archive_id;
-	unsigned long flags;
-	char fsname[LUSTRE_MAXFSNAME];
+	const char *fsname;
 };
 
 struct client {

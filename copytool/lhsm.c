@@ -33,18 +33,19 @@ int handle_ct_event(struct state *state) {
 			hal->hal_fsname, hal->hal_archive_id,
 			hal->hal_count);
 
-	struct hsm_action_queues *queues =
-		hsm_action_queues_get(state,
-				      hal->hal_archive_id,
-				      hal->hal_flags,
-				      hal->hal_fsname);
-	if (!queues)
-		return -EINVAL;
+	if (strcmp(hal->hal_fsname, state->fsname)) {
+		LOG_ERROR(-EINVAL, "Got unexpected fsname from lustre ct event: expected %s got %s. Accepting anyway.",
+			  state->fsname, hal->hal_fsname);
+	}
 
 	struct hsm_action_item *hai = hai_first(hal);
 	unsigned int i = 0;
+	int64_t timestamp = gettime_ns();
 	while (++i <= hal->hal_count) {
-		if ((rc = hsm_action_enqueue(queues, hai) < 0))
+		if ((rc = hsm_action_enqueue(state, hai,
+					     hal->hal_archive_id,
+					     hal->hal_flags,
+					     timestamp) < 0))
 			return rc;
 
 		struct lu_fid fid;
@@ -63,6 +64,15 @@ int handle_ct_event(struct state *state) {
 
 int ct_register(struct state *state) {
 	int rc;
+	char fsname[LUSTRE_MAXFSNAME + 1];
+
+	rc = llapi_search_fsname(state->mntpath, fsname);
+	if (rc < 0) {
+		LOG_ERROR(rc, "cannot find a Lustre filesystem mounted at '%s'",
+			  state->mntpath);
+		return rc;
+	}
+	state->fsname = xstrdup(fsname);
 
 	rc = llapi_hsm_copytool_register(&state->ctdata, state->mntpath,
 					 state->archive_cnt, state->archive_id, 0);
