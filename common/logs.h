@@ -8,19 +8,6 @@
 #include <sys/time.h>
 #include <sys/syscall.h>
 
-static inline double ct_now(void)
-{
-        struct timeval tv;
-
-        gettimeofday(&tv, NULL);
-        return tv.tv_sec + 0.000001 * tv.tv_usec;
-}
-
-static inline pid_t gettid(void)
-{
-        return syscall(SYS_gettid);
-}
-
 #define LOG_ERROR(_rc, _format, ...)                                   \
         llapi_error(LLAPI_MSG_ERROR, _rc,                              \
 		    "ERROR %s:%d "_format, __FILE__, __LINE__,         \
