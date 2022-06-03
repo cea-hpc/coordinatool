@@ -110,6 +110,7 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *     hai_gid = integer (u64)
  *     hai_data = string (can contain nul bytes as proper escaped json)
  *   note hai_len is NOT sent, it is computed again from hai_data length and struct size.
+ *     extra fields can be sent and are ignored
  *
  *   fid object properties
  *     f_seq = integer (u64)
@@ -133,7 +134,14 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  * - QUEUE command: add hsm action items to the server
  *   request properties:
  *     command = "queue"
- *     hsm_action_list = hsm_action_list object
+ *     fsname = string (optional, used for sanity check if set)
+ *     list = list of augmented hsm action items:
+ *       hsm_action_items properties
+ *       hal_archive_id = integer (u32)
+ *       hal_flags = integer (u64)
+ *       timestamp = integer (u64) epoch in ns
+ *                   (optional, receive timestamp if unset)
+ *
  *   reply properties:
  *     command = "queue"
  *     status = int (0 on success, errno on failure)
@@ -297,7 +305,8 @@ int json_fid_get(json_t *json, struct lu_fid *fid);
  * @param hai input hsm_action_item
  * @return json value representing the fid, or NULL on error
  */
-json_t *json_hsm_action_item(struct hsm_action_item *hai);
+json_t *json_hsm_action_item(struct hsm_action_item *hai,
+			     uint32_t archive_id, uint64_t flags);
 
 /**
  * jansson-like function to get hai from json value

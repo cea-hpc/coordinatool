@@ -151,9 +151,7 @@ int main(int argc, char *argv[]) {
 	int rc;
 
 	// state init
-	struct state state = {
-		.queues.archive_id = ARCHIVE_ID_UNINIT,
-	};
+	struct state state = { 0 };
 	CDS_INIT_LIST_HEAD(&state.stats.clients);
 	CDS_INIT_LIST_HEAD(&state.waiting_clients);
 
@@ -226,5 +224,6 @@ int main(int argc, char *argv[]) {
 out:
 	redisAsyncDisconnect(state.redis_ac);
 	config_free(&state.config);
+	free((void*)state.fsname);
 	return rc;
 }

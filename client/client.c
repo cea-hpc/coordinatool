@@ -36,23 +36,14 @@ void print_version(void) {
 int parse_hai_cb(struct hsm_action_item *hai, unsigned int archive_id,
 		 unsigned long flags, void *arg) {
 	struct active_requests_state *active_requests = arg;
+	json_t *json_hai = json_hsm_action_item(hai, archive_id, flags);
 
-	if (active_requests->archive_id == 0) {
-		active_requests->archive_id = archive_id;
-	} else if (active_requests->archive_id != archive_id) {
-		LOG_ERROR(-EINVAL, "Only support one archive_id active for now (got %d and %d)",
-			  active_requests->archive_id, archive_id);
-		return -EINVAL;
-	}
-	if (active_requests->flags == 0) {
-		active_requests->flags = flags;
-	} else if (active_requests->flags != flags) {
-		LOG_ERROR(-EINVAL, "Only support one active flagsfor now (got %lx and %lx)",
-			  active_requests->flags, flags);
-		return -EINVAL;
+	if (!json_hai) {
+		LOG_ERROR(-errno, "Could not pack hai to json");
+		return -1;
 	}
 
-	json_array_append_new(active_requests->hai_list, json_hsm_action_item(hai));
+	json_array_append_new(active_requests->hai_list, json_hai);
 
 #if 0
 	/* XXX send every 10000 items or so to avoid starving resources */
@@ -81,8 +72,6 @@ int client_run(struct client *client) {
 		client->active_requests.hai_list = json_array();
 		if (!client->active_requests.hai_list)
 			abort();
-		// XXX fsname
-		strcpy(client->active_requests.fsname, "testfs0");
 		rc = parse_active_requests(0, parse_hai_cb,
 					   &client->active_requests);
 		if (rc < 0) {
@@ -97,8 +86,7 @@ int client_run(struct client *client) {
 		}
 		/* takes ownership of hai_list */
 		state->fsname = client->active_requests.fsname;
-		protocol_request_queue(state, client->active_requests.archive_id,
-				       client->active_requests.flags,
+		protocol_request_queue(state,
 				       client->active_requests.hai_list);
 		break;
 	case MODE_RECV:
@@ -116,6 +104,8 @@ int client_run(struct client *client) {
 	return 0;
 }
 
+#define OPT_FSNAME 257
+
 int main(int argc, char *argv[]) {
 	struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
@@ -125,6 +115,7 @@ int main(int argc, char *argv[]) {
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
 		{ "queue", no_argument, NULL, 'Q' },
+		{ "fsname", required_argument, NULL, OPT_FSNAME },
 		{ "recv", no_argument, NULL, 'R' },
 		{ "iters", required_argument, NULL, 'i' },
 		{ 0 },
@@ -179,6 +170,13 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'i':
 			client.iters = atoi(optarg);
+			break;
+		case OPT_FSNAME:
+			if (client.mode != MODE_QUEUE) {
+				LOG_ERROR(-EINVAL, "fsname can only be set after -Q");
+				return EXIT_FAILURE;
+			}
+			client.active_requests.fsname = optarg;
 			break;
 		case 'V':
 			print_version();

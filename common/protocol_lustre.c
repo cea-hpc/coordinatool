@@ -30,8 +30,9 @@ int json_fid_get(json_t *json, struct lu_fid *fid) {
 	return 0;
 }
 
-json_t *json_hsm_action_item(struct hsm_action_item *hai) {
-	return json_pack("{si,so,so,sI,sI,sI,sI,ss#}",
+json_t *json_hsm_action_item(struct hsm_action_item *hai,
+			     uint32_t archive_id, uint64_t flags) {
+	return json_pack("{si,so,so,sI,sI,sI,sI,sI,sI,ss#}",
 			 "hai_action", hai->hai_action,
 			 "hai_fid", json_fid(&hai->hai_fid),
 			 "hai_dfid", json_fid(&hai->hai_dfid),
@@ -39,6 +40,8 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai) {
 			 "hai_extent_length", hai->hai_extent.length,
 			 "hai_cookie", hai->hai_cookie,
 			 "hai_gid", hai->hai_gid,
+			 "hal_archive_id", archive_id,
+			 "hal_flags", flags,
 			 "hai_data", hai->hai_data,
 			 hai->hai_len - sizeof(*hai));
 }
