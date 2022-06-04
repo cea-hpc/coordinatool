@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca73d92d_60658775",
+        "filename": "copytool/queue.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-04T22:15:34Z",
+      "side": 1,
+      "message": "(thanks scan-build!)",
+      "revId": "351855df486dd23a022ec672922b427a0a513793",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
