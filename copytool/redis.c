@@ -115,6 +115,12 @@ static void cb_common(redisAsyncContext *ac, redisReply *reply,
 		redisAsyncDisconnect(ac);
 		return;
 	}
+	if (reply->type == REDIS_REPLY_ERROR) {
+		LOG_WARN(-EIO, "Redis error in callback! %s", reply->str);
+		LOG_WARN(-EIO, "Could not %s cookie %lx", action, cookie);
+		/* do not disconnect in this case: could be bogus request */
+		return;
+	}
 }
 
 static void cb_insert(redisAsyncContext *ac, void *_reply, void *private) {
@@ -208,4 +214,156 @@ int redis_delete_request(struct state *state, uint64_t cookie) {
 	// as that likely means connection is broken
 	return redis_delete(state, "coordinatool_requests", cookie)
 		|| redis_delete(state, "coordinatool_assigned", cookie);
+}
+
+
+struct redis_wait {
+	struct state *state;
+	int done;
+	const char *hash;
+	void (*cb)(struct redis_wait *wait, const char *key, const char *value);
+};
+
+static int redis_wait_done(struct state *state, int *done) {
+	/* when this function runs the epoll loop is not live yet,
+	 * so run our own.
+	 * Unfortunately we cannot just use sync functions with ac->c... */
+	int rc;
+	struct epoll_event event;
+	int nfds;
+
+	while (!(*done)) {
+		nfds = epoll_wait(state->epoll_fd, &event, 1, -1);
+		if ((nfds < 0 && errno == EINTR) || nfds == 0)
+			continue;
+		if (nfds < 0) {
+			rc = -errno;
+			LOG_ERROR(rc, "epoll_wait failed");
+			return rc;
+		}
+		if (event.events & (EPOLLERR|EPOLLHUP)) {
+			LOG_INFO("%d on error/hup", event.data.fd);
+		}
+		if (event.data.ptr != state->redis_ac) {
+			LOG_ERROR(-EINVAL, "fd other than redis fd ready?! Giving up");
+			return -EINVAL;
+		}
+		if (event.events & EPOLLIN)
+			redisAsyncHandleRead(state->redis_ac);
+		// EPOLLOUT is only requested when we have something
+		// to send
+		if (event.events & EPOLLOUT)
+			redisAsyncHandleWrite(state->redis_ac);
+	}
+
+	return *done;
+}
+
+static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private) {
+	redisReply *reply = _reply;
+	struct redis_wait *wait = private;
+
+	if (!reply || reply->type == REDIS_REPLY_ERROR) {
+		LOG_ERROR(-EIO, "redis error on setup: %s",
+			  reply ? reply->str : ac->c.errstr);
+		wait->done = -EIO;
+		return;
+	}
+
+	// scan reply should be an array with
+	// - next cursor
+	// - array of alternating key, values
+	// and stops when cursor is 0 again. can have duplicates.
+
+	if (reply->type != REDIS_REPLY_ARRAY || reply->elements != 2) {
+		LOG_ERROR(-EINVAL, "unexpected reply to hscan, type %d elements %ld",
+			  reply->type, reply->elements);
+		wait->done = -EINVAL;
+		return;
+	}
+
+	redisReply *cursor_reply = reply->element[0];
+	if (cursor_reply->type != REDIS_REPLY_STRING) {
+		LOG_ERROR(-EINVAL, "unexpected cursor_reply to hscan, cursor wasn't int but %d",
+			  cursor_reply->type);
+		wait->done = -EINVAL;
+		return;
+	}
+	const char *cursor = cursor_reply->str;
+	if (!strcmp(cursor, "0")) {
+		wait->done = 1;
+	} else {
+		int rc = redisAsyncCommand(ac, redis_scan_cb, wait,
+					   "hscan %s %s", wait->hash, cursor);
+		if (rc) {
+			rc = redis_error_to_errno(rc);
+			LOG_ERROR(rc, "Redis error trying to scan %s from %s",
+				  wait->hash, cursor);
+			wait->done = rc;
+			return;
+		}
+	}
+
+	reply = reply->element[1];
+	if (reply->type != REDIS_REPLY_ARRAY || reply->elements % 2 != 0) {
+		LOG_ERROR(-EINVAL, "unexpected reply for hscan values, type %d elements %ld",
+			  reply->type, reply->elements);
+		wait->done = -EINVAL;
+		return;
+	}
+	for (unsigned int i=0; i < reply->elements; i += 2) {
+		redisReply *key_reply = reply->element[i];
+		redisReply *value_reply = reply->element[i+1];
+		if (key_reply->type != REDIS_REPLY_STRING
+		    || value_reply->type != REDIS_REPLY_STRING) {
+			LOG_ERROR(-EINVAL, "unexpected reply for hscan values items, type %d / %d",
+				  key_reply->type, value_reply->type);
+		}
+		const char *key = key_reply->str;
+		const char *value = value_reply->str;
+		wait->cb(wait, key, value);
+	}
+}
+
+static void redis_scan_requests(struct redis_wait *wait,
+				const char *key UNUSED,
+				const char *value) {
+	int rc;
+	json_error_t json_error;
+	json_t *json_hai;
+
+
+	json_hai = json_loads(value, 0, &json_error);
+	if (!json_hai) {
+		LOG_ERROR(-EINVAL, "Invalid json from redis (%s): %s",
+			  value, json_error.text);
+		wait->done = -EINVAL;
+		return;
+	}
+
+	rc = hsm_action_enqueue_json(wait->state, json_hai, 0);
+	if (rc < 0)
+		wait->done = rc;
+}
+
+int redis_recovery(struct state *state) {
+	struct redis_wait wait = {
+		.state = state,
+		.cb = redis_scan_requests,
+		.hash = "coordinatool_requests",
+	};
+
+	int rc = redisAsyncCommand(state->redis_ac, redis_scan_cb, &wait,
+				   "hscan %s %d", wait.hash, 0);
+	if (rc) {
+		rc = redis_error_to_errno(rc);
+		LOG_ERROR(rc, "Redis error trying to scan %s (start)",
+			  wait.hash);
+		return rc;
+	}
+	rc = redis_wait_done(state, &wait.done);
+	if (rc < 0)
+		return rc;
+
+	return 0;
 }

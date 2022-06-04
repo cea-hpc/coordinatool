@@ -177,7 +177,7 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	han->info.archive_id = protocol_getjson_int(json_hai, "hal_archive_id", 0);
 	han->info.hal_flags = protocol_getjson_int(json_hai, "hal_flags", 0);
 	if (!han->info.archive_id) {
-		LOG_WARN(rc, "hai from client did not contain archive_id");
+		LOG_WARN(-EINVAL, "hai from client did not contain archive_id");
 		free(han);
 		return -EINVAL;
 	}
