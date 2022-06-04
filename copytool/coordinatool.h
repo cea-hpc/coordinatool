@@ -209,6 +209,7 @@ int redis_store_request(struct state *state, struct hsm_action_node *han);
 int redis_assign_request(struct state *state, struct client *client,
 			 struct hsm_action_node *han);
 int redis_delete_request(struct state *state, uint64_t cookie);
+int redis_recovery(struct state *state);
 
 
 /* scheduler */

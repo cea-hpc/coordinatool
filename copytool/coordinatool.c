@@ -86,6 +86,11 @@ static int ct_start(struct state *state) {
 	if (rc < 0)
 		return rc;
 
+	/* we need to run this before other fds have been added to epoll */
+	rc = redis_recovery(state);
+	if (rc < 0)
+		return rc;
+
 	rc = tcp_listen(state);
 	if (rc < 0)
 		return rc;

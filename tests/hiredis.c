@@ -5,6 +5,13 @@
 
 #include "../copytool/coordinatool.h"
 
+/* fill in dummy requirements to copytool/redis.c */
+int hsm_action_enqueue_json(struct state *state UNUSED, json_t *json UNUSED,
+			    int64_t timestamp UNUSED) {
+	return 0;
+}
+
+
 /* copy from copytool/coordinatool.c */
 int epoll_addfd(int epoll_fd, int fd, void *data) {
 	struct epoll_event ev;
@@ -207,9 +214,21 @@ int main() {
 		return 1;
 	}
 
-	/* subscribe works, but then any other command fails on the connection...
-			"subscribe testpubsub");
+	/* try a synchronous command with underlying connection before epoll is setup */
+	redisReply *reply = redisCommand(&state.redis_ac->c, "del testList");
+	if (!reply) {
+		LOG_ERROR(-EIO, "sync command failed");
+	} else {
+		assert(reply->type == REDIS_REPLY_INTEGER);
+		freeReplyObject(reply);
+	}
+
+
+	/* note subscribe works, but then any other command fails as
+	 * subscribe "reserves" the connection: "subscribe testpubsub"
+	 * We'd need to reconnect on a dedicated connection for it.
 	 */
+	/* this will start the callback chain for tests */
 	rc = redisAsyncCommand(state.redis_ac, cb_initial_delete, &testdata,
 			"del testList");
 	if (rc) {
