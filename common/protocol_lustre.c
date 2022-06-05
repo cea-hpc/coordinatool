@@ -152,13 +152,12 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 	json_array_foreach(json_list, count, item) {
 		if ((rc = json_hsm_action_item_get(item, hai, hal_len)) < 0)
 			return rc;
-		if (cb) {
-			if ((rc = cb(hal, hai, cb_arg)))
-				return rc;
-		} else {
+		if (!cb || (rc = cb(hal, hai, item, cb_arg)) == 0) {
 			hal_len -= hai->hai_len;
 			hai = hai_next(hai);
 		}
+		if (rc < 0)
+			return rc;
 	}
 	hal->hal_count = count;
 
