@@ -26,6 +26,10 @@ struct hsm_copytool_private {
         struct ct_state state;
 	struct hsm_action_list *hal;
 	int msgsize;
+	/* pipe used to signal request has been processed to recv thread
+	 * or process. Since some copytools fork to handle work we cannot
+	 * just reply directly safely from llapi_hsm_action_end */
+	int notify_done_fd[2];
 };
 
 /* this one is used as is by llapi so keep the same magic,
@@ -43,6 +47,13 @@ struct hsm_copyaction_private {
 	uint64_t cookie;
 };
 
+
+/* done infos */
+struct notify_done {
+	uint64_t cookie;
+	int archive_id;
+	int rc;
+};
 
 /* protocol.c */
 extern protocol_read_cb copytool_cbs[];

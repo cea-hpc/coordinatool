@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -45,6 +46,13 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 
 	ct->hal = xmalloc(ct->state.config.hsm_action_list_size);
 
+	rc = pipe2(ct->notify_done_fd, O_NONBLOCK|O_CLOEXEC);
+	if (rc) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not create pipes");
+		goto err_out;
+	}
+
 	rc = tcp_connect(&ct->state);
 	if (rc) {
 		LOG_ERROR(rc, "Could not connect to server");
@@ -83,12 +91,37 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 	return 0;
 }
 
+static int process_dones(struct hsm_copytool_private *ct) {
+	int rc = 0;
+	struct notify_done done;
+
+	while ((rc = read(ct->notify_done_fd[0], &done, sizeof(done))) == sizeof(done)) {
+		rc = protocol_request_done(&ct->state, done.archive_id,
+					   done.cookie, done.rc);
+		if (rc < 0)
+			return rc;
+	}
+	if (rc < 0 && (errno == EWOULDBLOCK || errno == EAGAIN))
+		return 0;
+	if (rc > 0) // short reads are not normally possible
+		return -EIO;
+	if (rc < 0)
+		return -errno;
+	return 0;
+}
+
 int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 			    struct hsm_action_list **halh, int *msgsize) {
 	int rc;
+	struct pollfd pollfds[2];
 
 	if (!ct || ct->magic != CT_PRIV_MAGIC || !halh || !msgsize)
 		return -EINVAL;
+
+	pollfds[0].fd = ct->state.socket_fd;
+	pollfds[0].events = POLLIN;
+	pollfds[1].fd = ct->notify_done_fd[0];
+	pollfds[1].events = POLLIN;
 
 again:
 	rc = protocol_request_recv(&ct->state);
@@ -100,6 +133,35 @@ again:
 
 	ct->msgsize = -1;
 	while (ct->msgsize == -1) {
+		rc = poll(pollfds, sizeof(pollfds)/sizeof(*pollfds), -1);
+		if (rc < 0 && errno == EAGAIN) {
+			continue;
+		}
+		if (rc < 0) {
+			rc = -errno;
+			LOG_ERROR(rc, "Poll failed waiting for completion or work");
+			return rc;
+		}
+		if (pollfds[1].revents & POLLIN) {
+			rc = process_dones(ct);
+			if (rc) {
+				return rc;
+			}
+		}
+		if (pollfds[1].revents & (POLLERR|POLLHUP|POLLNVAL)) {
+			LOG_ERROR(-EIO, "pipe done broken? %x", pollfds[1].revents);
+			return -EIO;
+		}
+		if (pollfds[0].revents & (POLLERR|POLLHUP|POLLNVAL)) {
+			LOG_WARN(-EIO, "tcp socket broken? %x. Reconnecting", pollfds[1].revents);
+			goto reconnect;
+		}
+
+		// keep looping unless we've got work to do
+		if (! (pollfds[0].revents & POLLIN)) {
+			continue;
+		}
+
 		rc = protocol_read_command(ct->state.socket_fd, "server", NULL,
 					   copytool_cbs, ct);
 		if (rc) {
@@ -172,16 +234,31 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	if (!phcp)
 		return -EINVAL;
 
+
 	struct hsm_copyaction_private *hcp = *phcp;
 	const struct hsm_copytool_private *ct = hcp->ct_priv;
-	uint32_t archive_id = hcp->archive_id;
-	uint64_t cookie = hcp->cookie;
+	struct notify_done done = {
+		.archive_id = hcp->archive_id,
+		.cookie = hcp->cookie,
+	};
 	int rc, rc_done;
-
+	// note: this frees hcp
 	rc = real_action_end(phcp, he, hp_flags, errval);
 
-	rc_done = protocol_request_done(&ct->state, archive_id,
-					cookie, rc);
+	done.rc = rc;
+	rc_done = write(ct->notify_done_fd[1], &done, sizeof(done));
+	if (rc_done < 0) {
+		rc_done = -errno;
+		LOG_WARN(rc_done, "Could not notify coordinatool of done for cookie %lx",
+			 done.cookie);
+	} else if (rc_done != sizeof(done)) {
+		// linux guarnatees this never happens, but better safe...
+		rc_done = -EIO;
+		LOG_WARN(rc_done, "Short write to notif pipe!! (cookie %lx)",
+			 done.cookie);
+	} else {
+		rc_done = 0;
+	}
 
 	return rc || rc_done;
 }
