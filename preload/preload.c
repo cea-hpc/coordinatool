@@ -107,23 +107,32 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 }
 
 static int process_dones(struct hsm_copytool_private *ct) {
-	int rc = 0;
+	int rc = 0, rc_proto = 0;
 	struct notify_done done;
 
 	while ((rc = read(ct->notify_done_fd[0], &done, sizeof(done))) == sizeof(done)) {
 		action_delete(ct, done.cookie);
-		rc = protocol_request_done(&ct->state, done.archive_id,
-					   done.cookie, done.rc);
-		if (rc < 0)
-			return rc;
+		// XXX remember cookie in another list, free from that list when done_cb kicks in
+		// (repeat cookie in done reply for convenience)
+		// and send that list in ehlo too.
+		rc_proto = protocol_request_done(&ct->state, done.archive_id,
+						 done.cookie, done.rc);
+		if (rc_proto < 0) {
+			LOG_WARN(rc_proto, "Could not send done to client: will resolve on reconnect");
+			// continue
+		}
 	}
 	if (rc < 0 && (errno == EWOULDBLOCK || errno == EAGAIN))
-		return 0;
+		return rc_proto;
 	if (rc > 0) // short reads are not normally possible
 		return -EIO;
-	if (rc < 0)
-		return -errno;
-	return 0;
+	if (rc < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "Read error reading from notify done pipe?");
+		// XXX abort?
+		return rc;
+	}
+	return rc_proto;
 }
 
 int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
@@ -162,7 +171,7 @@ again:
 		if (pollfds[1].revents & POLLIN) {
 			rc = process_dones(ct);
 			if (rc) {
-				return rc;
+				goto reconnect;
 			}
 		}
 		if (pollfds[1].revents & (POLLERR|POLLHUP|POLLNVAL)) {
