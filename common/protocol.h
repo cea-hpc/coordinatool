@@ -155,7 +155,8 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *     command = "ehlo"
  *     id = string, optional requested id, should be unique per client
  *          if not set reconnection will not be supported
- *     reconnect = boolean, set if this is a reconnection
+ *     fsname = string (optional, sanity check we have the right fs)
+ *     hai_list = list of running hai (see queue)
  *   reply properties:
  *     command = "ehlo"
  *     status = int (0 on success, errno on failure)

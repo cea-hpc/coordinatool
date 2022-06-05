@@ -78,5 +78,11 @@ json_t *actions_get_list(struct hsm_copytool_private *ct) {
 	twalk(ct->actions_tree, walk_append);
 #endif
 
+	if (json_array_size(hai_list) == 0) {
+		/* nothing in progress */
+		json_decref(hai_list);
+		hai_list = NULL;
+	}
+
 	return hai_list;
 }

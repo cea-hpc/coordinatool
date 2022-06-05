@@ -60,7 +60,7 @@ int client_run(struct client *client) {
 	int rc;
 	struct ct_state *state = &client->state;
 
-	rc = tcp_connect(state);
+	rc = tcp_connect(state, NULL);
 	if (rc < 0)
 		return rc;
 
