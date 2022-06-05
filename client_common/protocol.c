@@ -135,15 +135,21 @@ out_free:
 }
 
 
-int protocol_request_ehlo(const struct ct_state *state, bool reconnecting) {
+int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list) {
 	int rc;
 
 	json_t *request = json_object();
 	if (!request)
 		abort();
 
-	if ((rc = protocol_setjson_str(request, "command", "ehlo")) ||
-	    (rc = protocol_setjson_bool(request, "reconnect", reconnecting)))
+	if ((rc = protocol_setjson_str(request, "command", "ehlo")))
+		goto out_free;
+
+	if (state->fsname &&
+	    (rc = protocol_setjson_str(request, "fsname", state->fsname)))
+		goto out_free;
+	if (hai_list &&
+	    (rc = protocol_setjson(request, "hai_list", hai_list)))
 		goto out_free;
 
 	if (state->config.client_id

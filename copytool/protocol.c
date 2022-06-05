@@ -337,13 +337,19 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	free((void*)client->id);
 	client->id = xstrdup(id);
 
-	if (!protocol_getjson_bool(json, "reconnect")) {
+	json_t *hai_list = json_object_get(json, "hai_list");
+	if (!hai_list) {
 		// new client, ok. remember id for logs?
 		return protocol_reply_ehlo(client, 0, NULL);
 	}
 	// reconnecting client
-	// XXX check filesystem for runnning xfers
+	// XXX
+	// - match if it was a known client
+	// - complete running xfer list with what's here if any
+	// - remove from running xfer list with what's not here
+	// (done while we were out)
 	(void) state;
+	(void) hai_list;
 	return protocol_reply_ehlo(client, 0, NULL);
 }
 

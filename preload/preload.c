@@ -39,6 +39,14 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 		goto err_out;
 	}
 
+	char fsname[LUSTRE_MAXFSNAME + 1];
+	rc = llapi_search_fsname(mnt, fsname);
+	if (rc) {
+		LOG_ERROR(rc, "Cannot find lustre fsname at %s", mnt);
+		goto err_out;
+	}
+	ct->state.fsname = xstrdup(fsname);
+
 	rc = ct_config_init(&ct->state.config);
 	if (rc)
 		goto err_out;
@@ -52,7 +60,7 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 		goto err_out;
 	}
 
-	rc = tcp_connect(&ct->state);
+	rc = tcp_connect(&ct->state, NULL);
 	if (rc) {
 		LOG_ERROR(rc, "Could not connect to server");
 		goto err_out;
@@ -114,6 +122,7 @@ int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 			    struct hsm_action_list **halh, int *msgsize) {
 	int rc;
 	struct pollfd pollfds[2];
+	json_t *hai_list;
 
 	if (!ct || ct->magic != CT_PRIV_MAGIC || !halh || !msgsize)
 		return -EINVAL;
@@ -175,7 +184,8 @@ again:
 	return 0;
 
 reconnect:
-	rc = tcp_connect(&ct->state);
+	hai_list = actions_get_list(ct);
+	rc = tcp_connect(&ct->state, hai_list);
 	if (rc) {
 		LOG_ERROR(rc, "Could not reconnect to server");
 		return rc;
