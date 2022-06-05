@@ -135,15 +135,24 @@ out_free:
 }
 
 
-int protocol_request_ehlo(const struct ct_state *state, bool reconnecting) {
+int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list) {
 	int rc;
 
 	json_t *request = json_object();
 	if (!request)
 		abort();
 
-	if ((rc = protocol_setjson_str(request, "command", "ehlo")) ||
-	    (rc = protocol_setjson_bool(request, "reconnect", reconnecting)))
+	if ((rc = protocol_setjson_str(request, "command", "ehlo")))
+		goto out_free;
+
+	if (state->fsname &&
+	    (rc = protocol_setjson_str(request, "fsname", state->fsname)))
+		goto out_free;
+
+	/* use json_object_set for hai to not steal the ref: we can
+	 * try to send it many times */
+	if (hai_list &&
+	    (rc = json_object_set(request, "hai_list", hai_list)))
 		goto out_free;
 
 	if (state->config.client_id
@@ -153,7 +162,7 @@ int protocol_request_ehlo(const struct ct_state *state, bool reconnecting) {
 	LOG_INFO("Sending elho request to %d", state->socket_fd);
 	if (protocol_write(request, state->socket_fd, "ehlo", 0)) {
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write queue request");
+		LOG_ERROR(rc, "Could not write ehlo request");
 		goto out_free;
 	}
 out_free:
