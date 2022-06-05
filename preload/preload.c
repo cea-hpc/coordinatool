@@ -20,7 +20,6 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 	ct = xcalloc(sizeof(*ct), 1);
 
 	ct->magic = CT_PRIV_MAGIC;
-	CDS_INIT_LIST_HEAD(&ct->actions);
 	ct->mnt_fd = ct->open_by_fid_fd = -1;
 	ct->state.socket_fd = -1;
 
@@ -96,6 +95,7 @@ static int process_dones(struct hsm_copytool_private *ct) {
 	struct notify_done done;
 
 	while ((rc = read(ct->notify_done_fd[0], &done, sizeof(done))) == sizeof(done)) {
+		action_delete(ct, done.cookie);
 		rc = protocol_request_done(&ct->state, done.archive_id,
 					   done.cookie, done.rc);
 		if (rc < 0)

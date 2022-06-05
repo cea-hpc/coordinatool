@@ -321,7 +321,8 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
 			     size_t hai_len);
 
 typedef int (*hal_get_cb)(struct hsm_action_list *hal,
-			  struct hsm_action_item *hai, void *arg);
+			  struct hsm_action_item *hai,
+			  json_t *hai_json, void *arg);
 /**
  * helper to parse hsm_action_list json value
  *
@@ -329,13 +330,17 @@ typedef int (*hal_get_cb)(struct hsm_action_list *hal,
  * @param hal buffer to write to
  * @param hal_len length of the buffer we can write in
  * @param cb optional callback to call on each item
- *           if given, the first item of the list is repeatedly
- *           written each time as it is assumed list will not be
- *           required again later
+ *           its return value should be:
+ *            < 0  error, the function stops immediately
+ *            == 0 appends item to hal
+ *            == 1 skip hai (overwrites next in same position)
+ *            > 1  unspecified
+ *           no callback acts as if 0 had been returned (build hal)
  * @param cb_arg passed as is to cb if used
  * @return positive number of items processed on success,
- *         -1 on json parsing error, or
- *         -E2BIG if we could not write everything to the hsm action list
+ *         -1 on json parsing error,
+ *         -E2BIG if we could not write everything to the hsm action list,
+ *         error returned from cb
  */
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 			     size_t hal_len, hal_get_cb cb, void *cb_arg);

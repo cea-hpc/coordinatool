@@ -9,6 +9,12 @@
 #include "utils.h"
 
 /* preload.c */
+/* remember running actions to send back on reconnect */
+struct action_tree_node {
+	uint64_t cookie;
+	json_t *hai;
+};
+
 /* lustre has a magic check for these two -- keep the magic, but make
  * it different on purpose to make sure we don't mix calls.
  * keep start of struct in sync with lustre's to use as is with llapi
@@ -22,7 +28,7 @@ struct hsm_copytool_private {
         int mnt_fd;
         int open_by_fid_fd;
         void *kuc;
-	struct cds_list_head actions;
+	void *actions_tree;
         struct ct_state state;
 	struct hsm_action_list *hal;
 	int msgsize;
@@ -57,5 +63,11 @@ struct notify_done {
 
 /* protocol.c */
 extern protocol_read_cb copytool_cbs[];
+
+/* tree.c */
+void action_insert(struct hsm_copytool_private *ct,
+		   struct action_tree_node *node);
+void action_delete(struct hsm_copytool_private *ct, uint64_t cookie);
+json_t *actions_get_list(struct hsm_copytool_private *ct);
 
 #endif
