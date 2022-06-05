@@ -53,10 +53,18 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 
 	ct->hal = xmalloc(ct->state.config.hsm_action_list_size);
 
-	rc = pipe2(ct->notify_done_fd, O_NONBLOCK|O_CLOEXEC);
+	rc = pipe2(ct->notify_done_fd, O_CLOEXEC);
 	if (rc) {
 		rc = -errno;
 		LOG_ERROR(rc, "Could not create pipes");
+		goto err_out;
+	}
+	/* only set receiving end nonblock */
+	int flags = fcntl(ct->notify_done_fd[0], F_GETFL, 0);
+	rc = fcntl(ct->notify_done_fd[0], F_SETFL, flags | O_NONBLOCK);
+	if (rc < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not set pipe receive end nonblock");
 		goto err_out;
 	}
 
