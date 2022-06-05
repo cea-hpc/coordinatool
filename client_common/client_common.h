@@ -34,7 +34,8 @@ int ct_config_init(struct ct_state_config *config);
 void ct_config_free(struct ct_state_config *config);
 
 /* tcp.c */
-int tcp_connect(struct ct_state *state);
+/* optionally send running actions on reconnect */
+int tcp_connect(struct ct_state *state, json_t *hai_list);
 
 /* protocol.c */
 
@@ -51,7 +52,7 @@ int protocol_request_done(const struct ct_state *state, uint32_t archive_id,
 			  uint64_t cookie, int status);
 int protocol_request_queue(const struct ct_state *state,
 			   json_t *hai_list);
-int protocol_request_ehlo(const struct ct_state *state, bool reconnecting);
+int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list);
 extern protocol_read_cb protocol_ehlo_cbs[];
 
 #endif
