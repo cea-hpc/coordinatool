@@ -86,7 +86,7 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 
 void ct_schedule_client(struct state *state,
 			struct client *client) {
-	if (client->state != CLIENT_WAITING)
+	if (client->status != CLIENT_WAITING)
 		return;
 
 	json_t *hai_list = json_array();
@@ -168,15 +168,15 @@ void ct_schedule_client(struct state *state,
 		return;
 	}
 
-	cds_list_del(&client->node_waiting);
-	client->state = CLIENT_CONNECTED;
+	cds_list_del(&client->waiting_node);
+	client->status = CLIENT_READY;
 
 	// frees hai_list
 	int rc = protocol_reply_recv(client, state->fsname, archive_id,
 				     hal_flags, hai_list, 0, NULL);
 	if (rc < 0) {
 		LOG_ERROR(rc, "Could not send reply to %s", client->id);
-		free_client(state, client);
+		client_disconnect(client);
 	}
 }
 
@@ -185,7 +185,7 @@ void ct_schedule(struct state *state) {
 
 	cds_list_for_each_safe(n, nnext, &state->waiting_clients) {
 		struct client *client = caa_container_of(n, struct client,
-				node_waiting);
+				waiting_node);
 		ct_schedule_client(state, client);
 	}
 }

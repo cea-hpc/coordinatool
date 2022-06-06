@@ -92,17 +92,23 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
 	return addrstring;
 }
 
-void free_client(struct state *state, struct client *client) {
-	struct cds_list_head *n, *next;
-	LOG_INFO("Disconnecting %s (%d)", client->id, client->fd);
+static void client_closefd(struct state *state, struct client *client) {
 	if (client->fd >= 0) {
 		epoll_delfd(state->epoll_fd, client->fd);
 		close(client->fd);
 		state->stats.clients_connected--;
+		client->fd = -1;
 	}
+}
+
+static void client_free(struct state *state, struct client *client) {
+	struct cds_list_head *n, *next;
+
+	LOG_INFO("Disconnecting %s (%d)", client->id, client->fd);
+	client_closefd(state, client);
 	cds_list_del(&client->node_clients);
-	if (client->state == CLIENT_WAITING)
-		cds_list_del(&client->node_waiting);
+	if (client->status == CLIENT_WAITING)
+		cds_list_del(&client->waiting_node);
 	// reassign any request that would be lost
 	cds_list_for_each_safe(n, next, &client->active_requests) {
 		struct hsm_action_node *node =
@@ -113,6 +119,34 @@ void free_client(struct state *state, struct client *client) {
 	ct_schedule(state);
 	free((void*)client->id);
 	free(client);
+}
+
+void client_disconnect(struct client *client) {
+	struct state *state = client->queues.state;
+
+	/* no point in keeping client around if it has no id */
+	if (!client->id) {
+		client_free(state, client);
+		return;
+	}
+
+	switch (client->status) {
+	case CLIENT_READY:
+	case CLIENT_WAITING:
+		/* remember disconnected clients for a bit */
+		client->status = CLIENT_DISCONNECTED;
+		client_closefd(state, client);
+		client->disconnected_timestamp = gettime_ns();
+		cds_list_del(&client->node_clients);
+		cds_list_add(&client->node_clients,
+			     &state->stats.disconnected_clients);
+		break;
+	default:
+		/* clients who never sent ehlo or aren't actually connected
+		 * are just freed */
+		client_free(state, client);
+		break;
+	}
 }
 
 int handle_client_connect(struct state *state) {
@@ -133,11 +167,11 @@ int handle_client_connect(struct state *state) {
 	client->fd = fd;
 	client->id = sockaddr2str(&peer_addr, peer_addr_len);
 	CDS_INIT_LIST_HEAD(&client->active_requests);
-	CDS_INIT_LIST_HEAD(&client->node_waiting);
 	cds_list_add(&client->node_clients, &state->stats.clients);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_restore);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
+	client->status = CLIENT_INIT;
 	client->queues.state = state;
 	state->stats.clients_connected++;
 
@@ -147,8 +181,27 @@ int handle_client_connect(struct state *state) {
 	if (rc < 0) {
 		LOG_ERROR(rc, "Could not add client %s to epoll",
 			  client->id);
-		free_client(state, client);
+		client_free(state, client);
 	}
 
 	return rc;
+}
+
+struct client *client_new_disconnected(struct state *state, const char *id) {
+	/* create client in disconnected state for recovery */
+	struct client *client = xcalloc(sizeof(*client), 1);
+
+	client->fd = -1;
+	client->id = xstrdup(id);
+	CDS_INIT_LIST_HEAD(&client->active_requests);
+	cds_list_add(&client->node_clients, &state->stats.disconnected_clients);
+	CDS_INIT_LIST_HEAD(&client->queues.waiting_restore);
+	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
+	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
+	client->status = CLIENT_DISCONNECTED;
+	client->queues.state = state;
+
+	LOG_DEBUG("New disconnected client for %s", id);
+
+	return client;
 }
