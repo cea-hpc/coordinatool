@@ -157,6 +157,9 @@ int config_init(struct state_config *config) {
 	getenv_str("COORDINATOOL_HOST", &config->host);
 	getenv_str("COORDINATOOL_PORT", &config->port);
 	getenv_str("COORDINATOOL_STATE_DIR_PREFIX", &config->state_dir_prefix);
+	getenv_str("COORDINATOOL_REDIS_HOST", &config->redis_host);
+	getenv_int("COORDINATOOL_REDIS_PORT", &config->redis_port);
+	getenv_int("COORDINATOOL_CLIENT_GRACE", &config->client_grace_ms);
 	rc = getenv_verbose("COORDINATOOL_VERBOSE", &config->verbose);
 	if (rc < 0)
 		return rc;
