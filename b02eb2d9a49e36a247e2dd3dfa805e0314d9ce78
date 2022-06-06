@@ -1,4 +1,22 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d768fcb0_5ba3fb18",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-06T22:23:41Z",
+      "side": 1,
+      "message": "@Guillaume since some of the hai can come from clients on queue it\u0027s possible they\u0027ll just send non-existing fids or something we don\u0027t find; I think it\u0027d make sense to change this from void to int and just refuse to enqueue (skip) anything invalid we found with a WARN message\n\nI\u0027m not touching this part as I don\u0027t know if you\u0027ve started, this is pretty independant from what I\u0027ve been working on :)",
+      "revId": "b02eb2d9a49e36a247e2dd3dfa805e0314d9ce78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ],
   "submitRequirementResults": []
 }
