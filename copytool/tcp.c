@@ -134,12 +134,15 @@ void client_disconnect(struct client *client) {
 	case CLIENT_READY:
 	case CLIENT_WAITING:
 		/* remember disconnected clients for a bit */
+		if (client->status == CLIENT_WAITING)
+			cds_list_del(&client->waiting_node);
 		client->status = CLIENT_DISCONNECTED;
 		client_closefd(state, client);
 		client->disconnected_timestamp = gettime_ns();
 		cds_list_del(&client->node_clients);
 		cds_list_add(&client->node_clients,
 			     &state->stats.disconnected_clients);
+		timer_rearm(state);
 		break;
 	default:
 		/* clients who never sent ehlo or aren't actually connected

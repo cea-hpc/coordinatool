@@ -116,6 +116,7 @@ struct state {
 		enum llapi_message_level verbose;
 		const char *redis_host;
 		int redis_port;
+		int client_grace_ms;
 	} config;
 	/* options: command line switches only */
 	int archive_cnt;
@@ -128,6 +129,7 @@ struct state {
 	int epoll_fd;
 	int hsm_fd;
 	int listen_fd;
+	int timer_fd;
 	struct hsm_action_queues queues;
 	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
@@ -229,6 +231,12 @@ void ct_schedule_client(struct state *state,
 int tcp_listen(struct state *state);
 char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
 int handle_client_connect(struct state *state);
+struct client *client_new_disconnected(struct state *state, const char *id);
 void client_disconnect(struct client *client);
+
+/* timer */
+int timer_init(struct state *state);
+int timer_rearm(struct state *state);
+void handle_expired_timers(struct state *state);
 
 #endif
