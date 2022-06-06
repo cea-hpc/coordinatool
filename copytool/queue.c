@@ -142,7 +142,7 @@ static int hsm_action_enqueue_common(struct state *state,
 		/* duplicate */
 		json_decref(han->hai);
 		free(han);
-		return 0;
+		return -EEXIST;
 	}
 
 	hsm_action_node_enrich(state, han);
@@ -153,7 +153,8 @@ static int hsm_action_enqueue_common(struct state *state,
 }
 
 int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
-			    int64_t timestamp) {
+			    int64_t timestamp,
+			    struct hsm_action_node **han_out) {
 	struct hsm_action_node *han;
 	struct hsm_action_item hai;
 	int rc;
@@ -200,7 +201,16 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 
 	han->hai = json_incref(json_hai);
 
-	return hsm_action_enqueue_common(state, han);
+	rc = hsm_action_enqueue_common(state, han);
+	if (rc < 0 && rc != -EEXIST) {
+		return rc;
+	}
+
+	if (han_out) {
+		*han_out = (rc == -EEXIST ? NULL : han);
+	}
+
+	return 0;
 }
 
 /* checks for duplicate, and if unique enrich and insert node */
@@ -209,6 +219,7 @@ int hsm_action_enqueue(struct state *state,
 		       uint32_t archive_id, uint64_t hal_flags,
 		       int64_t timestamp) {
 	struct hsm_action_node *han;
+	int rc;
 
 	if (hai->hai_action == HSMA_CANCEL) {
 		// XXX tfind + remove from waiting queue or signal client
@@ -244,7 +255,13 @@ int hsm_action_enqueue(struct state *state,
 	// order wrong on recovery
 	(void)protocol_setjson_int(han->hai, "timestamp", timestamp);
 
-	return hsm_action_enqueue_common(state, han);
+	rc = hsm_action_enqueue_common(state, han);
+	// ignore duplicates
+	if (rc < 0 && rc != -EEXIST) {
+		return rc;
+	}
+
+	return 0;
 }
 
 /* remove action node from its queue */

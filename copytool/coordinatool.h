@@ -196,8 +196,9 @@ int hsm_action_requeue(struct hsm_action_node *han, bool start);
 void hsm_action_move(struct hsm_action_queues *queues,
 		     struct hsm_action_node *han,
 		     bool start);
-int hsm_action_enqueue_json(struct state *state, json_t *json,
-		       int64_t timestamp);
+int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
+			    int64_t timestamp,
+			    struct hsm_action_node **han_out);
 int hsm_action_enqueue(struct state *state,
 		       struct hsm_action_item *hai,
 		       uint32_t archive_id, uint64_t hal_flags,
