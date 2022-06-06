@@ -137,6 +137,7 @@ void client_disconnect(struct client *client) {
 		client->status = CLIENT_DISCONNECTED;
 		client_closefd(state, client);
 		client->disconnected_timestamp = gettime_ns();
+		timer_rearm(state);
 		cds_list_del(&client->node_clients);
 		cds_list_add(&client->node_clients,
 			     &state->stats.disconnected_clients);

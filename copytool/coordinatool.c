@@ -125,6 +125,8 @@ static int ct_start(struct state *state) {
 				// to send
 				if (events[n].events & EPOLLOUT)
 					redisAsyncHandleWrite(state->redis_ac);
+			} else if (events[n].data.fd == state->timer_fd) {
+				handle_expired_timers(state);
 			} else {
 				struct client *client = events[n].data.ptr;
 				if (protocol_read_command(client->fd, client->id, client,
@@ -140,6 +142,7 @@ static int ct_start(struct state *state) {
 
 #define OPT_REDIS_HOST 257
 #define OPT_REDIS_PORT 258
+#define OPT_CLIENT_GRACE 259
 int main(int argc, char *argv[]) {
 	struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
@@ -149,6 +152,7 @@ int main(int argc, char *argv[]) {
 		{ "host", required_argument, NULL, 'H' },
 		{ "redis-host", required_argument, NULL, OPT_REDIS_HOST },
 		{ "redis-port", required_argument, NULL, OPT_REDIS_PORT },
+		{ "client-grace", required_argument, NULL, OPT_CLIENT_GRACE },
 		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0 },
@@ -202,6 +206,10 @@ int main(int argc, char *argv[]) {
 			break;
 		case OPT_REDIS_PORT:
 			state.config.redis_port = parse_int(optarg, 65535);
+			break;
+		case OPT_CLIENT_GRACE:
+			state.config.client_grace_ms =
+				parse_int(optarg, INT_MAX);
 			break;
 		case 'V':
 			print_version();
