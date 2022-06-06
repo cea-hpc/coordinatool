@@ -346,7 +346,7 @@ static int redis_scan_requests(struct state *state,
 		return -EINVAL;
 	}
 
-	rc = hsm_action_enqueue_json(state, json_hai, 0);
+	rc = hsm_action_enqueue_json(state, json_hai, 0, NULL);
 	if (rc < 0)
 		return rc;
 	return 0;

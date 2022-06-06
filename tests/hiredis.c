@@ -7,7 +7,8 @@
 
 /* fill in dummy requirements to copytool/redis.c */
 int hsm_action_enqueue_json(struct state *state UNUSED, json_t *json UNUSED,
-			    int64_t timestamp UNUSED) {
+			    int64_t timestamp UNUSED,
+			    struct hsm_action_node **han_out UNUSED) {
 	return 0;
 }
 

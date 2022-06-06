@@ -30,6 +30,38 @@ static const char *client_status_to_str(enum client_status status) {
 	}
 }
 
+static int protocol_reply_status_client(json_t *clients, struct cds_list_head *head) {
+	struct cds_list_head *n;
+	int rc;
+
+	cds_list_for_each(n, head) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+		json_t *c = json_object();
+		if (!c)
+			abort();
+		if ((rc = protocol_setjson_str(c, "client_id", client->id)) ||
+				(rc = protocol_setjson_int(c, "current_restore", client->current_restore)) ||
+				(rc = protocol_setjson_int(c, "current_archive", client->current_archive)) ||
+				(rc = protocol_setjson_int(c, "current_remove", client->current_remove)) ||
+				(rc = protocol_setjson_int(c, "done_restore", client->done_restore)) ||
+				(rc = protocol_setjson_int(c, "done_archive", client->done_archive)) ||
+				(rc = protocol_setjson_int(c, "done_remove", client->done_remove)) ||
+				(rc = protocol_setjson_str(c, "status", client_status_to_str(client->status)))) {
+			json_decref(c);
+			return rc;
+		}
+		if (client->status == CLIENT_DISCONNECTED &&
+				(rc == protocol_setjson_int(c, "disconnected_timestamp", client->disconnected_timestamp))) {
+			json_decref(c);
+			return rc;
+		}
+
+		json_array_append_new(clients, c);
+	}
+	return 0;
+}
+
 int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 			  int status, char *error) {
 	json_t *reply, *clients = NULL;
@@ -56,31 +88,14 @@ int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 	clients = json_array();
 	if (!clients)
 		abort();
-	struct cds_list_head *n;
-	cds_list_for_each(n, &ct_stats->clients) {
-		struct client *client =
-			caa_container_of(n, struct client, node_clients);
-		json_t *c = json_object();
-		if (!c)
-			abort();
-		if ((rc = protocol_setjson_str(c, "client_id", client->id)) ||
-		    (rc = protocol_setjson_int(c, "current_restore", client->current_restore)) ||
-		    (rc = protocol_setjson_int(c, "current_archive", client->current_archive)) ||
-		    (rc = protocol_setjson_int(c, "current_remove", client->current_remove)) ||
-		    (rc = protocol_setjson_int(c, "done_restore", client->done_restore)) ||
-		    (rc = protocol_setjson_int(c, "done_archive", client->done_archive)) ||
-		    (rc = protocol_setjson_int(c, "done_remove", client->done_remove)) ||
-		    (rc = protocol_setjson_str(c, "status", client_status_to_str(client->status)))) {
-			json_decref(c);
-			goto out_freereply;
-		}
-		if (client->status == CLIENT_DISCONNECTED &&
-		    (rc == protocol_setjson_int(c, "disconnected_timestamp", client->disconnected_timestamp))) {
-			json_decref(c);
-			goto out_freereply;
-		}
 
-		json_array_append_new(clients, c);
+	rc = protocol_reply_status_client(clients, &ct_stats->clients);
+	if (rc) {
+		goto out_freereply;
+	}
+	rc = protocol_reply_status_client(clients, &ct_stats->disconnected_clients);
+	if (rc) {
+		goto out_freereply;
 	}
 
 	if ((rc = protocol_setjson(reply, "clients", clients)))
@@ -131,6 +146,11 @@ int protocol_reply_recv(struct client *client,
 			int status, char *error) {
 	json_t *reply;
 	int rc;
+
+	if (client->status != CLIENT_READY) {
+		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
+					   "Client must send EHLO first and not already be in RECV");
+	}
 
 	reply = json_object();
 	if (!reply)
@@ -291,12 +311,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	json_t *item;
 	int64_t timestamp = gettime_ns();
 	json_array_foreach(json_hal, count, item) {
-		/* XXX we'll get either something we get back from client to confirm
-		 * their running actions on reconnect, in which case we just check
-		 * we know about these items, otherwise it's new stuff we need to
-		 * enrich
-		 */
-		rc = hsm_action_enqueue_json(state, item, timestamp);
+		rc = hsm_action_enqueue_json(state, item, timestamp, NULL);
 		if (rc < 0) {
 			final_rc = rc;
 			continue;
@@ -344,28 +359,91 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	struct state *state = arg;
 	const char *id;
 
+	if (client->status != CLIENT_INIT) {
+		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
+					   "Client cannot send EHLO twice");
+	}
 	client->status = CLIENT_READY;
 	id = protocol_getjson_str(json, "id", NULL, NULL);
 	if (!id) {
 		// no id: no special treatment
 		return protocol_reply_ehlo(client, 0, NULL);
 	}
+
 	free((void*)client->id);
 	client->id = xstrdup(id);
 
-	json_t *hai_list = json_object_get(json, "hai_list");
-	if (!hai_list) {
-		// new client, ok. remember id for logs?
-		return protocol_reply_ehlo(client, 0, NULL);
+
+	struct cds_list_head *n, *nnext;
+	cds_list_for_each(n, &state->stats.disconnected_clients) {
+		struct client *old_client =
+			caa_container_of(n, struct client, node_clients);
+
+		if (strcmp(id, old_client->id))
+			continue;
+
+		cds_list_splice(&old_client->active_requests,
+				&client->active_requests);
+		cds_list_splice(&old_client->queues.waiting_restore,
+				&client->queues.waiting_restore);
+		cds_list_splice(&old_client->queues.waiting_archive,
+				&client->queues.waiting_archive);
+		cds_list_splice(&old_client->queues.waiting_remove,
+				&client->queues.waiting_remove);
+
+		// should be only one but try to find other matches
+		break;
 	}
-	// reconnecting client
-	// XXX
-	// - match if it was a known client
-	// - complete running xfer list with what's here if any
-	// - remove from running xfer list with what's not here
-	// (done while we were out)
-	(void) state;
-	(void) hai_list;
+
+
+	struct cds_list_head free_hai;
+	CDS_INIT_LIST_HEAD(&free_hai);
+	cds_list_splice(&client->active_requests, &free_hai);
+
+	json_t *hai_list = json_object_get(json, "hai_list");
+	int64_t timestamp = gettime_ns();
+	if (hai_list) {
+		int count;
+		json_t *hai;
+		json_array_foreach(hai_list, count, hai) {
+			uint64_t cookie = protocol_getjson_int(hai, "cookie", 0);
+			if (cookie == 0) {
+				LOG_WARN(-EINVAL, "No cookie set for entry in ehlo from %s",
+					 client->id);
+				continue;
+			}
+
+			/* Look for exisiting action node first: if found this will
+			 * automatically remove it from free_hai list.
+			 */
+			struct hsm_action_node *han;
+			han = hsm_action_search_queue(&state->queues, cookie);
+			if (han) {
+				cds_list_del(&han->node);
+				cds_list_add_tail(&han->node, &client->active_requests);
+				continue;
+			}
+			/* Otherwise create new one. Use enqueue to enrich it just in case */
+			if (hsm_action_enqueue_json(state, hai, timestamp, &han) || !han) {
+				/* ignore bad items in hai list */
+				continue;
+			}
+			hsm_action_dequeue(&state->queues, han);
+			cds_list_add_tail(&han->node, &client->active_requests);
+		}
+	}
+
+	/* requeue anything left */
+	cds_list_for_each_safe(n, nnext, &free_hai) {
+                struct hsm_action_node *node =
+			caa_container_of(n, struct hsm_action_node, node);
+		cds_list_del(n);
+		hsm_action_requeue(node, true);
+		/* XXX stats running_restore/archive/remove not accounted properly
+		 * fix client_free as well
+		 */
+	}
+
 	return protocol_reply_ehlo(client, 0, NULL);
 }
 
