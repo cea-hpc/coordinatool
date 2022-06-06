@@ -134,6 +134,7 @@ int config_init(struct state_config *config) {
 	config->state_dir_prefix = xstrdup(".coordinatool");
 	config->redis_host = xstrdup("localhost");
 	config->redis_port = 6379;
+	config->client_grace_ms = 10000; /* 10s, double of client reconnect time */
 	config->verbose = LLAPI_MSG_NORMAL;
 	llapi_msg_set_level(config->verbose);
 

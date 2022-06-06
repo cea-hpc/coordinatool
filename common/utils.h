@@ -30,6 +30,16 @@ static inline char *xstrdup(const char *s) {
 	return val;
 }
 
+#define NS_IN_MSEC 1000000LL
+#define NS_IN_SEC 1000000000LL
+static inline void ts_from_ns(struct timespec *ts, int64_t ns) {
+	ts->tv_sec = ns / NS_IN_SEC;
+	ts->tv_nsec = ns % NS_IN_SEC;
+}
+static inline int64_t ns_from_ts(struct timespec *ts) {
+	return ts->tv_sec * NS_IN_SEC + ts->tv_nsec;
+}
+
 /* get number of ns since epoch as int64
  * (that's good for ~300 years, signed because jansson ints are signed)
  */
@@ -44,7 +54,8 @@ static inline int64_t gettime_ns(void) {
 		abort();
 	}
 
-	return ts.tv_sec * 1000000000 + ts.tv_nsec;
+	return ns_from_ts(&ts);
 }
+
 
 #endif

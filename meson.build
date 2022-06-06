@@ -87,6 +87,7 @@ executable(
 		'copytool/redis.c',
 		'copytool/scheduler.c',
 		'copytool/tcp.c',
+		'copytool/timer.c',
 	) + [ version_h ],
 	dependencies: [hiredis, urcu],
 	include_directories: include_directories('common'),
