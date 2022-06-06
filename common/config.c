@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <limits.h>
 #include <stdlib.h>
 #include <strings.h>
 
@@ -72,6 +73,24 @@ int getenv_u32(const char *name, uint32_t *val) {
 	LOG_INFO("env setting %s to %u", name, *val);
 	return 1;
 }
+
+int getenv_int(const char *name, int *val) {
+	const char *env = getenv(name);
+	if (!env)
+		return 0;
+
+	char *endptr;
+	long long envval = strtol(env, &endptr, 0);
+	if (envval < 0 || envval > INT_MAX) {
+		LOG_ERROR(-EINVAL, "env %s (%s) not an int", name, env);
+		return -EINVAL;
+	}
+
+	*val = envval;
+	LOG_INFO("env setting %s to %u", name, *val);
+	return 1;
+}
+
 
 enum llapi_message_level str_to_verbose(const char *str) {
 	if (!strcasecmp(str, "off")) {
