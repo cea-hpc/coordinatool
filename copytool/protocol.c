@@ -20,6 +20,16 @@ static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg) {
 	return protocol_reply_status(client, &state->stats, 0, NULL);
 }
 
+static const char *client_status_to_str(enum client_status status) {
+	switch (status) {
+	case CLIENT_INIT: return "init";
+	case CLIENT_READY: return "ready";
+	case CLIENT_DISCONNECTED: return "disconnected";
+	case CLIENT_WAITING: return "waiting";
+	default: return "INVALID";
+	}
+}
+
 int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 			  int status, char *error) {
 	json_t *reply, *clients = NULL;
@@ -60,10 +70,16 @@ int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 		    (rc = protocol_setjson_int(c, "done_restore", client->done_restore)) ||
 		    (rc = protocol_setjson_int(c, "done_archive", client->done_archive)) ||
 		    (rc = protocol_setjson_int(c, "done_remove", client->done_remove)) ||
-		    (rc = protocol_setjson_int(c, "state", client->state))) { /* XXX convert state to string */
+		    (rc = protocol_setjson_str(c, "status", client_status_to_str(client->status)))) {
 			json_decref(c);
 			goto out_freereply;
 		}
+		if (client->status == CLIENT_DISCONNECTED &&
+		    (rc == protocol_setjson_int(c, "disconnected_timestamp", client->disconnected_timestamp))) {
+			json_decref(c);
+			goto out_freereply;
+		}
+
 		json_array_append_new(clients, c);
 	}
 
@@ -102,8 +118,8 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
 					   "Buffer too small");
 
-	cds_list_add(&client->node_waiting, &state->waiting_clients);
-	client->state = CLIENT_WAITING;
+	cds_list_add(&client->waiting_node, &state->waiting_clients);
+	client->status = CLIENT_WAITING;
 	/* schedule immediately in case work is available */
 	ct_schedule_client(state, client);
 	return 0;
@@ -144,7 +160,6 @@ int protocol_reply_recv(struct client *client,
 	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;
 
-	client->state = CLIENT_CONNECTED;
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
@@ -214,7 +229,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 		return -EINVAL;
 	}
 
-	if (client->state == CLIENT_WAITING) {
+	if (client->status == CLIENT_WAITING) {
 		ct_schedule_client(state, client);
 	}
 
@@ -329,6 +344,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	struct state *state = arg;
 	const char *id;
 
+	client->status = CLIENT_READY;
 	id = protocol_getjson_str(json, "id", NULL, NULL);
 	if (!id) {
 		// no id: no special treatment

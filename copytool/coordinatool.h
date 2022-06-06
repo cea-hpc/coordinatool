@@ -76,15 +76,18 @@ struct client {
 	int max_restore;
 	int max_archive;
 	int max_remove;
-	enum client_state {
-		CLIENT_CONNECTED = 0, /* default state */
-		CLIENT_WAITING,
-	} state;
+	enum client_status {
+		CLIENT_INIT,         /* new connection */
+		CLIENT_READY,        /* connected, post ehlo */
+		CLIENT_DISCONNECTED, /* recovery or temporary disconnect */
+		CLIENT_WAITING,      /* recv in progress */
+	} status;
 	struct cds_list_head active_requests;
 	/* per client queues */
 	struct hsm_action_queues queues;
-	union { /* state-dependant fields */
-		struct cds_list_head node_waiting;
+	union { /* status-dependant fields */
+		int64_t disconnected_timestamp;
+		struct cds_list_head waiting_node;
 	};
 };
 
@@ -100,6 +103,7 @@ struct ct_stats {
 	long unsigned int done_remove;
 	unsigned int clients_connected;
 	struct cds_list_head clients;
+	struct cds_list_head disconnected_clients;
 };
 
 struct state {
@@ -225,6 +229,6 @@ void ct_schedule_client(struct state *state,
 int tcp_listen(struct state *state);
 char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
 int handle_client_connect(struct state *state);
-void free_client(struct state *state, struct client *client);
+void client_disconnect(struct client *client);
 
 #endif
