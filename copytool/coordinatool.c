@@ -129,7 +129,7 @@ static int ct_start(struct state *state) {
 				struct client *client = events[n].data.ptr;
 				if (protocol_read_command(client->fd, client->id, client,
 							  protocol_cbs, state) < 0) {
-					free_client(state, client);
+					client_disconnect(client);
 				}
 			}
 		}
@@ -158,6 +158,7 @@ int main(int argc, char *argv[]) {
 	// state init
 	struct state state = { 0 };
 	CDS_INIT_LIST_HEAD(&state.stats.clients);
+	CDS_INIT_LIST_HEAD(&state.stats.disconnected_clients);
 	CDS_INIT_LIST_HEAD(&state.waiting_clients);
 
 	config_init(&state.config);
