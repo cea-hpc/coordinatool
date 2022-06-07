@@ -414,6 +414,10 @@ static int redis_scan_assigned(struct state *state,
 		client = client_new_disconnected(state, client_id);
 	}
 
+#ifdef DEBUG_ACTION_NODE
+	LOG_DEBUG("Moving han %p to active requests %p (redis)",
+		  (void*)han, (void*)&client->active_requests);
+#endif
 	// XXX scan can return same cookie multiple times, so the request
 	// could already be enqueued.
 	// This will work (list del is the same) but stats will be wrong
