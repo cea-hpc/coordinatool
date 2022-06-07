@@ -81,6 +81,11 @@ int getenv_int(const char *name, int *val) {
 
 	char *endptr;
 	long long envval = strtol(env, &endptr, 0);
+	if (*endptr != '\0') {
+		LOG_ERROR(-EINVAL, "env %s (%s) contains (trailing) garbage",
+			  name, env);
+		return -EINVAL;
+	}
 	if (envval < 0 || envval > INT_MAX) {
 		LOG_ERROR(-EINVAL, "env %s (%s) not an int", name, env);
 		return -EINVAL;
