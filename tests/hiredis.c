@@ -11,6 +11,18 @@ int hsm_action_enqueue_json(struct state *state UNUSED, json_t *json UNUSED,
 			    struct hsm_action_node **han_out UNUSED) {
 	return 0;
 }
+struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues UNUSED,
+                                                unsigned long cookie UNUSED) {
+	return NULL;
+}
+struct client *client_new_disconnected(struct state *state UNUSED,
+				       const char *id UNUSED) {
+	return NULL;
+}
+void hsm_action_dequeue(struct hsm_action_queues *queues UNUSED,
+                        struct hsm_action_node *han UNUSED) {
+	return;
+}
 
 
 /* copy from copytool/coordinatool.c */
