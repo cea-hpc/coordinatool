@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <limits.h>
 #include <sys/epoll.h>
 
 #include "coordinatool.h"
@@ -352,24 +353,105 @@ static int redis_scan_requests(struct state *state,
 	return 0;
 }
 
+
+static inline int parse_cookie(const char *str, uint64_t *val) {
+	char *endptr;
+
+	if (str[0] == '-') {
+                LOG_ERROR(-EINVAL, "value (%s) is negative?!",
+                          str);
+		return -EINVAL;
+	}
+
+	errno = 0;
+	*val = strtoull(str, &endptr, 16);
+	if (*endptr != '\0') {
+                LOG_ERROR(-EINVAL, "value (%s) contains (trailing) garbage",
+                          str);
+		return -EINVAL;
+        }
+	if (*val == ULLONG_MAX && errno == ERANGE) {
+                LOG_ERROR(-ERANGE, "value (%s) overflowed",
+                          str);
+		return -ERANGE;
+	}
+
+	return 0;
+}
+
+static int redis_scan_assigned(struct state *state,
+			       const char *cookie_str,
+			       const char *client_id) {
+	struct cds_list_head *n;
+	bool found = false;
+	struct client *client;
+	uint64_t cookie;
+	int rc;
+
+	rc = parse_cookie(cookie_str, &cookie);
+	if (rc)
+		return rc;
+
+	LOG_DEBUG("Cookie %lx running on client %s", cookie, client_id);
+
+
+	struct hsm_action_node *han;
+	han = hsm_action_search_queue(&state->queues, cookie);
+	if (!han) {
+		LOG_WARN(-EINVAL, "cookie %lx assigned but wasn't in request list, cleaning up",
+			 cookie);
+		return redis_delete(state, "coordinatool_assigned", cookie);
+	}
+
+	cds_list_for_each(n, &state->stats.disconnected_clients) {
+		client = caa_container_of(n, struct client, node_clients);
+		if (!strcmp(client_id, client->id)) {
+			found = true;
+			break;
+		}
+	}
+	if (!found) {
+		client = client_new_disconnected(state, client_id);
+	}
+
+	// XXX scan can return same cookie multiple times, so the request
+	// could already be enqueued.
+	// This will work (list del is the same) but stats will be wrong
+	// we need to add some han state to fix this
+	hsm_action_dequeue(&state->queues, han);
+	cds_list_add_tail(&han->node, &client->active_requests);
+
+	return 0;
+}
+
 int redis_recovery(struct state *state) {
-	struct redis_wait wait = {
-		.state = state,
-		.cb = redis_scan_requests,
-		.hash = "coordinatool_requests",
+	struct redis_wait wait[2] = {
+		{
+			.state = state,
+			.cb = redis_scan_requests,
+			.hash = "coordinatool_requests",
+		},
+		{
+			.state = state,
+			.cb = redis_scan_assigned,
+			.hash = "coordinatool_assigned",
+		}
 	};
 
-	int rc = redisAsyncCommand(state->redis_ac, redis_scan_cb, &wait,
-				   "hscan %s %d", wait.hash, 0);
-	if (rc) {
-		rc = redis_error_to_errno(rc);
-		LOG_ERROR(rc, "Redis error trying to scan %s (start)",
-			  wait.hash);
-		return rc;
+	for (unsigned int i=0; i < sizeof(wait)/sizeof(*wait); i++) {
+		int rc = redisAsyncCommand(state->redis_ac, redis_scan_cb, &wait[i],
+					   "hscan %s %d", wait[i].hash, 0);
+		if (rc) {
+			rc = redis_error_to_errno(rc);
+			LOG_ERROR(rc, "Redis error trying to scan %s (start)",
+				  wait[i].hash);
+			return rc;
+		}
+		rc = redis_wait_done(state, &wait[i].done);
+		if (rc < 0)
+			return rc;
 	}
-	rc = redis_wait_done(state, &wait.done);
-	if (rc < 0)
-		return rc;
+
 
 	return 0;
 }
