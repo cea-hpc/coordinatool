@@ -57,5 +57,4 @@ static inline int64_t gettime_ns(void) {
 	return ns_from_ts(&ts);
 }
 
-
 #endif
