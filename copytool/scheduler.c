@@ -153,6 +153,10 @@ void ct_schedule_client(struct state *state,
 				hal_flags = han->info.hal_flags;
 			}
 			redis_assign_request(state, client, han);
+#ifdef DEBUG_ACTION_NODE
+			LOG_DEBUG("moving node %p to %p (active requests)",
+				  (void*)han, (void*)&client->active_requests);
+#endif
 			hsm_action_dequeue(queues, han);
 			cds_list_add(&han->node, &client->active_requests);
 			(*running_count[i])++;

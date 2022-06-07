@@ -19,8 +19,69 @@
 #include "utils.h"
 
 
-/* uncomment to add magic checks for han */
+/* uncomment to add magic checks for han and list sanity checks */
 // #define DEBUG_ACTION_NODE 0x12349876abcd1234ULL
+#ifdef DEBUG_ACTION_NODE
+static inline int check_list(struct cds_list_head *h) {
+	struct cds_list_head *n;
+	int cnt = 0;
+	cds_list_for_each(n, h) {
+		if (cnt++ > 100000)
+			return 1;
+	}
+	return 0;
+}
+#define cds_list_splice(a, h) do { \
+	if (check_list(h)) { \
+		LOG_ERROR(-EIO, "BAD LIST SPLICE (head)"); \
+		abort(); \
+	} \
+	if (check_list(a)) { \
+		LOG_ERROR(-EIO, "BAD LIST SPLICE (add)"); \
+		abort(); \
+	} \
+	cds_list_splice(a, h); \
+	/* a is invalid at this point */ \
+	if (check_list(h)) { \
+		LOG_ERROR(-EIO, "BAD LIST SPLICE post (head)"); \
+		abort(); \
+	} \
+} while (0)
+#define cds_list_add(n, h) do { \
+	if (check_list(h)) { \
+		LOG_ERROR(-EIO, "BAD LIST ADD (head)"); \
+		abort(); \
+	} \
+	if (!cds_list_empty(n)) { \
+		LOG_ERROR(-EIO, "BAD LIST ADD"); \
+		abort(); \
+	}	\
+	cds_list_add(n, h); \
+} while (0)
+#define cds_list_add_tail(n, h) do { \
+	if (check_list(h)) { \
+		LOG_ERROR(-EIO, "BAD LIST ADD TAIL (head)"); \
+		abort(); \
+	} \
+	if (!cds_list_empty(n)) { \
+		LOG_ERROR(-EIO, "BAD LIST ADD TAIL"); \
+		abort(); \
+	}	\
+	cds_list_add_tail(n, h); \
+} while (0)
+#define cds_list_del(n) do { \
+	struct cds_list_head *__next = (n)->next; \
+	if (check_list(n)) { \
+		LOG_ERROR(-EIO, "BAD LIST DEL"); \
+		abort(); \
+	} \
+	cds_list_del_init(n); \
+	if (check_list(__next)) { \
+		LOG_ERROR(-EIO, "BAD LIST DEL (post)"); \
+		abort(); \
+	} \
+} while (0)
+#endif
 
 /* queue types */
 

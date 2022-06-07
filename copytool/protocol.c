@@ -136,6 +136,9 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 
 	// XXX get archive_id and only send appropriate requests
 
+#ifdef DEBUG_ACTION_NODE
+	CDS_INIT_LIST_HEAD(&client->waiting_node);
+#endif
 	cds_list_add(&client->waiting_node, &state->waiting_clients);
 	client->status = CLIENT_WAITING;
 	/* schedule immediately in case work is available */
@@ -431,6 +434,10 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 			struct hsm_action_node *han;
 			han = hsm_action_search_queue(&state->queues, cookie);
 			if (han) {
+#ifdef DEBUG_ACTION_NODE
+				LOG_DEBUG("Moving han %p to active requests %p (ehlo)",
+					  (void*)han, (void*)&client->active_requests);
+#endif
 				cds_list_del(&han->node);
 				cds_list_add_tail(&han->node, &client->active_requests);
 				continue;
@@ -441,6 +448,10 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 				/* ignore bad items in hai list */
 				continue;
 			}
+#ifdef DEBUG_ACTION_NODE
+			LOG_DEBUG("Moving new han %p to active requests %p (ehlo)",
+				  (void*)han, (void*)&client->active_requests);
+#endif
 			hsm_action_dequeue(&state->queues, han);
 			cds_list_add_tail(&han->node, &client->active_requests);
 		}

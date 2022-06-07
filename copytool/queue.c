@@ -169,6 +169,7 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	han = xmalloc(sizeof(struct hsm_action_node));
 #ifdef DEBUG_ACTION_NODE
 	han->magic = DEBUG_ACTION_NODE;
+	CDS_INIT_LIST_HEAD(&han->node);
 #endif
 	han->queues = &state->queues;
 	han->info.cookie = hai.hai_cookie;
@@ -237,6 +238,7 @@ int hsm_action_enqueue(struct state *state,
 	han = xmalloc(sizeof(struct hsm_action_node));
 #ifdef DEBUG_ACTION_NODE
 	han->magic = DEBUG_ACTION_NODE;
+	CDS_INIT_LIST_HEAD(&han->node);
 #endif
 	han->hai = json_hsm_action_item(hai, archive_id, hal_flags);
 	if (!han->hai) {
