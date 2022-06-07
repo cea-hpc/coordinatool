@@ -168,6 +168,9 @@ int handle_client_connect(struct state *state) {
 	client->fd = fd;
 	client->id = sockaddr2str(&peer_addr, peer_addr_len);
 	CDS_INIT_LIST_HEAD(&client->active_requests);
+#ifdef DEBUG_ACTION_NODE
+	CDS_INIT_LIST_HEAD(&client->node_clients);
+#endif
 	cds_list_add(&client->node_clients, &state->stats.clients);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_restore);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
@@ -195,6 +198,9 @@ struct client *client_new_disconnected(struct state *state, const char *id) {
 	client->fd = -1;
 	client->id = xstrdup(id);
 	CDS_INIT_LIST_HEAD(&client->active_requests);
+#ifdef DEBUG_ACTION_NODE
+	CDS_INIT_LIST_HEAD(&client->node_clients);
+#endif
 	cds_list_add(&client->node_clients, &state->stats.disconnected_clients);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_restore);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
