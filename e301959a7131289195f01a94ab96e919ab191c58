@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce32fd8f_9b8bc3af",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-08T14:53:33Z",
+      "side": 1,
+      "message": "nit: gerrithub doesn\u0027t look too happy with that",
+      "range": {
+        "startLine": 158,
+        "startChar": 51,
+        "endLine": 158,
+        "endChar": 54
+      },
+      "revId": "e301959a7131289195f01a94ab96e919ab191c58",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
