@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6126e714_058894ae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-08T14:14:46Z",
+      "side": 1,
+      "message": "typo: then\n\nMaybe not that important if it implies a rebase but hopefully not for a simple commit change.",
+      "range": {
+        "startLine": 10,
+        "startChar": 24,
+        "endLine": 10,
+        "endChar": 28
+      },
+      "revId": "c4c7514a4abccff800247a7c9e3e90aba4afa1ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
