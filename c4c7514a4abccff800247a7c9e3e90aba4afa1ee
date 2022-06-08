@@ -22,6 +22,30 @@
       },
       "revId": "c4c7514a4abccff800247a7c9e3e90aba4afa1ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c9ec8d5_45f948dd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-08T20:40:12Z",
+      "side": 1,
+      "message": "ugh! Right at the bottom of the patch list 😊\n\nI\u0027ll fix this when submitting to avoid spamming everyone with all the rebases",
+      "parentUuid": "6126e714_058894ae",
+      "range": {
+        "startLine": 10,
+        "startChar": 24,
+        "endLine": 10,
+        "endChar": 28
+      },
+      "revId": "c4c7514a4abccff800247a7c9e3e90aba4afa1ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
