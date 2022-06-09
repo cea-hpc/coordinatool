@@ -46,6 +46,30 @@
       },
       "revId": "9b043f721e1c0fd0b5176fa980e9024ff560a709",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57db481f_f09e2c46",
+        "filename": "copytool/redis.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T15:19:47Z",
+      "side": 1,
+      "message": "My bad, I think I\u0027ve done enough reviews for one day :)",
+      "parentUuid": "8d99b124_1b1c8123",
+      "range": {
+        "startLine": 414,
+        "startChar": 0,
+        "endLine": 414,
+        "endChar": 34
+      },
+      "revId": "9b043f721e1c0fd0b5176fa980e9024ff560a709",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
