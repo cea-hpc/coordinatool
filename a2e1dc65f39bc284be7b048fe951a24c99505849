@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "851f3f1e_2e052d50",
+        "filename": "preload/preload.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T13:21:06Z",
+      "side": 1,
+      "message": "question: as far as I understand, on reconnect you will read every item in the tree and send them to the server, right? Shouldn\u0027t you call action_delete after you made sure that protocol_request_done succeeds? Otherwise, the request will not be in the tree when reconnecting. Unless I\u0027m missing something.",
+      "range": {
+        "startLine": 118,
+        "startChar": 54,
+        "endLine": 118,
+        "endChar": 79
+      },
+      "revId": "a2e1dc65f39bc284be7b048fe951a24c99505849",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
