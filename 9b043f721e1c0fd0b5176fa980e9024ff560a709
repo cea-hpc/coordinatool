@@ -22,6 +22,30 @@
       },
       "revId": "9b043f721e1c0fd0b5176fa980e9024ff560a709",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d99b124_1b1c8123",
+        "filename": "copytool/redis.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:12:30Z",
+      "side": 1,
+      "message": "This is the other way around: we create a new client if one wasn\u0027t found.",
+      "parentUuid": "1f492f1e_12c6a0ea",
+      "range": {
+        "startLine": 414,
+        "startChar": 0,
+        "endLine": 414,
+        "endChar": 34
+      },
+      "revId": "9b043f721e1c0fd0b5176fa980e9024ff560a709",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
