@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "edf5e943_01b62be3",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:06:48Z",
+      "side": 1,
+      "message": "hm right rest of the file does that, will do.",
+      "parentUuid": "69233c56_6f55b273",
+      "range": {
+        "startLine": 55,
+        "startChar": 4,
+        "endLine": 55,
+        "endChar": 9
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e514c1c_34a279f6",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98bcb4a4_2dede6f1",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:06:48Z",
+      "side": 1,
+      "message": "Yes. There\u0027s no real use for these stats yet, so it\u0027s whatever we want them to be.\ndisconnected clients will have \"status\": \"disconnected\" + disconnected_timestamp so it should be easy to handle them if required; I don\u0027t see why disconnected should be handled separately from e.g. status \u003d init...",
+      "parentUuid": "4e514c1c_34a279f6",
+      "range": {
+        "startLine": 96,
+        "startChar": 6,
+        "endLine": 96,
+        "endChar": 34
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c4f135c_3b45c814",
@@ -60,6 +108,30 @@
       "writtenOn": "2022-06-09T14:16:21Z",
       "side": 1,
       "message": "major: reply_ehlo?",
+      "range": {
+        "startLine": 363,
+        "startChar": 24,
+        "endLine": 363,
+        "endChar": 28
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df2b582f_e36b75ce",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:06:48Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4c4f135c_3b45c814",
       "range": {
         "startLine": 363,
         "startChar": 24,
@@ -95,6 +167,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "38e5dc6a_38e93038",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:06:48Z",
+      "side": 1,
+      "message": "Yes, not doing that will try to walk through the old list when freeing client and cause annoying use-after-frees later which was painful to debug...\nI was thinking making a wrapper around cds_list_splice that does it so we don\u0027t forget later, just didn\u0027t take the time to...",
+      "parentUuid": "ed98bde1_2e46823f",
+      "range": {
+        "startLine": 390,
+        "startChar": 2,
+        "endLine": 390,
+        "endChar": 20
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e9573145_acbf9626",
         "filename": "copytool/protocol.c",
         "patchSetId": 4
@@ -106,6 +202,30 @@
       "writtenOn": "2022-06-09T14:16:21Z",
       "side": 1,
       "message": "minor: I don\u0027t think the comment is accurate here",
+      "range": {
+        "startLine": 402,
+        "startChar": 2,
+        "endLine": 402,
+        "endChar": 8
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ad4b9b5_e5dac7b6",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:06:48Z",
+      "side": 1,
+      "message": "err yes that was leftover from debugging when things didn\u0027t go quite right.\nBut since I plan on forbidding multiple clients with same id I\u0027ll remove the comment instead.",
+      "parentUuid": "e9573145_acbf9626",
       "range": {
         "startLine": 402,
         "startChar": 2,
@@ -139,6 +259,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c39d6e4_89f3e4df",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:06:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fcfa738_c7c84ab2",
+      "range": {
+        "startLine": 425,
+        "startChar": 15,
+        "endLine": 425,
+        "endChar": 24
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25eb1fde_3ad0be33",
@@ -152,6 +296,30 @@
       "writtenOn": "2022-06-09T14:16:21Z",
       "side": 1,
       "message": "question: I\u0027m not sure why you do a dequeue here. Is it a \"hack\" to call enrich and other initialization steps through hsm_action_equeue_json and dequeue it because its already handled by a client? If so a small comment above this line would be great.",
+      "range": {
+        "startLine": 440,
+        "startChar": 3,
+        "endLine": 440,
+        "endChar": 21
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3571b99c_b10ad99c",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:06:48Z",
+      "side": 1,
+      "message": "There\u0027s already a comment above enqueue, I\u0027ll add that using it requires dequeue.",
+      "parentUuid": "25eb1fde_3ad0be33",
       "range": {
         "startLine": 440,
         "startChar": 3,
