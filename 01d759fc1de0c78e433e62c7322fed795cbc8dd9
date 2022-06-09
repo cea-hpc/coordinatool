@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69233c56_6f55b273",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:16:21Z",
+      "side": 1,
+      "message": "style: this line and the others above are quite long, I think we could at least align them with the first parenthesis of the if",
+      "range": {
+        "startLine": 55,
+        "startChar": 4,
+        "endLine": 55,
+        "endChar": 9
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e514c1c_34a279f6",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:16:21Z",
+      "side": 1,
+      "message": "question: I think connected and disconnected clients are on the same JSON list here. Is this intentional?",
+      "range": {
+        "startLine": 96,
+        "startChar": 6,
+        "endLine": 96,
+        "endChar": 34
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c4f135c_3b45c814",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:16:21Z",
+      "side": 1,
+      "message": "major: reply_ehlo?",
+      "range": {
+        "startLine": 363,
+        "startChar": 24,
+        "endLine": 363,
+        "endChar": 28
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed98bde1_2e46823f",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:16:21Z",
+      "side": 1,
+      "message": "question: why to you initialize the old list? Is it so that they are considered empty when freeing old_client?",
+      "range": {
+        "startLine": 390,
+        "startChar": 2,
+        "endLine": 390,
+        "endChar": 20
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9573145_acbf9626",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:16:21Z",
+      "side": 1,
+      "message": "minor: I don\u0027t think the comment is accurate here",
+      "range": {
+        "startLine": 402,
+        "startChar": 2,
+        "endLine": 402,
+        "endChar": 8
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fcfa738_c7c84ab2",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:16:21Z",
+      "side": 1,
+      "message": "typo: existing",
+      "range": {
+        "startLine": 425,
+        "startChar": 15,
+        "endLine": 425,
+        "endChar": 24
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25eb1fde_3ad0be33",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:16:21Z",
+      "side": 1,
+      "message": "question: I\u0027m not sure why you do a dequeue here. Is it a \"hack\" to call enrich and other initialization steps through hsm_action_equeue_json and dequeue it because its already handled by a client? If so a small comment above this line would be great.",
+      "range": {
+        "startLine": 440,
+        "startChar": 3,
+        "endLine": 440,
+        "endChar": 21
+      },
+      "revId": "01d759fc1de0c78e433e62c7322fed795cbc8dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
