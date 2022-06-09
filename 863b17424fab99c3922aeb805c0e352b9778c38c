@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56469cbc_b91319c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:21:48Z",
+      "side": 1,
+      "message": "I\u0027ll rebase with changes once later patches also have gotten their reviews",
+      "revId": "863b17424fab99c3922aeb805c0e352b9778c38c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "235c933c_8429991e",
@@ -24,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c893e05_25b41d80",
+        "filename": "copytool/redis.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:21:48Z",
+      "side": 1,
+      "message": "Definitely should, yes. Thanks!",
+      "parentUuid": "235c933c_8429991e",
+      "range": {
+        "startLine": 306,
+        "startChar": 3,
+        "endLine": 306,
+        "endChar": 12
+      },
+      "revId": "863b17424fab99c3922aeb805c0e352b9778c38c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7111401_54ba0ce8",
@@ -37,6 +78,30 @@
       "writtenOn": "2022-06-09T08:52:07Z",
       "side": 1,
       "message": "question: what does the cursor represent? It seems that elements are sent by chunks by looking at your code. Is it an index into the table?",
+      "range": {
+        "startLine": 319,
+        "startChar": 13,
+        "endLine": 319,
+        "endChar": 19
+      },
+      "revId": "863b17424fab99c3922aeb805c0e352b9778c38c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e9d423a_2901b391",
+        "filename": "copytool/redis.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:21:48Z",
+      "side": 1,
+      "message": "It\u0027s sort of an index; basically hscan will return a magical number that we should use to keep reading from where we were left off as well as any number of entries (by default not so many, 10ish? I forgot I wanted to increase the amount to send at a time...)\n\nOnce all hash entries have been seen you\u0027ll get 0 as cursor and that guarnatees you\u0027ve seen all entries that were present when your scan started and are still present now at least once.\n(In particular, if the hash is mutating you can get any entry any numbers of time -- but all entries that haven\u0027t left the hash will be listed)",
+      "parentUuid": "f7111401_54ba0ce8",
       "range": {
         "startLine": 319,
         "startChar": 13,
