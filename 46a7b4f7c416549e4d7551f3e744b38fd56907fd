@@ -18,6 +18,46 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe78da73_04954729",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "I put -1 because of my comment regarding the lack of check of archive_ids for copytools.",
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40a8b66a_7ecff6ec",
+        "filename": "client/client.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "minor: you should add --fsname to the help",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 15
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7478ceb5_513870db",
@@ -60,6 +100,121 @@
         "startChar": 19,
         "endLine": 107,
         "endChar": 22
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9f7fe1c_5f1121cf",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "comment: regarding my comment about checking the archive_ids that the copytool support, I don\u0027t see the archive_ids in this structure which means that it is probably not checked in the code.\n\nAlso, it seems that the archives and archive_count parameters of llapi_hsm_copytool_register are unused in preload/preload.c.",
+      "range": {
+        "startLine": 65,
+        "startChar": 7,
+        "endLine": 65,
+        "endChar": 13
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccc06793_66d41fcb",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "nit: maybe we can use a name a bit more expressive",
+      "range": {
+        "startLine": 193,
+        "startChar": 57,
+        "endLine": 193,
+        "endChar": 61
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59e53b2a_05b079fb",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "style: I see this line is not aligned with \u0027struct\u0027 above.",
+      "range": {
+        "startLine": 194,
+        "startChar": 9,
+        "endLine": 194,
+        "endChar": 28
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36565ba7_8f109ec8",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "nit/style: maybe this would be a bit more readable:\n\n```\nrc \u003d hsm_action_enqueue(...);\nif (rc \u003c 0)\n    ...\n```",
+      "range": {
+        "startLine": 45,
+        "startChar": 5,
+        "endLine": 48,
+        "endChar": 26
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ce5f74b_31b90fe3",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "question: could these sort of state machine handling be done outside of the callbacks? So that, each time a client sends request, we know that its connected without having to do it explicitly in the callback. This not a big deal since I think there is only one such callback on the server. But this could be extended to the clients as well to keep track of the state of the server.\n\nThis is just a thought, nothing to take into consideration at the moment or even in this patch.",
+      "range": {
+        "startLine": 147,
+        "startChar": 1,
+        "endLine": 147,
+        "endChar": 34
       },
       "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
@@ -131,6 +286,121 @@
         "startChar": 3,
         "endLine": 286,
         "endChar": 17
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5b063d6_c95ff2c6",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "question: do you intend to do something on error here at some point? Presumably, if this fails it could be that the REDIS server is not available. We could retry at some point later or have a thread continually retry.\n\nI don\u0027t know how well Lustre\u0027s coordinator handle a request which was sent to the coordinatool but it forgot about it. Presumably the request will have to be canceled manually at some point since the timeout is very long for the coordinatool to work.\n\nAlso, I assume redis_insert will log the failure so that the admin knows where to look for unsaved requests after a failure of the coordinatool.",
+      "range": {
+        "startLine": 150,
+        "startChar": 4,
+        "endLine": 150,
+        "endChar": 37
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70e4c391_2629bf9d",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "nit: to make it a bit more explicit we could say hai_data which is I think what you mean here.",
+      "range": {
+        "startLine": 163,
+        "startChar": 40,
+        "endLine": 163,
+        "endChar": 44
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92e57497_dc1a32a8",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "minor: I don\u0027t think this is strictly true. If the client is able to group requests by hsm_action_lists before giving them to the real copytool, the server could send any request as long as the client support that particular archive_id. Which would allow us to schedule a bit more freely on the server side.\n\nAlso, I think what Lustre\u0027s coordinator does is that it builds a bunch of hsm_action_lists by grouping requests of the same archive_id together and then sends each list one by one. Which means that in a single pass, a client could receive different lists with different archive_ids.",
+      "range": {
+        "startLine": 139,
+        "startChar": 22,
+        "endLine": 139,
+        "endChar": 46
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5978621e_6e099b00",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "typo: send",
+      "range": {
+        "startLine": 139,
+        "startChar": 16,
+        "endLine": 139,
+        "endChar": 21
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "843bb3f7_78fd91bb",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:08:40Z",
+      "side": 1,
+      "message": "defect: correct me if I\u0027m wrong but I don\u0027t see a check for the archive_ids allowed by the client. We should make sure that we don\u0027t send requests to a copytool which doesn\u0027t want a given archive_id.",
+      "range": {
+        "startLine": 174,
+        "startChar": 10,
+        "endLine": 174,
+        "endChar": 29
       },
       "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
