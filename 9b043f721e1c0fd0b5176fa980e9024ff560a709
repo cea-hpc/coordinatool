@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f492f1e_12c6a0ea",
+        "filename": "copytool/redis.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T15:08:35Z",
+      "side": 1,
+      "message": "nit: you could call this function inside the loop and remove the variable found I think",
+      "range": {
+        "startLine": 414,
+        "startChar": 0,
+        "endLine": 414,
+        "endChar": 34
+      },
+      "revId": "9b043f721e1c0fd0b5176fa980e9024ff560a709",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
