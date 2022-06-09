@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9529945_76c75797",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T15:24:30Z",
+      "side": 1,
+      "message": "typo: coordinatool",
+      "range": {
+        "startLine": 347,
+        "startChar": 14,
+        "endLine": 347,
+        "endChar": 25
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3116e980_222484f2",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T15:24:30Z",
+      "side": 1,
+      "message": "typo: empirical",
+      "range": {
+        "startLine": 397,
+        "startChar": 7,
+        "endLine": 397,
+        "endChar": 16
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a46c111c_1fb30517",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T15:24:30Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 432,
+        "startChar": 7,
+        "endLine": 432,
+        "endChar": 16
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9a3b0ff_87422b20",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T15:24:30Z",
+      "side": 1,
+      "message": "question: so this means that the coordinatool will see that the client has stopped and reschedule requests to the other, right?\n\nMaybe a more robust way to handle this would be to start the second copytool after the grace period? Although, this would probably go through some slightly different code paths if it works and maybe both tests would be useful?",
+      "range": {
+        "startLine": 436,
+        "startChar": 1,
+        "endLine": 436,
+        "endChar": 22
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
