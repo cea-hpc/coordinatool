@@ -46,6 +46,30 @@
       },
       "revId": "a2e1dc65f39bc284be7b048fe951a24c99505849",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56997d41_7b27c7db",
+        "filename": "preload/preload.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T14:47:52Z",
+      "side": 1,
+      "message": "I\u0027m not sure how Lustre and the copytool will handle the same request twice. If the real llapi_hsm_action_end is called before we try to restart the request, I think the cookie will no longer be valid and Lustre might complain. But if not, archive and restore might still trigger some copy I think. Even if Lustre tells the copytool at the end that the request was already done. I looked at the code and didn\u0027t find any checks from Lustre when calling llapi_hsm_action_begin. I looked at it quickly though, I might have missed something.\n\nYour solution seems good. Maybe we can first test how Lustre will handle this, maybe it\u0027s done correctly. :) I think it\u0027s easy to call llapi_hsm_action_begin twice on restore and archive and what Lustre thinks. And maybe we can also call it after llapi_hsm_action_end with the same cookie and see how Lustre behaves.",
+      "parentUuid": "82427557_6ba61deb",
+      "range": {
+        "startLine": 118,
+        "startChar": 54,
+        "endLine": 118,
+        "endChar": 79
+      },
+      "revId": "a2e1dc65f39bc284be7b048fe951a24c99505849",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
