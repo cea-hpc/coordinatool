@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20f29818_783ea487",
+        "filename": "copytool/timer.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T13:44:01Z",
+      "side": 1,
+      "message": "question: just to be sure I understand this correctly. You set the time in timer_rearm to trigger for the client which will expire the grace period first. Then when this callback is called, you will disconnect the client for good. I don\u0027t remember if that\u0027s already done but I assume that if the client reconnects before the time is triggered, it will be removed from the desconnected_clients list, right? Which means that it won\u0027t be disconnected.",
+      "range": {
+        "startLine": 58,
+        "startChar": 5,
+        "endLine": 58,
+        "endChar": 26
+      },
+      "revId": "8f9f90e3cd5c9de13d75b10fc5624528c4278eee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
