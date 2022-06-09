@@ -22,6 +22,30 @@
       },
       "revId": "a2e1dc65f39bc284be7b048fe951a24c99505849",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82427557_6ba61deb",
+        "filename": "preload/preload.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T13:48:14Z",
+      "side": 1,
+      "message": "The first part is correct, we send still running requests when reconnecting to the server in ehlo.\nBut we don\u0027t want to send this action we tried to send done for: it\u0027s done and over with, we\u0027ll never get another chance to send that done (unless we also try to remember that somewhere else).\n\nI\u0027ve described this in yesterday\u0027s mail too as adding a flag to differentiate requests not listed on ehlo because they\u0027re done, and requests not listed because the client restarted/lost one.\n\nThinking about it again (with what you said about reply recv failing in the other change), we can\u0027t make the difference between a request we thought we sent that isn\u0027t listed, and a request that is already done... So I guess that does need some more thought.\nPerhaps it\u0027s best to just keep things as they are though; in doubt requests are always rescheduled, and if it was already done it\u0027ll just fail immediately (I think? remove definitely fails, restore should notice the file is already online.. archive might rearchive depending on the copytool)\n\nIf we don\u0027t want that we need to store that done cookie in another list, and free from that other list when we receive done\u0027s ack, and send anything in that list in ehlo as another cookie list -- I guess that\u0027d probably be ideal?",
+      "parentUuid": "851f3f1e_2e052d50",
+      "range": {
+        "startLine": 118,
+        "startChar": 54,
+        "endLine": 118,
+        "endChar": 79
+      },
+      "revId": "a2e1dc65f39bc284be7b048fe951a24c99505849",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
