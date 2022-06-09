@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "235c933c_8429991e",
+        "filename": "copytool/redis.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:52:07Z",
+      "side": 1,
+      "message": "minor: shouldn\u0027t you do a continue or break in this case?",
+      "range": {
+        "startLine": 306,
+        "startChar": 3,
+        "endLine": 306,
+        "endChar": 12
+      },
+      "revId": "863b17424fab99c3922aeb805c0e352b9778c38c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7111401_54ba0ce8",
+        "filename": "copytool/redis.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:52:07Z",
+      "side": 1,
+      "message": "question: what does the cursor represent? It seems that elements are sent by chunks by looking at your code. Is it an index into the table?",
+      "range": {
+        "startLine": 319,
+        "startChar": 13,
+        "endLine": 319,
+        "endChar": 19
+      },
+      "revId": "863b17424fab99c3922aeb805c0e352b9778c38c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
