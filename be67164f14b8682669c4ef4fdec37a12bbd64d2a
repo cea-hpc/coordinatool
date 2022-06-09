@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "679754b7_f7fc3d8d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:10:52Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "73f5290f_85e43a01",
+      "range": {
+        "startLine": 10,
+        "startChar": 13,
+        "endLine": 10,
+        "endChar": 17
+      },
+      "revId": "be67164f14b8682669c4ef4fdec37a12bbd64d2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "46894eb7_67992717",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-06-09T14:22:04Z",
       "side": 1,
       "message": "minor: I think there is also a case where strtol returns 0 and endptr \u003d\u003d env if env is not a number.\n\nAnd the case where the value would overflow but I think the check envval \u003e INT_MAX covers this case because strtol should return LONG_MAX.",
+      "range": {
+        "startLine": 84,
+        "startChar": 35,
+        "endLine": 84,
+        "endChar": 36
+      },
+      "revId": "be67164f14b8682669c4ef4fdec37a12bbd64d2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ef73c2b_1bb16261",
+        "filename": "common/config.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:10:52Z",
+      "side": 1,
+      "message": "I messed up a rebase; the endptr check has been added in Change-Id: Ie59bab5617aa950ce337312c9f419841b674a265 (recreate clients on recovery)\nthe overflow check is covered by \u003e INT_MAX, yes. There is no need to check errno for our use case.",
+      "parentUuid": "46894eb7_67992717",
       "range": {
         "startLine": 84,
         "startChar": 35,
