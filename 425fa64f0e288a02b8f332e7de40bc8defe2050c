@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4e48d86_b10b8be5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:36:05Z",
+      "side": 1,
+      "message": "so many typos... sorry.",
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9529945_76c75797",
@@ -14,6 +31,30 @@
       "writtenOn": "2022-06-09T15:24:30Z",
       "side": 1,
       "message": "typo: coordinatool",
+      "range": {
+        "startLine": 347,
+        "startChar": 14,
+        "endLine": 347,
+        "endChar": 25
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "036e4889_45c970e7",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:36:05Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b9529945_76c75797",
       "range": {
         "startLine": 347,
         "startChar": 14,
@@ -47,6 +88,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96fdba40_50ada280",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:36:05Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3116e980_222484f2",
+      "range": {
+        "startLine": 397,
+        "startChar": 7,
+        "endLine": 397,
+        "endChar": 16
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a46c111c_1fb30517",
@@ -70,6 +135,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f456410_9cc55c30",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:36:05Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a46c111c_1fb30517",
+      "range": {
+        "startLine": 432,
+        "startChar": 7,
+        "endLine": 432,
+        "endChar": 16
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9a3b0ff_87422b20",
@@ -83,6 +172,30 @@
       "writtenOn": "2022-06-09T15:24:30Z",
       "side": 1,
       "message": "question: so this means that the coordinatool will see that the client has stopped and reschedule requests to the other, right?\n\nMaybe a more robust way to handle this would be to start the second copytool after the grace period? Although, this would probably go through some slightly different code paths if it works and maybe both tests would be useful?",
+      "range": {
+        "startLine": 436,
+        "startChar": 1,
+        "endLine": 436,
+        "endChar": 22
+      },
+      "revId": "425fa64f0e288a02b8f332e7de40bc8defe2050c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a5ab77a_3378c19e",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T15:36:05Z",
+      "side": 1,
+      "message": "the wait is just waiting for completion (making sure all requests were scheduled); it doesn\u0027t matter if the second copytool was running when the first one stopped or not: this test only makes sure a client that gets put in disconnected state (its running actions get put on hold) eventually also gets freed and the actions get rescheduled.\n\nHaving the second client start after the grace period would just test that we\u0027ll schedule work if there are actions already pending. I guess that could make another test (just start coordinatool, archive req, wait a bit, start lhsmtoolcmd) though.",
+      "parentUuid": "f9a3b0ff_87422b20",
       "range": {
         "startLine": 436,
         "startChar": 1,
