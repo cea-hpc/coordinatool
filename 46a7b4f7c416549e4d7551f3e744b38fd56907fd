@@ -176,6 +176,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c50d35f4_e399451c",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T11:44:28Z",
+      "side": 1,
+      "message": "Ok, I will put +1 then.",
+      "parentUuid": "b259ab4e_71d10538",
+      "range": {
+        "startLine": 65,
+        "startChar": 7,
+        "endLine": 65,
+        "endChar": 13
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ccc06793_66d41fcb",
@@ -364,6 +388,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b8e8661_b19630fe",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T11:44:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c612c4c7_75d8df41",
+      "range": {
+        "startLine": 147,
+        "startChar": 1,
+        "endLine": 147,
+        "endChar": 34
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b71007d8_a5d7d69a",
@@ -472,6 +520,30 @@
       "side": 1,
       "message": "My stance at the moment is that redis is purely optional and should not be trusted: it\u0027s convenient for server restarts, but that\u0027s about it.\n\nThe code that parses active_requests from mds is still valid and works, so if there is a stuck request the way to handle it would be to just run that. For production I\u0027d suggest running it in a cron as it\u0027s harmless if the states are synchronous -- just need to make sure it runs fast enough... A very lofty goal would be to have request processing times statistics to check that eventually but I don\u0027t think I\u0027ll ever get there, although it\u0027s not difficult to do :)",
       "parentUuid": "d5b063d6_c95ff2c6",
+      "range": {
+        "startLine": 150,
+        "startChar": 4,
+        "endLine": 150,
+        "endChar": 37
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1fbd2d2_d911b639",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T11:44:28Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand the last part of your comment. Do you mean, when a request has been stuck for too long, we ask the MDS for the list of requests? Or we consider it stuck and try to reschedule it somehow?",
+      "parentUuid": "5a516d7f_4d5cfa37",
       "range": {
         "startLine": 150,
         "startChar": 4,
@@ -623,6 +695,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "62cf8264_4c7fb967",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T11:44:28Z",
+      "side": 1,
+      "message": "Ok, that makes sense, thanks.",
+      "parentUuid": "5289ac5e_b26a9170",
+      "range": {
+        "startLine": 139,
+        "startChar": 22,
+        "endLine": 139,
+        "endChar": 46
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "843bb3f7_78fd91bb",
@@ -660,6 +756,30 @@
       "side": 1,
       "message": "Ack -- but not an easy fix and not a new bug, so leaving it as it until later.",
       "parentUuid": "843bb3f7_78fd91bb",
+      "range": {
+        "startLine": 174,
+        "startChar": 10,
+        "endLine": 174,
+        "endChar": 29
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09e28183_df1d7b7d",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T11:44:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8408be1a_a68b5144",
       "range": {
         "startLine": 174,
         "startChar": 10,
