@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72f4d48a_3b1fedb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:25:31Z",
+      "side": 1,
+      "message": "I leave it at 0 to wait for the answer to my question but otherwise good patch.",
+      "revId": "48e703cefef80635831d9c7082bdda14b0677770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f28acad_f927eae0",
+        "filename": "copytool/redis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:25:31Z",
+      "side": 1,
+      "message": "nit: maybe redis_error_to_rc since they are now negative",
+      "range": {
+        "startLine": 33,
+        "startChar": 26,
+        "endLine": 33,
+        "endChar": 31
+      },
+      "revId": "48e703cefef80635831d9c7082bdda14b0677770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7592175e_ad5efb54",
+        "filename": "copytool/redis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:25:31Z",
+      "side": 1,
+      "message": "nit: maybe hashtable or table would be more explicit? (same for redis_delete)",
+      "range": {
+        "startLine": 131,
+        "startChar": 57,
+        "endLine": 131,
+        "endChar": 61
+      },
+      "revId": "48e703cefef80635831d9c7082bdda14b0677770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56972368_ed769f5d",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-09T08:25:31Z",
+      "side": 1,
+      "message": "question: don\u0027t you have to remove them from the assigned hash table if the call to protocol_reply_recv fails?",
+      "range": {
+        "startLine": 155,
+        "startChar": 3,
+        "endLine": 155,
+        "endChar": 44
+      },
+      "revId": "48e703cefef80635831d9c7082bdda14b0677770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
