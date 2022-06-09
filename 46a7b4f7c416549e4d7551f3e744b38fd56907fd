@@ -58,6 +58,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d955504_92d33836",
+        "filename": "client/client.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "Ack, will add all the new options in a later patch I always forget...",
+      "parentUuid": "40a8b66a_7ecff6ec",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 15
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7478ceb5_513870db",
@@ -130,6 +154,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b259ab4e_71d10538",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "it\u0027s a bigger problem than this, the protocol expects a single archive_id in recv but it should be a list as it is for copytools; and the clients need to send it properly.\nI can\u0027t fix it fast so it\u0027ll be fixed in a later commit, added to my todo",
+      "parentUuid": "d9f7fe1c_5f1121cf",
+      "range": {
+        "startLine": 65,
+        "startChar": 7,
+        "endLine": 65,
+        "endChar": 13
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ccc06793_66d41fcb",
         "filename": "copytool/coordinatool.h",
         "patchSetId": 2
@@ -141,6 +189,30 @@
       "writtenOn": "2022-06-09T08:08:40Z",
       "side": 1,
       "message": "nit: maybe we can use a name a bit more expressive",
+      "range": {
+        "startLine": 193,
+        "startChar": 57,
+        "endLine": 193,
+        "endChar": 61
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0763afd_948da711",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "it\u0027s already json_hai in the code, I\u0027ve fixed the header.",
+      "parentUuid": "ccc06793_66d41fcb",
       "range": {
         "startLine": 193,
         "startChar": 57,
@@ -174,6 +246,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2eafe6c_cd65f386",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "a later commit aligned it -- sorry, I\u0027m not going to bother untangling these patches...",
+      "parentUuid": "59e53b2a_05b079fb",
+      "range": {
+        "startLine": 194,
+        "startChar": 9,
+        "endLine": 194,
+        "endChar": 28
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36565ba7_8f109ec8",
@@ -197,6 +293,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e22dbc55_3e79bd53",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "hmm, I use quite a lot of these if ((rc \u003d ...) in protocol.c, but I guess I agree it\u0027s not really great and shouldn\u0027t leak out to other files.",
+      "parentUuid": "36565ba7_8f109ec8",
+      "range": {
+        "startLine": 45,
+        "startChar": 5,
+        "endLine": 48,
+        "endChar": 26
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ce5f74b_31b90fe3",
@@ -210,6 +330,30 @@
       "writtenOn": "2022-06-09T08:08:40Z",
       "side": 1,
       "message": "question: could these sort of state machine handling be done outside of the callbacks? So that, each time a client sends request, we know that its connected without having to do it explicitly in the callback. This not a big deal since I think there is only one such callback on the server. But this could be extended to the clients as well to keep track of the state of the server.\n\nThis is just a thought, nothing to take into consideration at the moment or even in this patch.",
+      "range": {
+        "startLine": 147,
+        "startChar": 1,
+        "endLine": 147,
+        "endChar": 34
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c612c4c7_75d8df41",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "hm, this state machine is actually quite subtle and I already had two problems with these in this patch series; mostly because there are expectations about what part of the union is valid and in which list the client \u0027node\u0027 is depending on the state.\n\nA later patch in here added quite a few checks to make sure a client that\u0027s already waiting for recv can\u0027t send another recv etc even if I haven\u0027t had this bug yet, and it\u0027s just all too imbricated to share in common code imo.\nWorth thinking about it at some point maybe but we\u0027ll need to have better typing, this is the kind of things that are much harder to get wrong with proper \"enum with data\" as many high level languages do :/",
+      "parentUuid": "9ce5f74b_31b90fe3",
       "range": {
         "startLine": 147,
         "startChar": 1,
@@ -316,6 +460,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5a516d7f_4d5cfa37",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "My stance at the moment is that redis is purely optional and should not be trusted: it\u0027s convenient for server restarts, but that\u0027s about it.\n\nThe code that parses active_requests from mds is still valid and works, so if there is a stuck request the way to handle it would be to just run that. For production I\u0027d suggest running it in a cron as it\u0027s harmless if the states are synchronous -- just need to make sure it runs fast enough... A very lofty goal would be to have request processing times statistics to check that eventually but I don\u0027t think I\u0027ll ever get there, although it\u0027s not difficult to do :)",
+      "parentUuid": "d5b063d6_c95ff2c6",
+      "range": {
+        "startLine": 150,
+        "startChar": 4,
+        "endLine": 150,
+        "endChar": 37
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "70e4c391_2629bf9d",
         "filename": "copytool/queue.c",
         "patchSetId": 2
@@ -327,6 +495,30 @@
       "writtenOn": "2022-06-09T08:08:40Z",
       "side": 1,
       "message": "nit: to make it a bit more explicit we could say hai_data which is I think what you mean here.",
+      "range": {
+        "startLine": 163,
+        "startChar": 40,
+        "endLine": 163,
+        "endChar": 44
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fe0f13b_76cb4a01",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "70e4c391_2629bf9d",
       "range": {
         "startLine": 163,
         "startChar": 40,
@@ -385,6 +577,54 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5289ac5e_b26a9170",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "afaiu that will still be one llapi_hsm_copytool_recv() per hsm_action_list, so we can\u0027t do that.\n\nThe main difference is that the real coordinator can just keep pushing lists and kuc will take care of buffering, but the preload lib doesn\u0027t have any such buffering: our protocol expects exactly one reply to each recv request, and we can\u0027t just send a list of lists.\n\nHonestly this is a rather bad API, but it\u0027s what fit llapi model best.\nFor new copytools it might make sense to have \"coordinatool-native\" copytools that could do better as most of the client code is shared and could be reused, but that\u0027ll require new protocol calls in my opinion.",
+      "parentUuid": "92e57497_dc1a32a8",
+      "range": {
+        "startLine": 139,
+        "startChar": 22,
+        "endLine": 139,
+        "endChar": 46
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71fa4f51_73a0b128",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "5978621e_6e099b00",
+      "range": {
+        "startLine": 139,
+        "startChar": 16,
+        "endLine": 139,
+        "endChar": 21
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "843bb3f7_78fd91bb",
         "filename": "copytool/scheduler.c",
         "patchSetId": 2
@@ -396,6 +636,30 @@
       "writtenOn": "2022-06-09T08:08:40Z",
       "side": 1,
       "message": "defect: correct me if I\u0027m wrong but I don\u0027t see a check for the archive_ids allowed by the client. We should make sure that we don\u0027t send requests to a copytool which doesn\u0027t want a given archive_id.",
+      "range": {
+        "startLine": 174,
+        "startChar": 10,
+        "endLine": 174,
+        "endChar": 29
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8408be1a_a68b5144",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:09:20Z",
+      "side": 1,
+      "message": "Ack -- but not an easy fix and not a new bug, so leaving it as it until later.",
+      "parentUuid": "843bb3f7_78fd91bb",
       "range": {
         "startLine": 174,
         "startChar": 10,
