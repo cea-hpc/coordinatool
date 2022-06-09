@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2c8982ab_f5486c89",
+        "filename": "copytool/redis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:15:53Z",
+      "side": 1,
+      "message": "lazy wins I think I\u0027ll keep errno as it\u0027s still a 1:1 errno map",
+      "parentUuid": "5f28acad_f927eae0",
+      "range": {
+        "startLine": 33,
+        "startChar": 26,
+        "endLine": 33,
+        "endChar": 31
+      },
+      "revId": "48e703cefef80635831d9c7082bdda14b0677770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7592175e_ad5efb54",
         "filename": "copytool/redis.c",
         "patchSetId": 2
@@ -54,6 +78,30 @@
       "writtenOn": "2022-06-09T08:25:31Z",
       "side": 1,
       "message": "nit: maybe hashtable or table would be more explicit? (same for redis_delete)",
+      "range": {
+        "startLine": 131,
+        "startChar": 57,
+        "endLine": 131,
+        "endChar": 61
+      },
+      "revId": "48e703cefef80635831d9c7082bdda14b0677770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8109f98c_ae3110f6",
+        "filename": "copytool/redis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:15:53Z",
+      "side": 1,
+      "message": "Ack, redis calls these \u0027key\u0027 but I find that even less clear (as key is usually associated with the hash.. key, which they call \u0027field\u0027)\n\nI\u0027m not happy with any name but hash_table is probably the least bad... Give me some time to think.",
+      "parentUuid": "7592175e_ad5efb54",
       "range": {
         "startLine": 131,
         "startChar": 57,
@@ -77,6 +125,30 @@
       "writtenOn": "2022-06-09T08:25:31Z",
       "side": 1,
       "message": "question: don\u0027t you have to remove them from the assigned hash table if the call to protocol_reply_recv fails?",
+      "range": {
+        "startLine": 155,
+        "startChar": 3,
+        "endLine": 155,
+        "endChar": 44
+      },
+      "revId": "48e703cefef80635831d9c7082bdda14b0677770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "331493b9_255bc215",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T10:15:53Z",
+      "side": 1,
+      "message": "Yes and no -- protocol_reply_recv failing should trigger a forceful disconnect from the client, which should then reconnect and renegotiate it\u0027s list when it reconnects.\n\nThat\u0027s where the redis assign hash should be fixed but as said in yesterday\u0027s mail it\u0027s not done yet.",
+      "parentUuid": "56972368_ed769f5d",
       "range": {
         "startLine": 155,
         "startChar": 3,
