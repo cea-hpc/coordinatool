@@ -556,6 +556,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "85200273_37b6e0fa",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T11:59:29Z",
+      "side": 1,
+      "message": "There\u0027s two parts:\n\n- if the client send failed somehow it *should* bubble up somewhere that\u0027ll disconnect the client (e.g. main epoll loop does this, schedule client does this). There might be code paths that don\u0027t, these should be fixed if we notice, but I think we\u0027re mostly ok here: send or receive failure \u003d disconnect.\nWhen that client disconnects with the latest version it\u0027s put in disconnected state for a while (grace period) from which either it reconnects and we check what it says is running (if it wasn\u0027t really running we\u0027ll reschedule it), or it didn\u0027t reconnect in time and we send requests to other clients.\n\n- If the coordinatool happens to restart at this point -- it\u0027s actually the same. It\u0027ll recreate a client from the redis assigned hash, but the requests will only stay \"assigned\" for the duration of the grace period: either the client shows up again or we put all requests back in the pool to be scheduled to any other client.\n \nSo really the assigned part is just remembering \"oh this request might be scheduled, let\u0027s not send it to a client immediately when we restart\" -- we don\u0027t *really* care which client it\u0027s assigned to, it\u0027s only an optimization.\n\n\nThe last part about the parse_active request is a bit more subtle, it\u0027s for the case when we\u0027ve received work from the coordinator but it\u0027s not been stored in the main redis table yet.\nThis is a problem because of the coordinator design: there\u0027s no acknowledgement, so if the client the coordinator runs on crashes I believe lustre will not properly resend whatever it just sent until timeout, which we don\u0027t want to wait.\nIt\u0027s unfortunate, but it should be very rare... yet unfortunately required; I don\u0027t think any amout of redis or any other stable memory could spare us from having this fallback.\n\nIf queue request is too slow in production it could check in redis what the server knows about and only send requests not in redis for example, there\u0027s room for optimization, but if it\u0027s too slow just reading the active requests file is going to be slow for lustre anyway so I don\u0027t think we need to worry about this. We still need to keep the total amount of active requests reasonably (up to tens of thousands) small.",
+      "parentUuid": "c1fbd2d2_d911b639",
+      "range": {
+        "startLine": 150,
+        "startChar": 4,
+        "endLine": 150,
+        "endChar": 37
+      },
+      "revId": "46a7b4f7c416549e4d7551f3e744b38fd56907fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "70e4c391_2629bf9d",
         "filename": "copytool/queue.c",
         "patchSetId": 2
