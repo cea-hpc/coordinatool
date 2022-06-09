@@ -22,6 +22,30 @@
       },
       "revId": "8f9f90e3cd5c9de13d75b10fc5624528c4278eee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "513933c2_8f2d8749",
+        "filename": "copytool/timer.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-09T13:50:02Z",
+      "side": 1,
+      "message": "Yes.\nIn that case the timer fd event will still fire but it won\u0027t be found in this list so nothing happens.\n\nHaving you write this out made me notice we need to re-arm the timerfd when we\u0027re here for whenever the next client expires...",
+      "parentUuid": "20f29818_783ea487",
+      "range": {
+        "startLine": 58,
+        "startChar": 5,
+        "endLine": 58,
+        "endChar": 26
+      },
+      "revId": "8f9f90e3cd5c9de13d75b10fc5624528c4278eee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
