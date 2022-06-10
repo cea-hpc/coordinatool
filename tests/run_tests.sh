@@ -146,10 +146,22 @@ do_coordinatool_service() {
 do_lhsmtoolcmd_start() {
 	local i="$1"
 	local LHSMCMD_CONF="${LHSMCMD_CONF:-${SOURCEDIR}/tests/lhsm_cmd.conf}"
+	# see coordinatool_start commment for CTOOL_ENV for usage (string -> assoc array)
+	declare -A AGENT_ENV=${AGENT_ENV:-( )}
+	local env="" var
+
+	if [ -z "${AGENT_ENV[COORDINATOOL_CLIENT_ID]}" ]; then
+		# add default client id unless set
+		AGENT_ENV[COORDINATOOL_CLIENT_ID]="agent_$i"
+	fi
+
+	for var in "${!AGENT_ENV[@]}"; do
+		env+=" -E $var=${AGENT_ENV[$var]@Q}"
+	done
 
 	do_client "$i" "
 		rm -rf ${ARCHIVEDIR@Q} && mkdir ${ARCHIVEDIR@Q}
-		systemd-run -P -G --unit=ctest_lhsmtool_cmd@$i.service \
+		systemd-run -P -G --unit=ctest_lhsmtool_cmd@$i.service $env \
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
 				--config ${LHSMCMD_CONF@Q} \
@@ -435,7 +447,6 @@ server_stop_lhsmtoolcmd_busy() {
 
 	client_archive_n_wait 3 100
 }
-
 run_test 06 server_stop_lhsmtoolcmd_busy
 
 
