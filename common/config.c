@@ -5,12 +5,14 @@
 #include <strings.h>
 
 #include "logs.h"
+#include "utils.h"
 
 int getenv_str(const char *name, const char **val) {
 	const char *env = getenv(name);
 	if (!env)
 		return 0;
-	*val = env;
+	free((void*)*val);
+	*val = xstrdup(env);
 	LOG_INFO("env setting %s to %s", name, env);
 	return 1;
 }
