@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ca51317_e9349543",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-10T22:51:47Z",
+      "side": 1,
+      "message": "Ok I won\u0027t be pushing by mistake again :-D\n\nin case you missed it in the spam:\n---\nbah, I did it again :/ I pushed to master instead of refs/for/master... sigh, sorry.\n\nI\u0027ve rolled in all the feedback I was asked so I think it\u0027s ok, but I guess I really ought to do something about it, I\u0027ll add a pre-push hook to forbid that.....\nIt\u0027s a bit less convenient than if changes were open but you can still compare revisions and navigate through commits in the \"relation chain\" here, feel free to check my changes, but I\u0027d understand if you don\u0027t want to.\n---",
+      "revId": "d0597275a6415921627996cccb98d425f25cbaad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
