@@ -56,9 +56,13 @@ static void print_help(char *argv0) {
 	printf("Options:\n");
 	printf("    -v, --verbose: increase verbosity (repeatable)\n");
 	printf("    -q, --quiet: decrease verbosity\n");
-	printf("    -A, --archive: set which archive id to handle\n");
-	printf("    -p, --port: select port to listen to\n");
-	printf("    -H, --host: select address to listen to\n");
+	printf("    -A, --archive <id>: set which archive id to handle\n");
+	printf("                      (default any, can be set multiple times)\n");
+	printf("    -p, --port <port>: select port to listen to\n");
+	printf("    -H, --host <host>: select address to listen to\n");
+	printf("    --redis-host <host>: hostname for redis server (default: localhost)\n");
+	printf("    --redis-port <port>: port for redis server (default 6397)\n");
+	printf("    --client-grace <time_ms>: time before we forget a client (default 10s)\n");
 	printf("    -V, --version: print version info\n");
 	printf("    -h, --help: this help\n");
 }

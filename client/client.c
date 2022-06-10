@@ -23,6 +23,8 @@ void print_help(char *argv[]) {
 	printf("           note the work will be reclaimed when client disconnects\n");
 	printf("--iters/-i: number of replies to expect (can be used to wait after\n");
 	printf("            receiving work, negative number loops forever)\n");
+	printf("--fsname <name>: fsname for -Q, optionally used by coordinatool to avoid\n");
+	printf("                 sending to wrong server\n");
 	printf("--verbose/-v: Increase log level (can repeat)\n");
 	printf("--quiet/-q: Decreate log level\n");
 	printf("--version/-V: show version\n");
