@@ -174,9 +174,9 @@ struct state {
 		const char *confpath;
 		const char *host;
 		const char *port;
-		enum llapi_message_level verbose;
 		const char *redis_host;
 		int redis_port;
+		enum llapi_message_level verbose;
 		int client_grace_ms;
 		int archive_cnt;
 		int archives[LL_HSM_MAX_ARCHIVES_PER_AGENT];
@@ -191,6 +191,7 @@ struct state {
 	int hsm_fd;
 	int listen_fd;
 	int timer_fd;
+	int signal_fd;
 	struct hsm_action_queues queues;
 	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
