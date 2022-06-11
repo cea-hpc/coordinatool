@@ -57,7 +57,7 @@ static void redis_disconnect_cb(const struct redisAsyncContext *ac,
 				int status UNUSED) {
 	struct state *state = ac->data;
 
-	LOG_WARN(0, "Redis disconnected");
+	LOG_INFO("Redis disconnected");
 	state->redis_ac = NULL;
 }
 

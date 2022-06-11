@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <assert.h>
 #include <getopt.h>
 #include <limits.h>
 #include <signal.h>
@@ -106,6 +107,21 @@ static void signal_log(int signal_fd) {
 		 siginfo.ssi_signo, siginfo.ssi_pid);
 }
 
+static void initiate_termination(struct state *state) {
+	struct cds_list_head *n, *nnext;
+	state->terminating = true;
+
+	epoll_delfd(state->epoll_fd, state->hsm_fd);
+	close(state->listen_fd);
+	close(state->timer_fd);
+	cds_list_for_each_safe(n, nnext, &state->stats.clients) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+
+		client_disconnect(client);
+	}
+}
+
 #define MAX_EVENTS 10
 static int ct_start(struct state *state) {
 	int rc;
@@ -166,17 +182,47 @@ static int ct_start(struct state *state) {
 			} else if (events[n].data.fd == state->listen_fd) {
 				handle_client_connect(state);
 			} else if (events[n].data.ptr == state->redis_ac) {
-				if (events[n].events & EPOLLIN)
+				if (events[n].events & EPOLLIN) {
 					redisAsyncHandleRead(state->redis_ac);
-				// EPOLLOUT is only requested when we have something
-				// to send
-				if (events[n].events & EPOLLOUT)
+				}
+				/* EPOLLOUT is only requested when we have something
+				 * to send.
+				 * When disconnecting redis_ac can be cleared while
+				 * handling read, so check it's still here.
+				 */
+				if (state->redis_ac && events[n].events & EPOLLOUT) {
 					redisAsyncHandleWrite(state->redis_ac);
+				}
+				if (!state->redis_ac) {
+					/* done flushing redis requests,
+					 * we can exit */
+					if (state->terminating)
+						return 0;
+					// XXX check rc
+					redis_connect(state);
+				}
 			} else if (events[n].data.fd == state->timer_fd) {
 				handle_expired_timers(state);
 			} else if (events[n].data.fd == state->signal_fd) {
 				signal_log(state->signal_fd);
-				return 0;
+
+				/* we got killed, close all clients and stop listening
+				 * for lustre events and initiate redis disconnect. */
+				if (state->terminating) {
+					LOG_WARN(0, "Got killed twice, no longer waiting for redis");
+					return 0;
+				}
+				initiate_termination(state);
+
+				/* The loop will stop when redis is done */
+				if (state->redis_ac) {
+					redisAsyncDisconnect(state->redis_ac);
+				}
+				/* It's also possible asyncDisconnect was immediate if
+				 * no work was pending */
+				if (!state->redis_ac) {
+					return 0;
+				}
 			} else {
 				struct client *client = events[n].data.ptr;
 				if (protocol_read_command(client->fd, client->id, client,
@@ -308,8 +354,12 @@ int main(int argc, char *argv[]) {
 	rc = rc ? EXIT_FAILURE : EXIT_SUCCESS;
 
 out:
-	if (state.redis_ac)
-		redisAsyncDisconnect(state.redis_ac);
+	if (state.redis_ac) {
+		LOG_WARN(EISCONN, "redis connection was not closed completely, some requests will likely not be remembered");
+	}
+	if (state.ctdata) {
+		llapi_hsm_copytool_unregister(&state.ctdata);
+	}
 	config_free(&state.config);
 	free((void*)state.fsname);
 	return rc;

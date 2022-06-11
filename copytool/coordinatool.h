@@ -192,6 +192,7 @@ struct state {
 	int listen_fd;
 	int timer_fd;
 	int signal_fd;
+	bool terminating;
 	struct hsm_action_queues queues;
 	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
