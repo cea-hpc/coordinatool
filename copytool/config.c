@@ -81,10 +81,20 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 			LOG_INFO("config setting port to %s", config->port);
 			continue;
 		}
-		if (!strcasecmp(key, "state_dir_prefix")) {
-			free((void*)config->state_dir_prefix);
-			config->state_dir_prefix = xstrdup(val);
-			LOG_INFO("config setting state dir prefix to %s", config->state_dir_prefix);
+		if (!strcasecmp(key, "redis_host")) {
+			free((void*)config->redis_host);
+			config->redis_host = xstrdup(val);
+			LOG_INFO("config setting redis_host to %s", config->redis_host);
+			continue;
+		}
+		if (!strcasecmp(key, "redis_port")) {
+			config->redis_port = parse_int(val, 65535);
+			LOG_INFO("config setting redis_port to %d", config->redis_port);
+			continue;
+		}
+		if (!strcasecmp(key, "client_grace_ms")) {
+			config->client_grace_ms = parse_int(val, INT_MAX);
+			LOG_INFO("config setting client_grace_ms to %d", config->client_grace_ms);
 			continue;
 		}
 		if (!strcasecmp(key, "verbose")) {
@@ -131,7 +141,6 @@ int config_init(struct state_config *config) {
 	/* first set defaults */
 	config->host = xstrdup("coordinatool");
 	config->port = xstrdup("5123");
-	config->state_dir_prefix = xstrdup(".coordinatool");
 	config->redis_host = xstrdup("localhost");
 	config->redis_port = 6379;
 	config->client_grace_ms = 10000; /* 10s, double of client reconnect time */
@@ -156,7 +165,6 @@ int config_init(struct state_config *config) {
 	/* then overwrite with env */
 	getenv_str("COORDINATOOL_HOST", &config->host);
 	getenv_str("COORDINATOOL_PORT", &config->port);
-	getenv_str("COORDINATOOL_STATE_DIR_PREFIX", &config->state_dir_prefix);
 	getenv_str("COORDINATOOL_REDIS_HOST", &config->redis_host);
 	getenv_int("COORDINATOOL_REDIS_PORT", &config->redis_port);
 	getenv_int("COORDINATOOL_CLIENT_GRACE", &config->client_grace_ms);
@@ -170,5 +178,5 @@ int config_init(struct state_config *config) {
 void config_free(struct state_config *config) {
 	free((void*)config->host);
 	free((void*)config->port);
-	free((void*)config->state_dir_prefix);
+	free((void*)config->redis_host);
 }
