@@ -174,7 +174,6 @@ struct state {
 		const char *confpath;
 		const char *host;
 		const char *port;
-		const char *state_dir_prefix;
 		enum llapi_message_level verbose;
 		const char *redis_host;
 		int redis_port;
