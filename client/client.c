@@ -17,6 +17,7 @@ void print_help(char *argv[]) {
 	printf("common client options are shared with lib (see config file and env var\n");
 	printf("defaults to printing status\n\n");
 	printf("options:\n");
+	printf("--config/-c: alternative config file\n");
 	printf("--host/-H: server to connect to\n");
 	printf("--port/-p: port to connect to\n");
 	printf("--queue/-Q: queue active_requests from stdin\n");
@@ -111,7 +112,7 @@ int client_run(struct client *client) {
 #define OPT_FSNAME 257
 
 int main(int argc, char *argv[]) {
-	struct option long_opts[] = {
+	const struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
 		{ "version", no_argument, NULL, 'V' },
 		{ "help", no_argument, NULL, 'h'},
@@ -125,6 +126,7 @@ int main(int argc, char *argv[]) {
 		{ "iters", required_argument, NULL, 'i' },
 		{ 0 },
 	};
+	const char short_opts[] = "c:vqH:p:QRA:i:Vh";
 	int rc;
 
 	// default options
@@ -134,11 +136,14 @@ int main(int argc, char *argv[]) {
 		.state.socket_fd = -1,
 	};
 
-	/* slight hack: if first arg is --config use it to overwrite
-	 * conf file... This is mostly for fuzzing parser
-	 */
-	if (argc > 2 && !strcmp(argv[1], "--config"))
-		client.state.config.confpath = argv[2];
+	/* parse arguments once first just for config */
+	while ((rc = getopt_long(argc, argv, short_opts,
+				  long_opts, NULL)) != -1) {
+		if (rc == 'c') {
+			free((void*)client.state.config.confpath);
+			client.state.config.confpath = xstrdup(optarg);
+		}
+	}
 
 	rc = ct_config_init(&client.state.config);
 	if (rc) {
@@ -150,9 +155,12 @@ int main(int argc, char *argv[]) {
 	free((void*)client.state.config.client_id);
 	client.state.config.client_id = NULL;
 
-	while ((rc = getopt_long(argc, argv, "vqH:p:QRA:i:Vh",
+	optind = 1;
+	while ((rc = getopt_long(argc, argv, short_opts,
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
+		case 'c': // parsed above
+			break;
 		case 'v':
 			client.state.config.verbose++;
 			llapi_msg_set_level(client.state.config.verbose);

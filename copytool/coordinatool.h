@@ -178,14 +178,14 @@ struct state {
 		const char *redis_host;
 		int redis_port;
 		int client_grace_ms;
+		int archive_cnt;
+		int archives[LL_HSM_MAX_ARCHIVES_PER_AGENT];
 	} config;
 	/* options: command line switches only */
-	int archive_cnt;
-	int archive_id[LL_HSM_MAX_ARCHIVES_PER_AGENT];
 	const char *mntpath;
-	const char *fsname;
 	/* state values */
 	struct hsm_copytool_private *ctdata;
+	const char *fsname;
 	redisAsyncContext *redis_ac;
 	int epoll_fd;
 	int hsm_fd;

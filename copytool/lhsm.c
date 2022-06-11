@@ -75,7 +75,8 @@ int ct_register(struct state *state) {
 	state->fsname = xstrdup(fsname);
 
 	rc = llapi_hsm_copytool_register(&state->ctdata, state->mntpath,
-					 state->archive_cnt, state->archive_id, 0);
+					 state->config.archive_cnt,
+					 state->config.archives, 0);
 	if (rc < 0) {
 		LOG_ERROR(rc, "cannot start copytool interface");
 		return rc;
