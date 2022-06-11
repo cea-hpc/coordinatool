@@ -2,9 +2,11 @@
 
 #include <getopt.h>
 #include <limits.h>
+#include <signal.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <sys/epoll.h>
-#include <stdint.h>
+#include <sys/signalfd.h>
 
 #include "coordinatool.h"
 #include "version.h"
@@ -57,6 +59,53 @@ static void print_version(void) {
 	printf("Coordinatool version %s\n", VERSION);
 }
 
+static int signal_init(struct state *state) {
+	int rc;
+	sigset_t ss;
+
+	sigemptyset(&ss);
+	sigaddset(&ss, SIGTERM);
+	sigaddset(&ss, SIGINT);
+	sigaddset(&ss, SIGQUIT);
+
+	state->signal_fd = signalfd(-1, &ss, SFD_NONBLOCK | SFD_CLOEXEC);
+	if (state->signal_fd < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not setup signal fd");
+		return rc;
+	}
+
+	/* we need to block signals for signal fd to get a chance */
+	rc = sigprocmask(SIG_BLOCK, &ss, NULL);
+	if (rc < 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "Could not block signals");
+		return rc;
+	}
+	return epoll_addfd(state->epoll_fd, state->signal_fd,
+			   (void*)(uintptr_t)state->signal_fd);
+}
+
+static void signal_log(int signal_fd) {
+	int n;
+	struct signalfd_siginfo siginfo;
+
+	n = read(signal_fd, &siginfo, sizeof(siginfo));
+	if (n < 0) {
+		n = -errno;
+		LOG_WARN(n, "Read from signal fd failed, exiting anyway");
+		return;
+	}
+	if (n != sizeof(siginfo)) {
+		LOG_WARN(-EIO, "Read %d bytes from signal fd instead of %zd?! Exiting anyway",
+			 n, sizeof(siginfo));
+		return;
+	}
+
+	LOG_INFO("Got signal %d from %d, exiting",
+		 siginfo.ssi_signo, siginfo.ssi_pid);
+}
+
 #define MAX_EVENTS 10
 static int ct_start(struct state *state) {
 	int rc;
@@ -71,6 +120,10 @@ static int ct_start(struct state *state) {
 	}
 
 	rc = timer_init(state);
+	if (rc < 0)
+		return rc;
+
+	rc = signal_init(state);
 	if (rc < 0)
 		return rc;
 
@@ -121,6 +174,9 @@ static int ct_start(struct state *state) {
 					redisAsyncHandleWrite(state->redis_ac);
 			} else if (events[n].data.fd == state->timer_fd) {
 				handle_expired_timers(state);
+			} else if (events[n].data.fd == state->signal_fd) {
+				signal_log(state->signal_fd);
+				return 0;
 			} else {
 				struct client *client = events[n].data.ptr;
 				if (protocol_read_command(client->fd, client->id, client,
@@ -129,8 +185,6 @@ static int ct_start(struct state *state) {
 				}
 			}
 		}
-
-
 	}
 }
 
