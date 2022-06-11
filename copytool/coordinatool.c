@@ -40,8 +40,10 @@ static void print_help(char *argv0) {
 	printf("Options:\n");
 	printf("    -v, --verbose: increase verbosity (repeatable)\n");
 	printf("    -q, --quiet: decrease verbosity\n");
+	printf("    -c, --config: alternative config path\n");
 	printf("    -A, --archive <id>: set which archive id to handle\n");
 	printf("                      (default any, can be set multiple times)\n");
+	printf("                      note option removes any id defined in config\n");
 	printf("    -p, --port <port>: select port to listen to\n");
 	printf("    -H, --host <host>: select address to listen to\n");
 	printf("    --redis-host <host>: hostname for redis server (default: localhost)\n");
@@ -139,6 +141,7 @@ int main(int argc, char *argv[]) {
 	struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
 		{ "quiet",   no_argument, NULL, 'q' },
+		{ "config", required_argument, NULL, 'c' },
 		{ "archive", required_argument, NULL, 'A' },
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
@@ -150,6 +153,7 @@ int main(int argc, char *argv[]) {
 		{ 0 },
 	};
 	int rc;
+	bool first_archive_id = true;
 
 	// state init
 	struct state state = { 0 };
@@ -157,24 +161,45 @@ int main(int argc, char *argv[]) {
 	CDS_INIT_LIST_HEAD(&state.stats.disconnected_clients);
 	CDS_INIT_LIST_HEAD(&state.waiting_clients);
 
-	config_init(&state.config);
+	/* parse arguments once first just for config */
+	while ((rc = getopt_long(argc, argv, "c:A:vqH:p:Vh",
+			         long_opts, NULL)) != -1) {
+		if (rc == 'c') {
+			free((void*)state.config.confpath);
+			state.config.confpath = xstrdup(optarg);
+		}
+	}
 
-	while ((rc = getopt_long(argc, argv, "A:vqH:p:Vh",
+	rc = config_init(&state.config);
+	if (rc)
+		goto out;
+
+	optind = 1;
+	while ((rc = getopt_long(argc, argv, "c:A:vqH:p:Vh",
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
+		case 'c': // parsed above
+			break;
 		case 'A':
-			if (state.archive_cnt >= LL_HSM_MAX_ARCHIVES_PER_AGENT) {
+			if (first_archive_id) {
+				/* reset any value defined in config */
+				state.config.archive_cnt = 0;
+				first_archive_id = false;
+			}
+			if (state.config.archive_cnt >= LL_HSM_MAX_ARCHIVES_PER_AGENT) {
 				LOG_ERROR(-E2BIG, "too many archive id given");
 				rc = EXIT_FAILURE;
 				goto out;
 			}
-			state.archive_id[state.archive_cnt] =
+			state.config.archives[state.config.archive_cnt] =
 				parse_int(optarg, INT_MAX);
-			if (state.archive_id[state.archive_cnt] < 0) {
+			if (state.config.archives[state.config.archive_cnt] <= 0) {
+				LOG_ERROR(-ERANGE, "Archive id %s must be > 0",
+					  optarg);
 				rc = EXIT_FAILURE;
 				goto out;
 			}
-			state.archive_cnt++;
+			state.config.archive_cnt++;
 			break;
 		case 'v':
 			state.config.verbose++;
