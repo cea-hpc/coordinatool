@@ -84,6 +84,10 @@ static int ct_start(struct state *state) {
 		return rc;
 	}
 
+	rc = timer_init(state);
+	if (rc < 0)
+		return rc;
+
 	hsm_action_queues_init(state, &state->queues);
 
 	rc = redis_connect(state);
