@@ -131,17 +131,6 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 				 config->hsm_action_list_size);
 			continue;
 		}
-		if (!strcasecmp(key, "archive_id")) {
-			long long intval = str_suffix_to_u32(val, "archive_id");
-			if (intval < 0) {
-				rc = intval;
-				goto out;
-			}
-			config->archive_id = intval;
-			LOG_INFO("config setting archive_id to %u",
-				 config->archive_id);
-			continue;
-		}
 		if (!strcasecmp(key, "verbose")) {
 			int intval = str_to_verbose(val);
 			if (intval < 0) {
@@ -178,7 +167,6 @@ int ct_config_init(struct ct_state_config *config) {
 	config->max_archive = -1;
 	config->max_remove = -1;
 	config->hsm_action_list_size = 1024 * 1024;
-	config->archive_id = 0;
 	config->verbose = LLAPI_MSG_NORMAL;
 	llapi_msg_set_level(config->verbose);
 
@@ -213,9 +201,6 @@ int ct_config_init(struct ct_state_config *config) {
 	rc = getenv_u32("COORDINATOOL_HAL_SIZE", &config->hsm_action_list_size);
 	if (rc < 0)
 		return rc;
-	rc = getenv_u32("COORDINATOOL_ARCHIVE_ID", &config->archive_id);
-	if (rc < 0)
-		return rc;
 	rc = getenv_verbose("COORDINATOOL_VERBOSE", &config->verbose);
 	if (rc < 0)
 		return rc;
@@ -239,9 +224,10 @@ int ct_config_init(struct ct_state_config *config) {
 	return 0;
 }
 
-void ct_config_free(struct ct_state_config *config) {
-	free((void*)config->host);
-	free((void*)config->port);
-	free((void*)config->client_id);
-	free((void*)config->state_dir_prefix);
+void ct_free(struct ct_state *state) {
+	free((void*)state->config.host);
+	free((void*)state->config.port);
+	free((void*)state->config.client_id);
+	free((void*)state->fsname);
+	json_decref(state->archive_ids);
 }

@@ -137,6 +137,7 @@ struct client {
 	int max_restore;
 	int max_archive;
 	int max_remove;
+	int *archives;
 	enum client_status {
 		CLIENT_INIT,         /* new connection */
 		CLIENT_READY,        /* connected, post ehlo */

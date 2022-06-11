@@ -118,6 +118,7 @@ static void client_free(struct state *state, struct client *client) {
 	}
 	ct_schedule(state);
 	free((void*)client->id);
+	free((void*)client->archives);
 	free(client);
 }
 

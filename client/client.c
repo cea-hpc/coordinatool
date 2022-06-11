@@ -1,11 +1,12 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <assert.h>
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <sys/epoll.h>
-#include <stdint.h>
 
 #include "client.h"
 #include "lustre.h"
@@ -21,6 +22,7 @@ void print_help(char *argv[]) {
 	printf("--queue/-Q: queue active_requests from stdin\n");
 	printf("--recv/-R: (debug tool) ask for receiving work\n");
 	printf("           note the work will be reclaimed when client disconnects\n");
+	printf("--archive/-A: archive id (repeatable). Only makes sense for recv\n");
 	printf("--iters/-i: number of replies to expect (can be used to wait after\n");
 	printf("            receiving work, negative number loops forever)\n");
 	printf("--fsname <name>: fsname for -Q, optionally used by coordinatool to avoid\n");
@@ -119,6 +121,7 @@ int main(int argc, char *argv[]) {
 		{ "queue", no_argument, NULL, 'Q' },
 		{ "fsname", required_argument, NULL, OPT_FSNAME },
 		{ "recv", no_argument, NULL, 'R' },
+		{ "archive", required_argument, NULL, 'A' },
 		{ "iters", required_argument, NULL, 'i' },
 		{ 0 },
 	};
@@ -147,7 +150,7 @@ int main(int argc, char *argv[]) {
 	free((void*)client.state.config.client_id);
 	client.state.config.client_id = NULL;
 
-	while ((rc = getopt_long(argc, argv, "vqH:p:QRi:Vh",
+	while ((rc = getopt_long(argc, argv, "vqH:p:QRA:i:Vh",
 			         long_opts, NULL)) != -1) {
 		switch (rc) {
 		case 'v':
@@ -170,8 +173,18 @@ int main(int argc, char *argv[]) {
 		case 'R':
 			client.mode = MODE_RECV;
 			break;
+		case 'A':
+			if (!client.state.archive_ids) {
+				client.state.archive_ids = json_array();
+				assert(client.state.archive_ids);
+			}
+			rc = parse_int(optarg, INT_MAX);
+			rc = json_array_append_new(client.state.archive_ids,
+						   json_integer(rc));
+			assert(rc == 0);
+			break;
 		case 'i':
-			client.iters = atoi(optarg);
+			client.iters = parse_int(optarg, INT_MAX);
 			break;
 		case OPT_FSNAME:
 			if (client.mode != MODE_QUEUE) {
@@ -196,7 +209,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	rc = client_run(&client);
-	ct_config_free(&client.state.config);
+	ct_free(&client.state);
 	if (rc)
 		return EXIT_FAILURE;
 	return EXIT_SUCCESS;

@@ -29,11 +29,6 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 		return -EINVAL;
 	}
 
-	/* XXX find a better place to store it for action_begin */
-	unsigned int archive_id =
-		protocol_getjson_int(hal, "hal_archive_id", 0);
-	priv->state.config.archive_id = archive_id;
-
 	rc = json_hsm_action_list_get(hal, priv->hal,
 				      priv->state.config.hsm_action_list_size,
 				      action_list_get_cb, priv);
