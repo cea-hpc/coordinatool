@@ -94,7 +94,6 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len) {
 
 static void client_closefd(struct state *state, struct client *client) {
 	if (client->fd >= 0) {
-		epoll_delfd(state->epoll_fd, client->fd);
 		close(client->fd);
 		state->stats.clients_connected--;
 		client->fd = -1;
