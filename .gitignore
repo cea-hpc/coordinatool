@@ -3,3 +3,4 @@ build*
 *.swp
 cscope.*
 *.tar.xz
+/tests/tests_config.local.sh
