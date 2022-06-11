@@ -444,7 +444,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		unsigned int count;
 		json_t *hai;
 		json_array_foreach(hai_list, count, hai) {
-			uint64_t cookie = protocol_getjson_int(hai, "cookie", 0);
+			uint64_t cookie = protocol_getjson_int(hai, "hai_cookie", 0);
 			if (cookie == 0) {
 				LOG_WARN(-EINVAL, "No cookie set for entry in ehlo from %s",
 					 client->id);
