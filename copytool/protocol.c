@@ -360,6 +360,25 @@ out_freereply:
 	return rc;
 }
 
+static bool ehlo_is_id_unique(struct state *state, const char *id) {
+	struct cds_list_head *n;
+	cds_list_for_each(n, &state->stats.clients) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+
+		// skip initializing clients
+		// note disconnected clients are not in this list
+		if (client->status == CLIENT_INIT) {
+			continue;
+		}
+
+		if (!strcmp(id, client->id)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
@@ -369,8 +388,12 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_ehlo(client, EINVAL,
 					   "Client cannot send EHLO twice");
 	}
-	client->status = CLIENT_READY;
 	id = protocol_getjson_str(json, "id", NULL, NULL);
+	if (! ehlo_is_id_unique(state, id ? id : client->id)) {
+		return protocol_reply_ehlo(client, EEXIST,
+					   "id already used by another client");
+	}
+	client->status = CLIENT_READY;
 	if (!id) {
 		// no id: no special treatment
 		return protocol_reply_ehlo(client, 0, NULL);
