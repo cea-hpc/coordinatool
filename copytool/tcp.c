@@ -208,6 +208,7 @@ struct client *client_new_disconnected(struct state *state, const char *id) {
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
 	client->status = CLIENT_DISCONNECTED;
+	client->disconnected_timestamp = gettime_ns();
 	client->queues.state = state;
 
 	LOG_DEBUG("New disconnected client for %s", id);
