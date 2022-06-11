@@ -136,6 +136,7 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 				goto out;
 			}
 			config->verbose = intval;
+			llapi_msg_set_level(config->verbose);
 			continue;
 		}
 
