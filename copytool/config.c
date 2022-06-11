@@ -25,7 +25,7 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 	char *line = NULL;
 	size_t line_size = 0;
 	ssize_t n, linenum = 0;
-	while ((n = getline(&line, &line_size, conffile)) >= 0) {
+	while (errno = 0, (n = getline(&line, &line_size, conffile)) >= 0) {
 		linenum++;
 		LOG_DEBUG("Read line %zd: %s", linenum, line);
 		char *key = line, *val;
@@ -50,10 +50,9 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 			i++;
 		}
 		if (i >= n - 1) {
-			rc = -EINVAL;
-			LOG_ERROR(rc, "%s in %s (line %zd) not in 'key value' format",
-				  line, config->confpath, linenum);
-			goto out;
+			LOG_WARN(rc, "skipping %s in %s (line %zd) not in 'key value' format",
+				 line, config->confpath, linenum);
+			continue;
 		}
 		key[i] = 0;
 		i++;
@@ -63,10 +62,9 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 			val++; n--;
 		}
 		if (n == 0) {
-			rc = -EINVAL;
-			LOG_ERROR(rc, "%s in %s (line %zd) not in 'key value' format",
-				  line, config->confpath, linenum);
-			goto out;
+			LOG_WARN(-EINVAL, "skipping %s in %s (line %zd) not in 'key value' format",
+				 line, config->confpath, linenum);
+			continue;
 		}
 
 		if (!strcasecmp(key, "host")) {
@@ -91,6 +89,21 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 			config->redis_port = parse_int(val, 65535);
 			LOG_INFO("config setting redis_port to %d", config->redis_port);
 			continue;
+		}
+		if (!strcasecmp(key, "archive_id")) {
+			if (config->archive_cnt >= LL_HSM_MAX_ARCHIVES_PER_AGENT) {
+				LOG_ERROR(-E2BIG, "too many archive id given");
+				rc = EXIT_FAILURE;
+				goto out;
+			}
+			config->archives[config->archive_cnt] =
+				parse_int(val, INT_MAX);
+			if (config->archives[config->archive_cnt] <= 0) {
+				LOG_ERROR(-ERANGE, "Archive id %s must be > 0", val);
+				rc = EXIT_FAILURE;
+				goto out;
+			}
+			config->archive_cnt++;
 		}
 		if (!strcasecmp(key, "client_grace_ms")) {
 			config->client_grace_ms = parse_int(val, INT_MAX);
@@ -117,16 +130,15 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 			continue;
 		if (!strcasecmp(key, "hal_size"))
 			continue;
-		if (!strcasecmp(key, "archive_id"))
-			continue;
 
-		rc = -EINVAL;
-		LOG_ERROR(rc, "unknown key %s in %s (line %zd)",
-			  key, config->confpath, linenum);
-		goto out;
+		LOG_WARN(-EINVAL, "skipping unknown key %s in %s (line %zd)",
+			 key, config->confpath, linenum);
 
 	}
-	// XXX check error
+	if (n < 0 && errno != 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "getline failed reading %s", config->confpath);
+	}
 
 out:
 	free(line);
@@ -153,10 +165,13 @@ int config_init(struct state_config *config) {
 		return rc;
 
 	/* then parse config */
-	int fail_enoent = false;
+	int fail_enoent = true;
 	if (!config->confpath) {
-		config->confpath = "/etc/coordinatool.conf";
 		fail_enoent = getenv_str("COORDINATOOL_CONF", &config->confpath);
+		if (!fail_enoent) {
+			config->confpath = xstrdup("/etc/coordinatool.conf");
+		}
+
 	}
 	rc = config_parse(config, fail_enoent);
 	if (rc)
@@ -176,6 +191,7 @@ int config_init(struct state_config *config) {
 }
 
 void config_free(struct state_config *config) {
+	free((void*)config->confpath);
 	free((void*)config->host);
 	free((void*)config->port);
 	free((void*)config->redis_host);

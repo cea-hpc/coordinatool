@@ -25,7 +25,7 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 	char *line = NULL;
 	size_t line_size = 0;
 	ssize_t n, linenum = 0;
-	while ((n = getline(&line, &line_size, conffile)) >= 0) {
+	while (errno = 0, (n = getline(&line, &line_size, conffile)) >= 0) {
 		linenum++;
 		LOG_DEBUG("Read line %zd: %s", linenum, line);
 		char *key = line, *val;
@@ -50,10 +50,9 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			i++;
 		}
 		if (i >= n - 1) {
-			rc = -EINVAL;
-			LOG_ERROR(rc, "%s in %s (line %zd) not in 'key value' format",
-				  line, config->confpath, linenum);
-			goto out;
+			LOG_WARN(rc, "skipping %s in %s (line %zd) not in 'key value' format",
+				 line, config->confpath, linenum);
+			continue;
 		}
 		key[i] = 0;
 		i++;
@@ -63,10 +62,9 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			val++; n--;
 		}
 		if (n == 0) {
-			rc = -EINVAL;
-			LOG_ERROR(rc, "%s in %s (line %zd) not in 'key value' format",
-				  line, config->confpath, linenum);
-			goto out;
+			LOG_WARN(-EINVAL, "skipping %s in %s (line %zd) not in 'key value' format",
+				 line, config->confpath, linenum);
+			continue;
 		}
 
 		if (!strcasecmp(key, "host")) {
@@ -151,13 +149,13 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 		if (!strcasecmp(key, "client_grace_ms"))
 			continue;
 
-		rc = -EINVAL;
-		LOG_ERROR(rc, "unknown key %s in %s (line %zd)",
-			  key, config->confpath, linenum);
-		goto out;
-
+		LOG_WARN(-EINVAL, "skipping unknown key %s in %s (line %zd)",
+			 key, config->confpath, linenum);
 	}
-	// XXX check error
+	if (n < 0 && errno != 0) {
+		rc = -errno;
+		LOG_ERROR(rc, "getline failed reading %s", config->confpath);
+	}
 
 out:
 	free(line);
@@ -186,10 +184,12 @@ int ct_config_init(struct ct_state_config *config) {
 		return rc;
 
 	/* then parse config */
-	int fail_enoent = false;
+	int fail_enoent = true;
 	if (!config->confpath) {
-		config->confpath = "/etc/coordinatool.conf";
 		fail_enoent = getenv_str("COORDINATOOL_CONF", &config->confpath);
+		if (!fail_enoent) {
+			config->confpath = xstrdup("/etc/coordinatool.conf");
+		}
 	}
 	rc = config_parse(config, fail_enoent);
 	if (rc)
@@ -235,6 +235,7 @@ int ct_config_init(struct ct_state_config *config) {
 }
 
 void ct_free(struct ct_state *state) {
+	free((void*)state->config.confpath);
 	free((void*)state->config.host);
 	free((void*)state->config.port);
 	free((void*)state->config.client_id);
