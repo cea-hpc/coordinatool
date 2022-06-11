@@ -9,11 +9,9 @@
 
 #include "preload.h"
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
 int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 				const char *mnt, int archive_count,
-				int *archives, int rfd_flags) {
+				int *archives, int rfd_flags UNUSED) {
 	struct hsm_copytool_private *ct;
 	int rc = 0;
 
@@ -46,6 +44,11 @@ int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 		goto err_out;
 	}
 	ct->state.fsname = xstrdup(fsname);
+
+	rc = protocol_archive_ids(archive_count, archives,
+				  &ct->state.archive_ids);
+	if (rc)
+		goto err_out;
 
 	rc = ct_config_init(&ct->state.config);
 	if (rc)
@@ -101,7 +104,7 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 	close(ct->open_by_fid_fd);
 	close(ct->state.socket_fd);
 	free(ct->mnt);
-	ct_config_free(&ct->state.config);
+	ct_free(&ct->state);
 	free(ct);
 	return 0;
 }
@@ -115,7 +118,7 @@ static int process_dones(struct hsm_copytool_private *ct) {
 		// XXX remember cookie in another list, free from that list when done_cb kicks in
 		// (repeat cookie in done reply for convenience)
 		// and send that list in ehlo too.
-		rc_proto = protocol_request_done(&ct->state, done.archive_id,
+		rc_proto = protocol_request_done(&ct->state,
 						 done.cookie, done.rc);
 		if (rc_proto < 0) {
 			LOG_WARN(rc_proto, "Could not send done to client: will resolve on reconnect");
@@ -237,8 +240,6 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 		hcp = realloc(*phcp, sizeof(*hcp));
 		if (!hcp)
 			abort();
-		/* XXX archive_id */
-		hcp->archive_id = ct->state.config.archive_id;
 		hcp->cookie = hai->hai_cookie;
 		*phcp = hcp;
 	}
@@ -267,7 +268,6 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	struct hsm_copyaction_private *hcp = *phcp;
 	const struct hsm_copytool_private *ct = hcp->ct_priv;
 	struct notify_done done = {
-		.archive_id = hcp->archive_id,
 		.cookie = hcp->cookie,
 	};
 	int rc, rc_done;

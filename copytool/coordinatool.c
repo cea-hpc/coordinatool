@@ -34,22 +34,6 @@ int epoll_delfd(int epoll_fd, int fd) {
 	return rc;
 }
 
-static long parse_int(const char *arg, long max) {
-	long rc;
-	char *endptr;
-
-	rc = strtol(arg, &endptr, 0);
-	if (rc < 0 || rc > max) {
-		rc = -ERANGE;
-		LOG_ERROR(rc, "argument %s too big", arg);
-	}
-	if (*endptr != '\0') {
-		rc = -EINVAL;
-		LOG_ERROR(rc, "argument %s contains (trailing) garbage", arg);
-	}
-	return rc;
-}
-
 static void print_help(char *argv0) {
 	printf("Usage: %s [options] mountpoint\n", argv0);
 	printf("\n");

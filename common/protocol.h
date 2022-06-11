@@ -81,9 +81,6 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *      ^ maximum size of items to send when reencoded, defaults to 1MB
  *        (this is due to how llapi_hsm_copytool_recv works with a static
  *         buffer for kuc in lustre code)
- *     archive_id = integer (u32)
- *      ^ defaults to any if unset or 0
- *     XXX fsname
  *   reply properties:
  *     command = "recv"
  *     status = int (0 on success, errno on failure)
@@ -156,6 +153,7 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *     id = string, optional requested id, should be unique per client
  *          if not set reconnection will not be supported
  *     fsname = string (optional, sanity check we have the right fs)
+ *     archive_ids = array of integer (u32) (optional, any archive if unset or empty)
  *     hai_list = list of running hai (see queue)
  *   reply properties:
  *     command = "ehlo"
