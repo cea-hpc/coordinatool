@@ -49,7 +49,6 @@ struct hsm_copyaction_private {
 	const struct hsm_copytool_private *ct_priv;
 	struct hsm_copy copy;
 	lstatx_t statx;
-	uint32_t archive_id;
 	uint64_t cookie;
 };
 
@@ -57,7 +56,6 @@ struct hsm_copyaction_private {
 /* done infos */
 struct notify_done {
 	uint64_t cookie;
-	int archive_id;
 	int rc;
 };
 

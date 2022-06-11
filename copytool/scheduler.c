@@ -71,6 +71,25 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 	return 0;
 }
 
+/* accept the archive_id if it is in the list, but also if there
+ * is no list or if it is empty (no archive_id set by client) */
+static bool accept_archive_id(int *archives, int archive_id) {
+	bool rc = true;
+
+	if (!archives)
+		return true;
+
+	while (*archives) {
+		if (*archives == archive_id)
+			return true;
+		archives++;
+		rc = false;
+	}
+
+	return rc;
+}
+
+
 /* scheduling would normally use cds_list_for_each_safe here but
  * we want to chain both queues, so cheat a bit:
  * this is cds_list_for_each_safe with starting condition from
@@ -139,6 +158,14 @@ void ct_schedule_client(struct state *state,
 				/* can only send one archive id at a time */
 				continue;
 			}
+			if (enqueued_bytes == 0) {
+				if (!accept_archive_id(client->archives,
+						       han->info.archive_id)) {
+					continue;
+				}
+				archive_id = han->info.archive_id;
+				hal_flags = han->info.hal_flags;
+			}
 			if (!schedule_can_send(client, han)) {
 				continue;
 			}
@@ -148,10 +175,6 @@ void ct_schedule_client(struct state *state,
 			}
 			LOG_INFO("Sending "DFID" to %d from queues" ,
 				 PFID(&han->info.dfid), client->fd);
-			if (archive_id == 0) {
-				archive_id = han->info.archive_id;
-				hal_flags = han->info.hal_flags;
-			}
 			redis_assign_request(state, client, han);
 #ifdef DEBUG_ACTION_NODE
 			LOG_DEBUG("moving node %p to %p (active requests)",

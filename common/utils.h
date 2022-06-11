@@ -9,6 +9,8 @@
 
 #define UNUSED __attribute__((unused))
 
+
+/* alloc */
 static inline void *xmalloc(size_t size) {
 	void *val = malloc(size);
 	if (!val)
@@ -30,6 +32,8 @@ static inline char *xstrdup(const char *s) {
 	return val;
 }
 
+
+/* time */
 #define NS_IN_MSEC 1000000LL
 #define NS_IN_SEC 1000000000LL
 static inline void ts_from_ns(struct timespec *ts, int64_t ns) {
@@ -55,6 +59,24 @@ static inline int64_t gettime_ns(void) {
 	}
 
 	return ns_from_ts(&ts);
+}
+
+
+/* parsing */
+static inline long parse_int(const char *arg, long max) {
+	long rc;
+	char *endptr;
+
+	rc = strtol(arg, &endptr, 0);
+	if (rc < 0 || rc > max) {
+		rc = -ERANGE;
+		LOG_ERROR(rc, "argument %s too big", arg);
+	}
+	if (*endptr != '\0') {
+		rc = -EINVAL;
+		LOG_ERROR(rc, "argument %s contains (trailing) garbage", arg);
+	}
+	return rc;
 }
 
 #endif

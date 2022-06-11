@@ -20,8 +20,6 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 		printf("no hal\n");
 		return -EINVAL;
 	}
-	unsigned int archive_id =
-		protocol_getjson_int(hal, "hal_archive_id", 0);
 	json_t *hai_list = json_object_get(hal, "list");
 	if (!hai_list) {
 		printf("no hal->list\n");
@@ -36,7 +34,7 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 			printf("cookie not set?\n");
 			return -EINVAL;
 		}
-		rc = protocol_request_done(state, archive_id, cookie, 0);
+		rc = protocol_request_done(state, cookie, 0);
 		if (rc)
 			return rc;
 	}
