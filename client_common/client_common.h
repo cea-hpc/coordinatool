@@ -14,7 +14,6 @@ struct ct_state {
 		const char *host;
 		const char *port;
 		const char *client_id;
-		const char *state_dir_prefix;
 		uint32_t max_archive;
 		uint32_t max_restore;
 		uint32_t max_remove;

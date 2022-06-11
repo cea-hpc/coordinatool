@@ -141,6 +141,16 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			continue;
 		}
 
+		/* skip server only options */
+		if (!strcasecmp(key, "archive_id"))
+			continue;
+		if (!strcasecmp(key, "redis_host"))
+			continue;
+		if (!strcasecmp(key, "redis_port"))
+			continue;
+		if (!strcasecmp(key, "client_grace_ms"))
+			continue;
+
 		rc = -EINVAL;
 		LOG_ERROR(rc, "unknown key %s in %s (line %zd)",
 			  key, config->confpath, linenum);
