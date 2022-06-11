@@ -145,6 +145,7 @@ do_coordinatool_service() {
 
 do_lhsmtoolcmd_start() {
 	local i="$1"
+	shift
 	local LHSMCMD_CONF="${LHSMCMD_CONF:-${SOURCEDIR}/tests/lhsm_cmd.conf}"
 	# see coordinatool_start comment for CTOOL_ENV for usage (string -> assoc array)
 	declare -A AGENT_ENV=${AGENT_ENV:-( )}
@@ -165,7 +166,7 @@ do_lhsmtoolcmd_start() {
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
 				--config ${LHSMCMD_CONF@Q} \
-				MNTPATH
+				MNTPATH ${*@Q}
 		" &
 	CLEANUP+=( "wait $!" "do_lhsmtoolcmd_service $i stop" )
 }
@@ -448,6 +449,33 @@ server_stop_lhsmtoolcmd_busy() {
 	client_archive_n_wait 3 100
 }
 run_test 06 server_stop_lhsmtoolcmd_busy
+
+# test archive_id is respected
+respect_client_archive_id() {
+	do_coordinatool_start 0
+	# requests go on archive id 1 by default, so start an agent on
+	# others and make sure it does not process anything
+	do_lhsmtoolcmd_start 1 -A 2 -A 3
+
+	client_reset 3
+	client_archive_n_req 3 5
+
+	# XXX can lower once clients have exponential backoff reconnect
+	# but better would be to wait for one coordinatool scheduling pass
+	# if/when we ever can
+	sleep 4
+	do_client 3 "
+		cd ${TESTDIR@Q}
+		for i in {1..5}; do
+			lfs hsm_state file.\$i | grep -q 0x00000001 || exit 1
+		done
+		"
+
+	# then start a normal one and wait
+	do_lhsmtoolcmd_start 2 -A 1
+	client_archive_n_wait 3 5
+}
+run_test 07 respect_client_archive_id
 
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"

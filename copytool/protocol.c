@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
 #include <assert.h>
+#include <limits.h>
 
 #include "coordinatool.h"
 
@@ -134,8 +135,6 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
 					   "Buffer too small");
 
-	// XXX get archive_id and only send appropriate requests
-
 #ifdef DEBUG_ACTION_NODE
 	CDS_INIT_LIST_HEAD(&client->waiting_node);
 #endif
@@ -212,11 +211,6 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 	if (!cookie)
 		return protocol_reply_done(client, EINVAL,
 					   "Cookie not set?");
-	unsigned int archive_id =
-		protocol_getjson_int(json, "archive_id", ARCHIVE_ID_UNINIT);
-	if (archive_id == ARCHIVE_ID_UNINIT)
-		return protocol_reply_done(client, EINVAL,
-					   "No or invalid archive_id");
 	struct hsm_action_node *han =
 		hsm_action_search_queue(&state->queues, cookie);
 	if (!han)
@@ -383,11 +377,36 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
 	const char *id;
+	json_t *json_archives;
 
 	if (client->status != CLIENT_INIT) {
 		return protocol_reply_ehlo(client, EINVAL,
 					   "Client cannot send EHLO twice");
 	}
+
+	json_archives = json_object_get(json, "archive_ids");
+	if (json_archives) {
+		size_t len, i;
+		json_t *json_id;
+
+		len = json_array_size(json_archives);
+		free(client->archives);
+		client->archives = xmalloc((len + 1) * sizeof(int));
+		json_array_foreach(json_archives, i, json_id) {
+			json_int_t id = json_integer_value(json_id);
+			// non-integers return 0, and 0 is not a valid id
+			if (id <= 0 || id > INT_MAX) {
+				LOG_ERROR(-EINVAL, "Client sent invalid archive id: %lld",
+					  id);
+				return protocol_reply_ehlo(client, EINVAL,
+							   "Bad archive id in list");
+			}
+			client->archives[i] = id;
+		}
+		assert(i == len);
+		client->archives[len] = 0;
+	}
+
 	id = protocol_getjson_str(json, "id", NULL, NULL);
 	if (! ehlo_is_id_unique(state, id ? id : client->id)) {
 		return protocol_reply_ehlo(client, EEXIST,
