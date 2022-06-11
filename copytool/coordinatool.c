@@ -228,7 +228,8 @@ int main(int argc, char *argv[]) {
 	rc = rc ? EXIT_FAILURE : EXIT_SUCCESS;
 
 out:
-	redisAsyncDisconnect(state.redis_ac);
+	if (state.redis_ac)
+		redisAsyncDisconnect(state.redis_ac);
 	config_free(&state.config);
 	free((void*)state.fsname);
 	return rc;
