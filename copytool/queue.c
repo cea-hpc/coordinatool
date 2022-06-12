@@ -24,20 +24,40 @@ static int tree_compare(const void *a, const void *b) {
 	return 1;
 }
 
-void queue_node_free(struct hsm_action_node *han) {
-	// XXX check action really isn't in a queue?
+static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
 #endif
 	LOG_DEBUG("freeing han for " DFID " node %p", PFID(&han->info.dfid),
 		  (void*)&han->node);
-	redis_delete_request(han->queues->state, han->info.cookie);
-	if (!tdelete(&han->info.cookie, &han->queues->actions_tree,
-		     tree_compare))
-		abort();
+	if (!final_cleanup) {
+		redis_delete_request(han->queues->state, han->info.cookie);
+		cds_list_del(&han->node);
+		if (!tdelete(&han->info.cookie, &han->queues->actions_tree,
+			     tree_compare))
+			abort();
+	}
 	if (han->hai)
 		json_decref(han->hai);
 	free(han);
+}
+
+void queue_node_free(struct hsm_action_node *han) {
+	_queue_node_free(han, false);
+}
+
+static void tree_free_cb(void *nodep) {
+	struct item_info *item_info =
+		caa_container_of(nodep, struct item_info, cookie);
+	struct hsm_action_node *han =
+		caa_container_of(item_info, struct hsm_action_node, info);
+
+	_queue_node_free(han, true);
+}
+
+
+void hsm_action_free_all(struct state *state) {
+	tdestroy(state->queues.actions_tree, tree_free_cb);
 }
 
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
@@ -78,6 +98,8 @@ int hsm_action_requeue(struct hsm_action_node *han, bool start) {
 		queues->state->stats.pending_remove++;
 		break;
 	default:
+		// free expects a list in good shape
+		CDS_INIT_LIST_HEAD(&han->node);
 		queue_node_free(han);
 		return -EINVAL;
 	}
