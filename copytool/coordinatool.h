@@ -297,6 +297,7 @@ int tcp_listen(struct state *state);
 char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
 int handle_client_connect(struct state *state);
 struct client *client_new_disconnected(struct state *state, const char *id);
+void client_free(struct client *client);
 void client_disconnect(struct client *client);
 
 /* timer */
