@@ -118,7 +118,13 @@ static void initiate_termination(struct state *state) {
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
 
-		client_disconnect(client);
+		client_free(client);
+	}
+	cds_list_for_each_safe(n, nnext, &state->stats.disconnected_clients) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+
+		client_free(client);
 	}
 }
 
