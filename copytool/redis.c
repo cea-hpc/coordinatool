@@ -266,10 +266,20 @@ static int redis_wait_done(struct state *state, int *done) {
 		}
 		if (event.events & EPOLLIN)
 			redisAsyncHandleRead(state->redis_ac);
+
 		// EPOLLOUT is only requested when we have something
 		// to send
-		if (event.events & EPOLLOUT)
+		if (state->redis_ac && event.events & EPOLLOUT)
 			redisAsyncHandleWrite(state->redis_ac);
+
+		/* We could get disconnected during either handler,
+		 * during client initialization don't try to reconnect
+		 * and error out */
+		if (!state->redis_ac) {
+			LOG_ERROR(-ESHUTDOWN,
+				  "Redis connection closed during recovery");
+			return -ESHUTDOWN;
+		}
 	}
 
 	return *done;
@@ -458,6 +468,17 @@ int redis_recovery(struct state *state) {
 			.hash = "coordinatool_assigned",
 		}
 	};
+
+	if (!state->redis_ac) {
+		int rc = -ENOTCONN;
+		if (state->config.redis_host && state->config.redis_host[0]) {
+			LOG_ERROR(rc, "Redis server configured but not connected, aborting. Run with --redis-host "" to skip");
+			return rc;
+		}
+		LOG_INFO("Redis not configured, skipping recovery.\n"
+			 "Run coordinatool-client --queue with MDS active_requests to recover previously received actions");
+		return 0;
+	}
 
 	for (unsigned int i=0; i < sizeof(wait)/sizeof(*wait); i++) {
 		int rc = redisAsyncCommand(state->redis_ac, redis_scan_cb, &wait[i],
