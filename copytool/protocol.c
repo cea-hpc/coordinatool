@@ -221,7 +221,6 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 	LOG_INFO("%d processed "DFID": %d" ,
 		  client->fd, PFID(&han->info.dfid), status);
 
-	cds_list_del(&han->node);
 	int action = han->info.action;
 	queue_node_free(han);
 
