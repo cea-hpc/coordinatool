@@ -253,6 +253,7 @@ int protocol_reply_ehlo(struct client *client, int status, char *error);
 /* queue */
 
 void queue_node_free(struct hsm_action_node *han);
+void hsm_action_free_all(struct state *state);
 void hsm_action_queues_init(struct state *state,
 			    struct hsm_action_queues *queues);
 int hsm_action_requeue(struct hsm_action_node *han, bool start);

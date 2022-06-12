@@ -365,6 +365,7 @@ out:
 	if (state.ctdata) {
 		llapi_hsm_copytool_unregister(&state.ctdata);
 	}
+	hsm_action_free_all(&state);
 	config_free(&state.config);
 	free((void*)state.fsname);
 	assert(!state.redis_ac);
