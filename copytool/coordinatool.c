@@ -198,7 +198,9 @@ static int ct_start(struct state *state) {
 					 * we can exit */
 					if (state->terminating)
 						return 0;
+					LOG_INFO("Connection to redis server failed, trying to reconnect");
 					// XXX check rc
+					// XXX if server isn't up we'll busy loop on this...
 					redis_connect(state);
 				}
 			} else if (events[n].data.fd == state->timer_fd) {
@@ -216,7 +218,14 @@ static int ct_start(struct state *state) {
 
 				/* The loop will stop when redis is done */
 				if (state->redis_ac) {
+					bool connected = state->redis_ac->c.flags & REDIS_CONNECTED;
 					redisAsyncDisconnect(state->redis_ac);
+					/* if we just initiated connect with no IO, the disconnect
+					 * callback won't be called yet state->redis_ac is freed:
+					 * just clear it here. */
+					if (!connected) {
+						state->redis_ac = NULL;
+					}
 				}
 				/* It's also possible asyncDisconnect was immediate if
 				 * no work was pending */
