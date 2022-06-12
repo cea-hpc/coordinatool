@@ -100,8 +100,15 @@ static void client_closefd(struct state *state, struct client *client) {
 	}
 }
 
-static void client_free(struct state *state, struct client *client) {
+void client_free(struct client *client) {
+	struct state *state = client->queues.state;
 	struct cds_list_head *n, *next;
+	struct cds_list_head *lists[] = {
+		&client->active_requests,
+		&client->queues.waiting_restore,
+		&client->queues.waiting_archive,
+		&client->queues.waiting_remove,
+	};
 
 	LOG_INFO("Disconnecting %s (%d)", client->id, client->fd);
 	client_closefd(state, client);
@@ -109,11 +116,13 @@ static void client_free(struct state *state, struct client *client) {
 	if (client->status == CLIENT_WAITING)
 		cds_list_del(&client->waiting_node);
 	// reassign any request that would be lost
-	cds_list_for_each_safe(n, next, &client->active_requests) {
-		struct hsm_action_node *node =
-			caa_container_of(n, struct hsm_action_node, node);
-		cds_list_del(n);
-		hsm_action_requeue(node, true);
+	for (unsigned int i = 0; i < sizeof(lists)/sizeof(*lists); i++) {
+		cds_list_for_each_safe(n, next, lists[i]) {
+			struct hsm_action_node *node =
+				caa_container_of(n, struct hsm_action_node, node);
+			cds_list_del(n);
+			hsm_action_requeue(node, true);
+		}
 	}
 	ct_schedule(state);
 	free((void*)client->id);
@@ -126,7 +135,7 @@ void client_disconnect(struct client *client) {
 
 	/* no point in keeping client around if it has no id */
 	if (!client->id) {
-		client_free(state, client);
+		client_free(client);
 		return;
 	}
 
@@ -147,7 +156,7 @@ void client_disconnect(struct client *client) {
 	default:
 		/* clients who never sent ehlo or aren't actually connected
 		 * are just freed */
-		client_free(state, client);
+		client_free(client);
 		break;
 	}
 }
@@ -187,7 +196,7 @@ int handle_client_connect(struct state *state) {
 	if (rc < 0) {
 		LOG_ERROR(rc, "Could not add client %s to epoll",
 			  client->id);
-		client_free(state, client);
+		client_free(client);
 	}
 
 	return rc;
