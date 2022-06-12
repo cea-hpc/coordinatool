@@ -61,6 +61,18 @@ static void redis_disconnect_cb(const struct redisAsyncContext *ac,
 	state->redis_ac = NULL;
 }
 
+static void redis_connect_cb(const struct redisAsyncContext *ac,
+			     int status) {
+	struct state *state = ac->data;
+
+	if (status == REDIS_OK) {
+		return;
+	}
+	LOG_INFO("Redis connection failed");
+
+	state->redis_ac = NULL;
+}
+
 int redis_connect(struct state *state) {
 	int rc;
 	redisAsyncContext *ac;
@@ -85,6 +97,9 @@ int redis_connect(struct state *state) {
 	 * use it for disconnect cleanup as that doesn't pass any argument */
 	ac->data = state;
 	redisAsyncSetDisconnectCallback(ac, redis_disconnect_cb);
+	/* ... and that disconnect callback will NOT be called if connect
+	 * failed: we need to handle these failures on connect callback */
+	redisAsyncSetConnectCallback(ac, redis_connect_cb);
 
 	/* We have our own event loop, so we need to register our own callbacks...
 	 * Switch to libev(ent) at some point?
