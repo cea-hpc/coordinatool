@@ -476,6 +476,32 @@ respect_client_archive_id() {
 }
 run_test 07 respect_client_archive_id
 
+# run without redis
+no_redis() {
+	CTOOL_ENV="( [COORDINATOOL_REDIS_HOST]='' )" \
+		do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+
+	client_reset 3
+	client_archive_n 3 5
+}
+run_test 08 no_redis
+
+# run without redis
+redis_restart() {
+	do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+
+	client_reset 3
+	client_archive_n_req 3 100
+
+	# XXX empirical: xfers aren't yet over in 0.5s...
+	sleep 0.5
+	do_client 0 "systemctl restart redis"
+
+	client_archive_n_wait 3 100
+}
+run_test 09 redis_restart
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
 
