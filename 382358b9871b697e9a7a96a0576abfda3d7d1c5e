@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3f8d5b3_71d0aea9",
+        "filename": "common/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-13T12:39:51Z",
+      "side": 1,
+      "message": "question: isn\u0027t it dangerous to put a free here? It means that we have to make sure that each call to getenv_str has *val \u003d\u003d NULL or something returned by malloc. It\u0027s easy to forget the initialization and just write:\n\n```\nchar *value;\n\ngetenv_str(\"my_var\", \u0026value);\n```\n\nThat being said, I don\u0027t have strong feelings against this so feel free to keep it this way if you find it simpler.",
+      "range": {
+        "startLine": 14,
+        "startChar": 1,
+        "endLine": 14,
+        "endChar": 5
+      },
+      "revId": "382358b9871b697e9a7a96a0576abfda3d7d1c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
