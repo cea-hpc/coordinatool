@@ -22,6 +22,30 @@
       },
       "revId": "382358b9871b697e9a7a96a0576abfda3d7d1c5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf818f7e_c8182b0b",
+        "filename": "common/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:20:08Z",
+      "side": 1,
+      "message": "The alternative would be to get this to return the non-strdup\u0027d value here and have the caller do the free/xstrdup dance, but that would be much easier to forget one and leak.\n\nWe\u0027ll be freeing unconditionally at program end anyway so I prefer this approach",
+      "parentUuid": "f3f8d5b3_71d0aea9",
+      "range": {
+        "startLine": 14,
+        "startChar": 1,
+        "endLine": 14,
+        "endChar": 5
+      },
+      "revId": "382358b9871b697e9a7a96a0576abfda3d7d1c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
