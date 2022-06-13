@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cec16cb0_18852c80",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:22:12Z",
+      "side": 1,
+      "message": "(have also made this line shorter, not sure why I didn\u0027t notice the gerrit warning when pushing)",
+      "revId": "eadbc16ad10a9b2051bedb4361d571f23843ab8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6108783d_69c401a3",
@@ -14,6 +31,30 @@
       "writtenOn": "2022-06-13T12:44:29Z",
       "side": 1,
       "message": "typo: comment",
+      "range": {
+        "startLine": 149,
+        "startChar": 28,
+        "endLine": 149,
+        "endChar": 31
+      },
+      "revId": "eadbc16ad10a9b2051bedb4361d571f23843ab8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e7bc5ef_f03aa29d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:22:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6108783d_69c401a3",
       "range": {
         "startLine": 149,
         "startChar": 28,
