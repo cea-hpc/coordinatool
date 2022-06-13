@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca2b6e16_75df42c8",
+        "filename": "client_common/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:17:34Z",
+      "side": 1,
+      "message": "json_integer is an allocation -- but json_array_append_new will check and return an error on null value, so the next rc check returning ENOMEM is enough",
+      "parentUuid": "4b71f041_4b2d34f8",
+      "range": {
+        "startLine": 63,
+        "startChar": 8,
+        "endLine": 63,
+        "endChar": 20
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "917a0294_94532aa8",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-06-13T14:06:19Z",
       "side": 1,
       "message": "nit: given the implementation when receiving EHLO, I think that if an empty list is given, the resulting list will be of size one.",
+      "range": {
+        "startLine": 77,
+        "startChar": 15,
+        "endLine": 77,
+        "endChar": 25
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28605841_8d68e1f2",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:17:34Z",
+      "side": 1,
+      "message": "archive_ids could (and will be if empty) missing from the json, so this can be null -- trust me, I forgot to check that in my first version of the patch and this segfaulted :-D",
+      "parentUuid": "917a0294_94532aa8",
       "range": {
         "startLine": 77,
         "startChar": 15,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b85a29f8_af7db1dc",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:17:34Z",
+      "side": 1,
+      "message": "This is a rather unfortunate variable naming -- well, there just are too many \u0027archive_id\u0027s in here.\n\nThis one is the one we will send in the next recv reply.\nWhen the loop starts it is 0, meaning we haven\u0027t decided on one yet so we should check if the client can accept it (and remember it below)\n\n\nWith that said, if schedule_can_send() below fails then we\u0027ll remember the archive_id/hal flags when we didn\u0027t need to, making us possibly not send anything when something else could have been sent -- it makes more sense to check for enqueued_bytes \u003d\u003d 0 (\u003d\u003d first request we consider for adding to the list) so I\u0027ll update to that.",
+      "parentUuid": "9a4446ca_cc95a9f0",
+      "range": {
+        "startLine": 160,
+        "startChar": 7,
+        "endLine": 160,
+        "endChar": 17
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc45ab11_4c897612",
@@ -93,6 +165,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "049c9bea_fbfc6c0e",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:17:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc45ab11_4c897612",
+      "range": {
+        "startLine": 463,
+        "startChar": 35,
+        "endLine": 463,
+        "endChar": 45
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c920c7e1_2212a01b",
@@ -106,6 +202,30 @@
       "writtenOn": "2022-06-13T14:06:19Z",
       "side": 1,
       "message": "This wouldn\u0027t be enough I think. Because the client could have finished the ehlo step but didn\u0027t have enough time to ask for/receive work yet. I think you don\u0027t have the choice even if you wait for ehlo you still have to wait a bit before you can be sure that no client has received any work. This would probably be less than 4s though, so it\u0027s a better solution.\n\nNow that I think about it, maybe the best solution is to wait for a RECV from the copytool on the coordinatool and wait just a bit to see that the coordinatool puts the client in the waiting queue. This would probably imply a much shorter sleep duration that with ehlo?",
+      "range": {
+        "startLine": 464,
+        "startChar": 23,
+        "endLine": 464,
+        "endChar": 39
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47c12a31_13956b5d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:17:34Z",
+      "side": 1,
+      "message": "I guess if we go down the rabbit hole of surveying logs it\u0027ll always be possible to add a debug log for \u0027putting client X in waiting list\u0027 on server -- it actually makes sense to have as far as debug logs go.\n\nThinking of it now we could just leave it to journald e.g. change that systemd-run above to not output to pipe but to journal, and use journalctl -f here, and only display logs on failure? But at this point I kind of use the interactive logs (e.g. was testing ^C at various points of the tests to check for leak checks in a later patch), so I don\u0027t really want to do that yet. I\u0027ve just updated the comment to make it clearer what we need to wait for.",
+      "parentUuid": "c920c7e1_2212a01b",
       "range": {
         "startLine": 464,
         "startChar": 23,
