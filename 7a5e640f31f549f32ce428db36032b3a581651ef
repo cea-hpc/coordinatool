@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d5a1020_7deadcd7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-13T12:48:10Z",
+      "side": 1,
+      "message": "question: this error will be returned to the copytool through the preloaded call to llapi_hsm_copytool_register? Which means that the copytool will stop (unless the error is ignored).",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 12
+      },
+      "revId": "7a5e640f31f549f32ce428db36032b3a581651ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
