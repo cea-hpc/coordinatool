@@ -22,6 +22,30 @@
       },
       "revId": "7a5e640f31f549f32ce428db36032b3a581651ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f33265a_9af194c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:24:23Z",
+      "side": 1,
+      "message": "No, the tcp_connect() client helper is stubborn and will keep trying to reconnect as if this had been a connection failure.\n\nI think we want that: if we just restart a copytool, and the new copytool connects before the server noticed the old one disconnected it\u0027ll just reconnect shortly after and will work out.",
+      "parentUuid": "8d5a1020_7deadcd7",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 12
+      },
+      "revId": "7a5e640f31f549f32ce428db36032b3a581651ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
