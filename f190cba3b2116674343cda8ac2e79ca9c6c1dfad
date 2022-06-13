@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16e3b627_c8015c1f",
+        "filename": "client/client.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-13T14:35:02Z",
+      "side": 1,
+      "message": "nit: we could define this in a variable or a macro to ease the evolution of the parameters to avoid forgetting to modify both values.",
+      "range": {
+        "startLine": 139,
+        "startChar": 38,
+        "endLine": 139,
+        "endChar": 56
+      },
+      "revId": "f190cba3b2116674343cda8ac2e79ca9c6c1dfad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f970e5a4_186a2774",
+        "filename": "coordinatool.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-13T14:35:02Z",
+      "side": 1,
+      "message": "suggest: you could also specify what -1 means here",
+      "range": {
+        "startLine": 19,
+        "startChar": 12,
+        "endLine": 19,
+        "endChar": 14
+      },
+      "revId": "f190cba3b2116674343cda8ac2e79ca9c6c1dfad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
