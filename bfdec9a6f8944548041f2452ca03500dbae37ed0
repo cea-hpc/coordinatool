@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02cf024f_f9b55be7",
+        "filename": "client_common/client.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-13T14:08:33Z",
+      "side": 1,
+      "message": "question: server?",
+      "range": {
+        "startLine": 144,
+        "startChar": 10,
+        "endLine": 144,
+        "endChar": 16
+      },
+      "revId": "bfdec9a6f8944548041f2452ca03500dbae37ed0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
