@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ef427e2_e10cfb54",
+        "filename": "copytool/coordinatool.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-13T14:09:34Z",
+      "side": 1,
+      "message": "nit: maybe a comment would be nice to be more future proof",
+      "range": {
+        "startLine": 231,
+        "startChar": 1,
+        "endLine": 231,
+        "endChar": 20
+      },
+      "revId": "aff967c3600e7bf287f56c76ab559e3d0b497418",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
