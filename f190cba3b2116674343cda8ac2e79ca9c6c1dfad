@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "493a2ba8_161c0d83",
+        "filename": "client/client.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:37:58Z",
+      "side": 1,
+      "message": "in practice I don\u0027t think it matters as this getopt will ignore missing options, but I didn\u0027t really check -- I\u0027ve added a const char short_opts[] (and made long_opts const as well while I\u0027m here) to both main parsing",
+      "parentUuid": "16e3b627_c8015c1f",
+      "range": {
+        "startLine": 139,
+        "startChar": 38,
+        "endLine": 139,
+        "endChar": 56
+      },
+      "revId": "f190cba3b2116674343cda8ac2e79ca9c6c1dfad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f970e5a4_186a2774",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-06-13T14:35:02Z",
       "side": 1,
       "message": "suggest: you could also specify what -1 means here",
+      "range": {
+        "startLine": 19,
+        "startChar": 12,
+        "endLine": 19,
+        "endChar": 14
+      },
+      "revId": "f190cba3b2116674343cda8ac2e79ca9c6c1dfad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0feffb47_68a958a2",
+        "filename": "coordinatool.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-13T20:37:58Z",
+      "side": 1,
+      "message": "Just specifying that -1 here doesn\u0027t really make sense, but I guess that file could describe a lot more... Done",
+      "parentUuid": "f970e5a4_186a2774",
       "range": {
         "startLine": 19,
         "startChar": 12,
