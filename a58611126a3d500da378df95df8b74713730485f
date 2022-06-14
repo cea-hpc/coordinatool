@@ -46,6 +46,30 @@
       },
       "revId": "a58611126a3d500da378df95df8b74713730485f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc6a216d_eac54527",
+        "filename": "copytool/coordinatool.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-14T09:23:59Z",
+      "side": 1,
+      "message": "Thank you for the explanation.",
+      "parentUuid": "b04a3c7a_c04affa0",
+      "range": {
+        "startLine": 226,
+        "startChar": 9,
+        "endLine": 226,
+        "endChar": 20
+      },
+      "revId": "a58611126a3d500da378df95df8b74713730485f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
