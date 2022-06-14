@@ -22,6 +22,30 @@
       },
       "revId": "d0f109a69e7e32fac1f15805ad1bdec990eca1b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6466c25_5b295556",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-14T11:47:42Z",
+      "side": 1,
+      "message": "Easy to hit, yes: just specify a server that doesn\u0027t exist e.g. `CTOOL_ENV\u003d\"( [COORDINATOOL_REDIS_HOST]\u003d\u0027127.0.0.2\u0027 )\"` is what I had when I found the bug.\n\nThe problem is I have no idea how to make a difference at the test level between service failed due to the check I added, or a segfault somewhere... I guess checking for log messages might work but I don\u0027t really like relying on implementation details; ultimately it doesn\u0027t matter to the use if the service segfaults or just refuses to start.\n\nChecking the service didn\u0027t start is possible though (just `do_coordinatool_service 0 status` should work), but I\u0027m not sure it\u0027s useful as a test either: Right now there\u0027s no way the service will be starting up, and if we decide to change the implementation to start anyway for some reason later we\u0027ll need to update a test... Call me lazy? :P",
+      "parentUuid": "fd16f0cd_9274a385",
+      "range": {
+        "startLine": 492,
+        "startChar": 0,
+        "endLine": 492,
+        "endChar": 13
+      },
+      "revId": "d0f109a69e7e32fac1f15805ad1bdec990eca1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
