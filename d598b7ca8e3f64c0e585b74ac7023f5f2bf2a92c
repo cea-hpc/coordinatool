@@ -95,6 +95,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2957dcd9_f9cabade",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-14T08:33:02Z",
+      "side": 1,
+      "message": "I know I was refering to the case where the client sends the archive_ids in the json but the list is empty. I thought that\u0027s what you meant by empty list here. I guess I don\u0027t understand the distinction between empty and no list (I assume this means archives \u003d\u003d NULL). But anyway, it\u0027s just a comment.",
+      "parentUuid": "28605841_8d68e1f2",
+      "range": {
+        "startLine": 77,
+        "startChar": 15,
+        "endLine": 77,
+        "endChar": 25
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a4446ca_cc95a9f0",
