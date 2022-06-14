@@ -119,6 +119,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbf29466_c7557885",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-14T08:57:14Z",
+      "side": 1,
+      "message": "I like comments, it means something isn\u0027t clear :)\n\nLet\u0027s try again:\n- client sends no list, we get NULL here, first return applies\n- client sends an empty list, in ehlo_cb we allocate an array of size 1 where archives[0]\u003d0. Here the initial rc\u003dtrue and it does not enter the loop so we return true as in allowed. My misunderstanding here is that I call this a list of size zero (the end delimiter is not counted), just like strlen(\"\") is 0 but the it takes one byte.\n- client sends some items, not in list: we run through the loop and rc\u003dfalse is executed, so we return false as in refused.\n- client sends some items, in the list: we match and return true.\n\nThe comment here refers not only to the initial `if (!archives)` but also to the rc above, now I\u0027ve said all of this I guess that\u0027s what you were pointing at?\nI can move the comment above rc\u003dtrue or split it?",
+      "parentUuid": "2957dcd9_f9cabade",
+      "range": {
+        "startLine": 77,
+        "startChar": 15,
+        "endLine": 77,
+        "endChar": 25
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a4446ca_cc95a9f0",
