@@ -143,6 +143,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0689a489_6461c7a3",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-14T09:15:09Z",
+      "side": 1,
+      "message": "As you wish, I just thought that `empty list \u003d accept any archive id` was refering to the test `if (!archive_ids)`. If you want, maybe putting the comment above `rc\u003dtrue` or even above the function definition would remove this ambiguity.\n\nAs long as it\u0027s explicit that `archive_id_in_list(NULL, whatever)` and `archive_id_in_list({}, whatever)` are supposed to return true, it will probably be enough.",
+      "parentUuid": "dbf29466_c7557885",
+      "range": {
+        "startLine": 77,
+        "startChar": 15,
+        "endLine": 77,
+        "endChar": 25
+      },
+      "revId": "d598b7ca8e3f64c0e585b74ac7023f5f2bf2a92c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a4446ca_cc95a9f0",
