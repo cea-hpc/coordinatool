@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60cd65b6_37eda9dd",
+        "filename": "client_common/client.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-14T11:39:54Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "db2a5c19_36107213",
+      "range": {
+        "startLine": 87,
+        "startChar": 28,
+        "endLine": 87,
+        "endChar": 44
+      },
+      "revId": "8db69fe2e3b55354c26bd047dc6871db4a46547c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4fe493d8_d2284460",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-06-14T09:28:35Z",
       "side": 0,
       "message": "suggest: seeing as max_restore, archive, remove and hal_size are retrieved the exact same way, maybe a function that would to it would be nice, something like \n\"retrieve_conf_value(const char *conf_string, const char *key, long long *value)\"\n\nAnd idem for the 3 values just above",
+      "range": {
+        "startLine": 90,
+        "startChar": 2,
+        "endLine": 90,
+        "endChar": 38
+      },
+      "revId": "8db69fe2e3b55354c26bd047dc6871db4a46547c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "275f6d84_5ecc4f31",
+        "filename": "client_common/client.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-14T11:39:54Z",
+      "side": 0,
+      "message": "Could make sense as an improvement, leaving that for now",
+      "parentUuid": "4fe493d8_d2284460",
       "range": {
         "startLine": 90,
         "startChar": 2,
