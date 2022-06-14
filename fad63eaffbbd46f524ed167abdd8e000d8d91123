@@ -22,6 +22,30 @@
       },
       "revId": "fad63eaffbbd46f524ed167abdd8e000d8d91123",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76717513_c3144191",
+        "filename": "copytool/queue.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-14T11:42:02Z",
+      "side": 1,
+      "message": "queue_node_free already existed: it is called in protocol.c in done_cb when a client is done with a request and we can throw it away.\n\nThis is just keeping the original function with the same arguments, rather than adding a bool to the caller",
+      "parentUuid": "3b240af7_b24a358f",
+      "range": {
+        "startLine": 45,
+        "startChar": 5,
+        "endLine": 45,
+        "endChar": 20
+      },
+      "revId": "fad63eaffbbd46f524ed167abdd8e000d8d91123",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
