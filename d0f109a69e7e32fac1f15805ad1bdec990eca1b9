@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd16f0cd_9274a385",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-14T09:48:47Z",
+      "side": 1,
+      "message": "question: would it be easy to add a test that make redis fail when starting up, before any request is received ? To test out the patch 539718",
+      "range": {
+        "startLine": 492,
+        "startChar": 0,
+        "endLine": 492,
+        "endChar": 13
+      },
+      "revId": "d0f109a69e7e32fac1f15805ad1bdec990eca1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
