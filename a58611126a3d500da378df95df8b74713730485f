@@ -22,6 +22,30 @@
       },
       "revId": "a58611126a3d500da378df95df8b74713730485f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b04a3c7a_c04affa0",
+        "filename": "copytool/coordinatool.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-06-14T09:06:20Z",
+      "side": 1,
+      "message": "Yes, took me some time to figure how to do this. Accesses to state-\u003eredis_ac after redisAsyncDisconnect() would be flagged as use-after-free by ASAN and I didn\u0027t understand how that was possible until I looked up hiredis code to see it didn\u0027t call any callback in this case...\nSince neither connected nor disconnected callbacks are called we need to detect it ourselves here... Hopefully that can\u0027t happen in the other redisAsyncDisconnect that comes from an error\u0027d callback, I\u0027ll check...",
+      "parentUuid": "cc746e33_abbc60c7",
+      "range": {
+        "startLine": 226,
+        "startChar": 9,
+        "endLine": 226,
+        "endChar": 20
+      },
+      "revId": "a58611126a3d500da378df95df8b74713730485f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
