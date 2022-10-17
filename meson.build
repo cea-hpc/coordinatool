@@ -26,6 +26,16 @@ systemd = dependency('systemd', required: false)
 systemd_system_unit_dir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
 urcu = dependency('liburcu')
 
+use_phobos = get_option('phobos')
+
+phobos = cc.find_library('phobos_store', required: use_phobos)
+glib = dependency('glib-2.0', required: use_phobos)
+
+conf_data = configuration_data()
+have_phobos = phobos.found() and glib.found()
+conf_data.set10('HAVE_PHOBOS', have_phobos)
+configure_file(output: 'config.h', configuration: conf_data)
+
 if systemd.found()
 	configure_file(
 		copy: true,
@@ -75,22 +85,27 @@ client_common = static_library(
 
 subdir('tests')
 
+lhsmd_coordinatool_sources = [
+	'copytool/config.c',
+	'copytool/coordinatool.c',
+	'copytool/lhsm.c',
+	'copytool/protocol.c',
+	'copytool/queue.c',
+	'copytool/redis.c',
+	'copytool/scheduler.c',
+	'copytool/tcp.c',
+	'copytool/timer.c',
+]
+
+if have_phobos
+	lhsmd_coordinatool_sources += 'copytool/phobos.c'
+endif
 
 executable(
 	'lhsmd_coordinatool',
-	sources: files(
-		'copytool/config.c',
-		'copytool/coordinatool.c',
-		'copytool/lhsm.c',
-		'copytool/protocol.c',
-		'copytool/queue.c',
-		'copytool/redis.c',
-		'copytool/scheduler.c',
-		'copytool/tcp.c',
-		'copytool/timer.c',
-	) + [ version_h ],
-	dependencies: [hiredis, urcu],
-	include_directories: include_directories('common'),
+	sources: files(lhsmd_coordinatool_sources) + [ version_h ],
+	dependencies: [hiredis, urcu, glib, phobos],
+	include_directories: include_directories(['common', '.']),
 	link_with: [common],
 	install: true,
 )

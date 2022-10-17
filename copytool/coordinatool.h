@@ -14,6 +14,7 @@
 #include <urcu/list.h>
 #include <hiredis/async.h>
 
+#include "config.h"
 #include "logs.h"
 #include "protocol.h"
 #include "utils.h"
@@ -101,7 +102,7 @@ struct hsm_action_node {
 		enum hsm_copytool_action action;
 		uint32_t archive_id;
 		uint64_t hal_flags;
-#ifdef PHOBOS
+#if HAVE_PHOBOS
 		char *hsm_fuid;
 #endif
 	} info;
@@ -304,5 +305,12 @@ void client_disconnect(struct client *client);
 int timer_init(struct state *state);
 int timer_rearm(struct state *state);
 void handle_expired_timers(struct state *state);
+
+#if HAVE_PHOBOS
+int phobos_enrich(struct state *state,
+		  struct hsm_action_node *han);
+bool phobos_can_send(struct client *client,
+		     struct hsm_action_node *han);
+#endif
 
 #endif
