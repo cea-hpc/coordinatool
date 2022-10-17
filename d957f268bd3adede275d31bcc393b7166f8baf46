@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0fd4a98_f81665eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-17T20:55:11Z",
+      "side": 1,
+      "message": "nitpicks aside this mostly looks good: thanks!",
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6ee69f5_7c45b81c",
@@ -20,6 +37,87 @@
         "endLine": 40,
         "endChar": 48
       },
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "435b0648_9457a847",
+        "filename": "copytool/queue.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-17T20:55:11Z",
+      "side": 1,
+      "message": "Argh.\nSo, yes for actions_tree -- we only have one right now, this is the correct fix for the current code.\n\nI originally wanted to have one queue per archive_id but now apparently just took the simpler approach that each han has its own archive_id and filter at schedule time.\nPerformance wise if we end up with many archive ids that skipping might be a bit costly so I was planning to have something like get_queue(state, archive_id); and that requierd han-\u003equeues as the han didn\u0027t nkow archive_id at the time.\nWell, that can still be changed later as we have archive_id here; but you\u0027re right that won\u0027t use han-\u003equeue.\n\nAnyway, we still need han-\u003equeues for requeue; if that gets reworked we can indeed change han-\u003equeues to han-\u003estate but we\u0027ll need that one pointer cost anyway so I don\u0027t think there\u0027s any hurry.\n\nThis is good for now, thanks!",
+      "parentUuid": "c6ee69f5_7c45b81c",
+      "range": {
+        "startLine": 40,
+        "startChar": 8,
+        "endLine": 40,
+        "endChar": 48
+      },
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b993ad6e_482705e2",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-17T20:55:11Z",
+      "side": 1,
+      "message": "this should be save_errno",
+      "range": {
+        "startLine": 35,
+        "startChar": 10,
+        "endLine": 35,
+        "endChar": 15
+      },
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "264e902c_23327458",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-17T20:55:11Z",
+      "side": 1,
+      "message": "this isn\u0027t allowing for the auto mode of feature (well, not that you allow it in meson_option.txt, but that\u0027ll be hard to track if we ever change it)\n\nIf use_phobos is disabled, find_library/dependency will be empty anyway so we can just use that.\nThe suggestion below should work.",
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f78e1ca_80cc5355",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-17T20:55:11Z",
+      "side": 1,
+      "message": "let\u0027s use a config.h\n\n```\nconf_data \u003d configuration_data()\nconf_data.set10(\u0027HAVE_PHOBOS\u0027, phobos.found() and glib.found())\nconfigure_file(output: \u0027config.h\u0027 configuration: conf_data)\n```\n(and include it in files that need it)",
       "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
