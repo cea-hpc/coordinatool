@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6ee69f5_7c45b81c",
+        "filename": "copytool/queue.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-17T13:45:42Z",
+      "side": 1,
+      "message": "I had to change this because han-\u003equeues-\u003eactions_tree is never initialized since we never add any cookie into the per-client tree. It seems to me that the client\u0027s tree is not useful since we want to have a global tree which contains every cookie. It doesn\u0027t make sense to me to have a tree per client.\n\nI saw this bug because I\u0027m now changing han-\u003equeues to \u0026client-\u003equeues in the enrich phase. Which means that han-\u003equeues here can refer to client-\u003equeues which is empty and raises the abort bellow.",
+      "range": {
+        "startLine": 40,
+        "startChar": 8,
+        "endLine": 40,
+        "endChar": 48
+      },
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
