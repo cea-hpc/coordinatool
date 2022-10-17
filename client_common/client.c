@@ -5,7 +5,7 @@
 
 #include "client_common.h"
 #include "utils.h"
-#include "config.h"
+#include "config_utils.h"
 
 static int config_parse(struct ct_state_config *config, int fail_enoent) {
 	int rc = 0;

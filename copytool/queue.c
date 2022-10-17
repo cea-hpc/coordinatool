@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <search.h>
 
+#include "config.h"
 #include "coordinatool.h"
 
 void hsm_action_queues_init(struct state *state,
@@ -33,7 +34,11 @@ static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
 	if (!final_cleanup) {
 		redis_delete_request(han->queues->state, han->info.cookie);
 		cds_list_del(&han->node);
-		if (!tdelete(&han->info.cookie, &han->queues->actions_tree,
+#if HAVE_PHOBOS
+		free(han->info.hsm_fuid);
+#endif
+		if (!tdelete(&han->info.cookie,
+			     &han->queues->state->queues.actions_tree,
 			     tree_compare))
 			abort();
 	}
