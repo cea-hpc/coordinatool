@@ -47,7 +47,7 @@ test_hiredis = executable(
 		'hiredis.c',
 		'../copytool/redis.c',
 	],
-	include_directories: include_directories('../common'),
+	include_directories: include_directories('../common', '..'),
 	dependencies: [hiredis],
 	link_with: [common],
 )
