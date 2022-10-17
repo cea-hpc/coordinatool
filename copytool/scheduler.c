@@ -2,14 +2,115 @@
 
 #include "coordinatool.h"
 
+#ifdef PHOBOS
+#include <phobos_store.h>
+#include <fcntl.h>
+#include <sys/xattr.h>
+#endif
+
 /* schedule decision helper */
+
+#ifdef PHOBOS
+static int phobos_enrich(struct state *state,
+			 struct hsm_action_node *han) {
+	char oid[XATTR_SIZE_MAX + 1];
+	int rc, save_errno, fd;
+	char *hostname;
+	ssize_t oidlen;
+
+	han->info.hsm_fuid = NULL;
+	if (han->info.action != HSMA_RESTORE)
+		/* only enrich restore */
+		return 0;
+
+	fd = llapi_open_by_fid(state->mntpath, &han->info.dfid,
+			       O_RDONLY | O_NOATIME | O_NOFOLLOW);
+	if (fd < 0)
+		return -errno;
+
+	oidlen = fgetxattr(fd, "trusted.hsm_fuid", oid, XATTR_SIZE_MAX);
+	save_errno = errno;
+	close(fd);
+	if (oidlen < 0)
+		return (errno == ENODATA || errno == ENOTSUP) ? 0 : -save_errno;
+
+	oid[oidlen] = '\0';
+
+	rc = phobos_locate(oid, NULL, 0, &hostname);
+	if (rc)
+		return rc;
+
+	han->info.hsm_fuid = xstrdup(oid);
+	if (hostname == NULL)
+		return 0;
+
+	struct cds_list_head *n, *nnext;
+
+	cds_list_for_each_safe(n, nnext, &state->stats.clients) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+
+		if (!strcmp(hostname, client->id)) {
+			han->queues = &client->queues;
+			break;
+		}
+	}
+
+	return 0;
+}
+
+static bool phobos_can_send(struct client *client,
+			    struct hsm_action_node *han) {
+	char *hostname;
+	int rc;
+
+	if (han->info.action != HSMA_RESTORE)
+		/* only enrich restore */
+		return true;
+
+	// TODO If we just received the request, we don't need to do a locate
+	// here.
+	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, &hostname);
+	if (rc)
+		/* do not prevent sending a request if Phobos fails */
+		return true;
+
+
+	if (hostname == NULL || !strcmp(client->id, hostname))
+		return true;
+
+	struct cds_list_head *n, *nnext;
+
+	cds_list_for_each_safe(n, nnext,
+			       &client->queues.state->stats.clients) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+
+		if (!strcmp(hostname, client->id)) {
+			hsm_action_move(&client->queues, han, true);
+			return false;
+		}
+	}
+
+	/* move the request back into the main queue */
+	hsm_action_move(&han->queues->state->queues, han, true);
+
+	return false;
+}
+#endif
 
 /* fill in static action item informations */
 void hsm_action_node_enrich(struct state *state UNUSED,
 			    struct hsm_action_node *han UNUSED) {
-	// XXX actually fill in han->info with static infos
-	// At this point we could also want to pre-assign the node to a client,
-	// this can be done by setting han->queues = &client->queues
+#ifdef PHOBOS
+	int rc = phobos_enrich(state, han);
+	if (rc) {
+		LOG_ERROR(rc, "phobos: failed to enrich %s request for "DFID,
+			  ct_action2str(han->info.action),
+			  PFID(&han->info.dfid));
+		return;
+	}
+#endif
 }
 
 /* check if we still want to schedule action to client.
@@ -20,18 +121,17 @@ void hsm_action_node_enrich(struct state *state UNUSED,
  */
 static bool schedule_can_send(struct client *client UNUSED,
 			      struct hsm_action_node *han UNUSED) {
-	// XXX check things
-	// There might be a way to signal we just assigned node and
-	// phobos_locate doesn't need rechecking? but in general this can
-	// be called much later so we should recheck.
-	// to requeue in another queue, use hsm_action_move(newqueue, han, start)
-	// (we have global queue in han->queues->state->queues)
+
+#ifdef PHOBOS
+	return phobos_can_send(client, han);
+#else
+	return true;
+#endif
 	// XXX2, also probably want to signal if we want to requeue
 	// at start or not?
 	// just adding a ts and letting it be automatic in this case would
 	// probably be ok: in most case we're inserting at start so insertion
 	// would be O(1). For very long lists it might get slow though.
-	return true;
 }
 
 /* enqueue to json list */

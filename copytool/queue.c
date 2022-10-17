@@ -33,7 +33,11 @@ static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
 	if (!final_cleanup) {
 		redis_delete_request(han->queues->state, han->info.cookie);
 		cds_list_del(&han->node);
-		if (!tdelete(&han->info.cookie, &han->queues->actions_tree,
+#ifdef PHOBOS
+		free(han->info.hsm_fuid);
+#endif
+		if (!tdelete(&han->info.cookie,
+			     &han->queues->state->queues.actions_tree,
 			     tree_compare))
 			abort();
 	}

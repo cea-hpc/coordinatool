@@ -26,6 +26,14 @@ systemd = dependency('systemd', required: false)
 systemd_system_unit_dir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
 urcu = dependency('liburcu')
 
+use_phobos = get_option('phobos')
+
+phobos = cc.find_library('phobos_store', required: use_phobos)
+glib = dependency('glib-2.0', required: use_phobos)
+if use_phobos.enabled()
+	add_project_arguments('-DPHOBOS', language: 'c')
+endif
+
 if systemd.found()
 	configure_file(
 		copy: true,
@@ -89,7 +97,7 @@ executable(
 		'copytool/tcp.c',
 		'copytool/timer.c',
 	) + [ version_h ],
-	dependencies: [hiredis, urcu],
+	dependencies: [hiredis, urcu, glib, phobos],
 	include_directories: include_directories('common'),
 	link_with: [common],
 	install: true,
