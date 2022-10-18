@@ -90,6 +90,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "cbc24169_1b9bd8a4",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-18T11:43:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b993ad6e_482705e2",
+      "range": {
+        "startLine": 35,
+        "startChar": 10,
+        "endLine": 35,
+        "endChar": 15
+      },
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "264e902c_23327458",
         "filename": "meson.build",
         "patchSetId": 1
@@ -118,6 +142,24 @@
       "writtenOn": "2022-10-17T20:55:11Z",
       "side": 1,
       "message": "let\u0027s use a config.h\n\n```\nconf_data \u003d configuration_data()\nconf_data.set10(\u0027HAVE_PHOBOS\u0027, phobos.found() and glib.found())\nconfigure_file(output: \u0027config.h\u0027 configuration: conf_data)\n```\n(and include it in files that need it)",
+      "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d964eda5_67c40151",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-18T11:43:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f78e1ca_80cc5355",
       "revId": "d957f268bd3adede275d31bcc393b7166f8baf46",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
