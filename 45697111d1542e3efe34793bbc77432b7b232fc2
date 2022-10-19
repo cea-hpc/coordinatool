@@ -239,6 +239,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1d3c6195_6e39e8b5",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-19T09:02:44Z",
+      "side": 1,
+      "message": "I agree with Guillaume\u0027s opinion here that splitting checks is easier to understand / maintain / update later if required; the comment helps.\n\nI don\u0027t know/remember if phobos_locate() has its own logging when it fails, but if not a debug message here (ratelimited log messages to add on the todo!) could be added later for example -- that might be very useful for production when someone tries to understand why requests are going to the wrong node.",
+      "parentUuid": "245a5784_0251edac",
+      "range": {
+        "startLine": 76,
+        "startChar": 1,
+        "endLine": 78,
+        "endChar": 14
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "595d7b96_e69da69f",
         "filename": "meson.build",
         "patchSetId": 2
@@ -369,6 +393,30 @@
       "side": 1,
       "message": "But then why isn\u0027t there also a \"jansson\" in here ?",
       "parentUuid": "2e5fffd0_80e23fa4",
+      "range": {
+        "startLine": 101,
+        "startChar": 31,
+        "endLine": 101,
+        "endChar": 35
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f02c787_3c1b7239",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-19T09:02:44Z",
+      "side": 1,
+      "message": "it is line 22: the whole meson setup will fail if jansson is missing.",
+      "parentUuid": "76e0f6f8_6a685e96",
       "range": {
         "startLine": 101,
         "startChar": 31,
