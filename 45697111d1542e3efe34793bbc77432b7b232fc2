@@ -95,6 +95,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8720998_ed06560d",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-10-19T07:39:12Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "43b387e1_9f471aca",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 24
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34c842f8_57638333",
@@ -191,6 +215,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "245a5784_0251edac",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-10-19T07:39:12Z",
+      "side": 1,
+      "message": "I understand that there is a difference, but outside of this function, the result is exactly the same, a \"return true\". So the two conditions you wrote in this comment thread will end up with a \"return true\", and so the caller cannot know the difference you describe unless they also check hostname",
+      "parentUuid": "dd4bb282_743b767a",
+      "range": {
+        "startLine": 76,
+        "startChar": 1,
+        "endLine": 78,
+        "endChar": 14
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "595d7b96_e69da69f",
         "filename": "meson.build",
         "patchSetId": 2
@@ -226,6 +274,30 @@
       "side": 1,
       "message": "But jansson is a required dependency and used by other parts of the code, not just Phobos. So we won\u0027t be able to compile anything or even make it past the `meson build` step without jansson.",
       "parentUuid": "595d7b96_e69da69f",
+      "range": {
+        "startLine": 35,
+        "startChar": 55,
+        "endLine": 35,
+        "endChar": 60
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "047c7e54_bf70c393",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-10-19T07:39:12Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "978f1cc0_87347703",
       "range": {
         "startLine": 35,
         "startChar": 55,
@@ -285,6 +357,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "76e0f6f8_6a685e96",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-10-19T07:39:12Z",
+      "side": 1,
+      "message": "But then why isn\u0027t there also a \"jansson\" in here ?",
+      "parentUuid": "2e5fffd0_80e23fa4",
+      "range": {
+        "startLine": 101,
+        "startChar": 31,
+        "endLine": 101,
+        "endChar": 35
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3ced7cf8_0e0c5e19",
         "filename": "meson.build",
         "patchSetId": 2
@@ -320,6 +416,30 @@
       "side": 1,
       "message": "Yes, for the config.h",
       "parentUuid": "3ced7cf8_0e0c5e19",
+      "range": {
+        "startLine": 102,
+        "startChar": 54,
+        "endLine": 102,
+        "endChar": 55
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61528dee_3bb4d652",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-10-19T07:39:12Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "be7770be_d22e6149",
       "range": {
         "startLine": 102,
         "startChar": 54,
