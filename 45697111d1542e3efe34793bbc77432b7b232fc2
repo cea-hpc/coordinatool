@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "023eeaac_2b031744",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-19T07:14:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9c3aa82_f487f492",
+      "range": {
+        "startLine": 15,
+        "startChar": 11,
+        "endLine": 15,
+        "endChar": 24
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca0917bd_24dff98c",
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "43b387e1_9f471aca",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-19T07:14:18Z",
+      "side": 1,
+      "message": "Because a restore implies a get on Phobos\u0027 copytool which is the only request that needs a locate. Archive -\u003e write, Remove -\u003e delete. Both of these don\u0027t need a specific node to be executed.",
+      "parentUuid": "ca0917bd_24dff98c",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 24
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "34c842f8_57638333",
         "filename": "copytool/scheduler.c",
         "patchSetId": 2
@@ -60,6 +108,30 @@
       "writtenOn": "2022-10-18T13:41:56Z",
       "side": 1,
       "message": "nit: use errno here, after setting it back just after the close",
+      "range": {
+        "startLine": 36,
+        "startChar": 10,
+        "endLine": 36,
+        "endChar": 20
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cca6d3d_81cb8a93",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-19T07:14:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "34c842f8_57638333",
       "range": {
         "startLine": 36,
         "startChar": 10,
@@ -95,6 +167,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd4bb282_743b767a",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-19T07:14:18Z",
+      "side": 1,
+      "message": "You have to know why hostname is NULL. hostname \u003d\u003d NULL \u0026\u0026 rc \u003d\u003d 0 is different from hostname \u003d\u003d NULL \u0026\u0026 rc !\u003d 0. So the rc is necessary. And, I think it\u0027s better to make the if (rc) return true; explicit rather than having a more complex error handling in a single if statement.",
+      "parentUuid": "88c94171_d81057a8",
+      "range": {
+        "startLine": 76,
+        "startChar": 1,
+        "endLine": 78,
+        "endChar": 14
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "595d7b96_e69da69f",
         "filename": "meson.build",
         "patchSetId": 2
@@ -106,6 +202,30 @@
       "writtenOn": "2022-10-18T13:41:56Z",
       "side": 1,
       "message": "minor: if you want to be thorough, checking that you also got jansson here would be nice, since it is also required",
+      "range": {
+        "startLine": 35,
+        "startChar": 55,
+        "endLine": 35,
+        "endChar": 60
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "978f1cc0_87347703",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-19T07:14:18Z",
+      "side": 1,
+      "message": "But jansson is a required dependency and used by other parts of the code, not just Phobos. So we won\u0027t be able to compile anything or even make it past the `meson build` step without jansson.",
+      "parentUuid": "595d7b96_e69da69f",
       "range": {
         "startLine": 35,
         "startChar": 55,
@@ -141,6 +261,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e5fffd0_80e23fa4",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-19T07:14:18Z",
+      "side": 1,
+      "message": "Yes because Phobos\u0027 packaging is basically inexistant so each project has to know the dependencies of Phobos...",
+      "parentUuid": "81d428aa_28f8bc95",
+      "range": {
+        "startLine": 101,
+        "startChar": 31,
+        "endLine": 101,
+        "endChar": 35
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3ced7cf8_0e0c5e19",
         "filename": "meson.build",
         "patchSetId": 2
@@ -152,6 +296,30 @@
       "writtenOn": "2022-10-18T13:41:56Z",
       "side": 1,
       "message": "question: is this necessary ?",
+      "range": {
+        "startLine": 102,
+        "startChar": 54,
+        "endLine": 102,
+        "endChar": 55
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be7770be_d22e6149",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-19T07:14:18Z",
+      "side": 1,
+      "message": "Yes, for the config.h",
+      "parentUuid": "3ced7cf8_0e0c5e19",
       "range": {
         "startLine": 102,
         "startChar": 54,
