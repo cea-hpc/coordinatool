@@ -34,6 +34,24 @@
       "parentUuid": "f37e2551_1bbafe77",
       "revId": "1186bc65087d1680c360a5d8e6a92102c79e2f2d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88f0db1d_9340c7bb",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-25T21:48:48Z",
+      "side": 0,
+      "message": "Ack",
+      "parentUuid": "dd8fcf96_56d1ce4e",
+      "revId": "1186bc65087d1680c360a5d8e6a92102c79e2f2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

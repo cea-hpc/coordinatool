@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c051bcd_ee0b9a97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-25T21:48:48Z",
+      "side": 1,
+      "message": "Thanks, spec LGTM.\nWe also have version in the project() of meson.build; but it doesn\u0027t actually look like it\u0027s used (version.h uses git tag --describe...), I guess we should still update it for principle?",
+      "revId": "ec3c17381ab2416ad6b87fcfe9cac0bc5ae04d4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
