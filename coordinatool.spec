@@ -1,5 +1,5 @@
 Name: coordinatool
-Version: 0.1
+Version: 0.2
 Release: 1%{?dist}
 Summary: lustre userspace coordinator implemented as a copytool
 License: LGPLv3+
@@ -11,6 +11,7 @@ BuildRequires: gcc
 BuildRequires: pkgconfig(jansson)
 BuildRequires: pkgconfig(liburcu)
 BuildRequires: pkgconfig(glib-2.0)
+BuildRequires: hiredis
 
 %description
 coordinatool is a lustre copytool that takes all requests off lustre's
@@ -57,6 +58,11 @@ standalone coordinatool client to interact with the server
 %postun lib -p /sbin/ldconfig
 
 %changelog
+* Tue Nov 25 2022 Guillaume Courrier <guillaume.courrier@cea.fr> - 0.2-1
+- Clients will try to reconnect the server when down
+- Use a REDIS database to store requests and recover from crash
+- Add compile time switch to use Phobos features
+
 * Sun Jun 27 2021 Dominique Martinet <dominique.martinet@codewreck.org> - 0.1-1
 - initial version
 
