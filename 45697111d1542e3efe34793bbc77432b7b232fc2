@@ -333,6 +333,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b56c633f_9b52d945",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-25T13:18:56Z",
+      "side": 1,
+      "message": "If you want a bit more time to test the patch I don\u0027t mind. It\u0027s just that I intend to test the coordinatool with Phobos this week on a \"big\" filesystem. As long as the code does not change a lot, I don\u0027t mind doing some modifications before landing it.",
+      "parentUuid": "533987e8_87566a64",
+      "range": {
+        "startLine": 76,
+        "startChar": 1,
+        "endLine": 78,
+        "endChar": 14
+      },
+      "revId": "45697111d1542e3efe34793bbc77432b7b232fc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "595d7b96_e69da69f",
