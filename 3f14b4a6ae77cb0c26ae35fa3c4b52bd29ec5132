@@ -16,6 +16,23 @@
       "message": "I updated the version because we will test it and see how well it performs.",
       "revId": "3f14b4a6ae77cb0c26ae35fa3c4b52bd29ec5132",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0168710_95de00d2",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-25T12:57:42Z",
+      "side": 1,
+      "message": "probably needs some new BR for hiredis?",
+      "revId": "3f14b4a6ae77cb0c26ae35fa3c4b52bd29ec5132",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
