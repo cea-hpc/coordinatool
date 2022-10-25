@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6891b370_18760df2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2022-10-25T22:05:52Z",
+      "side": 1,
+      "message": "oh gerrit started adding all this fluff here too.. We could change project settings to disable it (change from rebase always to rebase if necessary should do), but I guess it doesn\u0027t hurt -- I\u0027ll leave this unless you have opinions.",
+      "revId": "c930833f00ebea3143d77f70495b92d8dc0f4e58",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
