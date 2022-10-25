@@ -16,6 +16,24 @@
       "message": "I guess tests no longer pass without redis?\nProbably would make sense to just run a subset of them somehow...",
       "revId": "1186bc65087d1680c360a5d8e6a92102c79e2f2d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd8fcf96_56d1ce4e",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-10-25T13:29:48Z",
+      "side": 0,
+      "message": "This is a mistake. I removed this just to build the RPM quickly and should have put it back. The phobos\u003denabled should not be here as well...",
+      "parentUuid": "f37e2551_1bbafe77",
+      "revId": "1186bc65087d1680c360a5d8e6a92102c79e2f2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
