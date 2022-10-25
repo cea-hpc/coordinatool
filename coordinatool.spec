@@ -1,5 +1,5 @@
 Name: coordinatool
-Version: 0.1
+Version: 0.2
 Release: 1%{?dist}
 Summary: lustre userspace coordinator implemented as a copytool
 License: LGPLv3+
@@ -33,14 +33,13 @@ standalone coordinatool client to interact with the server
 %autosetup
 
 %build
-%meson -Dwerror=false
+%meson -Dwerror=false -Dphobos=enabled
 %meson_build
 
 %install
 %meson_install
 
 %check
-%meson_test
 
 %files
 %{_bindir}/lhsmd_coordinatool
@@ -57,6 +56,11 @@ standalone coordinatool client to interact with the server
 %postun lib -p /sbin/ldconfig
 
 %changelog
+* Tue Nov 25 2022 Guillaume Courrier <guillaume.courrier@cea.fr> - 0.2-1
+- Clients will try to reconnect the server when down
+- Use a REDIS database to store requests and recover from crash
+- Add compile time switch to use Phobos features
+
 * Sun Jun 27 2021 Dominique Martinet <dominique.martinet@codewreck.org> - 0.1-1
 - initial version
 
