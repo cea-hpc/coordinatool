@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd0a348e_402a9ae2",
+        "filename": "coordinatool.spec",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-10-26T07:52:48Z",
+      "side": 1,
+      "message": "minor: went\nor another phrasing: \"Clients reconnection after a server downtime\"",
+      "range": {
+        "startLine": 62,
+        "startChar": 43,
+        "endLine": 62,
+        "endChar": 47
+      },
+      "revId": "2fcf6405c727353f2fffb6b0900e7945fb0827c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
