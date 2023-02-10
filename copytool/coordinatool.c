@@ -12,6 +12,10 @@
 #include "coordinatool.h"
 #include "version.h"
 
+#if HAVE_PHOBOS_INIT
+#include <phobos_store.h>
+#endif
+
 int epoll_addfd(int epoll_fd, int fd, void *data) {
 	struct epoll_event ev;
 	int rc;
@@ -270,6 +274,11 @@ int main(int argc, char *argv[]) {
 	const char short_opts[] = "c:A:vqH:p:Vh";
 	int rc;
 	bool first_archive_id = true;
+
+#if HAVE_PHOBOS_INIT
+	phobos_init();
+	atexit(phobos_fini);
+#endif
 
 	// state init
 	struct state state = { 0 };

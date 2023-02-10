@@ -33,7 +33,18 @@ glib = dependency('glib-2.0', required: use_phobos)
 
 conf_data = configuration_data()
 have_phobos = phobos.found() and glib.found()
+
+have_phobos_init = false
+if have_phobos
+	have_phobos_init = cc.has_function(
+		'phobos_init',
+		prefix: '#define _GNU_SOURCE\n#include <phobos_store.h>',
+		dependencies: [ glib, phobos ],
+	)
+endif
+
 conf_data.set10('HAVE_PHOBOS', have_phobos)
+conf_data.set10('HAVE_PHOBOS_INIT', have_phobos_init)
 configure_file(output: 'config.h', configuration: conf_data)
 
 if systemd.found()
