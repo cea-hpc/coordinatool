@@ -33,6 +33,24 @@
       "message": "(I think this makes more sense to have clients send what we want (e.g. short hostname) rather than try to cut the id here in general; but this does not really matter to me so rolling with it)",
       "revId": "a3efa88eafc5bb4869e00911f47822dbf48dbd43",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33c95622_c149665f",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-05-05T13:36:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4aed87b7_1d0a5de1",
+      "revId": "a3efa88eafc5bb4869e00911f47822dbf48dbd43",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
