@@ -36,6 +36,41 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d22b1e71_6e3a7ac7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-09-29T14:21:17Z",
+      "side": 1,
+      "message": "Not yet. I wait the phobos 1.95 package.",
+      "parentUuid": "12ddf231_f5669cc4",
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5597d199_38640ff6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-09-29T14:21:17Z",
+      "side": 1,
+      "message": "Thanks for the review. I remove the double int definition.",
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a578cdb_f31b68d3",
@@ -49,6 +84,30 @@
       "writtenOn": "2023-09-29T14:01:48Z",
       "side": 1,
       "message": "defect: if you don\u0027t have Phobos 1.95, this variable is not used, and the compiler will most likely error out",
+      "range": {
+        "startLine": 14,
+        "startChar": 8,
+        "endLine": 14,
+        "endChar": 24
+      },
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dba7ee58_141cb33c",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-09-29T14:21:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a578cdb_f31b68d3",
       "range": {
         "startLine": 14,
         "startChar": 8,
@@ -82,6 +141,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a263364_7e536632",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-09-29T14:21:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e7c9ac0_e18d64fe",
+      "range": {
+        "startLine": 38,
+        "startChar": 1,
+        "endLine": 38,
+        "endChar": 17
+      },
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7f598b4_e8071626",
@@ -95,6 +178,30 @@
       "writtenOn": "2023-09-29T14:01:48Z",
       "side": 1,
       "message": "question: the compiler doesn\u0027t say anything about this variable only being affected a value and never actually used ?",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 17
+      },
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ac4d228_1c38389a",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-09-29T14:21:17Z",
+      "side": 1,
+      "message": "I guess it\u0027s OK. But we will check it at compilation test.",
+      "parentUuid": "a7f598b4_e8071626",
       "range": {
         "startLine": 77,
         "startChar": 1,
