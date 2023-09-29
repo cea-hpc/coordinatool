@@ -33,7 +33,12 @@ int phobos_enrich(struct state *state,
 
 	oid[oidlen] = '\0';
 
+#if HAVE_PHOBOS_1_95
+	int nb_new_lock;
+	rc = phobos_locate(oid, NULL, 0, NULL, &hostname, &nb_new_lock);
+#else
 	rc = phobos_locate(oid, NULL, 0, &hostname);
+#endif
 	if (rc)
 		return rc;
 
@@ -67,7 +72,13 @@ bool phobos_can_send(struct client *client,
 
 	// TODO If we just received the request, we don't need to do a locate
 	// here.
+#if HAVE_PHOBOS_1_95
+	int nb_new_lock;
+	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, NULL, &hostname,
+			   &nb_new_lock);
+#else
 	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, &hostname);
+#endif
 	if (rc)
 		/* do not prevent sending a request if Phobos fails */
 		return true;
