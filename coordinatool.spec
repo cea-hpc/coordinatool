@@ -1,5 +1,5 @@
 Name: coordinatool
-Version: 0.2
+Version: 0.3
 Release: 1%{?dist}
 Summary: lustre userspace coordinator implemented as a copytool
 License: LGPLv3+
