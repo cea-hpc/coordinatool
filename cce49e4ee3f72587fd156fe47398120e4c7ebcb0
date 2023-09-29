@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "557a793b_650cef2d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-09-29T14:01:48Z",
+      "side": 1,
+      "message": "Have you tried these modifications without a Phobos 1.95 installed ?",
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a578cdb_f31b68d3",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-09-29T14:01:48Z",
+      "side": 1,
+      "message": "defect: if you don\u0027t have Phobos 1.95, this variable is not used, and the compiler will most likely error out",
+      "range": {
+        "startLine": 14,
+        "startChar": 8,
+        "endLine": 14,
+        "endChar": 24
+      },
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e7c9ac0_e18d64fe",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-09-29T14:01:48Z",
+      "side": 1,
+      "message": "minor: double definition",
+      "range": {
+        "startLine": 38,
+        "startChar": 1,
+        "endLine": 38,
+        "endChar": 17
+      },
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7f598b4_e8071626",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-09-29T14:01:48Z",
+      "side": 1,
+      "message": "question: the compiler doesn\u0027t say anything about this variable only being affected a value and never actually used ?",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 17
+      },
+      "revId": "cce49e4ee3f72587fd156fe47398120e4c7ebcb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
