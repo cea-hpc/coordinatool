@@ -58,6 +58,9 @@ standalone coordinatool client to interact with the server
 %postun lib -p /sbin/ldconfig
 
 %changelog
+* Fri Oct 20 2023 Patrice Lucas <patrice.lucas@cea.fr> - 0.3-1
+- Update to new Phobos 1.95 API (phobos_init and phobos_locate)
+
 * Tue Oct 25 2022 Guillaume Courrier <guillaume.courrier@cea.fr> - 0.2-1
 - Clients will try to reconnect the server when down
 - Use a REDIS database to store requests and recover from crash
