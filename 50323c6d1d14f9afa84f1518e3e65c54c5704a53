@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "024d9ad8_d3864c85",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-10-20T08:56:00Z",
+      "side": 1,
+      "message": "Only a short changelog update into the spec file.",
+      "revId": "50323c6d1d14f9afa84f1518e3e65c54c5704a53",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
