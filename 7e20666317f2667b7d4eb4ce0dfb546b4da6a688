@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b728759c_92ceacaa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-10-20T09:05:26Z",
+      "side": 1,
+      "message": "One more version number to upgrade ...",
+      "revId": "7e20666317f2667b7d4eb4ce0dfb546b4da6a688",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
