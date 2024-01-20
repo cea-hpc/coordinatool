@@ -33,33 +33,29 @@ glib = dependency('glib-2.0', required: use_phobos)
 
 conf_data = configuration_data()
 have_phobos = phobos.found() and glib.found()
+conf_data.set10('HAVE_PHOBOS', have_phobos)
 
-have_phobos_init = false
 if have_phobos
 	have_phobos_init = cc.has_function(
 		'phobos_init',
 		prefix: '#define _GNU_SOURCE\n#include <phobos_store.h>',
 		dependencies: [ glib, phobos ],
 	)
+	conf_data.set10('HAVE_PHOBOS_INIT', have_phobos_init)
+
+	have_phobos_1_95 = cc.compiles(
+		'''
+		#include <phobos_store.h>
+		void func() {
+			char *hostname;
+			int nb_new_lock;
+			phobos_locate("obj", NULL, 0, NULL, &hostname, &nb_new_lock);
+		}
+		''',
+		name : 'phobos_locate 1.95 check',
+		dependencies: [glib, phobos])
+	conf_data.set10('HAVE_PHOBOS_1_95', have_phobos_1_95)
 endif
-
-phobos_locate_1_95_code = '''#include <phobos_store.h>
-void func()
-{
-	char *hostname;
-	int nb_new_lock;
-
-	phobos_locate("obj", NULL, 0, NULL, &hostname, &nb_new_lock);
-}
-'''
-have_phobos_1_95 = cc.compiles(
-	phobos_locate_1_95_code,
-	name : 'phobos_locate 1.95 check',
-	dependencies: [glib, phobos])
-
-conf_data.set10('HAVE_PHOBOS', have_phobos)
-conf_data.set10('HAVE_PHOBOS_INIT', have_phobos_init)
-conf_data.set10('HAVE_PHOBOS_1_95', have_phobos_1_95)
 
 have_gettid = cc.has_function(
 	'gettid',
