@@ -289,5 +289,5 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 		rc_done = 0;
 	}
 
-	return rc || rc_done;
+	return rc ? rc : rc_done;
 }
