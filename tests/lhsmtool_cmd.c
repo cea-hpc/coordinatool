@@ -46,9 +46,7 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -167,10 +165,12 @@ static inline double ct_now(void)
 	return tv.tv_sec + 0.000001 * tv.tv_usec;
 }
 
+#if !defined(HAVE_GETTID) || HAVE_GETTID == 0
 static inline pid_t gettid(void)
 {
 	return syscall(SYS_gettid);
 }
+#endif
 
 #define LOG_ERROR(_rc, _format, ...)					\
 	llapi_error(LLAPI_MSG_ERROR, _rc,				\

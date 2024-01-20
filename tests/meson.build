@@ -7,6 +7,8 @@ executable(
 		'lhsmtool_cmd.c',
 		],
 	dependencies: [glib2, lustre, resolv],
+	# for config.h
+	include_directories: include_directories(['..']),
 	c_args: cc.get_supported_arguments([
 		# gcc
 		'-Wno-implicit-fallthrough',
