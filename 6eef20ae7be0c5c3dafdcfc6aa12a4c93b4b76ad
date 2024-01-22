@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaf8f6a0_3d6b9d39",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003524
+      },
+      "writtenOn": "2024-01-22T00:56:33Z",
+      "side": 1,
+      "message": "EL9.2:\n```Checking for function \"gettid\" : YES```",
+      "revId": "6eef20ae7be0c5c3dafdcfc6aa12a4c93b4b76ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
