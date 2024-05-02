@@ -1,1 +1,1 @@
-option('phobos', type: 'feature', value: 'disabled')
+option('phobos', type: 'feature', value: 'enabled')
