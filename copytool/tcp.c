@@ -190,12 +190,12 @@ int handle_client_connect(struct state *state) {
 	client->queues.state = state;
 	state->stats.clients_connected++;
 
-	LOG_DEBUG("Got client connection from %s", client->id);
+	LOG_DEBUG("%s (%d): New client connection", client->id, client->fd);
 
 	rc = epoll_addfd(state->epoll_fd, fd, client);
 	if (rc < 0) {
-		LOG_ERROR(rc, "Could not add client %s to epoll",
-			  client->id);
+		LOG_ERROR(rc, "%s (%d): Could not add client to epoll",
+			  client->id, client->fd);
 		client_free(client);
 	}
 
@@ -220,7 +220,7 @@ struct client *client_new_disconnected(struct state *state, const char *id) {
 	client->disconnected_timestamp = gettime_ns();
 	client->queues.state = state;
 
-	LOG_DEBUG("New disconnected client for %s", id);
+	LOG_DEBUG("%s: New disconnected client", id);
 
 	return client;
 }
