@@ -374,7 +374,7 @@ static int redis_scan_requests(struct state *state,
 		return -EINVAL;
 	}
 
-	rc = hsm_action_enqueue_json(state, json_hai, 0, NULL);
+	rc = hsm_action_enqueue_json(state, json_hai, 0, NULL, "redis (recovery)");
 	json_decref(json_hai);
 	if (rc < 0)
 		return rc;
@@ -420,14 +420,14 @@ static int redis_scan_assigned(struct state *state,
 	if (rc)
 		return rc;
 
-	LOG_DEBUG("Cookie %lx running on client %s", cookie, client_id);
+	LOG_DEBUG("%s: Cookie %lx running", client_id, cookie);
 
 
 	struct hsm_action_node *han;
 	han = hsm_action_search_queue(&state->queues, cookie);
 	if (!han) {
-		LOG_WARN(-EINVAL, "cookie %lx assigned but wasn't in request list, cleaning up",
-			 cookie);
+		LOG_WARN(-EINVAL, "%s: cookie %lx assigned but wasn't in request list, cleaning up",
+			 client_id, cookie);
 		return redis_delete(state, "coordinatool_assigned", cookie);
 	}
 
@@ -443,8 +443,8 @@ static int redis_scan_assigned(struct state *state,
 	}
 
 #ifdef DEBUG_ACTION_NODE
-	LOG_DEBUG("Moving han %p to active requests %p (redis)",
-		  (void*)han, (void*)&client->active_requests);
+	LOG_DEBUG("%s: Moving han %p to active requests %p (redis)",
+		  client_id, (void*)han, (void*)&client->active_requests);
 #endif
 	// XXX scan can return same cookie multiple times, so the request
 	// could already be enqueued.
