@@ -181,7 +181,8 @@ static int hsm_action_enqueue_common(struct state *state,
 
 int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 			    int64_t timestamp,
-			    struct hsm_action_node **han_out) {
+			    struct hsm_action_node **han_out,
+			    const char *requestor) {
 	struct hsm_action_node *han;
 	struct hsm_action_item hai;
 	int rc;
@@ -189,7 +190,7 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	rc = json_hsm_action_item_get(json_hai, &hai, sizeof(hai));
 	// overflow is ok: we don't care about hai_data as we reuse the json
 	if (rc && rc != -EOVERFLOW) {
-		LOG_WARN(rc, "Got invalid hai from client: skipping");
+		LOG_WARN(rc, "%s: Could not process invalid hai: skipping", requestor);
 		return rc;
 	}
 
@@ -206,7 +207,7 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	han->info.archive_id = protocol_getjson_int(json_hai, "hal_archive_id", 0);
 	han->info.hal_flags = protocol_getjson_int(json_hai, "hal_flags", 0);
 	if (!han->info.archive_id) {
-		LOG_WARN(-EINVAL, "hai from client did not contain archive_id");
+		LOG_WARN(-EINVAL, "%s: hai did not contain archive_id", requestor);
 		free(han);
 		return -EINVAL;
 	}
@@ -216,7 +217,8 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	case HSMA_REMOVE:
 		break;
 	default:
-		LOG_WARN(rc, "hai from client had invalid action %d\n", hai.hai_action);
+		LOG_WARN(rc, "%s: hai had invalid action %d\n",
+			 requestor, hai.hai_action);
 		free(han);
 		return -EINVAL;
 	}

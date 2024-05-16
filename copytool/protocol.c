@@ -106,8 +106,8 @@ int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %s: %s",
-			  client->id, json_str);
+		LOG_ERROR(rc, "%s (%d): Could not write reply: %s",
+			  client->id, client->fd, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -188,8 +188,8 @@ int protocol_reply_recv(struct client *client,
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %s: %s",
-			  client->id, json_str);
+		LOG_ERROR(rc, "%s (%d): Could not write reply: %s",
+			  client->id, client->fd, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -218,8 +218,8 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 					   "Unknown cookie sent");
 
 	int status = protocol_getjson_int(json, "status", 0);
-	LOG_INFO("%d processed "DFID": %d" ,
-		  client->fd, PFID(&han->info.dfid), status);
+	LOG_INFO("%s (%d): processed "DFID": %d" ,
+		  client->id, client->fd, PFID(&han->info.dfid), status);
 
 	int action = han->info.action;
 	queue_node_free(han);
@@ -270,8 +270,8 @@ int protocol_reply_done(struct client *client, int status, char *error) {
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %s: %s",
-			  client->id, json_str);
+		LOG_ERROR(rc, "%s (%d): Could not write reply: %s",
+			  client->id, client->fd, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -301,8 +301,8 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	const char *fsname = protocol_getjson_str(json, "fsname", NULL, NULL);
 	/* fsname is optional */
 	if (fsname && strcmp(fsname, state->fsname)) {
-		LOG_WARN(-EINVAL, "client sent queue with bad fsname, expected %s got %s",
-			 state->fsname, fsname);
+		LOG_WARN(-EINVAL, "%s (%d): client sent queue with bad fsname, expected %s got %s",
+			 client->id, client->fd, state->fsname, fsname);
 		return protocol_reply_queue(client, 0, EINVAL, "Bad fsname");
 	}
 
@@ -310,7 +310,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	json_t *item;
 	int64_t timestamp = gettime_ns();
 	json_array_foreach(json_hal, count, item) {
-		rc = hsm_action_enqueue_json(state, item, timestamp, NULL);
+		rc = hsm_action_enqueue_json(state, item, timestamp, NULL, client->id);
 		if (rc < 0) {
 			final_rc = rc;
 			continue;
@@ -342,8 +342,8 @@ int protocol_reply_queue(struct client *client, int enqueued,
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %s: %s",
-			  client->id, json_str);
+		LOG_ERROR(rc, "%s (%d): Could not write reply: %s",
+			  client->id, client->fd, json_str);
 		free(json_str);
 		goto out_freereply;
 	};
@@ -395,8 +395,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 			json_int_t id = json_integer_value(json_id);
 			// non-integers return 0, and 0 is not a valid id
 			if (id <= 0 || id > INT_MAX) {
-				LOG_ERROR(-EINVAL, "Client sent invalid archive id: %lld",
-					  id);
+				LOG_ERROR(-EINVAL, "%s (%d): Client sent invalid archive id: %lld",
+					  client->id, client->fd, id);
 				return protocol_reply_ehlo(client, EINVAL,
 							   "Bad archive id in list");
 			}
@@ -417,6 +417,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_ehlo(client, 0, NULL);
 	}
 
+	LOG_DEBUG("%s (%d): renaming form %s", id, client->fd, client->id);
 	free((void*)client->id);
 	client->id = xstrdup(id);
 
@@ -429,7 +430,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		if (strcmp(id, old_client->id))
 			continue;
 
-		LOG_DEBUG("Splicing old client active_requests %p to new one %p",
+		LOG_DEBUG("%s (%d): Splicing old client active_requests %p to new one %p",
+			  id, client->fd,
 			  (void*)&old_client->active_requests,
 			  (void*)&client->active_requests);
 		cds_list_splice(&old_client->active_requests,
@@ -464,8 +466,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		json_array_foreach(hai_list, count, hai) {
 			uint64_t cookie = protocol_getjson_int(hai, "hai_cookie", 0);
 			if (cookie == 0) {
-				LOG_WARN(-EINVAL, "No cookie set for entry in ehlo from %s",
-					 client->id);
+				LOG_WARN(-EINVAL, "%s (%d): No cookie set for entry in ehlo",
+					 client->id, client->fd);
 				continue;
 			}
 
@@ -476,7 +478,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 			han = hsm_action_search_queue(&state->queues, cookie);
 			if (han) {
 #ifdef DEBUG_ACTION_NODE
-				LOG_DEBUG("Moving han %p to active requests %p (ehlo)",
+				LOG_DEBUG("%s (%d): Moving han %p to active requests %p (ehlo)",
+					  client->id, client->fd,
 					  (void*)han, (void*)&client->active_requests);
 #endif
 				cds_list_del(&han->node);
@@ -485,12 +488,13 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 			}
 			/* Otherwise create new one. Use enqueue to enrich it just in case.
 			 * Note that requires a dequeue to immediately get it off waiting list */
-			if (hsm_action_enqueue_json(state, hai, timestamp, &han) || !han) {
+			if (hsm_action_enqueue_json(state, hai, timestamp, &han, client->id) || !han) {
 				/* ignore bad items in hai list */
 				continue;
 			}
 #ifdef DEBUG_ACTION_NODE
-			LOG_DEBUG("Moving new han %p to active requests %p (ehlo)",
+			LOG_DEBUG("%s (%d): Moving new han %p to active requests %p (ehlo)",
+				  client->id, client->fd,
 				  (void*)han, (void*)&client->active_requests);
 #endif
 			hsm_action_dequeue(&state->queues, han);
@@ -527,8 +531,8 @@ int protocol_reply_ehlo(struct client *client, int status, char *error) {
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
 		rc = -EIO;
-		LOG_ERROR(rc, "Could not write reply to %s: %s",
-			  client->id, json_str);
+		LOG_ERROR(rc, "%s (%d): Could not write reply: %s",
+			  client->id, client->fd, json_str);
 		free(json_str);
 		goto out_freereply;
 	};

@@ -178,11 +178,12 @@ void ct_schedule_client(struct state *state,
 					 &enqueued_bytes)) {
 				break;
 			}
-			LOG_INFO("Sending "DFID" to %d from queues" ,
-				 PFID(&han->info.dfid), client->fd);
+			LOG_INFO("%s (%d): Sending "DFID" from queues" ,
+				 client->id, client->fd, PFID(&han->info.dfid));
 			redis_assign_request(state, client, han);
 #ifdef DEBUG_ACTION_NODE
-			LOG_DEBUG("moving node %p to %p (active requests)",
+			LOG_DEBUG("%s (%d): moving node %p to %p (active requests)",
+				  client->id, client->fd,
 				  (void*)han, (void*)&client->active_requests);
 #endif
 			hsm_action_dequeue(queues, han);
@@ -207,7 +208,7 @@ void ct_schedule_client(struct state *state,
 	int rc = protocol_reply_recv(client, state->fsname, archive_id,
 				     hal_flags, hai_list, 0, NULL);
 	if (rc < 0) {
-		LOG_ERROR(rc, "Could not send reply to %s", client->id);
+		LOG_ERROR(rc, "%s (%d): Could not send reply", client->id, client->fd);
 		client_disconnect(client);
 	}
 }
