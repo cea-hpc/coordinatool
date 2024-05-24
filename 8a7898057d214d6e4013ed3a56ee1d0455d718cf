@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba775449_c270c291",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003524
+      },
+      "writtenOn": "2024-05-24T15:17:07Z",
+      "side": 1,
+      "message": "YES! BTW it\u0027s related to https://github.com/cea-hpc/coordinatool/issues/2",
+      "revId": "8a7898057d214d6e4013ed3a56ee1d0455d718cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
