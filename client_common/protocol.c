@@ -101,13 +101,15 @@ out_free:
 }
 
 int protocol_request_done(const struct ct_state *state,
-			  uint64_t cookie, int status) {
+			  uint64_t cookie, struct lu_fid *dfid,
+			  int status) {
 	json_t *request;
 	int rc = 0;
 
-	request = json_pack("{ss,si,si}",
+	request = json_pack("{ss,si,so,si}",
 			    "command", "done",
-			    "cookie", cookie,
+			    "hai_cookie", cookie,
+			    "hai_dfid", json_fid(dfid),
 			    "status", status);
 	if (!request) {
 		rc = -ENOMEM;

@@ -9,9 +9,14 @@
 #include "utils.h"
 
 /* preload.c */
+struct action_key {
+	uint64_t cookie;
+	struct lu_fid dfid;
+};
+
 /* remember running actions to send back on reconnect */
 struct action_tree_node {
-	uint64_t cookie;
+	struct action_key key;
 	json_t *hai;
 };
 
@@ -39,7 +44,7 @@ struct hsm_copytool_private {
 };
 
 /* this one is used as is by llapi so keep the same magic,
- * but happend our cookie at the end for ourselves
+ * but happend our key at the end for ourselves
  */
 #define CP_PRIV_MAGIC 0x19880429
 struct hsm_copyaction_private {
@@ -49,13 +54,13 @@ struct hsm_copyaction_private {
 	const struct hsm_copytool_private *ct_priv;
 	struct hsm_copy copy;
 	lstatx_t statx;
-	uint64_t cookie;
+	struct action_key key;
 };
 
 
 /* done infos */
 struct notify_done {
-	uint64_t cookie;
+	struct action_key key;
 	int rc;
 };
 
@@ -65,7 +70,7 @@ extern protocol_read_cb copytool_cbs[];
 /* tree.c */
 void action_insert(struct hsm_copytool_private *ct,
 		   struct action_tree_node *node);
-void action_delete(struct hsm_copytool_private *ct, uint64_t cookie);
+void action_delete(struct hsm_copytool_private *ct, struct action_key *key);
 json_t *actions_get_list(struct hsm_copytool_private *ct);
 
 #endif

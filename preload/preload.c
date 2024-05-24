@@ -114,12 +114,13 @@ static int process_dones(struct hsm_copytool_private *ct) {
 	struct notify_done done;
 
 	while ((rc = read(ct->notify_done_fd[0], &done, sizeof(done))) == sizeof(done)) {
-		action_delete(ct, done.cookie);
+		action_delete(ct, &done.key);
 		// XXX remember cookie in another list, free from that list when done_cb kicks in
 		// (repeat cookie in done reply for convenience)
 		// and send that list in ehlo too.
 		rc_proto = protocol_request_done(&ct->state,
-						 done.cookie, done.rc);
+						 done.key.cookie, &done.key.dfid,
+						 done.rc);
 		if (rc_proto < 0) {
 			LOG_WARN(rc_proto, "Could not send done to client: will resolve on reconnect");
 			// continue
@@ -240,7 +241,8 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 		hcp = realloc(*phcp, sizeof(*hcp));
 		if (!hcp)
 			abort();
-		hcp->cookie = hai->hai_cookie;
+		hcp->key.cookie = hai->hai_cookie;
+		hcp->key.dfid = hai->hai_dfid;
 		*phcp = hcp;
 	}
 	return rc;
@@ -268,7 +270,7 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	struct hsm_copyaction_private *hcp = *phcp;
 	const struct hsm_copytool_private *ct = hcp->ct_priv;
 	struct notify_done done = {
-		.cookie = hcp->cookie,
+		.key = hcp->key,
 	};
 	int rc, rc_done;
 	// note: this frees hcp
@@ -278,13 +280,13 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	rc_done = write(ct->notify_done_fd[1], &done, sizeof(done));
 	if (rc_done < 0) {
 		rc_done = -errno;
-		LOG_WARN(rc_done, "Could not notify coordinatool of done for cookie %lx",
-			 done.cookie);
+		LOG_WARN(rc_done, "Could not notify coordinatool of done for " DFID " / %lx",
+			 PFID(&done.key.dfid), done.key.cookie);
 	} else if (rc_done != sizeof(done)) {
 		// linux guarnatees this never happens, but better safe...
 		rc_done = -EIO;
-		LOG_WARN(rc_done, "Short write to notif pipe!! (cookie %lx)",
-			 done.cookie);
+		LOG_WARN(rc_done, "Short write to notif pipe!! (" DFID " / %lx)",
+			 PFID(&done.key.dfid), done.key.cookie);
 	} else {
 		rc_done = 0;
 	}

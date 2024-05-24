@@ -120,7 +120,8 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *   request properties:
  *     command = "done"
  *     archive_id = integer (u32), archive_id of the cookie
- *     cookie = integers (u64), cookie of the hsm action items being acknowledged
+ *     hai_cookie = integers (u64), cookie of the hsm action items being acknowledged
+ *     hai_dfid = fid object (see recv), dfid of the hsm action item being acknowledged
  *   reply properties:
  *     command = "done"
  *     status = int (0 on success, errno on failure)
@@ -318,6 +319,18 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai,
  */
 int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
 			     size_t hai_len);
+
+/**
+ * jansson-like function to get just cookie and dfid from json value
+ *
+ * @param json input object with hai_cookie and hai_dfid
+ * @param hai_cookie output cookie
+ * @param hai_dfid output dfid
+ *
+ * @return 0 on success, -1 if json isn't correct
+ */
+int json_hsm_action_key_get(json_t *json, uint64_t *hai_cookie,
+			     struct lu_fid *hai_dfid);
 
 typedef int (*hal_get_cb)(struct hsm_action_list *hal,
 			  struct hsm_action_item *hai,
