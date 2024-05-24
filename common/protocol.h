@@ -144,6 +144,8 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *     command = "queue"
  *     status = int (0 on success, errno on failure)
  *     error = string (extra error message)
+ *     enqueued = int (number of enqueued requests)
+ *     skipped = int (number of skipped (already enqueued) requests)
  */
 
 /**

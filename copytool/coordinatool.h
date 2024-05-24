@@ -246,7 +246,7 @@ int protocol_reply_recv(struct client *client,
 			uint64_t hal_flags, json_t *hai_list,
 			int status, char *error);
 int protocol_reply_done(struct client *client, int status, char *error);
-int protocol_reply_queue(struct client *client, int enqueued,
+int protocol_reply_queue(struct client *client, int enqueued, int skipped,
 			 int status, char *error);
 int protocol_reply_ehlo(struct client *client, int status, char *error);
 
