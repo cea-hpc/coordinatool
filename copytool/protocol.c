@@ -207,15 +207,17 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
 
-	uint64_t cookie = protocol_getjson_int(json, "cookie", 0);
-	if (!cookie)
+	uint64_t cookie;
+	struct lu_fid dfid;
+
+	if (json_hsm_action_key_get(json, &cookie, &dfid))
 		return protocol_reply_done(client, EINVAL,
-					   "Cookie not set?");
+					   "cookie or fid not set -- old client?");
 	struct hsm_action_node *han =
-		hsm_action_search_queue(&state->queues, cookie);
+		hsm_action_search_queue(&state->queues, cookie, &dfid);
 	if (!han)
 		return protocol_reply_done(client, EINVAL,
-					   "Unknown cookie sent");
+					   "Request not found");
 
 	int status = protocol_getjson_int(json, "status", 0);
 	LOG_INFO("%s (%d): processed "DFID": %d" ,
@@ -464,9 +466,10 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		unsigned int count;
 		json_t *hai;
 		json_array_foreach(hai_list, count, hai) {
-			uint64_t cookie = protocol_getjson_int(hai, "hai_cookie", 0);
-			if (cookie == 0) {
-				LOG_WARN(-EINVAL, "%s (%d): No cookie set for entry in ehlo",
+			uint64_t cookie;
+			struct lu_fid dfid;
+			if (json_hsm_action_key_get(hai, &cookie, &dfid)) {
+				LOG_WARN(-EINVAL, "%s (%d): No cookie or dfid set for entry in ehlo, version mismatch?",
 					 client->id, client->fd);
 				continue;
 			}
@@ -475,7 +478,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 			 * automatically remove it from free_hai list.
 			 */
 			struct hsm_action_node *han;
-			han = hsm_action_search_queue(&state->queues, cookie);
+			han = hsm_action_search_queue(&state->queues, cookie, &dfid);
 			if (han) {
 #ifdef DEBUG_ACTION_NODE
 				LOG_DEBUG("%s (%d): Moving han %p to active requests %p (ehlo)",

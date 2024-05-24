@@ -122,6 +122,62 @@ int redis_connect(struct state *state) {
 	return 0;
 }
 
+// XXX optimize packing (base64?)
+#define KEY_SIZE (16*3+1)
+
+static inline void format_key(char *key, uint64_t cookie, struct lu_fid *dfid) {
+	// cannot fail as key is assumed to be KEY_SIZE = long enough
+	sprintf(key, "%016lx%016llx%08x%08x", cookie, dfid->f_seq, dfid->f_oid, dfid->f_ver);
+}
+
+static inline int parse_key(const char *key, uint64_t *cookie, struct lu_fid *dfid) {
+	char buf[17];
+	buf[16] = 0;
+	char *endptr;
+
+	memcpy(buf, key, 16);
+	*cookie = strtoull(buf, &endptr, 16);
+	if (endptr != buf + 16)
+		goto err;
+
+	memcpy(buf, key+16, 16);
+	dfid->f_seq = strtoull(buf, &endptr, 16);
+	if (endptr != buf + 16)
+		goto err;
+
+	buf[8] = 0;
+	memcpy(buf, key+32, 8);
+	dfid->f_oid = strtoull(buf, &endptr, 16);
+	if (endptr != buf + 8)
+		goto err;
+
+	memcpy(buf, key+40, 8);
+	dfid->f_ver = strtoull(buf, &endptr, 16);
+	if (endptr != buf + 8)
+		goto err;
+
+	return 0;
+err:
+	LOG_ERROR(-EINVAL, "invalid redis key: %s", key);
+	return 1;
+}
+
+#if 0
+static const char *prettify_key(const char *key) {
+	// max hex size for u64, u64, u32, u32 + base text length
+	static char pretty_key[16*3+14];
+	uint64_t cookie;
+	struct lu_fid dfid;
+	if (!parse_key(key, &cookie, &dfid))
+		return key;
+
+	snprintf(pretty_key, sizeof(pretty_key),
+		 "cookie %lx fid " DFID, cookie, PFID(&dfid));
+	return pretty_key;
+}
+#endif
+
+
 static void cb_common(redisAsyncContext *ac, redisReply *reply,
 		      const char *action, uint64_t cookie) {
 	if (!reply) {
@@ -151,14 +207,17 @@ static void cb_insert(redisAsyncContext *ac, void *_reply, void *private) {
 }
 
 static int redis_insert(struct state *state, const char *hash,
-			uint64_t cookie, const char *data) {
+			uint64_t cookie, struct lu_fid *dfid,
+			const char *data) {
 	int rc;
+	char key[KEY_SIZE];
 
 	if (!state->redis_ac)
 		return 0;
 
+	format_key(key, cookie, dfid);
 	rc = redisAsyncCommand(state->redis_ac, cb_insert, (void*)cookie,
-			       "hset %s %lx %s", hash, cookie, data);
+			       "hset %s %s %s", hash, key, data);
 	if (rc) {
 		rc = redis_error_to_errno(rc);
 		LOG_WARN(rc, "Redis error trying to set cookie %lx in %s",
@@ -181,18 +240,18 @@ static void cb_delete(redisAsyncContext *ac, void *_reply, void *private) {
 }
 
 static int redis_delete(struct state *state, const char *hash,
-			uint64_t cookie) {
+			    const char *key, uint64_t cookie) {
 	int rc;
 
 	if (!state->redis_ac)
 		return 0;
 
 	rc = redisAsyncCommand(state->redis_ac, cb_delete, (void*)cookie,
-			       "hdel %s %lx", hash, cookie);
+			       "hdel %s %s", hash, key);
 	if (rc) {
 		rc = redis_error_to_errno(rc);
-		LOG_WARN(rc, "Redis error trying to delete cookie %lx in %s",
-			 cookie, hash);
+		LOG_WARN(rc, "Redis error trying to delete key %s in %s",
+			 key, hash);
 		return rc;
 	}
 	return 0;
@@ -213,7 +272,7 @@ int redis_store_request(struct state *state,
 	}
 
 	rc = redis_insert(state, "coordinatool_requests",
-			  han->info.cookie, hai_json_str);
+			  han->info.cookie, &han->info.dfid, hai_json_str);
 	free(hai_json_str);
 
 	return rc;
@@ -222,14 +281,19 @@ int redis_store_request(struct state *state,
 int redis_assign_request(struct state *state, struct client *client,
 			 struct hsm_action_node *han) {
 	return redis_insert(state, "coordinatool_assigned",
-			    han->info.cookie, client->id);
+			    han->info.cookie, &han->info.dfid, client->id);
 }
 
-int redis_delete_request(struct state *state, uint64_t cookie) {
+int redis_delete_request(struct state *state, uint64_t cookie,
+			 struct lu_fid *dfid) {
+	char key[KEY_SIZE];
+
+	format_key(key, cookie, dfid);
+
 	// note we won't bother sending second request if first failed
 	// as that likely means connection is broken
-	return redis_delete(state, "coordinatool_requests", cookie)
-		|| redis_delete(state, "coordinatool_assigned", cookie);
+	return redis_delete(state, "coordinatool_requests", key, cookie)
+		|| redis_delete(state, "coordinatool_assigned", key, cookie);
 }
 
 
@@ -311,7 +375,7 @@ static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private) {
 
 	redisReply *cursor_reply = reply->element[0];
 	if (cursor_reply->type != REDIS_REPLY_STRING) {
-		LOG_ERROR(-EINVAL, "unexpected cursor_reply to hscan, cursor wasn't int but %d",
+		LOG_ERROR(-EINVAL, "unexpected cursor_reply to hscan, cursor wasn't string but %d",
 			  cursor_reply->type);
 		wait->done = -EINVAL;
 		return;
@@ -382,53 +446,28 @@ static int redis_scan_requests(struct state *state,
 }
 
 
-static inline int parse_cookie(const char *str, uint64_t *val) {
-	char *endptr;
-
-	if (str[0] == '-') {
-                LOG_ERROR(-EINVAL, "value (%s) is negative?!",
-                          str);
-		return -EINVAL;
-	}
-
-	errno = 0;
-	*val = strtoull(str, &endptr, 16);
-	if (*endptr != '\0') {
-                LOG_ERROR(-EINVAL, "value (%s) contains (trailing) garbage",
-                          str);
-		return -EINVAL;
-        }
-	if (*val == ULLONG_MAX && errno == ERANGE) {
-                LOG_ERROR(-ERANGE, "value (%s) overflowed",
-                          str);
-		return -ERANGE;
-	}
-
-	return 0;
-}
-
 static int redis_scan_assigned(struct state *state,
-			       const char *cookie_str,
+			       const char *key,
 			       const char *client_id) {
 	struct cds_list_head *n;
 	bool found = false;
 	struct client *client;
 	uint64_t cookie;
+	struct lu_fid dfid;
 	int rc;
 
-	rc = parse_cookie(cookie_str, &cookie);
+	rc = parse_key(key, &cookie, &dfid);
 	if (rc)
 		return rc;
 
 	LOG_DEBUG("%s: Cookie %lx running", client_id, cookie);
 
-
 	struct hsm_action_node *han;
-	han = hsm_action_search_queue(&state->queues, cookie);
+	han = hsm_action_search_queue(&state->queues, cookie, &dfid);
 	if (!han) {
 		LOG_WARN(-EINVAL, "%s: cookie %lx assigned but wasn't in request list, cleaning up",
 			 client_id, cookie);
-		return redis_delete(state, "coordinatool_assigned", cookie);
+		return redis_delete(state, "coordinatool_assigned", key, cookie);
 	}
 
 	cds_list_for_each(n, &state->stats.disconnected_clients) {

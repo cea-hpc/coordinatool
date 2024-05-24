@@ -96,8 +96,8 @@ struct hsm_action_node {
 	/* enriched infos to take scheduling decisions */
 	struct item_info {
 		uint64_t cookie;
-		uint64_t timestamp;
 		struct lu_fid dfid;
+		uint64_t timestamp;
 		size_t hai_len;
 		enum hsm_copytool_action action;
 		uint32_t archive_id;
@@ -272,7 +272,8 @@ int hsm_action_enqueue(struct state *state,
 void hsm_action_dequeue(struct hsm_action_queues *queues,
 			struct hsm_action_node *han);
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
-                                                unsigned long cookie);
+                                                unsigned long cookie,
+						struct lu_fid *dfid);
 
 
 /* redis */
@@ -281,7 +282,8 @@ int redis_connect(struct state *state);
 int redis_store_request(struct state *state, struct hsm_action_node *han);
 int redis_assign_request(struct state *state, struct client *client,
 			 struct hsm_action_node *han);
-int redis_delete_request(struct state *state, uint64_t cookie);
+int redis_delete_request(struct state *state, uint64_t cookie,
+			 struct lu_fid *dfid);
 int redis_recovery(struct state *state);
 
 

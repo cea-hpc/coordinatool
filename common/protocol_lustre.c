@@ -106,6 +106,26 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t h
 	return 0;
 }
 
+int json_hsm_action_key_get(json_t *json, uint64_t *hai_cookie, struct lu_fid *hai_dfid) {
+	/* likewise need unpacked fid for unaligned access warning */
+	struct lu_fid_unpacked unpack;
+	if (json_unpack(json,
+			"{sI,s{sI,si,si!}}",
+			 "hai_cookie", hai_cookie,
+			 "hai_dfid", "f_seq", &unpack.f_seq,
+				     "f_oid", &unpack.f_oid,
+				     "f_ver", &unpack.f_ver
+			 ) != 0)
+		return -EINVAL;
+
+	hai_dfid->f_seq = unpack.f_seq;
+	hai_dfid->f_oid = unpack.f_oid;
+	hai_dfid->f_ver = unpack.f_ver;
+
+
+	return 0;
+}
+
 int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 			     size_t hal_len, hal_get_cb cb, void *cb_arg) {
 	struct hsm_action_item *hai;

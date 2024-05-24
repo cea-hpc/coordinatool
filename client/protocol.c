@@ -29,12 +29,13 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	json_t *hai;
 	int rc;
 	json_array_foreach(hai_list, i, hai) {
-		uint64_t cookie = protocol_getjson_int(hai, "hai_cookie", 0);
-		if (!cookie) {
-			printf("cookie not set?\n");
+		uint64_t cookie;
+		struct lu_fid dfid;
+		if (json_hsm_action_key_get(hai, &cookie, &dfid)) {
+			printf("cookie/dfid not set - version mismatch?\n");
 			return -EINVAL;
 		}
-		rc = protocol_request_done(state, cookie, 0);
+		rc = protocol_request_done(state, cookie, &dfid, 0);
 		if (rc)
 			return rc;
 	}
