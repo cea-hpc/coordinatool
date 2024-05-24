@@ -71,7 +71,7 @@ int client_run(struct client *client) {
 
 	switch (client->mode) {
 	case MODE_STATUS:
-		protocol_request_status(state);
+		rc = protocol_request_status(state);
 		break;
 	case MODE_QUEUE:
 		client->active_requests.hai_list = json_array();
@@ -83,6 +83,7 @@ int client_run(struct client *client) {
 			json_decref(client->active_requests.hai_list);
 			return rc;
 		}
+		client->sent_items = rc;
 
 		if (json_array_size(client->active_requests.hai_list) == 0) {
 			LOG_DEBUG("Nothing to enqueue, exiting");
@@ -91,20 +92,25 @@ int client_run(struct client *client) {
 		}
 		/* takes ownership of hai_list */
 		state->fsname = client->active_requests.fsname;
-		protocol_request_queue(state,
-				       client->active_requests.hai_list);
+		rc = protocol_request_queue(state,
+					   client->active_requests.hai_list);
 		break;
 	case MODE_RECV:
-		protocol_request_recv(state);
+		rc = protocol_request_recv(state);
 		break;
 	default:
 		LOG_ERROR(-EINVAL, "Unkonwn mode %d", client->mode);
 		return -EINVAL;
 	}
 
+	if (rc < 0)
+		return rc;
+
 	while (client->iters < 0 || client->iters-- > 0) {
-		protocol_read_command(state->socket_fd, "server", NULL,
-				      protocol_cbs, state);
+		rc = protocol_read_command(state->socket_fd, "server", NULL,
+					   protocol_cbs, client);
+		if (rc < 0)
+			return rc;
 	}
 	return 0;
 }

@@ -10,7 +10,7 @@ static int status_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 }
 
 static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
-	struct ct_state *state = arg;
+	struct client *client = arg;
 	printf("Got recv reply:\n");
 	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
@@ -35,7 +35,7 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 			printf("cookie/dfid not set - version mismatch?\n");
 			return -EINVAL;
 		}
-		rc = protocol_request_done(state, cookie, &dfid, 0);
+		rc = protocol_request_done(&client->state, cookie, &dfid, 0);
 		if (rc)
 			return rc;
 	}
@@ -50,10 +50,25 @@ static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
 	return 0;
 }
 
-static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
+	struct client *client = arg;
+
 	printf("Got queue reply:\n");
 	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
+
+	int status = protocol_getjson_int(json, "status", 0);
+	if (status)
+		return -status;
+
+	int enqueued = protocol_getjson_int(json, "enqueued", 0);
+	int skipped = protocol_getjson_int(json, "skipped", 0);
+	if (client->sent_items != enqueued + skipped) {
+		printf("didn't process all records (expected %d, got %d+%d)\n",
+			client->sent_items, enqueued, skipped);
+		return -EINVAL;
+	}
+
 	return 0;
 }
 
