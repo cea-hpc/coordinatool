@@ -132,29 +132,17 @@ int protocol_request_queue(const struct ct_state *state,
 			   json_t *hai_list) {
 	int rc;
 
-	json_t *hal = json_object();
-	if (!hal)
-		abort();
-	if ((rc = protocol_setjson_int(hal, "hal_version", HAL_VERSION)) ||
-	    (rc = protocol_setjson_int(hal, "hal_count", json_array_size(hai_list)))) {
-		LOG_ERROR(rc, "Could not fill hsm action list");
-		json_decref(hal);
-		return rc;
-	}
-	if (state->fsname &&
-	    (rc = protocol_setjson_str(hal, "hal_fsname", state->fsname))) {
-		LOG_ERROR(rc, "Could not fill hsm action fsname");
-		json_decref(hal);
-		return rc;
-	}
-	if ((rc = protocol_setjson(hal, "list", hai_list)))
-		return rc;
-
 	json_t *request = json_object();
 	if (!request)
 		abort();
 
-	if ((rc = protocol_setjson(request, "hsm_action_list", hal)) ||
+	if (state->fsname &&
+	    (rc = protocol_setjson_str(request, "hal_fsname", state->fsname))) {
+		LOG_ERROR(rc, "Could not fill hsm action fsname");
+		goto out_free;
+	}
+
+	if ((rc = protocol_setjson(request, "hsm_action_items", hai_list)) ||
 	    (rc = protocol_setjson_str(request, "command", "queue")))
 		goto out_free;
 

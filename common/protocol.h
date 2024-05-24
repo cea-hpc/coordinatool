@@ -133,8 +133,7 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *   request properties:
  *     command = "queue"
  *     fsname = string (optional, used for sanity check if set)
- *     list = list of augmented hsm action items:
- *       hsm_action_items properties
+ *     hsm_action_items = list of 'hsm_action_item' (see RECV), plus:
  *       hal_archive_id = integer (u32)
  *       hal_flags = integer (u64)
  *       timestamp = integer (u64) epoch in ns
