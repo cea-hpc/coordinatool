@@ -8,7 +8,8 @@ static int action_list_get_cb(struct hsm_action_list *hal UNUSED,
 	struct hsm_copytool_private *priv = arg;
 	struct action_tree_node *node = xmalloc(sizeof(*node));
 
-	node->cookie = hai->hai_cookie;
+	node->key.cookie = hai->hai_cookie;
+	node->key.dfid = hai->hai_dfid;
 	node->hai = json_incref(hai_json);
 
 	action_insert(priv, node);

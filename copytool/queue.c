@@ -16,13 +16,19 @@ void hsm_action_queues_init(struct state *state,
 }
 
 static int tree_compare(const void *a, const void *b) {
-	__u64 va = *(__u64*)a, vb = *(__u64*)b;
+	const struct item_info *va = a, *vb = b;
 
-	if (va < vb)
+	/* lustre only guarantees identity per mdt.
+	 * We don't have mdt index in action info, so use cookie and fid
+	 * (there can be multiple requests on a single fid as well, but these
+	 * must be on the same mdt so cookie will be different)
+	 */
+
+	if (va->cookie < vb->cookie)
 		return -1;
-	else if (va == vb)
-		return 0;
-	return 1;
+	if (va->cookie > vb->cookie)
+		return 1;
+	return memcmp(&va->dfid, &vb->dfid, sizeof(va->dfid));
 }
 
 static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
@@ -32,12 +38,13 @@ static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
 	LOG_DEBUG("freeing han for " DFID " node %p", PFID(&han->info.dfid),
 		  (void*)&han->node);
 	if (!final_cleanup) {
-		redis_delete_request(han->queues->state, han->info.cookie);
+		redis_delete_request(han->queues->state, han->info.cookie,
+				     &han->info.dfid);
 		cds_list_del(&han->node);
 #if HAVE_PHOBOS
 		free(han->info.hsm_fuid);
 #endif
-		if (!tdelete(&han->info.cookie,
+		if (!tdelete(&han->info,
 			     &han->queues->state->queues.actions_tree,
 			     tree_compare))
 			abort();
@@ -66,16 +73,19 @@ void hsm_action_free_all(struct state *state) {
 }
 
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
-						unsigned long cookie) {
-	void *key = tfind(&cookie, &queues->actions_tree, tree_compare);
+						unsigned long cookie,
+						struct lu_fid *dfid) {
+	struct item_info search_item = {
+		.cookie = cookie,
+		.dfid = *dfid,
+	};
+	void *key = tfind(&search_item, &queues->actions_tree, tree_compare);
 
 	if (!key)
 		return NULL;
 
-	key = *(void **)key;
+	struct item_info *item_info = *(void **)key;
 
-	struct item_info *item_info =
-		caa_container_of(key, struct item_info, cookie);
 	struct hsm_action_node *han =
 		caa_container_of(item_info, struct hsm_action_node, info);
 #ifdef DEBUG_ACTION_NODE
@@ -159,13 +169,13 @@ void hsm_action_move(struct hsm_action_queues *queues,
 
 static int hsm_action_enqueue_common(struct state *state,
 				     struct hsm_action_node *han) {
-	uint64_t **tree_key;
+	struct item_info **tree_key;
 
-	tree_key = tsearch(&han->info.cookie, &han->queues->actions_tree,
+	tree_key = tsearch(&han->info, &han->queues->actions_tree,
 			   tree_compare);
 	if (!tree_key)
 		abort();
-	if (*tree_key != &han->info.cookie) {
+	if (*tree_key != &han->info) {
 		/* duplicate */
 		json_decref(han->hai);
 		free(han);
