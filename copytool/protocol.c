@@ -295,10 +295,10 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	int enqueued = 0, skipped = 0;
 	int rc, final_rc = 0;
 
-	json_t *json_hal = json_object_get(json, "hsm_action_list");
-	if (!json_hal)
+	json_t *json_items = json_object_get(json, "hsm_action_items");
+	if (!json_items)
 		return protocol_reply_queue(client, 0, 0, EINVAL,
-					    "No hsm_action_list set");
+					    "No hsm_action_items set");
 
 	const char *fsname = protocol_getjson_str(json, "fsname", NULL, NULL);
 	/* fsname is optional */
@@ -308,10 +308,11 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_queue(client, 0, 0, EINVAL, "Bad fsname");
 	}
 
+
 	unsigned int count;
 	json_t *item;
 	int64_t timestamp = gettime_ns();
-	json_array_foreach(json_hal, count, item) {
+	json_array_foreach(json_items, count, item) {
 		rc = hsm_action_enqueue_json(state, item, timestamp, NULL, client->id);
 		if (rc < 0) {
 			final_rc = rc;
@@ -324,7 +325,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	}
 	if (final_rc)
 		return protocol_reply_queue(client, enqueued, skipped, final_rc,
-					    "Error while parsing hsm action list");
+					    "Error while parsing hsm action items");
 
 	return protocol_reply_queue(client, enqueued, skipped, 0, NULL);
 }
