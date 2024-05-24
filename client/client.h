@@ -24,7 +24,11 @@ struct client {
 	int iters;
 	enum client_mode mode;
 	union {
-		struct active_requests_state active_requests;
+		// queue
+		struct {
+			struct active_requests_state active_requests;
+			int sent_items;
+		};
 	};
 };
 
