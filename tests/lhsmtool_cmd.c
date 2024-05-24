@@ -360,11 +360,14 @@ static bool hai_data_expandable(const struct hsm_action_item *hai)
 	size_t	datalen = hai->hai_len - sizeof(*hai);
 	int	i;
 
-	for (i = 0; i < datalen; i++)
-		if (!isprint(hai->hai_data[i]))
-			return false;
+	for (i = 0; i < datalen; i++) {
+		if (isprint(hai->hai_data[i]))
+			continue;
+		if (hai->hai_data[i] == 0)
+			return true;
+	}
 
-	return true;
+	return false;
 }
 
 static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
