@@ -250,7 +250,7 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 		*han_out = (rc == -EEXIST ? NULL : han);
 	}
 
-	return 0;
+	return rc < 0 ? 0 : 1;
 }
 
 /* checks for duplicate, and if unique enrich and insert node */
@@ -302,7 +302,7 @@ int hsm_action_enqueue(struct state *state,
 		return rc;
 	}
 
-	return 0;
+	return rc < 0 ? 0 : 1;
 }
 
 /* remove action node from its queue */

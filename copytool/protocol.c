@@ -292,12 +292,12 @@ out_freereply:
 static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	struct client *client = fd_arg;
 	struct state *state = arg;
-	int enqueued = 0;
+	int enqueued = 0, skipped = 0;
 	int rc, final_rc = 0;
 
 	json_t *json_hal = json_object_get(json, "hsm_action_list");
 	if (!json_hal)
-		return protocol_reply_queue(client, 0, EINVAL,
+		return protocol_reply_queue(client, 0, 0, EINVAL,
 					    "No hsm_action_list set");
 
 	const char *fsname = protocol_getjson_str(json, "fsname", NULL, NULL);
@@ -305,7 +305,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	if (fsname && strcmp(fsname, state->fsname)) {
 		LOG_WARN(-EINVAL, "%s (%d): client sent queue with bad fsname, expected %s got %s",
 			 client->id, client->fd, state->fsname, fsname);
-		return protocol_reply_queue(client, 0, EINVAL, "Bad fsname");
+		return protocol_reply_queue(client, 0, 0, EINVAL, "Bad fsname");
 	}
 
 	unsigned int count;
@@ -317,17 +317,19 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 			final_rc = rc;
 			continue;
 		}
-
-		enqueued++;
+		if (rc > 0)
+			enqueued++;
+		else
+			skipped++;
 	}
 	if (final_rc)
-		return protocol_reply_queue(client, enqueued, final_rc,
+		return protocol_reply_queue(client, enqueued, skipped, final_rc,
 					    "Error while parsing hsm action list");
 
-	return protocol_reply_queue(client, enqueued, 0, NULL);
+	return protocol_reply_queue(client, enqueued, skipped, 0, NULL);
 }
 
-int protocol_reply_queue(struct client *client, int enqueued,
+int protocol_reply_queue(struct client *client, int enqueued, int skipped,
 			 int status, char *error) {
 	json_t *reply;
 	int rc;
@@ -338,7 +340,8 @@ int protocol_reply_queue(struct client *client, int enqueued,
 	if ((rc = protocol_setjson_str(reply, "command", "queue")) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
 	    (rc = protocol_setjson_str(reply, "error", error)) ||
-	    (rc = protocol_setjson_int(reply, "enqueued", enqueued)))
+	    (rc = protocol_setjson_int(reply, "enqueued", enqueued)) ||
+	    (rc = protocol_setjson_int(reply, "skipped", skipped)))
 		goto out_freereply;
 
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
@@ -491,7 +494,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 			}
 			/* Otherwise create new one. Use enqueue to enrich it just in case.
 			 * Note that requires a dequeue to immediately get it off waiting list */
-			if (hsm_action_enqueue_json(state, hai, timestamp, &han, client->id) || !han) {
+			if (hsm_action_enqueue_json(state, hai, timestamp, &han, client->id) < 0 || !han) {
 				/* ignore bad items in hai list */
 				continue;
 			}
