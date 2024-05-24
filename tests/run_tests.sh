@@ -116,6 +116,11 @@ cleanup() {
 	return "$ret"
 }
 
+redis_clear_db() {
+	redis-cli del coordinatool_requests
+	redis-cli del coordinatool_assigned
+}
+
 #### plain action helpers
 do_coordinatool_start() {
 	local i="$1"
@@ -355,7 +360,8 @@ run_test 01 normal_requests
 
 # coordinatool restart with actions queued but no active requests on agents (no agent)
 server_restart_parse_active_requests() {
-	do_coordinatool_start 0
+	CTOOL_ENV="( [COORDINATOOL_REDIS_HOST]='' )" \
+		do_coordinatool_start 0
 
 	# start only coordinatool with no agent to queue a request
 
@@ -363,10 +369,7 @@ server_restart_parse_active_requests() {
 	client_archive_n_req 3 100
 
 	# wait for server to have processed requests, then flush cached data
-	# XXX add option to run without redis instead
 	sleep 1
-	redis-cli hdel coordinatool_requests
-	redis-cli hdel coordinatool_assigned
 
 	do_coordinatool_service 0 restart
 
