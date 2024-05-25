@@ -57,7 +57,11 @@ int timer_rearm(struct state *state) {
 
 void handle_expired_timers(struct state *state) {
 	struct cds_list_head *n, *nnext;
-	int64_t ns = gettime_ns();
+	int64_t ns = gettime_ns(), junk;
+
+	/* clear timer fd event, normally one u64 worth to read
+	 * saying how many time the timer expired. We don't care. */
+	while (read(state->timer_fd, &junk, sizeof(junk)) > 0);
 
 	cds_list_for_each_safe(n, nnext, &state->stats.disconnected_clients) {
 		struct client *client =
