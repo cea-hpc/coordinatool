@@ -170,7 +170,7 @@ do_lhsmtoolcmd_start() {
 	done
 
 	do_client "$i" "
-		rm -rf ${ARCHIVEDIR@Q} && mkdir ${ARCHIVEDIR@Q}
+		rm -rf ${ARCHIVEDIR@Q} && mkdir -p ${ARCHIVEDIR@Q}
 		systemd-run -P -G --unit=ctest_lhsmtool_cmd@$i.service $env \
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
@@ -184,7 +184,7 @@ do_lhsmtoolcmd_service() {
 	local i="$1"
 	local action="$2"
 
-	do_client "$i" "systemctl $action ctest_lhsmtool_cmd@${i}.service" || :
+	do_client "$i" "systemctl $action ctest_lhsmtool_cmd@${i}.service"
 }
 
 do_coordinatool_client() {
@@ -432,6 +432,9 @@ server_restart_coordinatool_recovery_busy() {
 	do_coordinatool_service 0 restart
 
 	client_archive_n_wait 3 100
+	do_lhsmtoolcmd_service 1 status || error "lhsmtool 1 gone"
+	do_lhsmtoolcmd_service 2 status || error "lhsmtool 2 gone"
+	do_coordinatool_service 0 status || error "coordinatool gone"
 }
 run_test 04 server_restart_coordinatool_recovery_busy
 
