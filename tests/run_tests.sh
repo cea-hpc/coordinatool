@@ -196,7 +196,7 @@ client_reset() {
 
 	do_client "$i" "
 		rm -rf ${TESTDIR@Q}
-		mkdir ${TESTDIR@Q}
+		lfs mkdir -C -1 ${TESTDIR@Q}
 		"
 	CLEANUP+=( "rm -rf ${TESTDIR@Q}" )
 }
@@ -376,6 +376,7 @@ server_restart_parse_active_requests() {
 	# make sure service really restarted before requeueing active requests
 	sleep 1
 	mds_requeue_active_requests 0
+	mds_requeue_active_requests 1
 	do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
 }
