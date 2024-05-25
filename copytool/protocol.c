@@ -220,8 +220,9 @@ static int done_cb(void *fd_arg, json_t *json, void *arg) {
 					   "Request not found");
 
 	int status = protocol_getjson_int(json, "status", 0);
-	LOG_INFO("%s (%d): processed "DFID": %d" ,
-		  client->id, client->fd, PFID(&han->info.dfid), status);
+	LOG_INFO("%s (%d): Finished processing "DFID" (cookie %lx): status %d" ,
+		 client->id, client->fd, PFID(&han->info.dfid), cookie,
+		 status);
 
 	int action = han->info.action;
 	queue_node_free(han);
@@ -313,15 +314,19 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg) {
 	json_t *item;
 	int64_t timestamp = gettime_ns();
 	json_array_foreach(json_items, count, item) {
-		rc = hsm_action_enqueue_json(state, item, timestamp, NULL, client->id);
+		struct hsm_action_node *han;
+		rc = hsm_action_enqueue_json(state, item, timestamp, &han, client->id);
 		if (rc < 0) {
 			final_rc = rc;
 			continue;
 		}
-		if (rc > 0)
+		if (rc > 0) {
 			enqueued++;
-		else
+			LOG_INFO("Enqueued "DFID" (cookie %lx) (from queue request)" ,
+				 PFID(&han->info.dfid), han->info.cookie);
+		} else {
 			skipped++;
+		}
 	}
 	if (final_rc)
 		return protocol_reply_queue(client, enqueued, skipped, final_rc,
@@ -423,7 +428,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_ehlo(client, 0, NULL);
 	}
 
-	LOG_DEBUG("%s (%d): renaming form %s", id, client->fd, client->id);
+	LOG_DEBUG("%s (%d): renaming from %s", id, client->fd, client->id);
 	free((void*)client->id);
 	client->id = xstrdup(id);
 
