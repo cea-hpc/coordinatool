@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# ignore silly warnings: cannot source file, CLEANUP modified in subshell
+# and test functions unreachable.
+# shellcheck disable=SC1091,SC2030,SC2031,SC2317
+
 error() {
 	printf "%s\n" "$@" >&2
 	if [[ "$-" = *i* ]]; then
@@ -108,7 +112,7 @@ cleanup() {
 	trap - EXIT
 	set +e
 
-	indices=( ${!CLEANUP[@]} )
+	indices=( "${!CLEANUP[@]}" )
 	for ((i=${#indices[@]} - 1; i >= 0; i--)); do
 		eval "${CLEANUP[indices[i]]}"
 	done
@@ -323,16 +327,16 @@ sanity() {
 		|| error "client and mntpoints number don't match"
 
 	for i in {0..4}; do
-		do_client $i "df -t lustre MNTPATH >/dev/null" \
+		do_client "$i" "df -t lustre MNTPATH >/dev/null" \
 			|| error "${CLIENT[i]}:${MNTPATH[i]} not mounted"
-		do_client $i "touch ${TESTDIR@Q} >/dev/null" \
+		do_client "$i" "touch ${TESTDIR@Q} >/dev/null" \
 			|| error "No sudo or cannot touch ${MNTPATH[i]}/.test on ${CLIENT[i]}"
-		do_client $i "stat ${BUILDDIR@Q}/lhsmd_coordinatool > /dev/null" \
+		do_client "$i" "stat ${BUILDDIR@Q}/lhsmd_coordinatool > /dev/null" \
 			|| error "$BUILDDIR not a build dir or not accessible on ${CLIENT[i]}"
-		do_client $i "stat ${SOURCEDIR@Q}/tests/lhsm_cmd.conf > /dev/null" \
+		do_client "$i" "stat ${SOURCEDIR@Q}/tests/lhsm_cmd.conf > /dev/null" \
 			|| error "$SOURCEDIR not a source dir or not accessible on ${CLIENT[i]}"
-		do_coordinatool_service $i stop 2>/dev/null || :
-		do_lhsmtoolcmd_service $i stop 2>/dev/null || :
+		do_coordinatool_service "$i" stop 2>/dev/null || :
+		do_lhsmtoolcmd_service "$i" stop 2>/dev/null || :
 	done
 
 
@@ -340,11 +344,11 @@ sanity() {
 		|| error "MDSs and MDTs number don't match"
 
 	for i in {0..1}; do
-		[[ "$(do_mds $i "lctl get_param mdt.MDT.hsm_control")" =~ =enabled$ ]] \
+		[[ "$(do_mds "$i" "lctl get_param mdt.MDT.hsm_control")" =~ =enabled$ ]] \
 			|| error "hsm not enabled on mdt $i (or no sudo on mds)"
 		# seems like agents stay registered for a while, but this does not seem
 		# to bother tests... ignore for now
-		#[[ -z "$(do_mds $i "lctl get_param mdt.MDT.hsm.agents")" ]] \
+		#[[ -z "$(do_mds "$i" "lctl get_param mdt.MDT.hsm.agents")" ]] \
 		#	|| error "Other hsm agent running on mdt $i"
 	done
 }
