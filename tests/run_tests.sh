@@ -204,12 +204,13 @@ client_reset() {
 client_archive_n_req() {
 	local i="$1"
 	local n="$2"
+	local start=${3:-1}
 	local archive_data="${archive_data:-}"
 	local archive_id="${archive_id:-}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
-		for i in {1..$n}; do
+		for i in {$start..$n}; do
 			echo foo.\$i > file.\$i
 			lfs hsm_archive ${archive_id:+--archive ${archive_id@Q} }${archive_data:+--data ${archive_data@Q} }file.\$i
 		done
@@ -219,13 +220,14 @@ client_archive_n_req() {
 client_archive_n_wait() {
 	local i="$1"
 	local n="$2"
+	local start=${3:-1}
 	local TMOUT="${TMOUT:-100}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
 		TMOUT=$TMOUT
 		while sleep 0.1; ((TMOUT-- > 0)); do
-			for i in {1..$n}; do
+			for i in {$start..$n}; do
 				lfs hsm_state file.\$i | grep -q archived || continue 2
 			done
 			break
@@ -242,27 +244,28 @@ client_archive_n() {
 client_restore_n() {
 	local i="$1"
 	local n="$2"
+	local start=${3:-1}
 	local TMOUT="${TMOUT:-100}"
 	local release_data="${release_data:-}"
 	local restore_data="${restore_data:-}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
-		for i in {1..$n}; do
+		for i in {$start..$n}; do
 			lfs hsm_release ${release_data:+--data ${release_data@Q} }file.\$i
 		done
-		for i in {1..$n}; do
+		for i in {$start..$n}; do
 			lfs hsm_restore ${restore_data:+--data ${restore_data@Q} }file.\$i
 		done
 		TMOUT=$TMOUT
 		while sleep 0.1; ((TMOUT-- > 0)); do
-			for i in {1..$n}; do
+			for i in {$start..$n}; do
 				lfs hsm_state file.\$i | grep -q released && continue 2
 			done
 			break
 		done
 		if ((TMOUT <= 0)); then echo 'Failed to restore'; exit 1; fi
-		for i in {1..$n}; do
+		for i in {$start..$n}; do
 			if ! [[ \"\$(cat file.\$i)\" = foo.\$i ]]; then
 				echo 'Content does not match after restore'
 				exit 1
@@ -274,17 +277,18 @@ client_restore_n() {
 client_remove_n() {
 	local i="$1"
 	local n="$2"
+	local start=${3:-1}
 	local TMOUT="${TMOUT:-100}"
 	remove_data="${remove_data:-}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
-		for i in {1..$n}; do
+		for i in {$start..$n}; do
 			lfs hsm_remove ${remove_data:+--data ${remove_data@Q} }file.\$i
 		done
 		TMOUT=$TMOUT
 		while sleep 0.1; ((TMOUT-- > 0)); do
-			for i in {1..$n}; do
+			for i in {$start..$n}; do
 				lfs hsm_state file.\$i | grep -q archived && continue 2
 			done
 			break
@@ -589,6 +593,92 @@ data_restore_active_requests() {
 	ls /tmp/archive/d\ at* || error "archive data was lost?"
 }
 run_test 32 data_restore_active_requests
+
+# 4x tests: test multiple archive ids
+# normal copies
+archive_id_normal() {
+	do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+
+	client_reset 3
+	# default coordinatool config accepts any archive, so this should work
+	# as normal, except we'll see archive_id by checking the file
+	archive_id=2
+	client_archive_n 3 1
+
+	do_client 3 "
+		cd ${TESTDIR@Q}
+		lfs hsm_state file.1 | grep archive_id:2
+		" || error "archive id wasn't 2"
+	client_restore_n 3 1
+	client_remove_n 3 1
+
+	[ "$(find /tmp/archive | wc -l)" = 1 ] \
+		|| error "files not removed? $(find /tmp/archive 2>&1)"
+}
+run_test 40 archive_id_normal
+
+# make sure restart from redis works
+archive_id_restart() {
+	do_coordinatool_start 0
+
+	# start only coordinatool with no agent to queue a request
+
+	client_reset 3
+	archive_id=2
+	client_archive_n_req 3 299 200
+	archive_id=1
+	client_archive_n_req 3 199 100
+
+	# wait for server to have processed requests, then flush cached data
+	sleep 1
+
+	do_coordinatool_service 0 restart
+
+	# make sure service really restarted before processing requests
+	do_lhsmtoolcmd_start 1
+	client_archive_n_wait 3 299 100
+	do_client 3 "
+		cd ${TESTDIR@Q}
+		! lfs hsm_state file.2* | grep -v archive_id:2
+		! lfs hsm_state file.1* | grep -v archive_id:1
+		" || error "some archive id wasn't as expected"
+}
+run_test 41 archive_id_restart
+
+archive_id_restore_active_requests() {
+	CTOOL_ENV="( [COORDINATOOL_REDIS_HOST]='' )" \
+		do_coordinatool_start 0
+
+	# start only coordinatool with no agent to queue a request
+
+	client_reset 3
+	archive_id=2
+	client_archive_n_req 3 299 200
+	archive_id=1
+	client_archive_n_req 3 199 100
+
+	# wait for server to have processed requests, then flush cached data
+	sleep 1
+
+	do_coordinatool_service 0 restart
+
+	# make sure service really restarted before requeueing active requests
+	sleep 1
+	mds_requeue_active_requests 0
+	mds_requeue_active_requests 1
+	do_lhsmtoolcmd_start 1
+	client_archive_n_wait 3 299 100
+	do_client 3 "
+		cd ${TESTDIR@Q}
+		! lfs hsm_state file.2* | grep -v archive_id:2
+		! lfs hsm_state file.1* | grep -v archive_id:1
+		" || error "some archive id wasn't as expected"
+}
+run_test 42 archive_id_restore_active_requests
+
+
+
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
 
