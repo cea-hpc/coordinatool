@@ -178,8 +178,9 @@ void ct_schedule_client(struct state *state,
 					 &enqueued_bytes)) {
 				break;
 			}
-			LOG_INFO("%s (%d): Sending "DFID" from queues" ,
-				 client->id, client->fd, PFID(&han->info.dfid));
+			LOG_INFO("%s (%d): Sending "DFID" (cookie %lx)" ,
+				 client->id, client->fd, PFID(&han->info.dfid),
+				 han->info.cookie);
 			redis_assign_request(state, client, han);
 #ifdef DEBUG_ACTION_NODE
 			LOG_DEBUG("%s (%d): moving node %p to %p (active requests)",

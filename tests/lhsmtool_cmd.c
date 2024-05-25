@@ -128,7 +128,7 @@ struct options {
 
 /* Everything else is zeroed */
 static struct options opt = {
-	.o_verbose 	= LLAPI_MSG_INFO,
+	.o_verbose	= LLAPI_MSG_INFO,
 	.o_fanout	= FANOUT_DEFAULT,
 	.o_report_int	= REPORT_INTERVAL_DEFAULT,
 	.o_config	= CONFIG_FILE_DEFAULT,

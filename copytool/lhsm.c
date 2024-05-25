@@ -1,8 +1,32 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <ctype.h>
 #include <limits.h>
 
 #include "coordinatool.h"
+
+static const char *pretty_data(struct hsm_action_item *hai) {
+	static char buf[32];
+	int i;
+	int end = hai->hai_len - sizeof(*hai);
+
+	if (end >= (int)sizeof(buf))
+		end = sizeof(buf) - 1;
+
+	for (i = 0; i < end; i++) {
+		if (isprint(hai->hai_data[i]))
+			buf[i] = hai->hai_data[i];
+		else if (hai->hai_data[i] == 0)
+			break;
+		else
+			buf[i] = '_';
+	}
+	buf[i] = 0;
+	if (i == 0)
+		sprintf(buf, "(empty)");
+
+	return buf;
+}
 
 int handle_ct_event(struct state *state) {
 	struct hsm_action_list *hal;
@@ -52,9 +76,11 @@ int handle_ct_event(struct state *state) {
 
 		/* memcpy to avoid unaligned accesses */
 		memcpy(&fid, &hai->hai_fid, sizeof(fid));
-		LOG_INFO("enqueued (%d): %s on "DFID ,
+		LOG_INFO("enqueued (%d): %s on " DFID " (cookie %llx, #%d, data %s)" ,
 				i, ct_action2str(hai->hai_action),
-				PFID(&fid));
+				PFID(&fid), hai->hai_cookie,
+				hal->hal_archive_id, pretty_data(hai));
+
 		hai = hai_next(hai);
 	}
 	ct_schedule(state);
