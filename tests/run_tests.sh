@@ -204,12 +204,14 @@ client_reset() {
 client_archive_n_req() {
 	local i="$1"
 	local n="$2"
+	local archive_data="${archive_data:-}"
+	local archive_id="${archive_id:-}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
 		for i in {1..$n}; do
 			echo foo.\$i > file.\$i
-			lfs hsm_archive file.\$i
+			lfs hsm_archive ${archive_id:+--archive ${archive_id@Q} }${archive_data:+--data ${archive_data@Q} }file.\$i
 		done
 		"
 }
@@ -241,14 +243,16 @@ client_restore_n() {
 	local i="$1"
 	local n="$2"
 	local TMOUT="${TMOUT:-100}"
+	local release_data="${release_data:-}"
+	local restore_data="${restore_data:-}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
 		for i in {1..$n}; do
-			lfs hsm_release file.\$i
+			lfs hsm_release ${release_data:+--data ${release_data@Q} }file.\$i
 		done
 		for i in {1..$n}; do
-			lfs hsm_restore file.\$i
+			lfs hsm_restore ${restore_data:+--data ${restore_data@Q} }file.\$i
 		done
 		TMOUT=$TMOUT
 		while sleep 0.1; ((TMOUT-- > 0)); do
@@ -271,11 +275,12 @@ client_remove_n() {
 	local i="$1"
 	local n="$2"
 	local TMOUT="${TMOUT:-100}"
+	remove_data="${remove_data:-}"
 
 	do_client "$i" "
 		cd ${TESTDIR@Q}
 		for i in {1..$n}; do
-			lfs hsm_remove file.\$i
+			lfs hsm_remove ${remove_data:+--data ${remove_data@Q} }file.\$i
 		done
 		TMOUT=$TMOUT
 		while sleep 0.1; ((TMOUT-- > 0)); do
@@ -355,6 +360,9 @@ normal_requests() {
 	client_archive_n 3 100
 	client_restore_n 3 100
 	client_remove_n 3 100
+
+	[ "$(find /tmp/archive | wc -l)" = 1 ] \
+		|| error "files not removed? $(find /tmp/archive 2>&1)"
 }
 run_test 01 normal_requests
 
@@ -492,7 +500,7 @@ no_redis() {
 }
 run_test 08 no_redis
 
-# run without redis
+# restart redis while doing transfers
 redis_restart() {
 	do_coordinatool_start 0
 	do_lhsmtoolcmd_start 1
@@ -505,8 +513,82 @@ redis_restart() {
 	do_client 0 "systemctl restart redis"
 
 	client_archive_n_wait 3 100
+	# XXX check redis db is empty after this?
+	# pretty sure it won't be...
 }
 run_test 09 redis_restart
+
+# 3x tests: test lfs hsm_* --data
+# normal copies
+data_normal() {
+	do_coordinatool_start 0
+	do_lhsmtoolcmd_start 1
+
+	client_reset 3
+	# our test lhsmtool_cmd archives at /tmp/archive/{ctdata}{fid}
+	# since it split command's words afte expansion we need to escape spaces
+	archive_data='some\ data'
+	restore_data="$archive_data"
+	remove_data="$archive_data"
+	client_archive_n 3 1
+	ls /tmp/archive/some\ data* || error "archive data was lost?"
+	client_restore_n 3 1
+	client_remove_n 3 1
+
+	[ "$(find /tmp/archive | wc -l)" = 1 ] \
+		|| error "files not removed? $(find /tmp/archive 2>&1)"
+}
+run_test 30 data_normal
+
+# make sure restart from redis works
+data_restart() {
+	do_coordinatool_start 0
+
+	# start only coordinatool with no agent to queue a request
+
+	client_reset 3
+	archive_data='some\ data'
+	client_archive_n_req 3 100
+
+	# wait for server to have processed requests, then flush cached data
+	sleep 1
+
+	do_coordinatool_service 0 restart
+
+	# make sure service really restarted before processing requests
+	do_lhsmtoolcmd_start 1
+	client_archive_n_wait 3 100
+	ls /tmp/archive/some\ data* || error "archive data was lost?"
+}
+run_test 31 data_restart
+
+data_restore_active_requests() {
+	CTOOL_ENV="( [COORDINATOOL_REDIS_HOST]='' )" \
+		do_coordinatool_start 0
+
+	# start only coordinatool with no agent to queue a request
+
+	client_reset 3
+	# XXX lustre only lists up to 5 chars in active_requests:
+	# longer data is lost!!!
+	# (this test will fail if more is restored)
+	archive_data='d\ at fails due to spaces'
+	client_archive_n_req 3 100
+
+	# wait for server to have processed requests, then flush cached data
+	sleep 1
+
+	do_coordinatool_service 0 restart
+
+	# make sure service really restarted before requeueing active requests
+	sleep 1
+	mds_requeue_active_requests 0
+	mds_requeue_active_requests 1
+	do_lhsmtoolcmd_start 1
+	client_archive_n_wait 3 100
+	ls /tmp/archive/d\ at* || error "archive data was lost?"
+}
+run_test 32 data_restore_active_requests
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
 
