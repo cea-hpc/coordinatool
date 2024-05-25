@@ -296,8 +296,8 @@ client_remove_n() {
 mds_requeue_active_requests() {
 	local i="$1"
 
-	do_mds "$i" "lctl get_param mdt.MDT.hsm.active_requests | \
-			${BUILDDIR@Q}/coordinatool-client -Q"
+	do_mds "$i" "lctl get_param -n mdt.MDT.hsm.active_requests \
+			| ${BUILDDIR@Q}/coordinatool-client -Q"
 }
 
 # init conditional global variables
