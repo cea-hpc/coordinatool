@@ -177,7 +177,7 @@ int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list) {
 	if (hai_list &&
 	    (rc = json_object_set(request, "hai_list", hai_list)))
 		goto out_free;
-	
+
 	if (state->archive_ids &&
 	    (rc = json_object_set(request, "archive_ids", state->archive_ids)))
 		goto out_free;
