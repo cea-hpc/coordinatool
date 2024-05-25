@@ -104,6 +104,7 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 				goto out;
 			}
 			config->archive_cnt++;
+			continue;
 		}
 		if (!strcasecmp(key, "client_grace_ms")) {
 			config->client_grace_ms = parse_int(val, INT_MAX);
