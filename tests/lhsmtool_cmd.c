@@ -568,7 +568,6 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 
 	} else if (hsma == HSMA_RESTORE) {
 
-#if HAVE_LLAPI_GET_MDT_INDEX_BY_FID
 		rc = llapi_get_mdt_index_by_fid(opt.o_mnt_fd, &hai->hai_fid, &mdt_idx);
 		if (rc < 0) {
 			LOG_ERROR(rc, "cannot get MDT index for "DFID,
@@ -576,7 +575,6 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 			err_major++;
 			goto out;
 		}
-#endif
 		rc = ct_begin_restore(&cb_args->hcp, hai, mdt_idx, 0);
 		if (rc < 0) {
 			LOG_ERROR(rc, "cannot start restore operation for "DFID,
