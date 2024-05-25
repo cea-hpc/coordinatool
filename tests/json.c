@@ -8,7 +8,7 @@
 #include "utils.h"
 
 
-int main() {
+int main(void) {
 	struct lu_fid fid = { 0x4200000000L, 1, 0 };
 	json_t *val;
 	char *s;

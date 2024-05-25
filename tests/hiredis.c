@@ -204,7 +204,7 @@ void cb_del(redisAsyncContext *ac, void *_reply, void *privdata) {
 }
 
 #define MAX_EVENTS 10
-int main() {
+int main(void) {
 	struct state state;
 	struct testdata testdata = { 0 };
 	int rc;
