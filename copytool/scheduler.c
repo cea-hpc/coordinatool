@@ -23,9 +23,46 @@ int schedule_on_client(struct state *state,
 	return 0;
 }
 
+static int schedule_on_host(struct state *state,
+			    struct hsm_action_node *han) {
+	/* only doing this for archive for now */
+	if (han->info.action != HSMA_ARCHIVE)
+		return 0;
+
+	struct cds_list_head *n;
+	struct host_mapping *mapping;
+	bool found = false;
+
+	cds_list_for_each(n, &state->config.archive_mappings) {
+		mapping = caa_container_of(n, struct host_mapping, node);
+		if (strstr(han->info.data, mapping->tag)) {
+			found = true;
+			break;
+		}
+	}
+
+	if (!found)
+		return 0;
+
+	int first_idx = rand() % mapping->count;
+	int idx = first_idx, rc;
+	const char *hostname = mapping->hosts[idx];
+	/* try all configured hosts until one found online */
+	while ((rc = schedule_on_client(state, han, hostname)) == 0) {
+		idx = (idx + 1) % mapping->count;
+		if (idx == first_idx)
+			break;
+		hostname = mapping->hosts[idx];
+	}
+	return rc;
+}
+
 /* fill in static action item informations */
-void hsm_action_node_enrich(struct state *state UNUSED,
-			    struct hsm_action_node *han UNUSED) {
+void hsm_action_node_enrich(struct state *state,
+			    struct hsm_action_node *han) {
+	if (schedule_on_host(state, han) > 0)
+		return;
+
 #if HAVE_PHOBOS
 	int rc = phobos_enrich(state, han);
 	if (rc < 0) {
