@@ -132,6 +132,7 @@ do_coordinatool_start() {
 	# like an associative array definition e.g. "( [COORDINATOOL_CONF]=/path )"
 	# This allows passing multiple arguments, with well defined escaping rules
 	declare -A CTOOL_ENV=${CTOOL_ENV:-( )}
+	local CTOOL_CONF=${CTOOL_CONF:-}
 	local env="" var
 
 	for var in "${!CTOOL_ENV[@]}"; do
@@ -140,7 +141,8 @@ do_coordinatool_start() {
 
 	do_client "$i" "
 		systemd-run -P -G --unit=ctest_coordinatool@${i}.service $env \
-		${BUILDDIR@Q}/lhsmd_coordinatool -vv MNTPATH
+			${BUILDDIR@Q}/lhsmd_coordinatool -vv \
+				${CTOOL_CONF:+ --config ${CTOOL_CONF@Q} }MNTPATH
 		" &
 	CLEANUP+=( "wait $!" "do_coordinatool_service $i stop" )
 }
@@ -529,6 +531,44 @@ redis_restart() {
 	# pretty sure it won't be...
 }
 run_test 09 redis_restart
+
+archive_on_host() {
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_archive_on_host.conf \
+		do_coordinatool_start 0
+	ARCHIVEDIR="$ARCHIVEDIR/0" do_lhsmtoolcmd_start 0
+	ARCHIVEDIR="$ARCHIVEDIR/1" do_lhsmtoolcmd_start 1
+	ARCHIVEDIR="$ARCHIVEDIR/2" do_lhsmtoolcmd_start 2
+	ARCHIVEDIR="$ARCHIVEDIR/3" do_lhsmtoolcmd_start 3
+
+	# wait for copytools to connect
+	# (otherwise requests aren't scheduled)
+	sleep 1
+	echo "done waiting"
+
+	# config has:
+	#  - tag=n0 -> agent 0
+	#  - tag=n1 -> agent 1/2
+	#  - tag=n2 -> agent 3/4
+	# we check:
+	#  - n0 all go to 0
+	#  - n1 split between 1/2
+	#  - n2 all to 3 (agent 4 not started)
+
+	client_reset 3
+	archive_data="tag=n0" client_archive_n 3 119 100
+	archive_data="ignored,tag=n1" client_archive_n 3 219 200
+	archive_data="tag=n2,ignored" client_archive_n 3 319 300
+
+	do_client 0 "[ \"\$(find ${ARCHIVEDIR@Q}/0 | wc -l)\" = 21 ]" \
+		|| error "missing archives on 0"
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" -gt 5 ]" \
+		|| error "missing archives on 1"
+	do_client 2 "[ \"\$(find ${ARCHIVEDIR@Q}/2 | wc -l)\" -gt 5 ]" \
+		|| error "missing archives on 2"
+	do_client 3 "[ \"\$(find ${ARCHIVEDIR@Q}/3 | wc -l)\" = 21 ]" \
+		|| error "missing archives on 3"
+}
+run_test 10 archive_on_host
 
 # 3x tests: test lfs hsm_* --data
 # normal copies
