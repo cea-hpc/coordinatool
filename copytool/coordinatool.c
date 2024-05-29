@@ -282,6 +282,7 @@ int main(int argc, char *argv[]) {
 
 	// state init
 	struct state state = { 0 };
+	CDS_INIT_LIST_HEAD(&state.config.archive_mappings);
 	CDS_INIT_LIST_HEAD(&state.stats.clients);
 	CDS_INIT_LIST_HEAD(&state.stats.disconnected_clients);
 	CDS_INIT_LIST_HEAD(&state.waiting_clients);
