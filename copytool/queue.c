@@ -206,7 +206,7 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 		return rc;
 	}
 
-	han = xmalloc(sizeof(struct hsm_action_node));
+	han = xcalloc(1, sizeof(struct hsm_action_node));
 #ifdef DEBUG_ACTION_NODE
 	han->magic = DEBUG_ACTION_NODE;
 	CDS_INIT_LIST_HEAD(&han->node);
@@ -277,7 +277,7 @@ int hsm_action_enqueue(struct state *state,
 		return -EINVAL;
 	}
 
-	han = xmalloc(sizeof(struct hsm_action_node));
+	han = xcalloc(1, sizeof(struct hsm_action_node));
 #ifdef DEBUG_ACTION_NODE
 	han->magic = DEBUG_ACTION_NODE;
 	CDS_INIT_LIST_HEAD(&han->node);
