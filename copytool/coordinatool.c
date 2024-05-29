@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <sys/epoll.h>
 #include <sys/signalfd.h>
+#include <time.h>
 
 #include "coordinatool.h"
 #include "version.h"
@@ -132,6 +133,20 @@ static void initiate_termination(struct state *state) {
 	}
 }
 
+static int random_init(void) {
+	struct timespec tp;
+
+	/* we don't need good rng, just use time */
+	if (clock_gettime(CLOCK_REALTIME, &tp) < 0) {
+		int rc = -errno;
+		LOG_ERROR(rc, "could not get time");
+		return rc;
+	}
+
+	srand(tp.tv_sec + tp.tv_nsec);
+	return 0;
+}
+
 #define MAX_EVENTS 10
 static int ct_start(struct state *state) {
 	int rc;
@@ -144,6 +159,10 @@ static int ct_start(struct state *state) {
 		LOG_ERROR(rc, "could not create epoll fd");
 		return rc;
 	}
+
+	rc = random_init();
+	if (rc < 0)
+		return rc;
 
 	rc = timer_init(state);
 	if (rc < 0)
