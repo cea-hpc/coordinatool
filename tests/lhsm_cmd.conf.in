@@ -1,0 +1,4 @@
+[commands]
+archive = "@src_dir@/lhsm_cmd_command.sh" archive "{fd}" "{fid}" "{ctdata}"
+restore = "@src_dir@/lhsm_cmd_command.sh" restore "{fd}" "{fid}" "{ctdata}"
+remove = "@src_dir@/lhsm_cmd_command.sh" remove "{fd}" "{fid}" "{ctdata}"

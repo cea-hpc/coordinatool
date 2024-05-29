@@ -24,6 +24,14 @@ executable(
 	]),
 )
 
+lhsmcmd_conf_data = configuration_data()
+lhsmcmd_conf_data.set('src_dir', meson.current_source_dir())
+configure_file(
+	input: 'lhsm_cmd.conf.in',
+	output: 'lhsm_cmd.conf',
+	configuration: lhsmcmd_conf_data,
+)
+
 parse_active_requests = executable(
 	'parse_active_requests',
 	sources: [

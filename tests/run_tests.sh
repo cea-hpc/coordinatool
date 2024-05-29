@@ -155,7 +155,7 @@ do_coordinatool_service() {
 do_lhsmtoolcmd_start() {
 	local i="$1"
 	shift
-	local LHSMCMD_CONF="${LHSMCMD_CONF:-${SOURCEDIR}/tests/lhsm_cmd.conf}"
+	local LHSMCMD_CONF="${LHSMCMD_CONF:-${BUILDDIR}/tests/lhsm_cmd.conf}"
 	# see coordinatool_start comment for CTOOL_ENV for usage (string -> assoc array)
 	declare -A AGENT_ENV=${AGENT_ENV:-( )}
 	local env="" var
@@ -173,6 +173,7 @@ do_lhsmtoolcmd_start() {
 		rm -rf ${ARCHIVEDIR@Q} && mkdir -p ${ARCHIVEDIR@Q}
 		systemd-run -P -G --unit=ctest_lhsmtool_cmd@$i.service $env \
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
+			-E ARCHIVEDIR=${ARCHIVEDIR@Q} \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
 				--config ${LHSMCMD_CONF@Q} \
 				MNTPATH ${*@Q}
@@ -333,7 +334,7 @@ sanity() {
 			|| error "No sudo or cannot touch ${MNTPATH[i]}/.test on ${CLIENT[i]}"
 		do_client "$i" "stat ${BUILDDIR@Q}/lhsmd_coordinatool > /dev/null" \
 			|| error "$BUILDDIR not a build dir or not accessible on ${CLIENT[i]}"
-		do_client "$i" "stat ${SOURCEDIR@Q}/tests/lhsm_cmd.conf > /dev/null" \
+		do_client "$i" "stat ${SOURCEDIR@Q}/tests/lhsm_cmd_command.sh > /dev/null" \
 			|| error "$SOURCEDIR not a source dir or not accessible on ${CLIENT[i]}"
 		do_coordinatool_service "$i" stop 2>/dev/null || :
 		do_lhsmtoolcmd_service "$i" stop 2>/dev/null || :
