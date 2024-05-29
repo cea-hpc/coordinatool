@@ -39,6 +39,12 @@ static inline char *xstrdup(const char *s) {
 	return val;
 }
 
+static inline char *xstrndup(const char *s, size_t n) {
+	char *val = strndup(s, n);
+	if (!val)
+		abort();
+	return val;
+}
 
 /* time */
 #define NS_IN_MSEC 1000000LL

@@ -58,7 +58,8 @@ struct hsm_action_item_unpacked {
         __u64      hai_gid;     /* grouplock id */
 };
 
-int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t hai_len) {
+int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
+			     size_t hai_len, const char **pdata) {
 	char *data;
 	size_t data_len;
 	struct hsm_action_item_unpacked unpack;
@@ -93,6 +94,8 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai, size_t h
 	hai->hai_extent.length = unpack.hai_extent.length;
 	hai->hai_cookie = unpack.hai_cookie;
 	hai->hai_gid = unpack.hai_gid;
+	if (pdata)
+		*pdata = data;
 
 	hai->hai_len = __ALIGN_KERNEL_MASK(sizeof(*hai) + data_len, 7);
 	if (hai_len < hai->hai_len) {
@@ -170,7 +173,7 @@ int json_hsm_action_list_get(json_t *json, struct hsm_action_list *hal,
 
 	hai = hai_first(hal);
 	json_array_foreach(json_list, count, item) {
-		if ((rc = json_hsm_action_item_get(item, hai, hal_len)) < 0)
+		if ((rc = json_hsm_action_item_get(item, hai, hal_len, NULL)) < 0)
 			return rc;
 		if (!cb || (rc = cb(hal, hai, item, cb_arg)) == 0) {
 			hal_len -= hai->hai_len;

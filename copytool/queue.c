@@ -49,6 +49,7 @@ static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
 			     tree_compare))
 			abort();
 	}
+	free((void*)han->info.data);
 	if (han->hai)
 		json_decref(han->hai);
 	free(han);
@@ -195,9 +196,10 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 			    const char *requestor) {
 	struct hsm_action_node *han;
 	struct hsm_action_item hai;
+	const char *data;
 	int rc;
 
-	rc = json_hsm_action_item_get(json_hai, &hai, sizeof(hai));
+	rc = json_hsm_action_item_get(json_hai, &hai, sizeof(hai), &data);
 	// overflow is ok: we don't care about hai_data as we reuse the json
 	if (rc && rc != -EOVERFLOW) {
 		LOG_WARN(rc, "%s: Could not proces invalid hai: skipping", requestor);
@@ -214,6 +216,7 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	han->info.action = hai.hai_action;
 	han->info.dfid = hai.hai_dfid;
 	han->info.hai_len = hai.hai_len;
+	han->info.data = xstrdup(data);
 	han->info.archive_id = protocol_getjson_int(json_hai, "hal_archive_id", 0);
 	han->info.hal_flags = protocol_getjson_int(json_hai, "hal_flags", 0);
 	if (!han->info.archive_id) {
@@ -289,6 +292,7 @@ int hsm_action_enqueue(struct state *state,
 	han->info.action = hai->hai_action;
 	han->info.dfid = hai->hai_dfid;
 	han->info.hai_len = hai->hai_len;
+	han->info.data = xstrndup(hai->hai_data, hai->hai_len - sizeof(*hai));
 	han->info.archive_id = archive_id;
 	han->info.hal_flags = hal_flags;
 	han->info.timestamp = timestamp;

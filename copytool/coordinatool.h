@@ -102,6 +102,7 @@ struct hsm_action_node {
 		enum hsm_copytool_action action;
 		uint32_t archive_id;
 		uint64_t hal_flags;
+		const char *data; /* unlike lustre's, nul-terminated */
 #if HAVE_PHOBOS
 		char *hsm_fuid;
 #endif

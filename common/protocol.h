@@ -315,11 +315,12 @@ json_t *json_hsm_action_item(struct hsm_action_item *hai,
  * @param json input representing hsm_action_item
  * @param hai output hsm_action_item, must have been preallocated
  * @param hai_len size of hai we can write on
+ * @param pdata pointer to data -- valid while json is valid
  *
  * @return 0 on success, -1 if json isn't correct
  */
 int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
-			     size_t hai_len);
+			     size_t hai_len, const char **pdata);
 
 /**
  * jansson-like function to get just cookie and dfid from json value
