@@ -25,6 +25,13 @@ static inline void *xcalloc(size_t nmemb, size_t size) {
 	return val;
 }
 
+static inline void *xrealloc(void *ptr, size_t size) {
+	void *val = realloc(ptr, size);
+	if (!val)
+		abort();
+	return val;
+}
+
 static inline char *xstrdup(const char *s) {
 	char *val = strdup(s);
 	if (!val)

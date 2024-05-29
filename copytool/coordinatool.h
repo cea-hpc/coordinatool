@@ -123,6 +123,13 @@ struct hsm_action_queues {
 	struct state *state;
 };
 
+struct host_mapping {
+	struct cds_list_head node;
+	const char *tag;
+	int count;
+	const char *hosts[];
+};
+
 /* common types */
 struct client {
 	const char *id; /* id sent by the client during EHLO, or addr */
@@ -181,6 +188,7 @@ struct state {
 		int client_grace_ms;
 		int archive_cnt;
 		int archives[LL_HSM_MAX_ARCHIVES_PER_AGENT];
+		struct cds_list_head archive_mappings;
 	} config;
 	/* options: command line switches only */
 	const char *mntpath;

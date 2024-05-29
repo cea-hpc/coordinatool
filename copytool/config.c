@@ -7,6 +7,34 @@
 #include "utils.h"
 #include "config_utils.h"
 
+static const char *SPACES = " \t\n\r\f\v";
+
+static int config_parse_host_mapping(struct cds_list_head *head, char *val) {
+	char *data_pattern = strtok(val, SPACES);
+	if (!data_pattern) {
+		// val is non-empty so should never happen...
+		return -EINVAL;
+	}
+	char *host = strtok(NULL, SPACES);
+	if (!host) {
+		LOG_INFO("Skipping host pattern for %s with no host",
+			 data_pattern);
+		return 0;
+	}
+	struct host_mapping *mapping = xmalloc(sizeof(*mapping) + sizeof(void*));
+	mapping->tag = xstrdup(data_pattern);
+	mapping->count = 1;
+	mapping->hosts[0] = xstrdup(host);
+	while ((host = strtok(NULL, SPACES))) {
+		mapping->count++;
+		mapping = xrealloc(mapping,
+				   sizeof(*mapping) + mapping->count * sizeof(void*));
+		mapping->hosts[mapping->count - 1] = xstrdup(host);
+	}
+	cds_list_add(&mapping->node, head);
+	return 0;
+}
+
 static int config_parse(struct state_config *config, int fail_enoent) {
 	int rc = 0;
 	FILE *conffile = fopen(config->confpath, "r");
@@ -99,11 +127,24 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 			config->archives[config->archive_cnt] =
 				parse_int(val, INT_MAX);
 			if (config->archives[config->archive_cnt] <= 0) {
-				LOG_ERROR(-ERANGE, "Archive id %s must be > 0", val);
+				LOG_ERROR(-ERANGE, "%s:%zd: Archive id %s must be > 0",
+					  config->confpath, linenum, val);
 				rc = EXIT_FAILURE;
 				goto out;
 			}
 			config->archive_cnt++;
+			continue;
+		}
+		if (!strcasecmp(key, "archive_on_hosts")) {
+			rc = config_parse_host_mapping(&config->archive_mappings, val);
+			if (rc < 0) {
+				/* note val has likely been modified and will only contain
+				 * the first word, but that's better than nothing. */
+				LOG_ERROR(rc, "%s:%zd: Could not parse %s (%s)\n",
+					  config->confpath, linenum, key, val);
+				rc = EXIT_FAILURE;
+				goto out;
+			}
 			continue;
 		}
 		if (!strcasecmp(key, "client_grace_ms")) {
