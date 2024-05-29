@@ -56,11 +56,9 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 	while (errno = 0, (n = getline(&line, &line_size, conffile)) >= 0) {
 		linenum++;
 		LOG_DEBUG("Read line %zd: %s", linenum, line);
-		char *key = line, *val;
-		while (n > 0 && isspace(*key)) {
-			key++; n--;
-		}
-		if (n == 0) /* blank line */
+		char *key, *val;
+		key = strtok(line, SPACES);
+		if (key == NULL) /* blank line */
 			continue;
 		if (*key == '#') /* comment */
 			continue;
@@ -73,24 +71,15 @@ static int config_parse(struct state_config *config, int fail_enoent) {
 		if (n == 0) // should never happen
 			abort();
 
-		ssize_t i = 0;
-		while (i < n - 1 && !isspace(key[i])) {
-			i++;
+		/* rest of line */
+		val = strtok(NULL, "");
+		if (val) {
+			while (isspace(*val)) {
+				val++;
+			}
 		}
-		if (i >= n - 1) {
+		if (val == NULL || *val == '\0') {
 			LOG_WARN(rc, "skipping %s in %s (line %zd) not in 'key value' format",
-				 line, config->confpath, linenum);
-			continue;
-		}
-		key[i] = 0;
-		i++;
-		val = key + i;
-		n -= i;
-		while (n > 0 && isspace(*val)) {
-			val++; n--;
-		}
-		if (n == 0) {
-			LOG_WARN(-EINVAL, "skipping %s in %s (line %zd) not in 'key value' format",
 				 line, config->confpath, linenum);
 			continue;
 		}
