@@ -226,6 +226,7 @@ int ct_config_init(struct ct_state_config *config) {
 			LOG_ERROR(rc, "Could not get hostname!");
 			return rc;
 		}
+		client_id[sizeof(client_id) - 1] = 0;
 		dot = strchr(client_id, '.');
 		if (dot)
 			*dot = '\0';
