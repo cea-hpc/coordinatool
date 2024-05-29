@@ -51,7 +51,7 @@ int main(void) {
 
 	val = json_loads(s, JSON_ALLOW_NUL, NULL);
 	free(s);
-	assert(json_hsm_action_item_get(val, newhai, sizeof(*hai)+16) == 0);
+	assert(json_hsm_action_item_get(val, newhai, sizeof(*hai)+16, NULL) == 0);
 	assert(protocol_getjson_int(val, "extra", 0) == 42);
 	assert(protocol_getjson_int(val, "hal_archive_id", 0) == 1);
 	assert(protocol_getjson_int(val, "hal_flags", 0) == 0);
