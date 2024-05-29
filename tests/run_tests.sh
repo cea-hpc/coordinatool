@@ -370,8 +370,8 @@ normal_requests() {
 	client_restore_n 3 100
 	client_remove_n 3 100
 
-	[ "$(find /tmp/archive | wc -l)" = 1 ] \
-		|| error "files not removed? $(find /tmp/archive 2>&1)"
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 1 ]" \
+		|| error "files not removed?"
 }
 run_test 01 normal_requests
 
@@ -537,18 +537,19 @@ data_normal() {
 	do_lhsmtoolcmd_start 1
 
 	client_reset 3
-	# our test lhsmtool_cmd archives at /tmp/archive/{ctdata}{fid}
+	# our test lhsmtool_cmd archives at $ARCHIVEDIR/{ctdata}{fid}
 	# since it split command's words afte expansion we need to escape spaces
 	archive_data='some\ data'
 	restore_data="$archive_data"
 	remove_data="$archive_data"
 	client_archive_n 3 1
-	ls /tmp/archive/some\ data* || error "archive data was lost?"
+	do_client 1 "ls ${ARCHIVEDIR@Q}/some\ data*" \
+		|| error "archive data was lost?"
 	client_restore_n 3 1
 	client_remove_n 3 1
 
-	[ "$(find /tmp/archive | wc -l)" = 1 ] \
-		|| error "files not removed? $(find /tmp/archive 2>&1)"
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 1 ]" \
+		|| error "files not removed?"
 }
 run_test 30 data_normal
 
@@ -570,7 +571,8 @@ data_restart() {
 	# make sure service really restarted before processing requests
 	do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
-	ls /tmp/archive/some\ data* || error "archive data was lost?"
+	do_client 1 "ls ${ARCHIVEDIR@Q}/some\ data*" \
+		|| error "archive data was lost?"
 }
 run_test 31 data_restart
 
@@ -598,7 +600,8 @@ data_restore_active_requests() {
 	mds_requeue_active_requests 1
 	do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
-	ls /tmp/archive/d\ at* || error "archive data was lost?"
+	do_client 1 "ls ${ARCHIVEDIR@Q}/d\ at*" \
+		|| error "archive data was lost?"
 }
 run_test 32 data_restore_active_requests
 
@@ -621,8 +624,8 @@ archive_id_normal() {
 	client_restore_n 3 1
 	client_remove_n 3 1
 
-	[ "$(find /tmp/archive | wc -l)" = 1 ] \
-		|| error "files not removed? $(find /tmp/archive 2>&1)"
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 1 ]" \
+		|| error "files not removed?"
 }
 run_test 40 archive_id_normal
 
