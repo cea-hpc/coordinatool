@@ -4,12 +4,31 @@
 
 /* schedule decision helper */
 
+/* XXX differentiate scheduling early (enrich time: just assign to client queue)
+ * and reschedule (can_send time: move to another queue) better */
+int schedule_on_client(struct state *state,
+		       struct hsm_action_node *han,
+		       const char *hostname) {
+	struct cds_list_head *n;
+
+	cds_list_for_each(n, &state->stats.clients) {
+		struct client *client =
+			caa_container_of(n, struct client, node_clients);
+
+		if (!strcmp(hostname, client->id)) {
+			han->queues = &client->queues;
+			return 1;
+		}
+	}
+	return 0;
+}
+
 /* fill in static action item informations */
 void hsm_action_node_enrich(struct state *state UNUSED,
 			    struct hsm_action_node *han UNUSED) {
 #if HAVE_PHOBOS
 	int rc = phobos_enrich(state, han);
-	if (rc) {
+	if (rc < 0) {
 		LOG_ERROR(rc, "phobos: failed to enrich %s request for "DFID,
 			  ct_action2str(han->info.action),
 			  PFID(&han->info.dfid));

@@ -46,19 +46,7 @@ int phobos_enrich(struct state *state,
 	if (hostname == NULL)
 		return 0;
 
-	struct cds_list_head *n, *nnext;
-
-	cds_list_for_each_safe(n, nnext, &state->stats.clients) {
-		struct client *client =
-			caa_container_of(n, struct client, node_clients);
-
-		if (!strcmp(hostname, client->id)) {
-			han->queues = &client->queues;
-			break;
-		}
-	}
-
-	return 0;
+	return schedule_on_client(state, han, hostname);
 }
 
 bool phobos_can_send(struct client *client,
@@ -87,10 +75,9 @@ bool phobos_can_send(struct client *client,
 	if (hostname == NULL || !strcmp(client->id, hostname))
 		return true;
 
-	struct cds_list_head *n, *nnext;
+	struct cds_list_head *n;
 
-	cds_list_for_each_safe(n, nnext,
-			       &client->queues.state->stats.clients) {
+	cds_list_for_each(n, &client->queues.state->stats.clients) {
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
 
