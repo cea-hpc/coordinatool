@@ -120,8 +120,7 @@ void client_free(struct client *client) {
 		cds_list_for_each_safe(n, next, lists[i]) {
 			struct hsm_action_node *node =
 				caa_container_of(n, struct hsm_action_node, node);
-			cds_list_del(n);
-			hsm_action_requeue(node, true);
+			hsm_action_move(&state->queues, node, true);
 		}
 	}
 	ct_schedule(state);
