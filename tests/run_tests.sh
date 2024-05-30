@@ -158,6 +158,8 @@ do_lhsmtoolcmd_start() {
 	local i="$1"
 	shift
 	local LHSMCMD_CONF="${LHSMCMD_CONF:-${BUILDDIR}/tests/lhsm_cmd.conf}"
+	local ARCHIVEDIR="${ARCHIVEDIR:-/tmp/archive}"
+	local WAIT_FILE="${WAIT_FILE:-}"
 	# see coordinatool_start comment for CTOOL_ENV for usage (string -> assoc array)
 	declare -A AGENT_ENV=${AGENT_ENV:-( )}
 	local env="" var
@@ -173,9 +175,11 @@ do_lhsmtoolcmd_start() {
 
 	do_client "$i" "
 		rm -rf ${ARCHIVEDIR@Q} && mkdir -p ${ARCHIVEDIR@Q}
+		if [ -n ${WAIT_FILE@Q} ]; then rm -f ${WAIT_FILE@Q}; fi
 		systemd-run -P -G --unit=ctest_lhsmtool_cmd@$i.service $env \
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
 			-E ARCHIVEDIR=${ARCHIVEDIR@Q} \
+			-E WAIT_FILE=${WAIT_FILE@Q} \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
 				--config ${LHSMCMD_CONF@Q} \
 				MNTPATH ${*@Q}
@@ -569,6 +573,54 @@ archive_on_host() {
 		|| error "missing archives on 3"
 }
 run_test 10 archive_on_host
+
+restarts_with_pending_work() {
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_archive_on_host.conf \
+		do_coordinatool_start 0
+	sleep 0.3
+	WAIT_FILE="$ARCHIVEDIR/wait" ARCHIVEDIR="$ARCHIVEDIR/1" do_lhsmtoolcmd_start 1
+	WAIT_FILE="$ARCHIVEDIR/wait" ARCHIVEDIR="$ARCHIVEDIR/2" do_lhsmtoolcmd_start 2
+	WAIT_FILE="$ARCHIVEDIR/wait" ARCHIVEDIR="$ARCHIVEDIR/3" do_lhsmtoolcmd_start 3
+
+	# wait for copytools to connect
+	# (otherwise requests aren't scheduled)
+	sleep 0.5
+	echo "done waiting"
+
+	# config has:
+	#  - tag=n0 -> agent 0
+	#  - tag=n1 -> agent 1/2
+	#  - tag=n2 -> agent 3/4
+	# we check:
+	#  - n0: unassigned, will be split
+	#  - n1: will go to 1/2, restart 1 see what happens
+	#  - n2: will go to 3, restart 3 see what happens
+
+	client_reset 3
+	archive_data="tag=n0" client_archive_n_req 3 119 100
+	archive_data="ignored,tag=n1" client_archive_n_req 3 219 200
+	archive_data="tag=n2,ignored" client_archive_n_req 3 319 300
+
+	sleep 0.5
+
+	do_lhsmtoolcmd_service 1 stop
+	do_lhsmtoolcmd_service 3 restart
+	for client in 2 3; do
+		do_client $client "touch ${ARCHIVEDIR@Q}/wait"
+	done
+
+	client_archive_n_wait 3 119 100
+	client_archive_n_wait 3 219 200
+	client_archive_n_wait 3 319 300
+
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" = 1 ]" \
+		|| error "should be no archive on 1"
+	do_client 2 "[ \"\$(find ${ARCHIVEDIR@Q}/2 | wc -l)\" -gt 25 ]" \
+		|| error "should be at least 25 archives on 2"
+	do_client 3 "[ \"\$(find ${ARCHIVEDIR@Q}/3 | wc -l)\" -gt 25 ]" \
+		|| error "should be at least 25 archives on 3"
+}
+run_test 11 restarts_with_pending_work
 
 # 3x tests: test lfs hsm_* --data
 # normal copies

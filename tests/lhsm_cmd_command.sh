@@ -10,10 +10,11 @@ if [ ! -d "$ARCHIVEDIR" ]; then
 	mkdir -p "$ARCHIVEDIR"
 fi
 
-# debug: delay archives
-#while ! [[ -e /tmp/doarch ]]; do
-#	sleep 1
-#done
+if [ -n "$WAIT_FILE" ]; then
+	while ! [ -e "$WAIT_FILE" ]; do
+		sleep 1
+	done
+fi
 
 case "$fn" in
 	archive)
