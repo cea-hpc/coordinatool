@@ -227,4 +227,16 @@ void config_free(struct state_config *config) {
 	free((void*)config->host);
 	free((void*)config->port);
 	free((void*)config->redis_host);
+
+	struct cds_list_head *n, *nnext;
+	cds_list_for_each_safe(n, nnext, &config->archive_mappings) {
+		struct host_mapping *mapping =
+			caa_container_of(n, struct host_mapping, node);
+		int i;
+		free((void*)mapping->tag);
+		for (i = 0; i < mapping->count; i++) {
+			free((void*)mapping->hosts[i]);
+		}
+		free(mapping);
+	}
 }
