@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30a638a1_7b2233ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2024-06-14T12:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fd824fd_a03e9f29",
+      "range": {
+        "startLine": 13,
+        "startChar": 39,
+        "endLine": 13,
+        "endChar": 51
+      },
+      "revId": "c698db06fb845ebb5df4501507a16f4ea8cce282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48477df2_d1b87b6e",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25d28bb5_029230e0",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2024-06-14T12:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48477df2_d1b87b6e",
+      "range": {
+        "startLine": 193,
+        "startChar": 30,
+        "endLine": 193,
+        "endChar": 36
+      },
+      "revId": "c698db06fb845ebb5df4501507a16f4ea8cce282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e03d2ca_1ed53585",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-06-14T06:31:16Z",
       "side": 1,
       "message": "nit: to be easier to grep, we could have this log match the connection one: New client disconnection",
+      "range": {
+        "startLine": 223,
+        "startChar": 16,
+        "endLine": 223,
+        "endChar": 39
+      },
+      "revId": "c698db06fb845ebb5df4501507a16f4ea8cce282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64f9fba1_02ce78b8",
+        "filename": "copytool/tcp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2024-06-14T12:42:42Z",
+      "side": 1,
+      "message": "(These don\u0027t happen at all during normal operation so it really isn\u0027t a problem, but I\u0027ve made this clearer in the message anyway)",
+      "parentUuid": "3e03d2ca_1ed53585",
       "range": {
         "startLine": 223,
         "startChar": 16,
