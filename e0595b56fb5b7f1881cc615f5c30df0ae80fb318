@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccfc8adc_5c27fcbe",
+        "filename": "common/protocol.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2024-06-14T07:08:16Z",
+      "side": 1,
+      "message": "Seeing this protocol change made me wonder if adding a version in the protocol would be a good idea? This would make the clients or server fail explicitly when there is an update that needs to have aligned client and server versions.",
+      "range": {
+        "startLine": 119,
+        "startChar": 5,
+        "endLine": 119,
+        "endChar": 17
+      },
+      "revId": "e0595b56fb5b7f1881cc615f5c30df0ae80fb318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "853bfb1d_07cfb978",
+        "filename": "copytool/redis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2024-06-14T07:08:16Z",
+      "side": 1,
+      "message": "major: I may be wrong but I think a few bytes are missing DFID will print `[0x\u003cu64\u003e:0x\u003cu32\u003e:0x\u003cu32\u003e]`. So at most 2 * 16 + 10 \u003d 42 (FID_LEN). Then you need 16 more for the cookie and 12 for the text + 1 for `\\0`. So 71 in total.",
+      "range": {
+        "startLine": 168,
+        "startChar": 24,
+        "endLine": 168,
+        "endChar": 31
+      },
+      "revId": "e0595b56fb5b7f1881cc615f5c30df0ae80fb318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
