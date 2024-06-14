@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e397902f_29b173cd",
+        "filename": "common/protocol.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2024-06-14T12:38:39Z",
+      "side": 1,
+      "message": "While that is true in theory, for HPC I don\u0027t think keeping version in sync on servers (copytools only) is difficult.\nIf there was interaction from other clients I\u0027d prioritize this higher, but at this point I think we\u0027re better off keeping dev overhead low.\n\nWhen we\u0027re happy about how this all works and want to dominate the world we can add some version in the ehlo message (at least causing failures isn\u0027t difficult), but as things stand transfers will fail just as fast so there is no real benefit",
+      "parentUuid": "ccfc8adc_5c27fcbe",
+      "range": {
+        "startLine": 119,
+        "startChar": 5,
+        "endLine": 119,
+        "endChar": 17
+      },
+      "revId": "e0595b56fb5b7f1881cc615f5c30df0ae80fb318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "853bfb1d_07cfb978",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-14T07:08:16Z",
       "side": 1,
       "message": "major: I may be wrong but I think a few bytes are missing DFID will print `[0x\u003cu64\u003e:0x\u003cu32\u003e:0x\u003cu32\u003e]`. So at most 2 * 16 + 10 \u003d 42 (FID_LEN). Then you need 16 more for the cookie and 12 for the text + 1 for `\\0`. So 71 in total.",
+      "range": {
+        "startLine": 168,
+        "startChar": 24,
+        "endLine": 168,
+        "endChar": 31
+      },
+      "revId": "e0595b56fb5b7f1881cc615f5c30df0ae80fb318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02563550_54b284de",
+        "filename": "copytool/redis.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2024-06-14T12:38:39Z",
+      "side": 1,
+      "message": "Woah. Thanks! double mistake here with not counting braces/0x: and making two u32 as short as one u64...\n\nI actually counted again as 75:\n\"cookie \"  7\n\"[0x\"  3\nu64 16\n\":0x\" 3\nu32 10\n\":0x\" 3\nu32 10\n\"]\" 1\n\" fid \" 5\ncookie 16\n\\0 1\nso 7+3+16+3+10+3+10+1+5+16+1 \u003d 75\n\nBut with that said we should just make it 100, it doesn\u0027t matter at all... And more importantly I ended up not using this at all, it\u0027s `#if 0`\u0027d and I should have removed before push.",
+      "parentUuid": "853bfb1d_07cfb978",
       "range": {
         "startLine": 168,
         "startChar": 24,
