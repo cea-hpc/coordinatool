@@ -35,9 +35,13 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 			printf("cookie/dfid not set - version mismatch?\n");
 			return -EINVAL;
 		}
-		rc = protocol_request_done(&client->state, cookie, &dfid, 0);
-		if (rc)
-			return rc;
+		// If we send done here, the coordinatool will consider the archive done and
+		// tell lustre, clearing the hsm request.
+		if (client->mode == MODE_DRAIN) {
+			rc = protocol_request_done(&client->state, cookie, &dfid, 0);
+			if (rc)
+				return rc;
+		}
 	}
 
 	// get work again
