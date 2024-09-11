@@ -12,6 +12,7 @@ enum client_mode {
 	MODE_STATUS,
 	MODE_QUEUE,
 	MODE_RECV,
+	MODE_DRAIN,
 };
 
 struct active_requests_state {
