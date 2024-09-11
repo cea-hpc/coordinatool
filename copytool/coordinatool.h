@@ -134,6 +134,7 @@ struct host_mapping {
 /* common types */
 struct client {
 	const char *id; /* id sent by the client during EHLO, or addr */
+	bool id_set; /* set if clients introduce themselves */
 	int fd;
 	struct cds_list_head node_clients;
 	unsigned int done_restore;
