@@ -130,9 +130,10 @@ int main(int argc, char *argv[]) {
 		{ "recv", no_argument, NULL, 'R' },
 		{ "archive", required_argument, NULL, 'A' },
 		{ "iters", required_argument, NULL, 'i' },
+		{ "client-id", required_argument, NULL, 'I' },
 		{ 0 },
 	};
-	const char short_opts[] = "c:vqH:p:QRA:i:Vh";
+	const char short_opts[] = "c:vqH:p:QRA:i:I:Vh";
 	int rc;
 
 	// default options
@@ -157,7 +158,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	/* we don't want an id for debug client */
+	/* we don't want an id for debug client unless set explicitly */
 	free((void*)client.state.config.client_id);
 	client.state.config.client_id = NULL;
 
@@ -186,6 +187,10 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'R':
 			client.mode = MODE_RECV;
+			break;
+		case 'I':
+			free((void*)client.state.config.client_id);
+			client.state.config.client_id = strdup(optarg);
 			break;
 		case 'A':
 			if (!client.state.archive_ids) {
