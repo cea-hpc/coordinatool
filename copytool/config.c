@@ -187,7 +187,7 @@ int config_init(struct state_config *config) {
 	config->port = xstrdup("5123");
 	config->redis_host = xstrdup("localhost");
 	config->redis_port = 6379;
-	config->client_grace_ms = 10000; /* 10s, double of client reconnect time */
+	config->client_grace_ms = 600000; /* 10 mins */
 	config->verbose = LLAPI_MSG_NORMAL;
 	llapi_msg_set_level(config->verbose);
 

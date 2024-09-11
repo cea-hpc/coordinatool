@@ -23,6 +23,7 @@ void print_help(char *argv[]) {
 	printf("--queue/-Q: queue active_requests from stdin\n");
 	printf("--recv/-R: (debug tool) ask for receiving work\n");
 	printf("           note the work will be reclaimed when client disconnects\n");
+	printf("--drain: (debug tool) recv and mark done everything one can get\n");
 	printf("--archive/-A: archive id (repeatable). Only makes sense for recv\n");
 	printf("--iters/-i: number of replies to expect (can be used to exit immediately after\n");
 	printf("            receiving work)\n");
@@ -96,6 +97,7 @@ int client_run(struct client *client) {
 					   client->active_requests.hai_list);
 		break;
 	case MODE_RECV:
+	case MODE_DRAIN:
 		rc = protocol_request_recv(state);
 		break;
 	default:
@@ -116,6 +118,7 @@ int client_run(struct client *client) {
 }
 
 #define OPT_FSNAME 257
+#define OPT_DRAIN 258
 
 int main(int argc, char *argv[]) {
 	const struct option long_opts[] = {
@@ -127,6 +130,7 @@ int main(int argc, char *argv[]) {
 		{ "host", required_argument, NULL, 'H' },
 		{ "queue", no_argument, NULL, 'Q' },
 		{ "fsname", required_argument, NULL, OPT_FSNAME },
+		{ "drain", no_argument, NULL, OPT_DRAIN },
 		{ "recv", no_argument, NULL, 'R' },
 		{ "archive", required_argument, NULL, 'A' },
 		{ "iters", required_argument, NULL, 'i' },
@@ -187,6 +191,10 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'R':
 			client.mode = MODE_RECV;
+			client.iters = -1;
+			break;
+		case OPT_DRAIN:
+			client.mode = MODE_DRAIN;
 			client.iters = -1;
 			break;
 		case 'I':
