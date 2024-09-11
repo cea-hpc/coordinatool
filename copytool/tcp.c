@@ -110,7 +110,11 @@ void client_free(struct client *client) {
 		&client->queues.waiting_remove,
 	};
 
-	LOG_INFO("Disconnecting %s (%d)", client->id, client->fd);
+	if (client->id_set) {
+		    LOG_INFO("Clients: freeing %s (%d)", client->id, client->fd);
+	} else {
+		    LOG_DEBUG("Clients: freeing anonymous %s (%d)", client->id, client->fd);
+	}
 	client_closefd(state, client);
 	cds_list_del(&client->node_clients);
 	if (client->status == CLIENT_WAITING)
@@ -133,7 +137,7 @@ void client_disconnect(struct client *client) {
 	struct state *state = client->queues.state;
 
 	/* no point in keeping client around if it has no id */
-	if (!client->id) {
+	if (!client->id_set) {
 		client_free(client);
 		return;
 	}
@@ -142,6 +146,7 @@ void client_disconnect(struct client *client) {
 	case CLIENT_READY:
 	case CLIENT_WAITING:
 		/* remember disconnected clients for a bit */
+		LOG_INFO("Clients: disconnect %s (%d)", client->id, client->fd);
 		if (client->status == CLIENT_WAITING)
 			cds_list_del(&client->waiting_node);
 		client->status = CLIENT_DISCONNECTED;
@@ -189,7 +194,7 @@ int handle_client_connect(struct state *state) {
 	client->queues.state = state;
 	state->stats.clients_connected++;
 
-	LOG_DEBUG("%s (%d): New client connection", client->id, client->fd);
+	LOG_DEBUG("Clients: new connection %s (%d)", client->id, client->fd);
 
 	rc = epoll_addfd(state->epoll_fd, fd, client);
 	if (rc < 0) {
@@ -219,7 +224,7 @@ struct client *client_new_disconnected(struct state *state, const char *id) {
 	client->disconnected_timestamp = gettime_ns();
 	client->queues.state = state;
 
-	LOG_DEBUG("%s: New client disconnected (redis recovery)", id);
+	LOG_INFO("Clients: restore from redis %s", id);
 
 	return client;
 }
