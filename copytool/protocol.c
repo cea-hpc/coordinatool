@@ -419,6 +419,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 
 	id = protocol_getjson_str(json, "id", NULL, NULL);
 	if (! ehlo_is_id_unique(state, id ? id : client->id)) {
+		LOG_INFO("Clients: duplicate id '%s' refused for %s (%d)" ,
+			 id ? id : client->id, client->id, client->fd);
 		return protocol_reply_ehlo(client, EEXIST,
 					   "id already used by another client");
 	}
@@ -428,9 +430,10 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_ehlo(client, 0, NULL);
 	}
 
-	LOG_DEBUG("%s (%d): renaming from %s", id, client->fd, client->id);
+	LOG_INFO("Clients: '%s' renamed to %s (%d)", client->id, id, client->fd);
 	free((void*)client->id);
 	client->id = xstrdup(id);
+	client->id_set = true;
 
 
 	struct cds_list_head *n, *nnext;
@@ -441,10 +444,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 		if (strcmp(id, old_client->id))
 			continue;
 
-		LOG_DEBUG("%s (%d): Splicing old client active_requests %p to new one %p",
-			  id, client->fd,
-			  (void*)&old_client->active_requests,
-			  (void*)&client->active_requests);
+		LOG_INFO("Clients: restoring state from previously disconnected client %s (%d)",
+			 id, client->fd);
 		cds_list_splice(&old_client->active_requests,
 				&client->active_requests);
 		CDS_INIT_LIST_HEAD(&old_client->active_requests);
