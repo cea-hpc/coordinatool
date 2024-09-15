@@ -223,6 +223,7 @@ struct client *client_new_disconnected(struct state *state, const char *id) {
 	client->status = CLIENT_DISCONNECTED;
 	client->disconnected_timestamp = gettime_ns();
 	client->queues.state = state;
+	timer_rearm(state);
 
 	LOG_INFO("Clients: restore from redis %s", id);
 

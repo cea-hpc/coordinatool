@@ -21,8 +21,9 @@ struct client *client_new_disconnected(struct state *state UNUSED,
 				       const char *id UNUSED) {
 	return NULL;
 }
-void hsm_action_dequeue(struct hsm_action_queues *queues UNUSED,
-                        struct hsm_action_node *han UNUSED) {
+void hsm_action_assign(struct hsm_action_queues *queues UNUSED,
+                        struct hsm_action_node *han UNUSED,
+			struct client *client UNUSED) {
 	return;
 }
 
