@@ -24,8 +24,8 @@ void print_help(char *argv[]) {
 	printf("--recv/-R: (debug tool) ask for receiving work\n");
 	printf("           note the work will be reclaimed when client disconnects\n");
 	printf("--archive/-A: archive id (repeatable). Only makes sense for recv\n");
-	printf("--iters/-i: number of replies to expect (can be used to wait after\n");
-	printf("            receiving work, negative number loops forever)\n");
+	printf("--iters/-i: number of replies to expect (can be used to exit immediately after\n");
+	printf("            receiving work)\n");
 	printf("--fsname <name>: fsname for -Q, optionally used by coordinatool to avoid\n");
 	printf("                 sending to wrong server\n");
 	printf("--verbose/-v: Increase log level (can repeat)\n");
@@ -187,6 +187,7 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'R':
 			client.mode = MODE_RECV;
+			client.iters = -1;
 			break;
 		case 'I':
 			free((void*)client.state.config.client_id);
