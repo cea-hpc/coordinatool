@@ -132,7 +132,6 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 		return -ERANGE;
 
 	json_array_append(hai_list, han->hai);
-	han->client = client;
 	(*current_count)++;
 	(*enqueued_bytes) += sizeof(struct hsm_action_item) + han->info.hai_len;
 
@@ -197,8 +196,6 @@ void ct_schedule_client(struct state *state,
 		&client->max_archive };
 	int *current_count[] = { &client->current_restore,
 		&client->current_remove, &client->current_archive };
-	unsigned int *running_count[] = { &state->stats.running_restore,
-		&state->stats.running_remove, &state->stats.running_archive };
 	unsigned int *pending_count[] = { &state->stats.pending_restore,
 		&state->stats.pending_remove, &state->stats.pending_archive };
 	/* archive_id cannot be 0, use it as check */
@@ -250,9 +247,7 @@ void ct_schedule_client(struct state *state,
 				  client->id, client->fd,
 				  (void*)han, (void*)&client->active_requests);
 #endif
-			hsm_action_dequeue(queues, han);
-			cds_list_add(&han->node, &client->active_requests);
-			(*running_count[i])++;
+			hsm_action_assign(queues, han, client);
 			enqueued_pass++;
 			/* don't hand in too much work if other clients waiting */
 			if (enqueued_pass > pending_pass / state->stats.clients_connected)

@@ -279,8 +279,9 @@ int hsm_action_enqueue(struct state *state,
 		       struct hsm_action_item *hai,
 		       uint32_t archive_id, uint64_t hal_flags,
 		       int64_t timestamp);
-void hsm_action_dequeue(struct hsm_action_queues *queues,
-			struct hsm_action_node *han);
+void hsm_action_assign(struct hsm_action_queues *queues,
+			struct hsm_action_node *han,
+			struct client *client);
 struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
                                                 unsigned long cookie,
 						struct lu_fid *dfid);
@@ -291,6 +292,8 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 int redis_connect(struct state *state);
 int redis_store_request(struct state *state, struct hsm_action_node *han);
 int redis_assign_request(struct state *state, struct client *client,
+			 struct hsm_action_node *han);
+int redis_deassign_request(struct state *state,
 			 struct hsm_action_node *han);
 int redis_delete_request(struct state *state, uint64_t cookie,
 			 struct lu_fid *dfid);
