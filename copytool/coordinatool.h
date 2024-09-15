@@ -299,7 +299,7 @@ int redis_recovery(struct state *state);
 
 /* scheduler */
 
-int schedule_on_client(struct state *state,
+int schedule_on_client(struct cds_list_head *clients,
                struct hsm_action_node *han,
                const char *hostname);
 void hsm_action_node_enrich(struct state *state, struct hsm_action_node *han);
