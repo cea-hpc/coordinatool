@@ -53,7 +53,7 @@ static int protocol_reply_status_client(json_t *clients, struct cds_list_head *h
 			return rc;
 		}
 		if (client->status == CLIENT_DISCONNECTED &&
-		    (rc == protocol_setjson_int(c, "disconnected_timestamp",
+		    (rc = protocol_setjson_int(c, "disconnected_timestamp",
 						client->disconnected_timestamp))) {
 			json_decref(c);
 			return rc;
