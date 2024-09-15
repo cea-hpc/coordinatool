@@ -17,7 +17,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel) \
 	|| error "Must run within git repository"
 SKIP_RC=163
 FATAL=0
-FAILURES=0
+FAILURES=()
 TESTS=0
 SKIPS=0
 ONLY=${ONLY:-}
@@ -96,7 +96,7 @@ run_test() {
 	elif ((status)); then
 		echo FAIL
 		((FATAL)) && exit 1
-		((FAILURES++))
+		FAILURES+=( "$caseno: $testcase" )
 	else
 		echo Ok
 	fi
@@ -731,7 +731,7 @@ run_test 42 archive_id_restore_active_requests
 
 
 
-echo "Summary: ran $TESTS tests, $SKIPS skipped, $FAILURES failures"
+echo "Summary: ran $TESTS tests, $SKIPS skipped, ${#FAILURES[@]} failures"
+printf "%s\n" "${FAILURES[@]}"
 
-exit $FAILURES
-
+exit ${#FAILURES[@]}
