@@ -9,6 +9,8 @@
 
 #define UNUSED __attribute__((unused))
 
+#define countof(x) (sizeof(x)/sizeof(*(x)))
+
 
 /* alloc */
 static inline void *xmalloc(size_t size) {
