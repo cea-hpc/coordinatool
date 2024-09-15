@@ -64,6 +64,7 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *     {running,pending}_{archive,restore,remove} = integer (u32)
  *     done_{archive,restore,remove} = integer (u64)
  *     clients_connected = integer (u32)
+ *     clients: list of clients with their properties e.g. client_id, status...
  *
  * example:
  * CLIENT: { "command": "status" }
