@@ -109,7 +109,7 @@ struct hsm_action_node {
 	} info;
 	/* queue han will be enqueued to */
 	struct hsm_action_queues *queues;
-	/* if sent to a client, remember who for eventual cancel */
+	/* if sent to a client, remember who for eventual cancel (not implemented) */
 	struct client *client;
 	/* json representation of hai */
 	json_t *hai;
