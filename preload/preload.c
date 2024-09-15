@@ -163,7 +163,7 @@ again:
 
 	ct->msgsize = -1;
 	while (ct->msgsize == -1) {
-		rc = poll(pollfds, sizeof(pollfds)/sizeof(*pollfds), -1);
+		rc = poll(pollfds, countof(pollfds), -1);
 		if (rc < 0 && errno == EAGAIN) {
 			continue;
 		}
