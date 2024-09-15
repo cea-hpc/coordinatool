@@ -120,7 +120,7 @@ void client_free(struct client *client) {
 	if (client->status == CLIENT_WAITING)
 		cds_list_del(&client->waiting_node);
 	// reassign any request that would be lost
-	for (unsigned int i = 0; i < sizeof(lists)/sizeof(*lists); i++) {
+	for (unsigned int i = 0; i < countof(lists); i++) {
 		cds_list_for_each_safe(n, next, lists[i]) {
 			struct hsm_action_node *node =
 				caa_container_of(n, struct hsm_action_node, node);
