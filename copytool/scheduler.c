@@ -6,12 +6,12 @@
 
 /* XXX differentiate scheduling early (enrich time: just assign to client queue)
  * and reschedule (can_send time: move to another queue) better */
-int schedule_on_client(struct state *state,
+int schedule_on_client(struct cds_list_head *clients_list,
 		       struct hsm_action_node *han,
 		       const char *hostname) {
 	struct cds_list_head *n;
 
-	cds_list_for_each(n, &state->stats.clients) {
+	cds_list_for_each(n, clients_list) {
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
 
@@ -47,11 +47,18 @@ static int schedule_on_host(struct state *state,
 	int first_idx = rand() % mapping->count;
 	int idx = first_idx, rc;
 	const char *hostname = mapping->hosts[idx];
-	/* try all configured hosts until one found online */
-	while ((rc = schedule_on_client(state, han, hostname)) == 0) {
+	struct cds_list_head *clients = &state->stats.clients;
+	/* try all configured hosts until one found online,
+	 * tand if none all hosts again with disconnected clients:
+	 * we don't want to send to another client if there are chances
+	 * an acceptable mover will come back */
+	while ((rc = schedule_on_client(clients, han, hostname)) == 0) {
 		idx = (idx + 1) % mapping->count;
-		if (idx == first_idx)
-			break;
+		if (idx == first_idx) {
+			if (clients == &state->stats.disconnected_clients)
+				break;
+			clients = &state->stats.disconnected_clients;
+		}
 		hostname = mapping->hosts[idx];
 	}
 	return rc;
