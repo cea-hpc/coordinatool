@@ -100,6 +100,7 @@ int hsm_action_requeue(struct hsm_action_node *han, bool start) {
 	struct cds_list_head *head;
 	struct hsm_action_queues *queues = han->queues;
 
+	han->client = NULL;
 	switch (han->info.action) {
 	case HSMA_RESTORE:
 		head = &queues->waiting_restore;
