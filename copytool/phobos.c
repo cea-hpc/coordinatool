@@ -46,7 +46,8 @@ int phobos_enrich(struct state *state,
 	if (hostname == NULL)
 		return 0;
 
-	return schedule_on_client(state, han, hostname);
+	return schedule_on_client(&state->stats.clients, han, hostname)
+		|| schedule_on_client(&state->stats.disconnected_clients, han, hostname);
 }
 
 bool phobos_can_send(struct client *client,
