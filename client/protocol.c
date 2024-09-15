@@ -40,7 +40,8 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 			return rc;
 	}
 
-	return 0;
+	// get work again
+	return protocol_request_recv(&client->state);
 }
 
 static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
