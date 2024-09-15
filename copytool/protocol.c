@@ -131,6 +131,11 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 	client->max_archive = protocol_getjson_int(json, "max_archive", -1);
 	client->max_remove = protocol_getjson_int(json, "max_remove", -1);
 
+	if (client->status != CLIENT_READY) {
+		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
+					   "Client must send EHLO first and not already be in RECV");
+	}
+
 	if (client->max_bytes < HAI_SIZE_MARGIN)
 		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
 					   "Buffer too small");
@@ -151,11 +156,6 @@ int protocol_reply_recv(struct client *client,
 			int status, char *error) {
 	json_t *reply;
 	int rc;
-
-	if (client->status != CLIENT_READY) {
-		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
-					   "Client must send EHLO first and not already be in RECV");
-	}
 
 	reply = json_object();
 	if (!reply)
