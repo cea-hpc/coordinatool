@@ -197,7 +197,7 @@ void ct_schedule_client(struct state *state,
 	/* archive_id cannot be 0, use it as check */
 	uint32_t archive_id = 0;
 	uint64_t hal_flags;
-	for (size_t i = 0; i < sizeof(max_action) / sizeof(*max_action); i++) {
+	for (size_t i = 0; i < countof(max_action); i++) {
 		unsigned int enqueued_pass = 0, pending_pass = *pending_count[i];
 		struct hsm_action_queues *queues = &client->queues;
 		struct cds_list_head *n, *nnext;

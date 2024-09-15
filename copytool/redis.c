@@ -509,7 +509,7 @@ int redis_recovery(struct state *state) {
 		return 0;
 	}
 
-	for (unsigned int i=0; i < sizeof(wait)/sizeof(*wait); i++) {
+	for (unsigned int i=0; i < countof(wait); i++) {
 		int rc = redisAsyncCommand(state->redis_ac, redis_scan_cb, &wait[i],
 					   "hscan %s %d", wait[i].hash, 0);
 		if (rc) {
