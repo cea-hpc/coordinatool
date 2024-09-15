@@ -468,8 +468,6 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 				struct hsm_action_node *han =
 					caa_container_of(han_node, struct hsm_action_node, node);
 				han->queues = &client->queues;
-				// shouldn't be needed, but better safe...
-				han->client = NULL;
 			}
 		}
 
@@ -529,9 +527,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 				  client->id, client->fd,
 				  (void*)han, (void*)&client->active_requests);
 #endif
-			hsm_action_dequeue(&state->queues, han);
-			cds_list_add_tail(&han->node, &client->active_requests);
-			han->client = client;
+			hsm_action_assign(&state->queues, han, client);
 		}
 	}
 
@@ -541,9 +537,6 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 			caa_container_of(n, struct hsm_action_node, node);
 		cds_list_del(n);
 		hsm_action_requeue(node, true);
-		/* XXX stats running_restore/archive/remove not accounted properly
-		 * fix client_free as well
-		 */
 	}
 
 	return protocol_reply_ehlo(client, 0, NULL);

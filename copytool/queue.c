@@ -99,20 +99,32 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 int hsm_action_requeue(struct hsm_action_node *han, bool start) {
 	struct cds_list_head *head;
 	struct hsm_action_queues *queues = han->queues;
+	bool was_running = (han->client != NULL);
 
+	// in theory we're only queueing at start if it was already running
+	assert(was_running == start);
 	han->client = NULL;
+	if (was_running)
+		redis_deassign_request(queues->state, han);
+
 	switch (han->info.action) {
 	case HSMA_RESTORE:
 		head = &queues->waiting_restore;
 		queues->state->stats.pending_restore++;
+		if (was_running)
+			queues->state->stats.running_restore--;
 		break;
 	case HSMA_ARCHIVE:
 		head = &queues->waiting_archive;
 		queues->state->stats.pending_archive++;
+		if (was_running)
+			queues->state->stats.running_archive--;
 		break;
 	case HSMA_REMOVE:
 		head = &queues->waiting_remove;
 		queues->state->stats.pending_remove++;
+		if (was_running)
+			queues->state->stats.running_remove--;
 		break;
 	default:
 		// free expects a list in good shape
@@ -311,20 +323,24 @@ int hsm_action_enqueue(struct state *state,
 }
 
 /* remove action node from its queue */
-void hsm_action_dequeue(struct hsm_action_queues *queues,
-			struct hsm_action_node *han) {
+void hsm_action_assign(struct hsm_action_queues *queues,
+			struct hsm_action_node *han,
+			struct client *client) {
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
 #endif
 	switch (han->info.action) {
 	case HSMA_RESTORE:
 		queues->state->stats.pending_restore--;
+		queues->state->stats.running_restore++;
 		break;
 	case HSMA_ARCHIVE:
 		queues->state->stats.pending_archive--;
+		queues->state->stats.running_archive++;
 		break;
 	case HSMA_REMOVE:
 		queues->state->stats.pending_remove--;
+		queues->state->stats.running_remove++;
 		break;
 	default:
 		LOG_ERROR(-EINVAL, "requested to dequeue %s",
@@ -332,4 +348,6 @@ void hsm_action_dequeue(struct hsm_action_queues *queues,
 	}
 
 	cds_list_del(&han->node);
+	han->client = client;
+	cds_list_add_tail(&han->node, &client->active_requests);
 }
