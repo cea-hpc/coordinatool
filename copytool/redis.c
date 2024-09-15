@@ -268,6 +268,14 @@ int redis_assign_request(struct state *state, struct client *client,
 			    han->info.cookie, &han->info.dfid, client->id);
 }
 
+int redis_deassign_request(struct state *state,
+			   struct hsm_action_node *han) {
+	char key[KEY_SIZE];
+
+	format_key(key, han->info.cookie, &han->info.dfid);
+	return redis_delete(state, "coordinatool_assigned", key, han->info.cookie);
+}
+
 int redis_delete_request(struct state *state, uint64_t cookie,
 			 struct lu_fid *dfid) {
 	char key[KEY_SIZE];
@@ -478,8 +486,7 @@ static int redis_scan_assigned(struct state *state,
 	// could already be enqueued.
 	// This will work (list del is the same) but stats will be wrong
 	// we need to add some han state to fix this
-	hsm_action_dequeue(&state->queues, han);
-	cds_list_add_tail(&han->node, &client->active_requests);
+	hsm_action_assign(&state->queues, han, client);
 
 	return 0;
 }
