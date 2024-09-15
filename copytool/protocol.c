@@ -446,18 +446,37 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 
 		LOG_INFO("Clients: restoring state from previously disconnected client %s (%d)",
 			 id, client->fd);
-		cds_list_splice(&old_client->active_requests,
-				&client->active_requests);
-		CDS_INIT_LIST_HEAD(&old_client->active_requests);
-		cds_list_splice(&old_client->queues.waiting_restore,
-				&client->queues.waiting_restore);
-		CDS_INIT_LIST_HEAD(&old_client->queues.waiting_restore);
-		cds_list_splice(&old_client->queues.waiting_archive,
-				&client->queues.waiting_archive);
-		CDS_INIT_LIST_HEAD(&old_client->queues.waiting_archive);
-		cds_list_splice(&old_client->queues.waiting_remove,
-				&client->queues.waiting_remove);
-		CDS_INIT_LIST_HEAD(&old_client->queues.waiting_remove);
+		/* move all requests to new client: splice then update pointers in han */
+		struct cds_list_head *old_lists[] = {
+			&old_client->active_requests,
+			&old_client->queues.waiting_restore,
+			&old_client->queues.waiting_archive,
+			&old_client->queues.waiting_remove,
+		};
+		struct cds_list_head *new_lists[] = {
+			&client->active_requests,
+			&client->queues.waiting_restore,
+			&client->queues.waiting_archive,
+			&client->queues.waiting_remove,
+		};
+		static_assert(sizeof(old_lists) == sizeof(new_lists));
+		for (unsigned int i = 0; i < countof(old_lists); i++) {
+			cds_list_splice(old_lists[i], new_lists[i]);
+			CDS_INIT_LIST_HEAD(old_lists[i]);
+			struct cds_list_head *han_node;
+			cds_list_for_each(han_node, new_lists[i]) {
+				struct hsm_action_node *han =
+					caa_container_of(han_node, struct hsm_action_node, node);
+				han->queues = &client->queues;
+				// shouldn't be needed, but better safe...
+				han->client = NULL;
+			}
+		}
+
+		// we no longer need it, free it immediately (unset id_set to lower debug message)
+		// note we cannot free it right here as queued entries
+		old_client->id_set = false;
+		client_free(old_client);
 
 		// there can only be one
 		break;
@@ -512,6 +531,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg) {
 #endif
 			hsm_action_dequeue(&state->queues, han);
 			cds_list_add_tail(&han->node, &client->active_requests);
+			han->client = client;
 		}
 	}
 
