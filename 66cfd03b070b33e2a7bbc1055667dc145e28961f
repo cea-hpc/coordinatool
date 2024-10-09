@@ -16,6 +16,24 @@
       "message": "I was looking for the patches that were landed recently and I found this stack. Do you intend to merge this at some point?\n\nIt would be nice if you could add me to the reviewers when you push patches. I don\u0027t really  have the time to do a proper review but at least I would stay uptodate on the code base. I\u0027ve lost track a bit recently... That being said, if you want a second opinion on your patches, I can find some time to do reviews.",
       "revId": "66cfd03b070b33e2a7bbc1055667dc145e28961f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "106e583b_981afc2f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2024-10-09T18:44:22Z",
+      "side": 1,
+      "message": "Yes these are still valid patches (used on stanford\u0027s system)\nI will try to get back to it and add a few more patches once I get back home next week (so probably end of october/early nov) as there was still a crash from what I recall; client copytool restarts still might have some problem when requests are currently running and I didn\u0027t reproduce it yet.\n\n\nI can add you to reviewers but it is just as easy for you to set up a watch to get emails on new patches:\n - top right corner, settings\n - notifications\n - Repo cea-hpc/coordinatool click add\n - check \u0027changes\u0027 and click save changes below",
+      "parentUuid": "c1d543ad_00e1aa06",
+      "revId": "66cfd03b070b33e2a7bbc1055667dc145e28961f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
