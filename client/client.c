@@ -202,27 +202,34 @@ int main(int argc, char *argv[]) {
 			break;
 		case OPT_FSNAME:
 			if (client.mode != MODE_QUEUE) {
-				LOG_ERROR(-EINVAL, "fsname can only be set after -Q");
-				return EXIT_FAILURE;
+				LOG_ERROR(-EINVAL,
+					  "fsname can only be set after -Q");
+				rc = 1;
+				goto out;
 			}
 			client.active_requests.fsname = optarg;
 			break;
 		case 'V':
 			print_version();
-			return EXIT_SUCCESS;
+			rc = 0; // success
+			goto out;
 		case 'h':
 			print_help(argv);
-			return EXIT_SUCCESS;
+			rc = 0; // success
+			goto out;
 		default:
-			return EXIT_FAILURE;
+			rc = 1; // invalid argument
+			goto out;
 		}
 	}
 	if (argc != optind) {
 		LOG_ERROR(-EINVAL, "extra argument specified");
-		return EXIT_FAILURE;
+		rc = 1;
+		goto out;
 	}
 
 	rc = client_run(&client);
+out:
 	ct_free(&client.state);
 	if (rc)
 		return EXIT_FAILURE;
