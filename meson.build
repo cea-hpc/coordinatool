@@ -14,6 +14,7 @@ cc = meson.get_compiler('c')
 global_arguments = cc.get_supported_arguments([
 		'-D_GNU_SOURCE',
 		'-Wno-gnu-zero-variadic-macro-arguments',
+		'-Wno-unknown-pragmas',
 	])
 
 add_project_arguments(global_arguments, language: 'c')
