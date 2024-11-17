@@ -7,17 +7,19 @@
 #include "logs.h"
 #include "utils.h"
 
-int getenv_str(const char *name, const char **val) {
+int getenv_str(const char *name, const char **val)
+{
 	const char *env = getenv(name);
 	if (!env)
 		return 0;
-	free((void*)*val);
+	free((void *)*val);
 	*val = xstrdup(env);
 	LOG_INFO("env setting %s to %s", name, env);
 	return 1;
 }
 
-long long str_suffix_to_u32(const char *str, const char *error_hint) {
+long long str_suffix_to_u32(const char *str, const char *error_hint)
+{
 	char *endptr;
 
 	long long val = strtoll(str, &endptr, 0);
@@ -40,8 +42,10 @@ long long str_suffix_to_u32(const char *str, const char *error_hint) {
 	case 'K':
 		multiplier *= 1024;
 		if (endptr[1] != 0) {
-			LOG_WARN(-EINVAL, "trailing data after size prefix: %s, continuing anyway",
-				  endptr + 1);
+			LOG_WARN(
+				-EINVAL,
+				"trailing data after size prefix: %s, continuing anyway",
+				endptr + 1);
 		}
 		break;
 	default:
@@ -62,7 +66,8 @@ long long str_suffix_to_u32(const char *str, const char *error_hint) {
 	return val * multiplier;
 }
 
-int getenv_u32(const char *name, uint32_t *val) {
+int getenv_u32(const char *name, uint32_t *val)
+{
 	const char *env = getenv(name);
 	if (!env)
 		return 0;
@@ -76,7 +81,8 @@ int getenv_u32(const char *name, uint32_t *val) {
 	return 1;
 }
 
-int getenv_int(const char *name, int *val) {
+int getenv_int(const char *name, int *val)
+{
 	const char *env = getenv(name);
 	if (!env)
 		return 0;
@@ -98,8 +104,8 @@ int getenv_int(const char *name, int *val) {
 	return 1;
 }
 
-
-enum llapi_message_level str_to_verbose(const char *str) {
+enum llapi_message_level str_to_verbose(const char *str)
+{
 	if (!strcasecmp(str, "off")) {
 		return LLAPI_MSG_OFF;
 	}
@@ -125,7 +131,8 @@ enum llapi_message_level str_to_verbose(const char *str) {
 	return -1;
 }
 
-int getenv_verbose(const char *name, int *val) {
+int getenv_verbose(const char *name, int *val)
+{
 	const char *env = getenv(name);
 	if (!env)
 		return 0;
@@ -138,5 +145,3 @@ int getenv_verbose(const char *name, int *val) {
 	llapi_msg_set_level(verbose);
 	return 1;
 }
-
-

@@ -33,7 +33,6 @@ enum protocol_commands {
 enum protocol_commands protocol_str2command(const char *str);
 const char *protocol_command2str(enum protocol_commands cmd);
 
-
 typedef int (*protocol_read_cb)(void *fd_arg, json_t *json, void *arg);
 
 /**
@@ -176,7 +175,8 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  * common helpers for packing
  */
 
-static inline int protocol_setjson(json_t *obj, const char *key, json_t *val) {
+static inline int protocol_setjson(json_t *obj, const char *key, json_t *val)
+{
 	// nocheck is only about key being valid utf8, we only use constants
 	if (json_object_set_new_nocheck(obj, key, val)) {
 		LOG_ERROR(-ENOMEM, "Could not assign key %s to object", key);
@@ -186,7 +186,8 @@ static inline int protocol_setjson(json_t *obj, const char *key, json_t *val) {
 }
 
 static inline int protocol_setjson_str(json_t *obj, const char *key,
-				       const char *val) {
+				       const char *val)
+{
 	// skip if no value
 	if (val == NULL || val[0] == '\0')
 		return 0;
@@ -200,21 +201,24 @@ static inline int protocol_setjson_str(json_t *obj, const char *key,
 }
 
 static inline int protocol_setjson_int(json_t *obj, const char *key,
-				       json_int_t val) {
+				       json_int_t val)
+{
 	// skip if no value
 	if (val == 0)
 		return 0;
 	json_t *json_val = json_integer(val);
 	if (!json_val) {
-		LOG_ERROR(-ENOMEM, "Could not instanciate int for %s: %"JSON_INTEGER_FORMAT,
-			  key, val);
+		LOG_ERROR(
+			-ENOMEM,
+			"Could not instanciate int for %s: %" JSON_INTEGER_FORMAT,
+			key, val);
 		return -ENOMEM;
 	}
 	return protocol_setjson(obj, key, json_val);
 }
 
-static inline int protocol_setjson_bool(json_t *obj, const char *key,
-					bool val) {
+static inline int protocol_setjson_bool(json_t *obj, const char *key, bool val)
+{
 	// skip if false
 	if (!val)
 		return 0;
@@ -227,12 +231,12 @@ static inline int protocol_setjson_bool(json_t *obj, const char *key,
 	return protocol_setjson(obj, key, json_val);
 }
 
-
 /**
  * helpers for getting, with default values
  */
 static inline json_int_t protocol_getjson_int(json_t *obj, const char *key,
-					      json_int_t defval) {
+					      json_int_t defval)
+{
 	json_t *json_val = json_object_get(obj, key);
 	if (!json_val)
 		return defval;
@@ -243,14 +247,17 @@ static inline json_int_t protocol_getjson_int(json_t *obj, const char *key,
 	 */
 	json_int_t val = json_integer_value(json_val);
 	if (val == 0 && !json_is_integer(json_val)) {
-		LOG_ERROR(-EINVAL, "field %s was set, but not an integer - assuming default",
-			  key);
+		LOG_ERROR(
+			-EINVAL,
+			"field %s was set, but not an integer - assuming default",
+			key);
 		return defval;
 	}
 	return val;
 }
 
-static inline bool protocol_getjson_bool(json_t *obj, const char *key) {
+static inline bool protocol_getjson_bool(json_t *obj, const char *key)
+{
 	json_t *json_val = json_object_get(obj, key);
 	if (!json_val)
 		return false;
@@ -261,7 +268,8 @@ static inline bool protocol_getjson_bool(json_t *obj, const char *key) {
 }
 
 static inline const char *protocol_getjson_str(json_t *obj, const char *key,
-					       const char *defval, size_t *len) {
+					       const char *defval, size_t *len)
+{
 	json_t *json_val = json_object_get(obj, key);
 	if (!json_val)
 		goto defval;
@@ -307,8 +315,8 @@ int json_fid_get(json_t *json, struct lu_fid *fid);
  * @param hai input hsm_action_item
  * @return json value representing the fid, or NULL on error
  */
-json_t *json_hsm_action_item(struct hsm_action_item *hai,
-			     uint32_t archive_id, uint64_t flags);
+json_t *json_hsm_action_item(struct hsm_action_item *hai, uint32_t archive_id,
+			     uint64_t flags);
 
 /**
  * jansson-like function to get hai from json value
@@ -333,11 +341,11 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
  * @return 0 on success, -1 if json isn't correct
  */
 int json_hsm_action_key_get(json_t *json, uint64_t *hai_cookie,
-			     struct lu_fid *hai_dfid);
+			    struct lu_fid *hai_dfid);
 
 typedef int (*hal_get_cb)(struct hsm_action_list *hal,
-			  struct hsm_action_item *hai,
-			  json_t *hai_json, void *arg);
+			  struct hsm_action_item *hai, json_t *hai_json,
+			  void *arg);
 /**
  * helper to parse hsm_action_list json value
  *

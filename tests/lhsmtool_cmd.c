@@ -74,23 +74,22 @@
 
 #include <glib.h>
 
-
 /* Progress reporting period */
 #define REPORT_INTERVAL_DEFAULT 30
 
 /* Default configuration file path */
-#define CONFIG_FILE_DEFAULT	"/etc/lhsm_cmd.conf"
+#define CONFIG_FILE_DEFAULT "/etc/lhsm_cmd.conf"
 
 /* .ini group label under which to define the commands format strings */
-#define CFG_GROUP_COMMANDS	"commands"
+#define CFG_GROUP_COMMANDS "commands"
 
 /* Default max number of commands to execute in parallel */
-#define FANOUT_DEFAULT		8
+#define FANOUT_DEFAULT 8
 
 /* GLib spawn flags to execute subprocesses */
-#define CMD_EXEC_FLAGS	(G_SPAWN_SEARCH_PATH |		\
-			 G_SPAWN_DO_NOT_REAP_CHILD |	\
-			 G_SPAWN_LEAVE_DESCRIPTORS_OPEN)
+#define CMD_EXEC_FLAGS                                     \
+	(G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD | \
+	 G_SPAWN_LEAVE_DESCRIPTORS_OPEN)
 
 #ifndef LL_HSM_MAX_ARCHIVE
 #define LL_HSM_MAX_ARCHIVE (sizeof(uint32_t) * 8)
@@ -101,47 +100,45 @@
 #define LPX64 "%#llx"
 #endif
 
-
 /** Move HAIs along with a copy of the HAL flags */
 struct hai_desc {
-	unsigned long		 hd_flags;
-	size_t			 hd_datalen;
-	char			 hd_data[0];
+	unsigned long hd_flags;
+	size_t hd_datalen;
+	char hd_data[0];
 };
 
 struct options {
-	int			 o_daemonize;
-	int			 o_dry_run;
-	int			 o_abort_on_error;
-	int			 o_verbose;
-	int			 o_fanout;
-	int			 o_report_int;
-	int			 o_archive_cnt;
-	int			 o_archive_id[LL_HSM_MAX_ARCHIVE];
-	unsigned long long	 o_bandwidth;
-	size_t			 o_chunk_size;
-	char			*o_config;
-	char			*o_event_fifo;
-	char			*o_mnt;
-	int			 o_mnt_fd;
+	int o_daemonize;
+	int o_dry_run;
+	int o_abort_on_error;
+	int o_verbose;
+	int o_fanout;
+	int o_report_int;
+	int o_archive_cnt;
+	int o_archive_id[LL_HSM_MAX_ARCHIVE];
+	unsigned long long o_bandwidth;
+	size_t o_chunk_size;
+	char *o_config;
+	char *o_event_fifo;
+	char *o_mnt;
+	int o_mnt_fd;
 };
 
 /* Everything else is zeroed */
 static struct options opt = {
-	.o_verbose	= LLAPI_MSG_INFO,
-	.o_fanout	= FANOUT_DEFAULT,
-	.o_report_int	= REPORT_INTERVAL_DEFAULT,
-	.o_config	= CONFIG_FILE_DEFAULT,
+	.o_verbose = LLAPI_MSG_INFO,
+	.o_fanout = FANOUT_DEFAULT,
+	.o_report_int = REPORT_INTERVAL_DEFAULT,
+	.o_config = CONFIG_FILE_DEFAULT,
 };
 
 /** Commands to execute on incoming HSM action orders */
 static char *ct_commands[] = {
-	[HSMA_ARCHIVE]	= NULL,
-	[HSMA_RESTORE]	= NULL,
-	[HSMA_CANCEL]	= NULL,
-	[HSMA_REMOVE]	= NULL,
+	[HSMA_ARCHIVE] = NULL,
+	[HSMA_RESTORE] = NULL,
+	[HSMA_CANCEL] = NULL,
+	[HSMA_REMOVE] = NULL,
 };
-
 
 static int err_major;
 
@@ -150,12 +147,11 @@ static char fs_name[MAX_OBD_NAME + 1];
 
 static struct hsm_copytool_private *ctdata;
 
-static GAsyncQueue	*mqueue;
-static bool		 stop;
-static GRegex		*fd_regex;
-static GRegex		*fid_regex;
-static GRegex		*ctdata_regex;
-
+static GAsyncQueue *mqueue;
+static bool stop;
+static GRegex *fd_regex;
+static GRegex *fid_regex;
+static GRegex *ctdata_regex;
 
 static inline double ct_now(void)
 {
@@ -172,65 +168,67 @@ static inline pid_t gettid(void)
 }
 #endif
 
-#define LOG_ERROR(_rc, _format, ...)					\
-	llapi_error(LLAPI_MSG_ERROR, _rc,				\
-		    "%f %s[%d]: "_format,				\
-		    ct_now(), cmd_name, gettid(), ## __VA_ARGS__)
+#define LOG_ERROR(_rc, _format, ...)                                       \
+	llapi_error(LLAPI_MSG_ERROR, _rc, "%f %s[%d]: " _format, ct_now(), \
+		    cmd_name, gettid(), ##__VA_ARGS__)
 
-#define LOG_DEBUG(_format, ...)						\
-	llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0,		\
-		    "%f %s[%d]: "_format,				\
-		    ct_now(), cmd_name, gettid(), ## __VA_ARGS__)
+#define LOG_DEBUG(_format, ...)                                          \
+	llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0,             \
+		    "%f %s[%d]: " _format, ct_now(), cmd_name, gettid(), \
+		    ##__VA_ARGS__)
 
 static void usage(const char *name, int rc)
 {
 	fprintf(stdout,
-	" Usage: %s [options] <lustre_mount_point>\n"
-	"   --daemon		  Daemon mode, run in background\n"
-	"   --abort-on-error	  Abort operation on major error\n"
-	"   -A, --archive <#>	  Archive number (repeatable)\n"
-	"   --dry-run		  Don't run, just show what would be done\n"
-	"   -f, --event-fifo <path>   Write events stream to fifo\n"
-	"   -F, --fanout <n>	  Max parallel commands (number of threads)\n"
-	"   -q, --quiet		  Produce less verbose output\n"
-	"   -u, --update-interval <s> Interval between progress reports sent\n"
-	"			     to Coordinator\n"
-	"   -v, --verbose	  Produce more verbose output\n", cmd_name);
+		" Usage: %s [options] <lustre_mount_point>\n"
+		"   --daemon		  Daemon mode, run in background\n"
+		"   --abort-on-error	  Abort operation on major error\n"
+		"   -A, --archive <#>	  Archive number (repeatable)\n"
+		"   --dry-run		  Don't run, just show what would be done\n"
+		"   -f, --event-fifo <path>   Write events stream to fifo\n"
+		"   -F, --fanout <n>	  Max parallel commands (number of threads)\n"
+		"   -q, --quiet		  Produce less verbose output\n"
+		"   -u, --update-interval <s> Interval between progress reports sent\n"
+		"			     to Coordinator\n"
+		"   -v, --verbose	  Produce more verbose output\n",
+		cmd_name);
 	exit(rc);
 }
 
-static int ct_parseopts(int argc, char * const *argv)
+static int ct_parseopts(int argc, char *const *argv)
 {
 	struct option long_opts[] = {
-		{"abort-on-error", no_argument,	      &opt.o_abort_on_error, 1},
-		{"abort_on_error", no_argument,	      &opt.o_abort_on_error, 1},
-		{"archive",	   required_argument, NULL,		   'A'},
-		{"daemon",	   no_argument,	      &opt.o_daemonize,	     1},
-		{"config",	   required_argument, NULL,		   'c'},
-		{"event-fifo",	   required_argument, NULL,		   'f'},
-		{"event_fifo",	   required_argument, NULL,		   'f'},
-		{"dry-run",	   no_argument,	      &opt.o_dry_run,	     1},
-		{"fanout",	   required_argument, NULL,		   'F'},
-		{"help",	   no_argument,	      NULL,		   'h'},
-		{"quiet",	   no_argument,	      NULL,		   'q'},
-		{"update-interval", required_argument,	NULL,		   'u'},
-		{"update_interval", required_argument,	NULL,		   'u'},
-		{"verbose",	   no_argument,	      NULL,		   'v'},
-		{0, 0, 0, 0}
+		{ "abort-on-error", no_argument, &opt.o_abort_on_error, 1 },
+		{ "abort_on_error", no_argument, &opt.o_abort_on_error, 1 },
+		{ "archive", required_argument, NULL, 'A' },
+		{ "daemon", no_argument, &opt.o_daemonize, 1 },
+		{ "config", required_argument, NULL, 'c' },
+		{ "event-fifo", required_argument, NULL, 'f' },
+		{ "event_fifo", required_argument, NULL, 'f' },
+		{ "dry-run", no_argument, &opt.o_dry_run, 1 },
+		{ "fanout", required_argument, NULL, 'F' },
+		{ "help", no_argument, NULL, 'h' },
+		{ "quiet", no_argument, NULL, 'q' },
+		{ "update-interval", required_argument, NULL, 'u' },
+		{ "update_interval", required_argument, NULL, 'u' },
+		{ "verbose", no_argument, NULL, 'v' },
+		{ 0, 0, 0, 0 }
 	};
-	int			 c;
-	int			 rc;
+	int c;
+	int rc;
 
 	optind = 0;
-	while ((c = getopt_long(argc, argv, "A:c:f:hqu:v",
-				long_opts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "A:c:f:hqu:v", long_opts, NULL)) !=
+	       -1) {
 		switch (c) {
 		case 'A':
 			if ((opt.o_archive_cnt >= LL_HSM_MAX_ARCHIVE) ||
 			    (atoi(optarg) >= LL_HSM_MAX_ARCHIVE)) {
 				rc = -E2BIG;
-				LOG_ERROR(rc, "archive number must be less"
-					  "than %zu", LL_HSM_MAX_ARCHIVE);
+				LOG_ERROR(rc,
+					  "archive number must be less"
+					  "than %zu",
+					  LL_HSM_MAX_ARCHIVE);
 				return rc;
 			}
 			opt.o_archive_id[opt.o_archive_cnt] = atoi(optarg);
@@ -290,16 +288,16 @@ static int ct_parseopts(int argc, char * const *argv)
 static int ct_path_lustre(char *buf, int sz, const char *mnt,
 			  const lustre_fid *fid)
 {
-	return snprintf(buf, sz, "%s/%s/fid/"DFID_NOBRACE, mnt,
+	return snprintf(buf, sz, "%s/%s/fid/" DFID_NOBRACE, mnt,
 			dot_lustre_name, PFID(fid));
 }
 
 static int ct_begin_restore(struct hsm_copyaction_private **phcp,
-			    const struct hsm_action_item *hai,
-			    int mdt_index, int open_flags)
+			    const struct hsm_action_item *hai, int mdt_index,
+			    int open_flags)
 {
-	char	 src[PATH_MAX];
-	int	 rc;
+	char src[PATH_MAX];
+	int rc;
 
 	rc = llapi_hsm_action_begin(phcp, ctdata, hai, mdt_index, open_flags,
 				    false);
@@ -322,12 +320,12 @@ static int ct_begin(struct hsm_copyaction_private **phcp,
 static int ct_fini(struct hsm_copyaction_private **phcp,
 		   const struct hsm_action_item *hai, int hp_flags, int ct_rc)
 {
-	struct hsm_copyaction_private	*hcp;
-	char				 lstr[PATH_MAX];
-	int				 rc;
+	struct hsm_copyaction_private *hcp;
+	char lstr[PATH_MAX];
+	int rc;
 
 	LOG_DEBUG("Action completed, notifying coordinator "
-		  "cookie="LPX64", FID="DFID", hp_flags=%d err=%d",
+		  "cookie=" LPX64 ", FID=" DFID ", hp_flags=%d err=%d",
 		  hai->hai_cookie, PFID(&hai->hai_fid), hp_flags, -ct_rc);
 
 	ct_path_lustre(lstr, sizeof(lstr), opt.o_mnt, &hai->hai_fid);
@@ -344,9 +342,10 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 
 	rc = llapi_hsm_action_end(phcp, &hai->hai_extent, hp_flags, abs(ct_rc));
 	if (rc == -ECANCELED)
-		LOG_ERROR(rc, "completed action on '%s' has been canceled: "
-			  "cookie="LPX64", FID="DFID, lstr, hai->hai_cookie,
-			 PFID(&hai->hai_fid));
+		LOG_ERROR(rc,
+			  "completed action on '%s' has been canceled: "
+			  "cookie=" LPX64 ", FID=" DFID,
+			  lstr, hai->hai_cookie, PFID(&hai->hai_fid));
 	else if (rc < 0)
 		LOG_ERROR(rc, "llapi_hsm_action_end on '%s' failed", lstr);
 	else
@@ -357,8 +356,8 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 
 static bool hai_data_expandable(const struct hsm_action_item *hai)
 {
-	size_t	datalen = hai->hai_len - sizeof(*hai);
-	int	i;
+	size_t datalen = hai->hai_len - sizeof(*hai);
+	int i;
 
 	for (i = 0; i < datalen; i++) {
 		if (isprint(hai->hai_data[i]))
@@ -373,12 +372,12 @@ static bool hai_data_expandable(const struct hsm_action_item *hai)
 static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 			const struct hsm_action_item *hai, int fd)
 {
-	const char	*cmd_format = ct_commands[hsma];
-	gchar		*res_cmd_fd = NULL;
-	gchar		*res_cmd_fid = NULL;
-	char		 tmpstr[128];
-	GError          *err = NULL;
-	int              rc = 0;
+	const char *cmd_format = ct_commands[hsma];
+	gchar *res_cmd_fd = NULL;
+	gchar *res_cmd_fid = NULL;
+	char tmpstr[128];
+	GError *err = NULL;
+	int rc = 0;
 
 	if (cmd_format == NULL)
 		return -ENOSYS;
@@ -388,10 +387,10 @@ static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 	res_cmd_fd = g_regex_replace_literal(fd_regex, cmd_format, -1, 0,
 					     tmpstr, 0, &err);
 	if (err != NULL) {
-	    rc = -EINVAL;
-	    LOG_ERROR(rc, "Cannot apply FD regex: %s", err->message);
-	    goto out_err;
-        }
+		rc = -EINVAL;
+		LOG_ERROR(rc, "Cannot apply FD regex: %s", err->message);
+		goto out_err;
+	}
 
 	/* replace all {fid} placeholders by lustre fid */
 	snprintf(tmpstr, sizeof(tmpstr), DFID, PFID(&hai->hai_dfid));
@@ -399,10 +398,10 @@ static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 	res_cmd_fid = g_regex_replace_literal(fid_regex, res_cmd_fd, -1, 0,
 					      tmpstr, 0, &err);
 	if (err != NULL) {
-	    rc = -EINVAL;
-	    LOG_ERROR(rc, "Cannot apply FID regex: %s", err->message);
-	    goto out_err;
-        }
+		rc = -EINVAL;
+		LOG_ERROR(rc, "Cannot apply FID regex: %s", err->message);
+		goto out_err;
+	}
 
 	/* replace all {ctdata} placeholders by received data blob */
 	if (hai_data_expandable(hai))
@@ -412,29 +411,28 @@ static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 		*cmd = g_regex_replace_literal(ctdata_regex, res_cmd_fid, -1, 0,
 					       "", 0, &err);
 	if (err != NULL) {
-	    rc = -EINVAL;
-	    LOG_ERROR(rc, "Cannot apply data regex: %s", err->message);
-	    goto out_err;
-        }
+		rc = -EINVAL;
+		LOG_ERROR(rc, "Cannot apply data regex: %s", err->message);
+		goto out_err;
+	}
 
 out_err:
-        if (err != NULL)
-            g_error_free(err);
+	if (err != NULL)
+		g_error_free(err);
 
 	g_free(res_cmd_fid);
 	g_free(res_cmd_fd);
 	return rc;
 }
 
-
 struct cmd_cb_args {
-	struct hsm_copyaction_private	*hcp;
-	const struct hsm_action_item	*hai;
-	struct hsm_extent		 he;
-	int				 fd;
-	off_t				 last_pos;
-	int				 retcode;
-	GMainLoop			*loop;
+	struct hsm_copyaction_private *hcp;
+	const struct hsm_action_item *hai;
+	struct hsm_extent he;
+	int fd;
+	off_t last_pos;
+	int retcode;
+	GMainLoop *loop;
 };
 
 /**
@@ -444,17 +442,17 @@ struct cmd_cb_args {
  */
 static gboolean cmd_progress_timer_cb(gpointer ud)
 {
-	struct cmd_cb_args	*args = ud;
-	struct hsm_extent	*phe = &args->he;
-	off_t			 pos;
-	int			 rc;
+	struct cmd_cb_args *args = ud;
+	struct hsm_extent *phe = &args->he;
+	off_t pos;
+	int rc;
 
 	pos = lseek(args->fd, 0, SEEK_CUR);
 	if (pos < 0) {
 		rc = -errno;
-		LOG_ERROR(rc, "cmd_progress_timer_cb: lseek failed for "DFID,
+		LOG_ERROR(rc, "cmd_progress_timer_cb: lseek failed for " DFID,
 			  PFID(&args->hai->hai_fid));
-		return FALSE;			/* stop progress report */
+		return FALSE; /* stop progress report */
 	}
 	if (pos > args->last_pos) {
 		phe->length = pos - phe->offset;
@@ -463,9 +461,9 @@ static gboolean cmd_progress_timer_cb(gpointer ud)
 
 	rc = llapi_hsm_action_progress(args->hcp, phe, phe->length, 0);
 	if (rc) {
-		LOG_ERROR(rc, "llapi_hsm_action_progress failed for "DFID,
+		LOG_ERROR(rc, "llapi_hsm_action_progress failed for " DFID,
 			  PFID(&args->hai->hai_fid));
-		return FALSE;			/* stop progress report */
+		return FALSE; /* stop progress report */
 	}
 	phe->offset = pos;
 
@@ -474,7 +472,7 @@ static gboolean cmd_progress_timer_cb(gpointer ud)
 
 static void cmd_termination_cb(GPid pid, gint status, gpointer ud)
 {
-	struct cmd_cb_args	*args = ud;
+	struct cmd_cb_args *args = ud;
 
 	if (WIFEXITED(status)) {
 		if (WEXITSTATUS(status) == 0) {
@@ -502,7 +500,7 @@ static void cmd_termination_cb(GPid pid, gint status, gpointer ud)
 static GSource *timer_subscribe(GMainLoop *loop, GSourceFunc func,
 				gpointer udata)
 {
-	GSource	*gsrc;
+	GSource *gsrc;
 
 	gsrc = g_timeout_source_new_seconds(opt.o_report_int);
 	g_source_set_callback(gsrc, func, udata, NULL);
@@ -517,7 +515,7 @@ static GSource *timer_subscribe(GMainLoop *loop, GSourceFunc func,
 static GSource *term_subscribe(GMainLoop *loop, GPid pid, GChildWatchFunc func,
 			       gpointer udata)
 {
-	GSource	*gsrc;
+	GSource *gsrc;
 
 	gsrc = g_child_watch_source_new(pid);
 	g_source_set_callback(gsrc, (GSourceFunc)func, udata, NULL);
@@ -526,58 +524,59 @@ static GSource *term_subscribe(GMainLoop *loop, GPid pid, GChildWatchFunc func,
 	return gsrc;
 }
 
-
 /**
  * Start a new HSM copytool I/O command: archive or restore.
  */
 static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
-			 const struct hsm_action_item *hai, const long hal_flags)
+			 const struct hsm_action_item *hai,
+			 const long hal_flags)
 {
-	struct cmd_cb_args	 *cb_args;
-	GError			 *err;
-	GPid			  pid;
-	GSource			 *timer_gsrc;
-	GSource			 *term_gsrc;
-	gint			  ac;
-	gchar			**av = NULL;
-	const char		 *hsma_name = hsm_copytool_action2name(hsma);
-	bool			  ok;
-	gchar			 *cmd = NULL;
-	int			  mdt_idx = -1;
-	int			  rc;
+	struct cmd_cb_args *cb_args;
+	GError *err;
+	GPid pid;
+	GSource *timer_gsrc;
+	GSource *term_gsrc;
+	gint ac;
+	gchar **av = NULL;
+	const char *hsma_name = hsm_copytool_action2name(hsma);
+	bool ok;
+	gchar *cmd = NULL;
+	int mdt_idx = -1;
+	int rc;
 
 	cb_args = calloc(1, sizeof(*cb_args));
 	if (cb_args == NULL) {
 		rc = -ENOMEM;
-		LOG_ERROR(rc, "cannot allocate context to archive "DFID,
+		LOG_ERROR(rc, "cannot allocate context to archive " DFID,
 			  PFID(&hai->hai_fid));
 		err_major++;
 		goto out;
 	}
-	cb_args->retcode	= -1;	/* for debugging */
-	cb_args->fd		= -1;
+	cb_args->retcode = -1; /* for debugging */
+	cb_args->fd = -1;
 
 	if (hsma == HSMA_ARCHIVE || hsma == HSMA_REMOVE) {
-
 		rc = ct_begin(&cb_args->hcp, hai);
 		if (rc < 0) {
-			LOG_ERROR(rc, "ct_begin failed for "DFID, PFID(&hai->hai_fid));
+			LOG_ERROR(rc, "ct_begin failed for " DFID,
+				  PFID(&hai->hai_fid));
 			err_major++;
 			goto out;
 		}
 
 	} else if (hsma == HSMA_RESTORE) {
-
-		rc = llapi_get_mdt_index_by_fid(opt.o_mnt_fd, &hai->hai_fid, &mdt_idx);
+		rc = llapi_get_mdt_index_by_fid(opt.o_mnt_fd, &hai->hai_fid,
+						&mdt_idx);
 		if (rc < 0) {
-			LOG_ERROR(rc, "cannot get MDT index for "DFID,
+			LOG_ERROR(rc, "cannot get MDT index for " DFID,
 				  PFID(&hai->hai_fid));
 			err_major++;
 			goto out;
 		}
 		rc = ct_begin_restore(&cb_args->hcp, hai, mdt_idx, 0);
 		if (rc < 0) {
-			LOG_ERROR(rc, "cannot start restore operation for "DFID,
+			LOG_ERROR(rc,
+				  "cannot start restore operation for " DFID,
 				  PFID(&hai->hai_fid));
 			err_major++;
 			goto out;
@@ -602,14 +601,14 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 		goto out;
 	}
 
-	ok = g_spawn_async(NULL,		/* working directory */
-			   av,			/* parsed command line */
-			   NULL,		/* environment vars */
-			   CMD_EXEC_FLAGS,	/* execution flags */
-			   NULL,		/* child setup function */
-			   NULL,		/* user data pointer */
-			   &pid,		/* child pid address */
-			   &err);		/* error marker */
+	ok = g_spawn_async(NULL, /* working directory */
+			   av, /* parsed command line */
+			   NULL, /* environment vars */
+			   CMD_EXEC_FLAGS, /* execution flags */
+			   NULL, /* child setup function */
+			   NULL, /* user data pointer */
+			   &pid, /* child pid address */
+			   &err); /* error marker */
 
 	if (!ok) {
 		LOG_ERROR(ECHILD, "Cannot spawn subprocess: %s", err->message);
@@ -625,7 +624,7 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 	term_gsrc = term_subscribe(loop, pid, cmd_termination_cb, cb_args);
 
 	cb_args->he.offset = hai->hai_extent.offset;
-	cb_args->loop      = loop;
+	cb_args->loop = loop;
 
 	g_main_loop_run(loop);
 
@@ -669,8 +668,8 @@ static void handler(int signal)
 /* Daemon waits for messages from the kernel; run it in the background. */
 static int ct_run(void)
 {
-	struct sigaction	act;
-	int			rc;
+	struct sigaction act;
+	int rc;
 
 	if (opt.o_daemonize) {
 		rc = daemon(1, 1);
@@ -690,18 +689,17 @@ static int ct_run(void)
 		llapi_error_callback_set(llapi_hsm_log_error);
 	}
 
-	rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt,
-					 opt.o_archive_cnt,
+	rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt, opt.o_archive_cnt,
 					 opt.o_archive_id, 0);
 	if (rc < 0) {
 		LOG_ERROR(rc, "cannot start copytool interface");
 		return rc;
 	}
 
-	memset (&act, 0, sizeof(act));
+	memset(&act, 0, sizeof(act));
 	act.sa_handler = &handler;
-	if (sigaction(SIGINT, &act, NULL) < 0
-	    || sigaction(SIGTERM, &act, NULL) < 0) {
+	if (sigaction(SIGINT, &act, NULL) < 0 ||
+	    sigaction(SIGTERM, &act, NULL) < 0) {
 		rc = -errno;
 		LOG_ERROR(rc, "cannot set signal handler for SIGINT/SIGTERM");
 		return rc;
@@ -714,10 +712,10 @@ static int ct_run(void)
 	}
 
 	while (1) {
-		struct hsm_action_list	*hal;
-		struct hsm_action_item	*hai;
-		int			 msgsize;
-		int			 i = 0;
+		struct hsm_action_list *hal;
+		struct hsm_action_item *hai;
+		int msgsize;
+		int i = 0;
 
 		LOG_DEBUG("waiting for message from kernel");
 
@@ -741,7 +739,7 @@ static int ct_run(void)
 		if (strcmp(hal->hal_fsname, fs_name) != 0) {
 			rc = -EINVAL;
 			LOG_ERROR(rc, "'%s' invalid fs name, expecting: %s",
-				 hal->hal_fsname, fs_name);
+				  hal->hal_fsname, fs_name);
 			err_major++;
 			if (opt.o_abort_on_error)
 				break;
@@ -770,7 +768,7 @@ static int ct_run(void)
 				err_major++;
 				break;
 			}
-			hd->hd_flags   = hal->hal_flags;
+			hd->hd_flags = hal->hal_flags;
 			hd->hd_datalen = hai->hai_len;
 			memcpy(hd->hd_data, hai, hai->hai_len);
 
@@ -794,8 +792,8 @@ static int ct_run(void)
 
 static gpointer subproc_mgr_main(gpointer data)
 {
-	GMainContext	*mctx;
-	GMainLoop	*loop;
+	GMainContext *mctx;
+	GMainLoop *loop;
 
 	mctx = g_main_context_new();
 	g_main_context_push_thread_default(mctx);
@@ -805,8 +803,8 @@ static gpointer subproc_mgr_main(gpointer data)
 	g_async_queue_ref(mqueue);
 
 	while (!stop) {
-		struct hsm_action_item	*hai;
-		struct hai_desc		*hd;
+		struct hsm_action_item *hai;
+		struct hai_desc *hd;
 
 		hd = g_async_queue_pop(mqueue);
 		if (hd->hd_datalen < sizeof(*hai)) {
@@ -844,12 +842,12 @@ static gpointer subproc_mgr_main(gpointer data)
  */
 static int ct_producer_setup(void)
 {
-	int	rc;
+	int rc;
 
 	rc = llapi_search_fsname(opt.o_mnt, fs_name);
 	if (rc < 0) {
 		LOG_ERROR(rc, "cannot find a Lustre filesystem mounted at '%s'",
-			 opt.o_mnt);
+			  opt.o_mnt);
 		return rc;
 	}
 
@@ -858,8 +856,7 @@ static int ct_producer_setup(void)
 	opt.o_mnt_fd = open(opt.o_mnt, O_RDONLY);
 	if (opt.o_mnt_fd < 0) {
 		rc = -errno;
-		LOG_ERROR(rc, "cannot open mount point at '%s'",
-			  opt.o_mnt);
+		LOG_ERROR(rc, "cannot open mount point at '%s'", opt.o_mnt);
 		return rc;
 	}
 
@@ -877,12 +874,12 @@ static int ct_producer_setup(void)
  */
 static int ct_load_cfg_file(void)
 {
-	GKeyFile	*keys = g_key_file_new();
-	GError		*err  = NULL;
-	int		 rc = 0;
+	GKeyFile *keys = g_key_file_new();
+	GError *err = NULL;
+	int rc = 0;
 
-	if (!g_key_file_load_from_file(keys, opt.o_config,
-				       G_KEY_FILE_NONE, &err)) {
+	if (!g_key_file_load_from_file(keys, opt.o_config, G_KEY_FILE_NONE,
+				       &err)) {
 		rc = -EINVAL;
 		LOG_ERROR(rc, "cannot load configuration at '%s': %s",
 			  opt.o_config, err->message);
@@ -900,18 +897,14 @@ static int ct_load_cfg_file(void)
 	}
 
 	/* commands are to be freed using g_free() and can be NULL */
-	ct_commands[HSMA_ARCHIVE] = g_key_file_get_string(keys,
-							  CFG_GROUP_COMMANDS,
-							  "archive", NULL);
-	ct_commands[HSMA_RESTORE] = g_key_file_get_string(keys,
-							  CFG_GROUP_COMMANDS,
-							  "restore", NULL);
-	ct_commands[HSMA_REMOVE] = g_key_file_get_string(keys,
-							 CFG_GROUP_COMMANDS,
-							 "remove", NULL);
-	ct_commands[HSMA_CANCEL] = g_key_file_get_string(keys,
-							 CFG_GROUP_COMMANDS,
-							 "cancel", NULL);
+	ct_commands[HSMA_ARCHIVE] = g_key_file_get_string(
+		keys, CFG_GROUP_COMMANDS, "archive", NULL);
+	ct_commands[HSMA_RESTORE] = g_key_file_get_string(
+		keys, CFG_GROUP_COMMANDS, "restore", NULL);
+	ct_commands[HSMA_REMOVE] =
+		g_key_file_get_string(keys, CFG_GROUP_COMMANDS, "remove", NULL);
+	ct_commands[HSMA_CANCEL] =
+		g_key_file_get_string(keys, CFG_GROUP_COMMANDS, "cancel", NULL);
 out:
 	g_key_file_free(keys);
 	return rc;
@@ -926,7 +919,7 @@ static int ct_setup(void)
 	int rc;
 
 	/* Initialize regular expression patterns for argument substitution */
-	fd_regex  = g_regex_new("{fd}", G_REGEX_OPTIMIZE, 0, NULL);
+	fd_regex = g_regex_new("{fd}", G_REGEX_OPTIMIZE, 0, NULL);
 	fid_regex = g_regex_new("{fid}", G_REGEX_OPTIMIZE, 0, NULL);
 	ctdata_regex = g_regex_new("{ctdata}", G_REGEX_OPTIMIZE, 0, NULL);
 
@@ -977,7 +970,7 @@ static int ct_cleanup(void)
 
 int main(int argc, char **argv)
 {
-	int	rc;
+	int rc;
 
 	strncpy(cmd_name, basename(argv[0]), sizeof(cmd_name) - 1);
 	rc = ct_parseopts(argc, argv);

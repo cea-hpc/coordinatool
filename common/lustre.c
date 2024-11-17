@@ -13,7 +13,8 @@
 
 #include <stdio.h>
 
-static int parse_fid(char *fid_str, struct lu_fid *fid) {
+static int parse_fid(char *fid_str, struct lu_fid *fid)
+{
 	char *end;
 	fid->f_seq = strtoull(fid_str, &end, 0);
 	if (*end != ':')
@@ -28,8 +29,9 @@ static int parse_fid(char *fid_str, struct lu_fid *fid) {
 }
 
 /* helper to make sure the keyword is a word start */
-static inline char *find_keyword(char *line, char *keyword) {
-	char *item, *orig_line=line;
+static inline char *find_keyword(char *line, char *keyword)
+{
+	char *item, *orig_line = line;
 
 	while (*line) {
 		item = strstr(line, keyword);
@@ -40,13 +42,14 @@ static inline char *find_keyword(char *line, char *keyword) {
 		line = item + 1;
 	}
 err_out:
-	LOG_ERROR(-EINVAL, "Keyword %s not found in \"%s\"",
-		  keyword, orig_line);
+	LOG_ERROR(-EINVAL, "Keyword %s not found in \"%s\"", keyword,
+		  orig_line);
 	return NULL;
 }
 
 static int parse_active_request_line(char *line, parse_request_cb cb,
-				     void *cb_arg) {
+				     void *cb_arg)
+{
 	char *item, *end;
 	int rc = -EINVAL, n;
 	size_t len, i;
@@ -67,15 +70,14 @@ static int parse_active_request_line(char *line, parse_request_cb cb,
 		LOG_ERROR(rc, "No end delimiter ] for data field");
 		return rc;
 	}
-	len = (end-item)/2;
+	len = (end - item) / 2;
 	n = __ALIGN_KERNEL_MASK(sizeof(*hai) + len, 7);
 	hai = xmalloc(n);
 	hai->hai_len = n;
-	for (i=0; i < len; i++) {
-		n = sscanf(item, "%2hhX", (unsigned char*)&hai->hai_data[i]);
+	for (i = 0; i < len; i++) {
+		n = sscanf(item, "%2hhX", (unsigned char *)&hai->hai_data[i]);
 		if (n != 1) {
-			LOG_ERROR(rc, "scanf failed to read hex from %s",
-			          item);
+			LOG_ERROR(rc, "scanf failed to read hex from %s", item);
 			goto out;
 		}
 		item += 2;
@@ -170,7 +172,8 @@ out:
 	return rc;
 }
 
-int parse_active_requests(int fd, parse_request_cb cb, void *cb_arg) {
+int parse_active_requests(int fd, parse_request_cb cb, void *cb_arg)
+{
 	char buffer[READ_CHUNK];
 	char *line = buffer, *end = buffer, *newline;
 	int n, rc = 0;
@@ -191,8 +194,7 @@ int parse_active_requests(int fd, parse_request_cb cb, void *cb_arg) {
 		n = read(fd, end, READ_CHUNK - (end - buffer) - 1);
 		if (n == 0 && line != end) {
 			rc = -EINVAL;
-			LOG_ERROR(rc, "trailing text at end of file: %s",
-				  line);
+			LOG_ERROR(rc, "trailing text at end of file: %s", line);
 			break;
 		}
 		if (n == 0)
@@ -209,7 +211,8 @@ int parse_active_requests(int fd, parse_request_cb cb, void *cb_arg) {
 		while ((newline = strchr(line, '\n'))) {
 			*newline = 0;
 			/* skip lines like mdt.[...]= from lctl get_param */
-			if (strncmp(line, "mdt.", 4) == 0 && newline[-1] == '=') {
+			if (strncmp(line, "mdt.", 4) == 0 &&
+			    newline[-1] == '=') {
 				line = newline + 1;
 				continue;
 			}
@@ -223,4 +226,3 @@ int parse_active_requests(int fd, parse_request_cb cb, void *cb_arg) {
 
 	return rc;
 }
-

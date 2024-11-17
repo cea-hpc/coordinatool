@@ -5,7 +5,8 @@
 
 #include "preload.h"
 
-static int tree_compare(const void *a, const void *b) {
+static int tree_compare(const void *a, const void *b)
+{
 	const struct action_key *va = a, *vb = b;
 
 	if (va->cookie < vb->cookie)
@@ -16,11 +17,11 @@ static int tree_compare(const void *a, const void *b) {
 }
 
 void action_insert(struct hsm_copytool_private *ct,
-		   struct action_tree_node *node) {
+		   struct action_tree_node *node)
+{
 	struct action_key **tree_key;
 
-	tree_key = tsearch(&node->key, &ct->actions_tree,
-			   tree_compare);
+	tree_key = tsearch(&node->key, &ct->actions_tree, tree_compare);
 	if (!tree_key)
 		abort();
 	if (*tree_key != &node->key) {
@@ -31,11 +32,11 @@ void action_insert(struct hsm_copytool_private *ct,
 	}
 }
 
-void action_delete(struct hsm_copytool_private *ct, struct action_key *key) {
+void action_delete(struct hsm_copytool_private *ct, struct action_key *key)
+{
 	if (!tdelete(key, &ct->actions_tree, tree_compare))
 		abort();
 }
-
 
 /* would want to use twalk_r but that was introduced in glibc 2.30
  * which is not yet available widely enough.
@@ -43,11 +44,13 @@ void action_delete(struct hsm_copytool_private *ct, struct action_key *key) {
  * has not been tested
  */
 #ifdef HAVE_TWALK_R
-static void walk_append(const void *nodep, VISIT which, void *arg) {
+static void walk_append(const void *nodep, VISIT which, void *arg)
+{
 	json_t *hai_list = arg;
 #else
 static json_t *walk_hai_list;
-static void walk_append(const void *nodep, VISIT which, int depth UNUSED) {
+static void walk_append(const void *nodep, VISIT which, int depth UNUSED)
+{
 	json_t *hai_list = walk_hai_list;
 #endif
 
@@ -66,7 +69,8 @@ static void walk_append(const void *nodep, VISIT which, int depth UNUSED) {
 		abort();
 }
 
-json_t *actions_get_list(struct hsm_copytool_private *ct) {
+json_t *actions_get_list(struct hsm_copytool_private *ct)
+{
 	json_t *hai_list = json_array();
 	if (!hai_list)
 		abort();

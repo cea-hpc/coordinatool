@@ -26,7 +26,6 @@ struct ct_state {
 	json_t *archive_ids;
 };
 
-
 /* client.c */
 int ct_config_init(struct ct_state_config *config);
 void ct_free(struct ct_state *state);
@@ -47,11 +46,9 @@ int protocol_checkerror(json_t *json);
 int protocol_archive_ids(int archive_count, int *archives, json_t **out);
 int protocol_request_status(const struct ct_state *state);
 int protocol_request_recv(const struct ct_state *state);
-int protocol_request_done(const struct ct_state *state,
-			  uint64_t cookie, struct lu_fid *dfid,
-			  int status);
-int protocol_request_queue(const struct ct_state *state,
-			   json_t *hai_list);
+int protocol_request_done(const struct ct_state *state, uint64_t cookie,
+			  struct lu_fid *dfid, int status);
+int protocol_request_queue(const struct ct_state *state, json_t *hai_list);
 int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list);
 extern protocol_read_cb protocol_ehlo_cbs[];
 

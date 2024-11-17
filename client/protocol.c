@@ -2,14 +2,16 @@
 
 #include "client.h"
 
-static int status_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+static int status_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED)
+{
 	printf("Got status reply:\n");
 	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
 	return 0;
 }
 
-static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
+static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg)
+{
 	struct client *client = arg;
 	printf("Got recv reply:\n");
 	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
@@ -28,7 +30,8 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	size_t i;
 	json_t *hai;
 	int rc;
-	json_array_foreach(hai_list, i, hai) {
+	json_array_foreach(hai_list, i, hai)
+	{
 		uint64_t cookie;
 		struct lu_fid dfid;
 		if (json_hsm_action_key_get(hai, &cookie, &dfid)) {
@@ -38,7 +41,8 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 		// If we send done here, the coordinatool will consider the archive done and
 		// tell lustre, clearing the hsm request.
 		if (client->mode == MODE_DRAIN) {
-			rc = protocol_request_done(&client->state, cookie, &dfid, 0);
+			rc = protocol_request_done(&client->state, cookie,
+						   &dfid, 0);
 			if (rc)
 				return rc;
 		}
@@ -48,14 +52,16 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	return protocol_request_recv(&client->state);
 }
 
-static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED)
+{
 	printf("Got done reply:\n");
 	protocol_write(json, STDOUT_FILENO, "stdout", JSON_INDENT(2));
 	printf("\n");
 	return 0;
 }
 
-static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
+static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg)
+{
 	struct client *client = arg;
 
 	printf("Got queue reply:\n");
@@ -70,7 +76,7 @@ static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	int skipped = protocol_getjson_int(json, "skipped", 0);
 	if (client->sent_items != enqueued + skipped) {
 		printf("didn't process all records (expected %d, got %d+%d)\n",
-			client->sent_items, enqueued, skipped);
+		       client->sent_items, enqueued, skipped);
 		return -EINVAL;
 	}
 

@@ -5,20 +5,23 @@
 
 #include "coordinatool.h"
 
-static void redis_addwrite(void *_state) {
+static void redis_addwrite(void *_state)
+{
 	struct state *state = _state;
 	struct epoll_event ev;
 
-	ev.events = EPOLLIN|EPOLLOUT;
+	ev.events = EPOLLIN | EPOLLOUT;
 	ev.data.ptr = state->redis_ac;
 
 	int rc = epoll_ctl(state->epoll_fd, EPOLL_CTL_MOD,
 			   state->redis_ac->c.fd, &ev);
 	if (rc < 0)
-		LOG_WARN(-errno, "Could not listen redis fd for write: redis broken!");
+		LOG_WARN(-errno,
+			 "Could not listen redis fd for write: redis broken!");
 }
 
-static void redis_delwrite(void *_state) {
+static void redis_delwrite(void *_state)
+{
 	struct state *state = _state;
 	struct epoll_event ev;
 
@@ -28,10 +31,12 @@ static void redis_delwrite(void *_state) {
 	int rc = epoll_ctl(state->epoll_fd, EPOLL_CTL_MOD,
 			   state->redis_ac->c.fd, &ev);
 	if (rc < 0)
-		LOG_WARN(-errno, "Could not stop listening redis fd for write?!");
+		LOG_WARN(-errno,
+			 "Could not stop listening redis fd for write?!");
 }
 
-static int redis_error_to_errno(int err) {
+static int redis_error_to_errno(int err)
+{
 	switch (err) {
 	case REDIS_ERR_OOM:
 		return -ENOMEM;
@@ -54,15 +59,16 @@ static int redis_error_to_errno(int err) {
 }
 
 static void redis_disconnect_cb(const struct redisAsyncContext *ac,
-				int status UNUSED) {
+				int status UNUSED)
+{
 	struct state *state = ac->data;
 
 	LOG_INFO("Redis disconnected");
 	state->redis_ac = NULL;
 }
 
-static void redis_connect_cb(const struct redisAsyncContext *ac,
-			     int status) {
+static void redis_connect_cb(const struct redisAsyncContext *ac, int status)
+{
 	struct state *state = ac->data;
 
 	if (status == REDIS_OK) {
@@ -73,7 +79,8 @@ static void redis_connect_cb(const struct redisAsyncContext *ac,
 	state->redis_ac = NULL;
 }
 
-int redis_connect(struct state *state) {
+int redis_connect(struct state *state)
+{
 	int rc;
 	redisAsyncContext *ac;
 
@@ -84,7 +91,7 @@ int redis_connect(struct state *state) {
 	ac = redisAsyncConnect(state->config.redis_host,
 			       state->config.redis_port);
 	if (!ac)
-	       abort(); // ENOMEM
+		abort(); // ENOMEM
 	if (ac->err) {
 		LOG_ERROR(redis_error_to_errno(ac->err),
 			  "redis error on connect: %s",
@@ -123,14 +130,18 @@ int redis_connect(struct state *state) {
 }
 
 // XXX optimize packing (base64?)
-#define KEY_SIZE (16*3+1)
+#define KEY_SIZE (16 * 3 + 1)
 
-static inline void format_key(char *key, uint64_t cookie, struct lu_fid *dfid) {
+static inline void format_key(char *key, uint64_t cookie, struct lu_fid *dfid)
+{
 	// cannot fail as key is assumed to be KEY_SIZE = long enough
-	sprintf(key, "%016lx%016llx%08x%08x", cookie, dfid->f_seq, dfid->f_oid, dfid->f_ver);
+	sprintf(key, "%016lx%016llx%08x%08x", cookie, dfid->f_seq, dfid->f_oid,
+		dfid->f_ver);
 }
 
-static inline int parse_key(const char *key, uint64_t *cookie, struct lu_fid *dfid) {
+static inline int parse_key(const char *key, uint64_t *cookie,
+			    struct lu_fid *dfid)
+{
 	char buf[17];
 	buf[16] = 0;
 	char *endptr;
@@ -140,18 +151,18 @@ static inline int parse_key(const char *key, uint64_t *cookie, struct lu_fid *df
 	if (endptr != buf + 16)
 		goto err;
 
-	memcpy(buf, key+16, 16);
+	memcpy(buf, key + 16, 16);
 	dfid->f_seq = strtoull(buf, &endptr, 16);
 	if (endptr != buf + 16)
 		goto err;
 
 	buf[8] = 0;
-	memcpy(buf, key+32, 8);
+	memcpy(buf, key + 32, 8);
 	dfid->f_oid = strtoull(buf, &endptr, 16);
 	if (endptr != buf + 8)
 		goto err;
 
-	memcpy(buf, key+40, 8);
+	memcpy(buf, key + 40, 8);
 	dfid->f_ver = strtoull(buf, &endptr, 16);
 	if (endptr != buf + 8)
 		goto err;
@@ -163,10 +174,12 @@ err:
 }
 
 static void cb_common(redisAsyncContext *ac, redisReply *reply,
-		      const char *action, uint64_t cookie) {
+		      const char *action, uint64_t cookie)
+{
 	if (!reply) {
 		LOG_WARN(-EIO, "Redis error in callback! %d: %s", ac->c.err,
-			 ac->c.errstr[0] ? ac->c.errstr : "Error string not set");
+			 ac->c.errstr[0] ? ac->c.errstr :
+					   "Error string not set");
 		LOG_WARN(-EIO, "Could not %s cookie %lx", action, cookie);
 		redisAsyncDisconnect(ac);
 		return;
@@ -179,20 +192,20 @@ static void cb_common(redisAsyncContext *ac, redisReply *reply,
 	}
 }
 
-static void cb_insert(redisAsyncContext *ac, void *_reply, void *private) {
+static void cb_insert(redisAsyncContext *ac, void *_reply, void *private)
+{
 	uint64_t cookie = (uint64_t)private;
 	redisReply *reply = _reply;
 
 	cb_common(ac, reply, "insert", cookie);
 
-
 	// should be an int with 1 or 0 depending on if we created a new key,
 	// but we don't really care so not checking.
 }
 
-static int redis_insert(struct state *state, const char *hash,
-			uint64_t cookie, struct lu_fid *dfid,
-			const char *data) {
+static int redis_insert(struct state *state, const char *hash, uint64_t cookie,
+			struct lu_fid *dfid, const char *data)
+{
 	int rc;
 	char key[KEY_SIZE];
 
@@ -200,7 +213,7 @@ static int redis_insert(struct state *state, const char *hash,
 		return 0;
 
 	format_key(key, cookie, dfid);
-	rc = redisAsyncCommand(state->redis_ac, cb_insert, (void*)cookie,
+	rc = redisAsyncCommand(state->redis_ac, cb_insert, (void *)cookie,
 			       "hset %s %s %s", hash, key, data);
 	if (rc) {
 		rc = redis_error_to_errno(rc);
@@ -211,8 +224,8 @@ static int redis_insert(struct state *state, const char *hash,
 	return 0;
 }
 
-
-static void cb_delete(redisAsyncContext *ac, void *_reply, void *private) {
+static void cb_delete(redisAsyncContext *ac, void *_reply, void *private)
+{
 	uint64_t cookie = (uint64_t)private;
 	redisReply *reply = _reply;
 
@@ -223,26 +236,27 @@ static void cb_delete(redisAsyncContext *ac, void *_reply, void *private) {
 	// without checking if it's in: skip check
 }
 
-static int redis_delete(struct state *state, const char *hash,
-			    const char *key, uint64_t cookie) {
+static int redis_delete(struct state *state, const char *hash, const char *key,
+			uint64_t cookie)
+{
 	int rc;
 
 	if (!state->redis_ac)
 		return 0;
 
-	rc = redisAsyncCommand(state->redis_ac, cb_delete, (void*)cookie,
+	rc = redisAsyncCommand(state->redis_ac, cb_delete, (void *)cookie,
 			       "hdel %s %s", hash, key);
 	if (rc) {
 		rc = redis_error_to_errno(rc);
-		LOG_WARN(rc, "Redis error trying to delete key %s in %s",
-			 key, hash);
+		LOG_WARN(rc, "Redis error trying to delete key %s in %s", key,
+			 hash);
 		return rc;
 	}
 	return 0;
 }
 
-int redis_store_request(struct state *state,
-		        struct hsm_action_node *han) {
+int redis_store_request(struct state *state, struct hsm_action_node *han)
+{
 	char *hai_json_str;
 	int rc;
 
@@ -251,43 +265,46 @@ int redis_store_request(struct state *state,
 
 	hai_json_str = json_dumps(han->hai, JSON_COMPACT);
 	if (!hai_json_str) {
-		LOG_WARN(-EINVAL, "Could not dump hsm action item to json ("DFID")",
+		LOG_WARN(-EINVAL,
+			 "Could not dump hsm action item to json (" DFID ")",
 			 PFID(&han->info.dfid));
 	}
 
-	rc = redis_insert(state, "coordinatool_requests",
-			  han->info.cookie, &han->info.dfid, hai_json_str);
+	rc = redis_insert(state, "coordinatool_requests", han->info.cookie,
+			  &han->info.dfid, hai_json_str);
 	free(hai_json_str);
 
 	return rc;
 }
 
 int redis_assign_request(struct state *state, struct client *client,
-			 struct hsm_action_node *han) {
-	return redis_insert(state, "coordinatool_assigned",
-			    han->info.cookie, &han->info.dfid, client->id);
+			 struct hsm_action_node *han)
+{
+	return redis_insert(state, "coordinatool_assigned", han->info.cookie,
+			    &han->info.dfid, client->id);
 }
 
-int redis_deassign_request(struct state *state,
-			   struct hsm_action_node *han) {
+int redis_deassign_request(struct state *state, struct hsm_action_node *han)
+{
 	char key[KEY_SIZE];
 
 	format_key(key, han->info.cookie, &han->info.dfid);
-	return redis_delete(state, "coordinatool_assigned", key, han->info.cookie);
+	return redis_delete(state, "coordinatool_assigned", key,
+			    han->info.cookie);
 }
 
 int redis_delete_request(struct state *state, uint64_t cookie,
-			 struct lu_fid *dfid) {
+			 struct lu_fid *dfid)
+{
 	char key[KEY_SIZE];
 
 	format_key(key, cookie, dfid);
 
 	// note we won't bother sending second request if first failed
 	// as that likely means connection is broken
-	return redis_delete(state, "coordinatool_requests", key, cookie)
-		|| redis_delete(state, "coordinatool_assigned", key, cookie);
+	return redis_delete(state, "coordinatool_requests", key, cookie) ||
+	       redis_delete(state, "coordinatool_assigned", key, cookie);
 }
-
 
 struct redis_wait {
 	struct state *state;
@@ -296,7 +313,8 @@ struct redis_wait {
 	int (*cb)(struct state *state, const char *key, const char *value);
 };
 
-static int redis_wait_done(struct state *state, int *done) {
+static int redis_wait_done(struct state *state, int *done)
+{
 	/* when this function runs the epoll loop is not live yet,
 	 * so run our own.
 	 * Unfortunately we cannot just use sync functions with ac->c... */
@@ -313,11 +331,12 @@ static int redis_wait_done(struct state *state, int *done) {
 			LOG_ERROR(rc, "epoll_wait failed");
 			return rc;
 		}
-		if (event.events & (EPOLLERR|EPOLLHUP)) {
+		if (event.events & (EPOLLERR | EPOLLHUP)) {
 			LOG_INFO("%d on error/hup", event.data.fd);
 		}
 		if (event.data.ptr != state->redis_ac) {
-			LOG_ERROR(-EINVAL, "fd other than redis fd ready?! Giving up");
+			LOG_ERROR(-EINVAL,
+				  "fd other than redis fd ready?! Giving up");
 			return -EINVAL;
 		}
 		if (event.events & EPOLLIN)
@@ -341,7 +360,8 @@ static int redis_wait_done(struct state *state, int *done) {
 	return *done;
 }
 
-static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private) {
+static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private)
+{
 	redisReply *reply = _reply;
 	struct redis_wait *wait = private;
 	int rc;
@@ -359,7 +379,8 @@ static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private) {
 	// and stops when cursor is 0 again. can have duplicates.
 
 	if (reply->type != REDIS_REPLY_ARRAY || reply->elements != 2) {
-		LOG_ERROR(-EINVAL, "unexpected reply to hscan, type %d elements %ld",
+		LOG_ERROR(-EINVAL,
+			  "unexpected reply to hscan, type %d elements %ld",
 			  reply->type, reply->elements);
 		wait->done = -EINVAL;
 		return;
@@ -367,26 +388,32 @@ static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private) {
 
 	redisReply *cursor_reply = reply->element[0];
 	if (cursor_reply->type != REDIS_REPLY_STRING) {
-		LOG_ERROR(-EINVAL, "unexpected cursor_reply to hscan, cursor wasn't string but %d",
-			  cursor_reply->type);
+		LOG_ERROR(
+			-EINVAL,
+			"unexpected cursor_reply to hscan, cursor wasn't string but %d",
+			cursor_reply->type);
 		wait->done = -EINVAL;
 		return;
 	}
 
 	reply = reply->element[1];
 	if (reply->type != REDIS_REPLY_ARRAY || reply->elements % 2 != 0) {
-		LOG_ERROR(-EINVAL, "unexpected reply for hscan values, type %d elements %ld",
-			  reply->type, reply->elements);
+		LOG_ERROR(
+			-EINVAL,
+			"unexpected reply for hscan values, type %d elements %ld",
+			reply->type, reply->elements);
 		wait->done = -EINVAL;
 		return;
 	}
-	for (unsigned int i=0; i < reply->elements; i += 2) {
+	for (unsigned int i = 0; i < reply->elements; i += 2) {
 		redisReply *key_reply = reply->element[i];
-		redisReply *value_reply = reply->element[i+1];
-		if (key_reply->type != REDIS_REPLY_STRING
-		    || value_reply->type != REDIS_REPLY_STRING) {
-			LOG_ERROR(-EINVAL, "unexpected reply for hscan values items, type %d / %d",
-				  key_reply->type, value_reply->type);
+		redisReply *value_reply = reply->element[i + 1];
+		if (key_reply->type != REDIS_REPLY_STRING ||
+		    value_reply->type != REDIS_REPLY_STRING) {
+			LOG_ERROR(
+				-EINVAL,
+				"unexpected reply for hscan values items, type %d / %d",
+				key_reply->type, value_reply->type);
 			wait->done = -EINVAL;
 			return;
 		}
@@ -403,8 +430,8 @@ static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private) {
 	if (!strcmp(cursor, "0")) {
 		wait->done = 1;
 	} else {
-		rc = redisAsyncCommand(ac, redis_scan_cb, wait,
-				       "hscan %s %s", wait->hash, cursor);
+		rc = redisAsyncCommand(ac, redis_scan_cb, wait, "hscan %s %s",
+				       wait->hash, cursor);
 		if (rc) {
 			rc = redis_error_to_errno(rc);
 			LOG_ERROR(rc, "Redis error trying to scan %s from %s",
@@ -415,37 +442,36 @@ static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private) {
 	}
 }
 
-static int redis_scan_requests(struct state *state,
-			       const char *key UNUSED,
-			       const char *value) {
+static int redis_scan_requests(struct state *state, const char *key UNUSED,
+			       const char *value)
+{
 	int rc;
 	json_error_t json_error;
 	json_t *json_hai;
 
-
 	json_hai = json_loads(value, 0, &json_error);
 	if (!json_hai) {
-		LOG_ERROR(-EINVAL, "Invalid json from redis (%s): %s",
-			  value, json_error.text);
+		LOG_ERROR(-EINVAL, "Invalid json from redis (%s): %s", value,
+			  json_error.text);
 		return -EINVAL;
 	}
 
 	struct hsm_action_node *han;
-	rc = hsm_action_enqueue_json(state, json_hai, 0, &han, "redis (recovery)");
+	rc = hsm_action_enqueue_json(state, json_hai, 0, &han,
+				     "redis (recovery)");
 	json_decref(json_hai);
 	if (rc < 0)
 		return rc;
 	if (rc > 0)
-            LOG_INFO("Enqueued "DFID" (cookie %lx) (from redis recovery)" ,
-		     PFID(&han->info.dfid), han->info.cookie);
+		LOG_INFO("Enqueued " DFID " (cookie %lx) (from redis recovery)",
+			 PFID(&han->info.dfid), han->info.cookie);
 
 	return 0;
 }
 
-
-static int redis_scan_assigned(struct state *state,
-			       const char *key,
-			       const char *client_id) {
+static int redis_scan_assigned(struct state *state, const char *key,
+			       const char *client_id)
+{
 	struct cds_list_head *n;
 	bool found = false;
 	struct client *client;
@@ -462,12 +488,16 @@ static int redis_scan_assigned(struct state *state,
 	struct hsm_action_node *han;
 	han = hsm_action_search_queue(&state->queues, cookie, &dfid);
 	if (!han) {
-		LOG_WARN(-EINVAL, "%s: cookie %lx assigned but wasn't in request list, cleaning up",
-			 client_id, cookie);
-		return redis_delete(state, "coordinatool_assigned", key, cookie);
+		LOG_WARN(
+			-EINVAL,
+			"%s: cookie %lx assigned but wasn't in request list, cleaning up",
+			client_id, cookie);
+		return redis_delete(state, "coordinatool_assigned", key,
+				    cookie);
 	}
 
-	cds_list_for_each(n, &state->stats.disconnected_clients) {
+	cds_list_for_each(n, &state->stats.disconnected_clients)
+	{
 		client = caa_container_of(n, struct client, node_clients);
 		if (!strcmp(client_id, client->id)) {
 			found = true;
@@ -479,8 +509,8 @@ static int redis_scan_assigned(struct state *state,
 	}
 
 #ifdef DEBUG_ACTION_NODE
-	LOG_DEBUG("%s: Moving han %p to active requests %p (redis)",
-		  client_id, (void*)han, (void*)&client->active_requests);
+	LOG_DEBUG("%s: Moving han %p to active requests %p (redis)", client_id,
+		  (void *)han, (void *)&client->active_requests);
 #endif
 	// XXX scan can return same cookie multiple times, so the request
 	// could already be enqueued.
@@ -491,34 +521,38 @@ static int redis_scan_assigned(struct state *state,
 	return 0;
 }
 
-int redis_recovery(struct state *state) {
-	struct redis_wait wait[2] = {
-		{
-			.state = state,
-			.cb = redis_scan_requests,
-			.hash = "coordinatool_requests",
-		},
-		{
-			.state = state,
-			.cb = redis_scan_assigned,
-			.hash = "coordinatool_assigned",
-		}
-	};
+int redis_recovery(struct state *state)
+{
+	struct redis_wait wait[2] = { {
+					      .state = state,
+					      .cb = redis_scan_requests,
+					      .hash = "coordinatool_requests",
+				      },
+				      {
+					      .state = state,
+					      .cb = redis_scan_assigned,
+					      .hash = "coordinatool_assigned",
+				      } };
 
 	if (!state->redis_ac) {
 		int rc = -ENOTCONN;
 		if (state->config.redis_host && state->config.redis_host[0]) {
-			LOG_ERROR(rc, "Redis server configured but not connected, aborting. Run with --redis-host "" to skip");
+			LOG_ERROR(
+				rc,
+				"Redis server configured but not connected, aborting. Run with --redis-host "
+				" to skip");
 			return rc;
 		}
-		LOG_INFO("Redis not configured, skipping recovery.\n"
-			 "Run coordinatool-client --queue with MDS active_requests to recover previously received actions");
+		LOG_INFO(
+			"Redis not configured, skipping recovery.\n"
+			"Run coordinatool-client --queue with MDS active_requests to recover previously received actions");
 		return 0;
 	}
 
-	for (unsigned int i=0; i < countof(wait); i++) {
-		int rc = redisAsyncCommand(state->redis_ac, redis_scan_cb, &wait[i],
-					   "hscan %s %d", wait[i].hash, 0);
+	for (unsigned int i = 0; i < countof(wait); i++) {
+		int rc = redisAsyncCommand(state->redis_ac, redis_scan_cb,
+					   &wait[i], "hscan %s %d",
+					   wait[i].hash, 0);
 		if (rc) {
 			rc = redis_error_to_errno(rc);
 			LOG_ERROR(rc, "Redis error trying to scan %s (start)",
@@ -529,7 +563,6 @@ int redis_recovery(struct state *state) {
 		if (rc < 0)
 			return rc;
 	}
-
 
 	return 0;
 }

@@ -7,8 +7,8 @@
 #include <fcntl.h>
 #include <sys/xattr.h>
 
-int phobos_enrich(struct state *state,
-		  struct hsm_action_node *han) {
+int phobos_enrich(struct state *state, struct hsm_action_node *han)
+{
 	char oid[XATTR_SIZE_MAX + 1];
 	int rc, save_errno, fd;
 	char *hostname;
@@ -29,7 +29,8 @@ int phobos_enrich(struct state *state,
 	close(fd);
 	if (oidlen < 0)
 		return (save_errno == ENODATA || save_errno == ENOTSUP) ?
-			0 : -save_errno;
+			       0 :
+			       -save_errno;
 
 	oid[oidlen] = '\0';
 
@@ -46,12 +47,13 @@ int phobos_enrich(struct state *state,
 	if (hostname == NULL)
 		return 0;
 
-	return schedule_on_client(&state->stats.clients, han, hostname)
-		|| schedule_on_client(&state->stats.disconnected_clients, han, hostname);
+	return schedule_on_client(&state->stats.clients, han, hostname) ||
+	       schedule_on_client(&state->stats.disconnected_clients, han,
+				  hostname);
 }
 
-bool phobos_can_send(struct client *client,
-		     struct hsm_action_node *han) {
+bool phobos_can_send(struct client *client, struct hsm_action_node *han)
+{
 	char *hostname;
 	int rc;
 
@@ -72,13 +74,13 @@ bool phobos_can_send(struct client *client,
 		/* do not prevent sending a request if Phobos fails */
 		return true;
 
-
 	if (hostname == NULL || !strcmp(client->id, hostname))
 		return true;
 
 	struct cds_list_head *n;
 
-	cds_list_for_each(n, &client->queues.state->stats.clients) {
+	cds_list_for_each(n, &client->queues.state->stats.clients)
+	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
 

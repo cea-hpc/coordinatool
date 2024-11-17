@@ -7,7 +7,8 @@
 #include "coordinatool.h"
 
 void hsm_action_queues_init(struct state *state,
-			    struct hsm_action_queues *queues) {
+			    struct hsm_action_queues *queues)
+{
 	CDS_INIT_LIST_HEAD(&queues->waiting_restore);
 	CDS_INIT_LIST_HEAD(&queues->waiting_archive);
 	CDS_INIT_LIST_HEAD(&queues->waiting_remove);
@@ -15,7 +16,8 @@ void hsm_action_queues_init(struct state *state,
 	queues->state = state;
 }
 
-static int tree_compare(const void *a, const void *b) {
+static int tree_compare(const void *a, const void *b)
+{
 	const struct item_info *va = a, *vb = b;
 
 	/* lustre only guarantees identity per mdt.
@@ -31,12 +33,13 @@ static int tree_compare(const void *a, const void *b) {
 	return memcmp(&va->dfid, &vb->dfid, sizeof(va->dfid));
 }
 
-static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
+static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup)
+{
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
 #endif
 	LOG_DEBUG("freeing han for " DFID " node %p", PFID(&han->info.dfid),
-		  (void*)&han->node);
+		  (void *)&han->node);
 	if (!final_cleanup) {
 		redis_delete_request(han->queues->state, han->info.cookie,
 				     &han->info.dfid);
@@ -49,17 +52,19 @@ static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup) {
 			     tree_compare))
 			abort();
 	}
-	free((void*)han->info.data);
+	free((void *)han->info.data);
 	if (han->hai)
 		json_decref(han->hai);
 	free(han);
 }
 
-void queue_node_free(struct hsm_action_node *han) {
+void queue_node_free(struct hsm_action_node *han)
+{
 	_queue_node_free(han, false);
 }
 
-static void tree_free_cb(void *nodep) {
+static void tree_free_cb(void *nodep)
+{
 	struct item_info *item_info =
 		caa_container_of(nodep, struct item_info, cookie);
 	struct hsm_action_node *han =
@@ -68,14 +73,15 @@ static void tree_free_cb(void *nodep) {
 	_queue_node_free(han, true);
 }
 
-
-void hsm_action_free_all(struct state *state) {
+void hsm_action_free_all(struct state *state)
+{
 	tdestroy(state->queues.actions_tree, tree_free_cb);
 }
 
-struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues,
-						unsigned long cookie,
-						struct lu_fid *dfid) {
+struct hsm_action_node *
+hsm_action_search_queue(struct hsm_action_queues *queues, unsigned long cookie,
+			struct lu_fid *dfid)
+{
 	struct item_info search_item = {
 		.cookie = cookie,
 		.dfid = *dfid,
@@ -96,7 +102,8 @@ struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues
 }
 
 /* actually inserts action node to its queue */
-int hsm_action_requeue(struct hsm_action_node *han, bool start) {
+int hsm_action_requeue(struct hsm_action_node *han, bool start)
+{
 	struct cds_list_head *head;
 	struct hsm_action_queues *queues = han->queues;
 	bool was_running = (han->client != NULL);
@@ -134,8 +141,8 @@ int hsm_action_requeue(struct hsm_action_node *han, bool start) {
 	}
 
 	LOG_DEBUG("Inserting han for " DFID " node %p at %s of %p",
-		  PFID(&han->info.dfid), (void*)&han->node,
-		  start ? "start" : "tail", (void*)head);
+		  PFID(&han->info.dfid), (void *)&han->node,
+		  start ? "start" : "tail", (void *)head);
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
 #endif
@@ -148,8 +155,8 @@ int hsm_action_requeue(struct hsm_action_node *han, bool start) {
 
 /* move an hsm action node to another queue */
 void hsm_action_move(struct hsm_action_queues *queues,
-		     struct hsm_action_node *han,
-		     bool start) {
+		     struct hsm_action_node *han, bool start)
+{
 	struct cds_list_head *head;
 
 	/* we can't use requeue as we don't want to update stats... */
@@ -182,16 +189,17 @@ void hsm_action_move(struct hsm_action_queues *queues,
 }
 
 static int hsm_action_enqueue_common(struct state *state,
-				     struct hsm_action_node *han) {
+				     struct hsm_action_node *han)
+{
 	struct item_info **tree_key;
 
-	tree_key = tsearch(&han->info, &han->queues->actions_tree,
-			   tree_compare);
+	tree_key =
+		tsearch(&han->info, &han->queues->actions_tree, tree_compare);
 	if (!tree_key)
 		abort();
 	if (*tree_key != &han->info) {
 		/* duplicate */
-		free((void*)han->info.data);
+		free((void *)han->info.data);
 		json_decref(han->hai);
 		free(han);
 		return -EEXIST;
@@ -205,9 +213,9 @@ static int hsm_action_enqueue_common(struct state *state,
 }
 
 int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
-			    int64_t timestamp,
-			    struct hsm_action_node **han_out,
-			    const char *requestor) {
+			    int64_t timestamp, struct hsm_action_node **han_out,
+			    const char *requestor)
+{
 	struct hsm_action_node *han;
 	struct hsm_action_item hai;
 	const char *data;
@@ -216,7 +224,8 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	rc = json_hsm_action_item_get(json_hai, &hai, sizeof(hai), &data);
 	// overflow is ok: we don't care about hai_data as we reuse the json
 	if (rc && rc != -EOVERFLOW) {
-		LOG_WARN(rc, "%s: Could not process invalid hai: skipping", requestor);
+		LOG_WARN(rc, "%s: Could not process invalid hai: skipping",
+			 requestor);
 		return rc;
 	}
 
@@ -230,10 +239,12 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	han->info.action = hai.hai_action;
 	han->info.dfid = hai.hai_dfid;
 	han->info.hai_len = hai.hai_len;
-	han->info.archive_id = protocol_getjson_int(json_hai, "hal_archive_id", 0);
+	han->info.archive_id =
+		protocol_getjson_int(json_hai, "hal_archive_id", 0);
 	han->info.hal_flags = protocol_getjson_int(json_hai, "hal_flags", 0);
 	if (!han->info.archive_id) {
-		LOG_WARN(-EINVAL, "%s: hai did not contain archive_id", requestor);
+		LOG_WARN(-EINVAL, "%s: hai did not contain archive_id",
+			 requestor);
 		free(han);
 		return -EINVAL;
 	}
@@ -243,8 +254,8 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	case HSMA_REMOVE:
 		break;
 	default:
-		LOG_WARN(rc, "%s: hai had invalid action %d\n",
-			 requestor, hai.hai_action);
+		LOG_WARN(rc, "%s: hai had invalid action %d\n", requestor,
+			 hai.hai_action);
 		free(han);
 		return -EINVAL;
 	}
@@ -272,10 +283,10 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 }
 
 /* checks for duplicate, and if unique enrich and insert node */
-int hsm_action_enqueue(struct state *state,
-		       struct hsm_action_item *hai,
+int hsm_action_enqueue(struct state *state, struct hsm_action_item *hai,
 		       uint32_t archive_id, uint64_t hal_flags,
-		       int64_t timestamp) {
+		       int64_t timestamp)
+{
 	struct hsm_action_node *han;
 	int rc;
 
@@ -326,8 +337,8 @@ int hsm_action_enqueue(struct state *state,
 
 /* remove action node from its queue */
 void hsm_action_assign(struct hsm_action_queues *queues,
-			struct hsm_action_node *han,
-			struct client *client) {
+		       struct hsm_action_node *han, struct client *client)
+{
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
 #endif
