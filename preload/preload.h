@@ -46,6 +46,10 @@ struct hsm_copytool_private {
 /* this one is used as is by llapi so keep the same magic,
  * but happend our key at the end for ourselves
  */
+/* hsm_copy is variable sized and not at the end, but it's the same
+ * in lustre_hsm.c: they don't copy the data part of the action item */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-variable-sized-type-not-at-end"
 #define CP_PRIV_MAGIC 0x19880429
 struct hsm_copyaction_private {
 	__u32 magic;
@@ -56,6 +60,7 @@ struct hsm_copyaction_private {
 	lstatx_t statx;
 	struct action_key key;
 };
+#pragma clang diagnostic pop
 
 
 /* done infos */
