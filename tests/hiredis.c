@@ -9,27 +9,31 @@
 int hsm_action_enqueue_json(struct state *state UNUSED, json_t *json UNUSED,
 			    int64_t timestamp UNUSED,
 			    struct hsm_action_node **han_out UNUSED,
-			    const char *requestor UNUSED) {
+			    const char *requestor UNUSED)
+{
 	return 0;
 }
-struct hsm_action_node *hsm_action_search_queue(struct hsm_action_queues *queues UNUSED,
-                                                unsigned long cookie UNUSED,
-						struct lu_fid *dfid UNUSED) {
+struct hsm_action_node *
+hsm_action_search_queue(struct hsm_action_queues *queues UNUSED,
+			unsigned long cookie UNUSED, struct lu_fid *dfid UNUSED)
+{
 	return NULL;
 }
 struct client *client_new_disconnected(struct state *state UNUSED,
-				       const char *id UNUSED) {
+				       const char *id UNUSED)
+{
 	return NULL;
 }
 void hsm_action_assign(struct hsm_action_queues *queues UNUSED,
-                        struct hsm_action_node *han UNUSED,
-			struct client *client UNUSED) {
+		       struct hsm_action_node *han UNUSED,
+		       struct client *client UNUSED)
+{
 	return;
 }
 
-
 /* copy from copytool/coordinatool.c */
-int epoll_addfd(int epoll_fd, int fd, void *data) {
+int epoll_addfd(int epoll_fd, int fd, void *data)
+{
 	struct epoll_event ev;
 	int rc;
 
@@ -44,15 +48,14 @@ int epoll_addfd(int epoll_fd, int fd, void *data) {
 	return 0;
 }
 
-
 struct testdata {
 	int counter;
 	bool stop;
 	int rc;
 };
 
-
-void print_reply(redisReply *reply, int idx) {
+void print_reply(redisReply *reply, int idx)
+{
 	switch (reply->type) {
 	case REDIS_REPLY_ARRAY:
 		LOG_DEBUG("(%d) got array size %ld", idx, reply->elements);
@@ -61,7 +64,8 @@ void print_reply(redisReply *reply, int idx) {
 		}
 		break;
 	case REDIS_REPLY_STRING:
-		LOG_DEBUG("(%d) got string %*s", idx, (int)reply->len, reply->str);
+		LOG_DEBUG("(%d) got string %*s", idx, (int)reply->len,
+			  reply->str);
 		break;
 	case REDIS_REPLY_INTEGER:
 		LOG_DEBUG("(%d) got int %lld", idx, reply->integer);
@@ -72,13 +76,14 @@ void print_reply(redisReply *reply, int idx) {
 	default:
 		LOG_DEBUG("(%d) Got reply type %d", idx, reply->type);
 	}
-
 }
 
 int cb_common(redisAsyncContext *ac, redisReply *reply,
-	       struct testdata *testdata, const char *step) {
+	      struct testdata *testdata, const char *step)
+{
 	if ((uintptr_t)reply < 4096) {
-		LOG_INFO("No reply?! %lx %d %s", (uintptr_t)reply, ac->c.err, ac->c.errstr);
+		LOG_INFO("No reply?! %lx %d %s", (uintptr_t)reply, ac->c.err,
+			 ac->c.errstr);
 		testdata->stop = true;
 		testdata->rc = 1;
 		return 1;
@@ -88,15 +93,18 @@ int cb_common(redisAsyncContext *ac, redisReply *reply,
 	return 0;
 }
 
-#define REDIS_SEND_CHECK(_ac, _cb, _td, _fmt, ...) do { \
-	int _rc = redisAsyncCommand(_ac, _cb, _td, _fmt, ## __VA_ARGS__); \
-	if (_rc) { \
-		LOG_ERROR(-EIO, "redisAsyncCommand %s fail: %d/%d", _fmt, _rc, errno); \
-		_td->stop = true; \
-		_td->rc = 1; \
-		return; \
-	} \
-} while (0)
+#define REDIS_SEND_CHECK(_ac, _cb, _td, _fmt, ...)                             \
+	do {                                                                   \
+		int _rc =                                                      \
+			redisAsyncCommand(_ac, _cb, _td, _fmt, ##__VA_ARGS__); \
+		if (_rc) {                                                     \
+			LOG_ERROR(-EIO, "redisAsyncCommand %s fail: %d/%d",    \
+				  _fmt, _rc, errno);                           \
+			_td->stop = true;                                      \
+			_td->rc = 1;                                           \
+			return;                                                \
+		}                                                              \
+	} while (0)
 
 void cb_initial_delete(redisAsyncContext *ac, void *_reply, void *privdata);
 void cb_populate(redisAsyncContext *ac, void *_reply, void *privdata);
@@ -105,7 +113,8 @@ void cb_rpop(redisAsyncContext *ac, void *_reply, void *privdata);
 void cb_llen_final(redisAsyncContext *ac, void *_reply, void *privdata);
 void cb_del(redisAsyncContext *ac, void *_reply, void *privdata);
 
-void cb_initial_delete(redisAsyncContext *ac, void *_reply, void *privdata) {
+void cb_initial_delete(redisAsyncContext *ac, void *_reply, void *privdata)
+{
 	struct testdata *testdata = privdata;
 	redisReply *reply = _reply;
 
@@ -116,12 +125,12 @@ void cb_initial_delete(redisAsyncContext *ac, void *_reply, void *privdata) {
 	assert(reply->type == REDIS_REPLY_INTEGER &&
 	       (reply->integer == 0 || reply->integer == 1));
 
-	REDIS_SEND_CHECK(ac, cb_populate, testdata,
-			"lpush testList 0");
+	REDIS_SEND_CHECK(ac, cb_populate, testdata, "lpush testList 0");
 }
 
 #define TEST_ITEM_COUNT 100
-void cb_populate(redisAsyncContext *ac, void *_reply, void *privdata) {
+void cb_populate(redisAsyncContext *ac, void *_reply, void *privdata)
+{
 	struct testdata *testdata = privdata;
 	redisReply *reply = _reply;
 
@@ -131,32 +140,33 @@ void cb_populate(redisAsyncContext *ac, void *_reply, void *privdata) {
 	testdata->counter++;
 
 	// lpush returns list length, just count with it
-	assert(reply->type == REDIS_REPLY_INTEGER
-	       && reply->integer == testdata->counter);
+	assert(reply->type == REDIS_REPLY_INTEGER &&
+	       reply->integer == testdata->counter);
 
 	if (testdata->counter < TEST_ITEM_COUNT) {
-		REDIS_SEND_CHECK(ac, cb_populate, testdata,
-				 "lpush testList %d", testdata->counter);
+		REDIS_SEND_CHECK(ac, cb_populate, testdata, "lpush testList %d",
+				 testdata->counter);
 	} else {
 		testdata->counter = 0;
-		REDIS_SEND_CHECK(ac, cb_llen, testdata,
-				 "llen testList");
+		REDIS_SEND_CHECK(ac, cb_llen, testdata, "llen testList");
 	}
 }
 
-void cb_llen(redisAsyncContext *ac, void *_reply, void *privdata) {
+void cb_llen(redisAsyncContext *ac, void *_reply, void *privdata)
+{
 	struct testdata *testdata = privdata;
 	redisReply *reply = _reply;
 
 	if (cb_common(ac, reply, testdata, "llen"))
 		return;
 
-	assert(reply->type == REDIS_REPLY_INTEGER && reply->integer == TEST_ITEM_COUNT);
-	REDIS_SEND_CHECK(ac, cb_rpop, testdata,
-			 "rpop testList");
+	assert(reply->type == REDIS_REPLY_INTEGER &&
+	       reply->integer == TEST_ITEM_COUNT);
+	REDIS_SEND_CHECK(ac, cb_rpop, testdata, "rpop testList");
 }
 
-void cb_rpop(redisAsyncContext *ac, void *_reply, void *privdata) {
+void cb_rpop(redisAsyncContext *ac, void *_reply, void *privdata)
+{
 	struct testdata *testdata = privdata;
 	redisReply *reply = _reply;
 
@@ -165,21 +175,19 @@ void cb_rpop(redisAsyncContext *ac, void *_reply, void *privdata) {
 	// rpop returns last element, which was first to have been inserted
 	// (== counter)
 	// it's returned as a string.
-	assert(reply->type == REDIS_REPLY_STRING
-	       && atoi(reply->str) == testdata->counter);
+	assert(reply->type == REDIS_REPLY_STRING &&
+	       atoi(reply->str) == testdata->counter);
 	testdata->counter++;
 	if (testdata->counter < TEST_ITEM_COUNT) {
-		REDIS_SEND_CHECK(ac, cb_rpop, testdata,
-				 "rpop testList");
+		REDIS_SEND_CHECK(ac, cb_rpop, testdata, "rpop testList");
 	} else {
-		REDIS_SEND_CHECK(ac, cb_llen_final, testdata,
-				 "llen testList");
-		REDIS_SEND_CHECK(ac, cb_del, testdata,
-				 "del testList");
+		REDIS_SEND_CHECK(ac, cb_llen_final, testdata, "llen testList");
+		REDIS_SEND_CHECK(ac, cb_del, testdata, "del testList");
 	}
 }
 
-void cb_llen_final(redisAsyncContext *ac, void *_reply, void *privdata) {
+void cb_llen_final(redisAsyncContext *ac, void *_reply, void *privdata)
+{
 	struct testdata *testdata = privdata;
 	redisReply *reply = _reply;
 
@@ -192,7 +200,8 @@ void cb_llen_final(redisAsyncContext *ac, void *_reply, void *privdata) {
 	// nothing to send, we previously sent two in parallel.
 }
 
-void cb_del(redisAsyncContext *ac, void *_reply, void *privdata) {
+void cb_del(redisAsyncContext *ac, void *_reply, void *privdata)
+{
 	struct testdata *testdata = privdata;
 	redisReply *reply = _reply;
 
@@ -207,7 +216,8 @@ void cb_del(redisAsyncContext *ac, void *_reply, void *privdata) {
 }
 
 #define MAX_EVENTS 10
-int main(void) {
+int main(void)
+{
 	struct state state;
 	struct testdata testdata = { 0 };
 	int rc;
@@ -230,14 +240,13 @@ int main(void) {
 		return 1;
 	}
 
-
 	/* note subscribe works, but then any other command fails as
 	 * subscribe "reserves" the connection: "subscribe testpubsub"
 	 * We'd need to reconnect on a dedicated connection for it.
 	 */
 	/* this will start the callback chain for tests */
 	rc = redisAsyncCommand(state.redis_ac, cb_initial_delete, &testdata,
-			"del testList");
+			       "del testList");
 	if (rc) {
 		LOG_ERROR(-EIO, "redisAsyncCommand failed: %d/%d", rc, errno);
 		return 1;
@@ -245,7 +254,7 @@ int main(void) {
 
 	struct epoll_event events[MAX_EVENTS];
 	int nfds;
-	while (! testdata.stop) {
+	while (!testdata.stop) {
 		nfds = epoll_wait(state.epoll_fd, events, MAX_EVENTS, -1);
 		if (nfds < 0 && errno == EINTR)
 			continue;
@@ -256,7 +265,7 @@ int main(void) {
 		}
 		int n;
 		for (n = 0; n < nfds; n++) {
-			if (events[n].events & (EPOLLERR|EPOLLHUP)) {
+			if (events[n].events & (EPOLLERR | EPOLLHUP)) {
 				LOG_INFO("%d on error/hup", events[n].data.fd);
 			}
 			assert(events[n].data.ptr == state.redis_ac);

@@ -17,7 +17,8 @@
 #include <phobos_store.h>
 #endif
 
-int epoll_addfd(int epoll_fd, int fd, void *data) {
+int epoll_addfd(int epoll_fd, int fd, void *data)
+{
 	struct epoll_event ev;
 	int rc;
 
@@ -32,7 +33,8 @@ int epoll_addfd(int epoll_fd, int fd, void *data) {
 	return 0;
 }
 
-int epoll_delfd(int epoll_fd, int fd) {
+int epoll_delfd(int epoll_fd, int fd)
+{
 	int rc = 0;
 
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL) < 0) {
@@ -42,7 +44,8 @@ int epoll_delfd(int epoll_fd, int fd) {
 	return rc;
 }
 
-static void print_help(char *argv0) {
+static void print_help(char *argv0)
+{
 	printf("Usage: %s [options] mountpoint\n", argv0);
 	printf("\n");
 	printf("Options:\n");
@@ -61,11 +64,13 @@ static void print_help(char *argv0) {
 	printf("    -h, --help: this help\n");
 }
 
-static void print_version(void) {
+static void print_version(void)
+{
 	printf("Coordinatool version %s\n", VERSION);
 }
 
-static int signal_init(struct state *state) {
+static int signal_init(struct state *state)
+{
 	int rc;
 	sigset_t ss;
 
@@ -89,10 +94,11 @@ static int signal_init(struct state *state) {
 		return rc;
 	}
 	return epoll_addfd(state->epoll_fd, state->signal_fd,
-			   (void*)(uintptr_t)state->signal_fd);
+			   (void *)(uintptr_t)state->signal_fd);
 }
 
-static void signal_log(int signal_fd) {
+static void signal_log(int signal_fd)
+{
 	int n;
 	struct signalfd_siginfo siginfo;
 
@@ -103,16 +109,19 @@ static void signal_log(int signal_fd) {
 		return;
 	}
 	if (n != sizeof(siginfo)) {
-		LOG_WARN(-EIO, "Read %d bytes from signal fd instead of %zd?! Exiting anyway",
-			 n, sizeof(siginfo));
+		LOG_WARN(
+			-EIO,
+			"Read %d bytes from signal fd instead of %zd?! Exiting anyway",
+			n, sizeof(siginfo));
 		return;
 	}
 
-	LOG_INFO("Got signal %d from %d, exiting",
-		 siginfo.ssi_signo, siginfo.ssi_pid);
+	LOG_INFO("Got signal %d from %d, exiting", siginfo.ssi_signo,
+		 siginfo.ssi_pid);
 }
 
-static void initiate_termination(struct state *state) {
+static void initiate_termination(struct state *state)
+{
 	struct cds_list_head *n, *nnext;
 	state->terminating = true;
 
@@ -121,13 +130,15 @@ static void initiate_termination(struct state *state) {
 		close(state->listen_fd);
 	if (state->timer_fd >= 0)
 		close(state->timer_fd);
-	cds_list_for_each_safe(n, nnext, &state->stats.clients) {
+	cds_list_for_each_safe(n, nnext, &state->stats.clients)
+	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
 
 		client_free(client);
 	}
-	cds_list_for_each_safe(n, nnext, &state->stats.disconnected_clients) {
+	cds_list_for_each_safe(n, nnext, &state->stats.disconnected_clients)
+	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
 
@@ -135,7 +146,8 @@ static void initiate_termination(struct state *state) {
 	}
 }
 
-static int random_init(void) {
+static int random_init(void)
+{
 	struct timespec tp;
 
 	/* we don't need good rng, just use time */
@@ -150,7 +162,8 @@ static int random_init(void) {
 }
 
 #define MAX_EVENTS 10
-static int ct_start(struct state *state) {
+static int ct_start(struct state *state)
+{
 	int rc;
 	struct epoll_event events[MAX_EVENTS];
 	int nfds;
@@ -205,7 +218,7 @@ static int ct_start(struct state *state) {
 		}
 		int n;
 		for (n = 0; n < nfds; n++) {
-			if (events[n].events & (EPOLLERR|EPOLLHUP)) {
+			if (events[n].events & (EPOLLERR | EPOLLHUP)) {
 				LOG_INFO("%d on error/hup", events[n].data.fd);
 			}
 			if (events[n].data.fd == state->hsm_fd) {
@@ -221,7 +234,8 @@ static int ct_start(struct state *state) {
 				 * When disconnecting redis_ac can be cleared while
 				 * handling read, so check it's still here.
 				 */
-				if (state->redis_ac && events[n].events & EPOLLOUT) {
+				if (state->redis_ac &&
+				    events[n].events & EPOLLOUT) {
 					redisAsyncHandleWrite(state->redis_ac);
 				}
 				if (!state->redis_ac) {
@@ -229,7 +243,8 @@ static int ct_start(struct state *state) {
 					 * we can exit */
 					if (state->terminating)
 						return 0;
-					LOG_INFO("Connection to redis server failed, trying to reconnect");
+					LOG_INFO(
+						"Connection to redis server failed, trying to reconnect");
 					// XXX check rc
 					// XXX if server isn't up we'll busy loop on this...
 					redis_connect(state);
@@ -242,14 +257,18 @@ static int ct_start(struct state *state) {
 				/* we got killed, close all clients and stop listening
 				 * for lustre events and initiate redis disconnect. */
 				if (state->terminating) {
-					LOG_WARN(0, "Got killed twice, no longer waiting for redis");
+					LOG_WARN(
+						0,
+						"Got killed twice, no longer waiting for redis");
 					return 0;
 				}
 				initiate_termination(state);
 
 				/* The loop will stop when redis is done */
 				if (state->redis_ac) {
-					bool connected = state->redis_ac->c.flags & REDIS_CONNECTED;
+					bool connected =
+						state->redis_ac->c.flags &
+						REDIS_CONNECTED;
 					redisAsyncDisconnect(state->redis_ac);
 					/* if we just initiated connect with no IO, the disconnect
 					 * callback won't be called yet state->redis_ac is freed:
@@ -265,8 +284,9 @@ static int ct_start(struct state *state) {
 				}
 			} else {
 				struct client *client = events[n].data.ptr;
-				if (protocol_read_command(client->fd, client->id, client,
-							  protocol_cbs, state) < 0) {
+				if (protocol_read_command(
+					    client->fd, client->id, client,
+					    protocol_cbs, state) < 0) {
 					client_disconnect(client);
 				}
 			}
@@ -277,10 +297,11 @@ static int ct_start(struct state *state) {
 #define OPT_REDIS_HOST 257
 #define OPT_REDIS_PORT 258
 #define OPT_CLIENT_GRACE 259
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	const struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
-		{ "quiet",   no_argument, NULL, 'q' },
+		{ "quiet", no_argument, NULL, 'q' },
 		{ "config", required_argument, NULL, 'c' },
 		{ "archive", required_argument, NULL, 'A' },
 		{ "port", required_argument, NULL, 'p' },
@@ -312,10 +333,10 @@ int main(int argc, char *argv[]) {
 	CDS_INIT_LIST_HEAD(&state.waiting_clients);
 
 	/* parse arguments once first just for config */
-	while ((rc = getopt_long(argc, argv, short_opts,
-			         long_opts, NULL)) != -1) {
+	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=
+	       -1) {
 		if (rc == 'c') {
-			free((void*)state.config.confpath);
+			free((void *)state.config.confpath);
 			state.config.confpath = xstrdup(optarg);
 		}
 	}
@@ -325,8 +346,8 @@ int main(int argc, char *argv[]) {
 		goto out;
 
 	optind = 1;
-	while ((rc = getopt_long(argc, argv, short_opts,
-			         long_opts, NULL)) != -1) {
+	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=
+	       -1) {
 		switch (rc) {
 		case 'c': // parsed above
 			break;
@@ -336,14 +357,16 @@ int main(int argc, char *argv[]) {
 				state.config.archive_cnt = 0;
 				first_archive_id = false;
 			}
-			if (state.config.archive_cnt >= LL_HSM_MAX_ARCHIVES_PER_AGENT) {
+			if (state.config.archive_cnt >=
+			    LL_HSM_MAX_ARCHIVES_PER_AGENT) {
 				LOG_ERROR(-E2BIG, "too many archive id given");
 				rc = EXIT_FAILURE;
 				goto out;
 			}
 			state.config.archives[state.config.archive_cnt] =
 				parse_int(optarg, INT_MAX);
-			if (state.config.archives[state.config.archive_cnt] <= 0) {
+			if (state.config.archives[state.config.archive_cnt] <=
+			    0) {
 				LOG_ERROR(-ERANGE, "Archive id %s must be > 0",
 					  optarg);
 				rc = EXIT_FAILURE;
@@ -360,15 +383,15 @@ int main(int argc, char *argv[]) {
 			llapi_msg_set_level(state.config.verbose);
 			break;
 		case 'H':
-			free((void*)state.config.host);
+			free((void *)state.config.host);
 			state.config.host = xstrdup(optarg);
 			break;
 		case 'p':
-			free((void*)state.config.port);
+			free((void *)state.config.port);
 			state.config.port = xstrdup(optarg);
 			break;
 		case OPT_REDIS_HOST:
-			free((void*)state.config.redis_host);
+			free((void *)state.config.redis_host);
 			state.config.redis_host = xstrdup(optarg);
 			break;
 		case OPT_REDIS_PORT:
@@ -404,13 +427,15 @@ int main(int argc, char *argv[]) {
 
 out:
 	if (state.redis_ac) {
-		LOG_WARN(EISCONN, "redis connection was not closed completely, some requests will likely not be remembered");
+		LOG_WARN(
+			EISCONN,
+			"redis connection was not closed completely, some requests will likely not be remembered");
 	}
 	if (state.ctdata) {
 		llapi_hsm_copytool_unregister(&state.ctdata);
 	}
 	hsm_action_free_all(&state);
 	config_free(&state.config);
-	free((void*)state.fsname);
+	free((void *)state.fsname);
 	return rc;
 }

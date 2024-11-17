@@ -5,19 +5,19 @@
 #include "client_common.h"
 #include "utils.h"
 
-
-int protocol_checkerror(json_t *reply) {
+int protocol_checkerror(json_t *reply)
+{
 	int rc = protocol_getjson_int(reply, "status", 0);
 	if (rc) {
-		const char *error = protocol_getjson_str(reply, "error",
-							 NULL, NULL);
-		LOG_ERROR(rc, "error: %s",
-			  error ? error : "(no detail)");
+		const char *error =
+			protocol_getjson_str(reply, "error", NULL, NULL);
+		LOG_ERROR(rc, "error: %s", error ? error : "(no detail)");
 	}
 	return rc;
 }
 
-int protocol_request_status(const struct ct_state *state) {
+int protocol_request_status(const struct ct_state *state)
+{
 	json_t *request;
 	int rc = 0;
 
@@ -40,8 +40,8 @@ out_free:
 	return rc;
 }
 
-
-int protocol_archive_ids(int archive_count, int *archives, json_t **out) {
+int protocol_archive_ids(int archive_count, int *archives, json_t **out)
+{
 	json_t *archive_id_array;
 	int rc, i;
 
@@ -72,17 +72,16 @@ int protocol_archive_ids(int archive_count, int *archives, json_t **out) {
 	return 0;
 }
 
-int protocol_request_recv(const struct ct_state *state) {
+int protocol_request_recv(const struct ct_state *state)
+{
 	json_t *request;
 	int rc = 0;
 
-
-	request = json_pack("{ss,si,si,si,si}",
-			    "command", "recv",
+	request = json_pack("{ss,si,si,si,si}", "command", "recv",
 			    "max_archive", state->config.max_archive,
 			    "max_restore", state->config.max_restore,
-			    "max_remove", state->config.max_remove,
-			    "max_bytes", state->config.hsm_action_list_size);
+			    "max_remove", state->config.max_remove, "max_bytes",
+			    state->config.hsm_action_list_size);
 	if (!request) {
 		rc = -ENOMEM;
 		LOG_ERROR(rc, "Could not pack recv request");
@@ -100,17 +99,15 @@ out_free:
 	return rc;
 }
 
-int protocol_request_done(const struct ct_state *state,
-			  uint64_t cookie, struct lu_fid *dfid,
-			  int status) {
+int protocol_request_done(const struct ct_state *state, uint64_t cookie,
+			  struct lu_fid *dfid, int status)
+{
 	json_t *request;
 	int rc = 0;
 
-	request = json_pack("{ss,si,so,si}",
-			    "command", "done",
-			    "hai_cookie", cookie,
-			    "hai_dfid", json_fid(dfid),
-			    "status", status);
+	request = json_pack("{ss,si,so,si}", "command", "done", "hai_cookie",
+			    cookie, "hai_dfid", json_fid(dfid), "status",
+			    status);
 	if (!request) {
 		rc = -ENOMEM;
 		LOG_ERROR(rc, "Could not pack recv request");
@@ -128,8 +125,8 @@ out_free:
 	return rc;
 }
 
-int protocol_request_queue(const struct ct_state *state,
-			   json_t *hai_list) {
+int protocol_request_queue(const struct ct_state *state, json_t *hai_list)
+{
 	int rc;
 
 	json_t *request = json_object();
@@ -157,8 +154,8 @@ out_free:
 	return rc;
 }
 
-
-int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list) {
+int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list)
+{
 	int rc;
 
 	json_t *request = json_object();
@@ -174,8 +171,7 @@ int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list) {
 
 	/* use json_object_set for hai and archive_ids to not steal the ref:
 	 * we can try to send it many times */
-	if (hai_list &&
-	    (rc = json_object_set(request, "hai_list", hai_list)))
+	if (hai_list && (rc = json_object_set(request, "hai_list", hai_list)))
 		goto out_free;
 
 	if (state->archive_ids &&
@@ -197,7 +193,8 @@ out_free:
 	return rc;
 }
 
-static int ehlo_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+static int ehlo_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED)
+{
 	return protocol_checkerror(json);
 }
 
