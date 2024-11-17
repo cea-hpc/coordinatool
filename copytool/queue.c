@@ -178,6 +178,7 @@ static int hsm_action_enqueue_common(struct state *state,
 		abort();
 	if (*tree_key != &han->info) {
 		/* duplicate */
+		free((void*)han->info.data);
 		json_decref(han->hai);
 		free(han);
 		return -EEXIST;
@@ -216,7 +217,6 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 	han->info.action = hai.hai_action;
 	han->info.dfid = hai.hai_dfid;
 	han->info.hai_len = hai.hai_len;
-	han->info.data = xstrdup(data);
 	han->info.archive_id = protocol_getjson_int(json_hai, "hal_archive_id", 0);
 	han->info.hal_flags = protocol_getjson_int(json_hai, "hal_flags", 0);
 	if (!han->info.archive_id) {
@@ -242,6 +242,8 @@ int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
 		(void)protocol_setjson_int(json_hai, "timestamp", timestamp);
 	}
 
+	// allocations last
+	han->info.data = xstrdup(data);
 	han->hai = json_incref(json_hai);
 
 	rc = hsm_action_enqueue_common(state, han);
