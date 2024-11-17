@@ -140,6 +140,10 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg) {
 		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
 					   "Buffer too small");
 
+	if (client->status != CLIENT_READY)
+		return protocol_reply_recv(client, NULL, 0, 0, NULL, EINVAL,
+					   "Client must send EHLO first and not already be in RECV");
+
 #ifdef DEBUG_ACTION_NODE
 	CDS_INIT_LIST_HEAD(&client->waiting_node);
 #endif
