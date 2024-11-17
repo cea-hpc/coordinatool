@@ -59,6 +59,7 @@ again:
 	if (rc < 0) {
 		rc = -errno;
 		LOG_ERROR(rc, "Could not listen");
+		close(sfd);
 		return rc;
 	}
 	state->listen_fd = sfd;

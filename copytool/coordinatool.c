@@ -117,8 +117,10 @@ static void initiate_termination(struct state *state) {
 	state->terminating = true;
 
 	epoll_delfd(state->epoll_fd, state->hsm_fd);
-	close(state->listen_fd);
-	close(state->timer_fd);
+	if (state->listen_fd >= 0)
+		close(state->listen_fd);
+	if (state->timer_fd >= 0)
+		close(state->timer_fd);
 	cds_list_for_each_safe(n, nnext, &state->stats.clients) {
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
@@ -300,7 +302,10 @@ int main(int argc, char *argv[]) {
 #endif
 
 	// state init
-	struct state state = { 0 };
+	struct state state = {
+		.listen_fd = -1,
+		.timer_fd = -1,
+	};
 	CDS_INIT_LIST_HEAD(&state.config.archive_mappings);
 	CDS_INIT_LIST_HEAD(&state.stats.clients);
 	CDS_INIT_LIST_HEAD(&state.stats.disconnected_clients);
