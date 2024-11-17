@@ -27,14 +27,14 @@ struct action_tree_node {
  */
 #define CT_PRIV_MAGIC 0xC52C9B6F
 struct hsm_copytool_private {
-        unsigned int magic;
+	unsigned int magic;
 	char *mnt;
-        void *kuch;
-        int mnt_fd;
-        int open_by_fid_fd;
-        void *kuc;
+	void *kuch;
+	int mnt_fd;
+	int open_by_fid_fd;
+	void *kuc;
 	void *actions_tree;
-        struct ct_state state;
+	struct ct_state state;
 	struct hsm_action_list *hal;
 	int msgsize;
 	/* pipe used to signal request has been processed to recv thread
@@ -61,7 +61,6 @@ struct hsm_copyaction_private {
 	struct action_key key;
 };
 #pragma clang diagnostic pop
-
 
 /* done infos */
 struct notify_done {

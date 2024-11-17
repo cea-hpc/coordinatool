@@ -7,7 +7,8 @@
 #include "utils.h"
 #include "config_utils.h"
 
-static int config_parse(struct ct_state_config *config, int fail_enoent) {
+static int config_parse(struct ct_state_config *config, int fail_enoent)
+{
 	int rc = 0;
 	FILE *conffile = fopen(config->confpath, "r");
 	if (!conffile) {
@@ -30,7 +31,8 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 		LOG_DEBUG("Read line %zd: %s", linenum, line);
 		char *key = line, *val;
 		while (n > 0 && isspace(*key)) {
-			key++; n--;
+			key++;
+			n--;
 		}
 		if (n == 0) /* blank line */
 			continue;
@@ -38,8 +40,8 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			continue;
 
 		/* trailing spaces */
-		while (n > 0 && isspace(key[n-1])) {
-			key[n-1] = 0;
+		while (n > 0 && isspace(key[n - 1])) {
+			key[n - 1] = 0;
 			n--;
 		}
 		if (n == 0) // should never happen
@@ -50,8 +52,10 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			i++;
 		}
 		if (i >= n - 1) {
-			LOG_WARN(rc, "skipping %s in %s (line %zd) not in 'key value' format",
-				 line, config->confpath, linenum);
+			LOG_WARN(
+				rc,
+				"skipping %s in %s (line %zd) not in 'key value' format",
+				line, config->confpath, linenum);
 			continue;
 		}
 		key[i] = 0;
@@ -59,34 +63,39 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 		val = key + i;
 		n -= i;
 		while (n > 0 && isspace(*val)) {
-			val++; n--;
+			val++;
+			n--;
 		}
 		if (n == 0) {
-			LOG_WARN(-EINVAL, "skipping %s in %s (line %zd) not in 'key value' format",
-				 line, config->confpath, linenum);
+			LOG_WARN(
+				-EINVAL,
+				"skipping %s in %s (line %zd) not in 'key value' format",
+				line, config->confpath, linenum);
 			continue;
 		}
 
 		if (!strcasecmp(key, "host")) {
-			free((void*)config->host);
+			free((void *)config->host);
 			config->host = xstrdup(val);
 			LOG_INFO("config setting host to %s", config->host);
 			continue;
 		}
 		if (!strcasecmp(key, "port")) {
-			free((void*)config->port);
+			free((void *)config->port);
 			config->port = xstrdup(val);
 			LOG_INFO("config setting port to %s", config->port);
 			continue;
 		}
 		if (!strcasecmp(key, "client_id")) {
-			free((void*)config->client_id);
+			free((void *)config->client_id);
 			config->client_id = xstrdup(val);
-			LOG_INFO("config setting client_id to %s", config->client_id);
+			LOG_INFO("config setting client_id to %s",
+				 config->client_id);
 			continue;
 		}
 		if (!strcasecmp(key, "max_restore")) {
-			long long intval = str_suffix_to_u32(val, "max_restore");
+			long long intval =
+				str_suffix_to_u32(val, "max_restore");
 			if (intval < 0) {
 				rc = intval;
 				goto out;
@@ -97,7 +106,8 @@ static int config_parse(struct ct_state_config *config, int fail_enoent) {
 			continue;
 		}
 		if (!strcasecmp(key, "max_archive")) {
-			long long intval = str_suffix_to_u32(val, "max_archive");
+			long long intval =
+				str_suffix_to_u32(val, "max_archive");
 			if (intval < 0) {
 				rc = intval;
 				goto out;
@@ -162,10 +172,10 @@ out:
 	free(line);
 	(void)fclose(conffile);
 	return rc;
-
 }
 
-int ct_config_init(struct ct_state_config *config) {
+int ct_config_init(struct ct_state_config *config)
+{
 	int rc;
 
 	/* first set defaults */
@@ -187,7 +197,8 @@ int ct_config_init(struct ct_state_config *config) {
 	/* then parse config */
 	int fail_enoent = true;
 	if (!config->confpath) {
-		fail_enoent = getenv_str("COORDINATOOL_CONF", &config->confpath);
+		fail_enoent =
+			getenv_str("COORDINATOOL_CONF", &config->confpath);
 		if (!fail_enoent) {
 			config->confpath = xstrdup("/etc/coordinatool.conf");
 		}
@@ -236,11 +247,12 @@ int ct_config_init(struct ct_state_config *config) {
 	return 0;
 }
 
-void ct_free(struct ct_state *state) {
-	free((void*)state->config.confpath);
-	free((void*)state->config.host);
-	free((void*)state->config.port);
-	free((void*)state->config.client_id);
-	free((void*)state->fsname);
+void ct_free(struct ct_state *state)
+{
+	free((void *)state->config.confpath);
+	free((void *)state->config.host);
+	free((void *)state->config.port);
+	free((void *)state->config.client_id);
+	free((void *)state->fsname);
 	json_decref(state->archive_ids);
 }

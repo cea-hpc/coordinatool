@@ -5,7 +5,8 @@
 
 #include "client_common.h"
 
-int tcp_connect(struct ct_state *state, json_t *hai_list) {
+int tcp_connect(struct ct_state *state, json_t *hai_list)
+{
 	struct addrinfo hints;
 	struct addrinfo *result, *rp;
 	int sfd, s;
@@ -20,7 +21,8 @@ again:
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	s = getaddrinfo(state->config.host, state->config.port, &hints, &result);
+	s = getaddrinfo(state->config.host, state->config.port, &hints,
+			&result);
 	if (s != 0) {
 		if (s == EAI_AGAIN)
 			goto again;
@@ -38,13 +40,12 @@ again:
 	}
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
-		sfd = socket(rp->ai_family, rp->ai_socktype,
-				rp->ai_protocol);
+		sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
 		if (sfd == -1)
 			continue;
 
 		if (connect(sfd, rp->ai_addr, rp->ai_addrlen) == 0)
-			break;                  /* Success */
+			break; /* Success */
 
 		close(sfd);
 	}
@@ -62,14 +63,18 @@ again:
 
 	rc = protocol_request_ehlo(state, hai_list);
 	if (rc) {
-		LOG_WARN(rc, "Just connected but could not send request? reconnecting");
+		LOG_WARN(
+			rc,
+			"Just connected but could not send request? reconnecting");
 		sleep(5);
 		goto again;
 	}
 	rc = protocol_read_command(state->socket_fd, "server", NULL,
 				   protocol_ehlo_cbs, state);
 	if (rc) {
-		LOG_WARN(rc, "Just connected but did not get correct ehlo? reconnecting");
+		LOG_WARN(
+			rc,
+			"Just connected but did not get correct ehlo? reconnecting");
 		sleep(5);
 		goto again;
 	}

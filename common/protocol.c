@@ -8,7 +8,8 @@
 #include "logs.h"
 #include "utils.h"
 
-enum protocol_commands protocol_str2command(const char *str) {
+enum protocol_commands protocol_str2command(const char *str)
+{
 	if (strcmp(str, "status") == 0) {
 		return STATUS;
 	}
@@ -28,22 +29,27 @@ enum protocol_commands protocol_str2command(const char *str) {
 	return PROTOCOL_COMMANDS_MAX;
 }
 
-const char *protocol_command2str(enum protocol_commands command) {
+const char *protocol_command2str(enum protocol_commands command)
+{
 	static char buf[32];
 
 	switch (command) {
-	case STATUS: return "status";
-	case RECV: return "recv";
-	case DONE: return "done";
-	case QUEUE: return "queue";
-	case EHLO: return "ehlo";
+	case STATUS:
+		return "status";
+	case RECV:
+		return "recv";
+	case DONE:
+		return "done";
+	case QUEUE:
+		return "queue";
+	case EHLO:
+		return "ehlo";
 	default:
 		LOG_ERROR(-EINVAL, "invalid command: %d", command);
 		snprintf(buf, sizeof(buf), "%d", command);
 		return buf;
 	}
 }
-
 
 struct load_cb_data {
 	int fd;
@@ -58,7 +64,8 @@ struct load_cb_data {
 // XXX can hang reading from socket on partial json written,
 // but I don't see any way around this short of keeping a
 // large buffer around
-static size_t json_load_cb(void *buffer, size_t buflen, void *data) {
+static size_t json_load_cb(void *buffer, size_t buflen, void *data)
+{
 	struct load_cb_data *cbdata = data;
 
 	if (cbdata->bufoff == cbdata->bufread) {
@@ -85,7 +92,8 @@ static size_t json_load_cb(void *buffer, size_t buflen, void *data) {
 }
 
 int protocol_read_command(int fd, const char *id, void *fd_arg,
-			  protocol_read_cb *cbs, void *cb_arg) {
+			  protocol_read_cb *cbs, void *cb_arg)
+{
 	json_t *request;
 	json_error_t json_error;
 	int rc = 0;
@@ -93,8 +101,8 @@ int protocol_read_command(int fd, const char *id, void *fd_arg,
 		.fd = fd,
 		.id = id,
 	};
-	cbdata.buffer = xmalloc(1024*1024);
-	cbdata.buflen = 1024*1024;
+	cbdata.buffer = xmalloc(1024 * 1024);
+	cbdata.buflen = 1024 * 1024;
 
 again:
 	request = json_load_callback(json_load_cb, &cbdata,
@@ -127,7 +135,8 @@ again:
 	if (!command_obj) {
 		char *json_str = json_dumps(request, 0);
 		rc = -EINVAL;
-		LOG_ERROR(rc, "Received valid json with no command: %s", json_str);
+		LOG_ERROR(rc, "Received valid json with no command: %s",
+			  json_str);
 		free(json_str);
 		goto out_freereq;
 	}
@@ -165,7 +174,8 @@ out_freebuf:
 	return rc;
 }
 
-static int write_full(int fd, const char *buf, size_t count) {
+static int write_full(int fd, const char *buf, size_t count)
+{
 	ssize_t n;
 
 	while (count > 0) {
@@ -183,7 +193,8 @@ static int write_full(int fd, const char *buf, size_t count) {
 	return 0;
 }
 
-static int json_dump_cb(const char *buffer, size_t _size, void *data) {
+static int json_dump_cb(const char *buffer, size_t _size, void *data)
+{
 	struct load_cb_data *cbdata = data;
 	int rc;
 	ssize_t size = _size;
@@ -208,7 +219,8 @@ static int json_dump_cb(const char *buffer, size_t _size, void *data) {
 	return 0;
 }
 
-int protocol_write(json_t *json, int fd, const char *id, size_t flags) {
+int protocol_write(json_t *json, int fd, const char *id, size_t flags)
+{
 	struct load_cb_data cbdata = {
 		.fd = fd,
 	};
@@ -220,8 +232,8 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags) {
 		free(json_str);
 	}
 
-	cbdata.buffer = xmalloc(64*1024);
-	cbdata.buflen = 64*1024;
+	cbdata.buffer = xmalloc(64 * 1024);
+	cbdata.buflen = 64 * 1024;
 	rc = json_dump_callback(json, json_dump_cb, &cbdata, flags);
 	if (rc == 0 && cbdata.bufread) {
 		rc = write_full(cbdata.fd, cbdata.buffer, cbdata.bufread);

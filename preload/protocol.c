@@ -3,8 +3,9 @@
 #include "preload.h"
 
 static int action_list_get_cb(struct hsm_action_list *hal UNUSED,
-			      struct hsm_action_item *hai,
-			      json_t *hai_json, void *arg) {
+			      struct hsm_action_item *hai, json_t *hai_json,
+			      void *arg)
+{
 	struct hsm_copytool_private *priv = arg;
 	struct action_tree_node *node = xmalloc(sizeof(*node));
 
@@ -16,7 +17,8 @@ static int action_list_get_cb(struct hsm_action_list *hal UNUSED,
 	return 0;
 }
 
-static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
+static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg)
+{
 	struct hsm_copytool_private *priv = arg;
 	int rc;
 
@@ -40,7 +42,8 @@ static int recv_cb(void *fd_arg UNUSED, json_t *json, void *arg) {
 	return 0;
 }
 
-static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED) {
+static int done_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED)
+{
 	return protocol_checkerror(json);
 }
 

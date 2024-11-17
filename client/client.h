@@ -33,7 +33,6 @@ struct client {
 	};
 };
 
-
 /* protocol */
 /** reply handlers vector */
 extern protocol_read_cb protocol_cbs[];

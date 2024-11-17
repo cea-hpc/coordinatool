@@ -12,7 +12,8 @@
 #include "lustre.h"
 #include "version.h"
 
-void print_help(char *argv[]) {
+void print_help(char *argv[])
+{
 	printf("Usage: %s [options]\n\n", argv[0]);
 	printf("common client options are shared with lib (see config file and env var\n");
 	printf("defaults to printing status\n\n");
@@ -35,12 +36,14 @@ void print_help(char *argv[]) {
 	printf("--help/-h: This help\n");
 }
 
-void print_version(void) {
+void print_version(void)
+{
 	printf("Coordinatool client version %s\n", VERSION);
 }
 
 int parse_hai_cb(struct hsm_action_item *hai, unsigned int archive_id,
-		 unsigned long flags, void *arg) {
+		 unsigned long flags, void *arg)
+{
 	struct active_requests_state *active_requests = arg;
 	json_t *json_hai = json_hsm_action_item(hai, archive_id, flags);
 
@@ -62,7 +65,8 @@ int parse_hai_cb(struct hsm_action_item *hai, unsigned int archive_id,
 	return 0;
 }
 
-int client_run(struct client *client) {
+int client_run(struct client *client)
+{
 	int rc;
 	struct ct_state *state = &client->state;
 
@@ -94,7 +98,7 @@ int client_run(struct client *client) {
 		/* takes ownership of hai_list */
 		state->fsname = client->active_requests.fsname;
 		rc = protocol_request_queue(state,
-					   client->active_requests.hai_list);
+					    client->active_requests.hai_list);
 		break;
 	case MODE_RECV:
 	case MODE_DRAIN:
@@ -120,12 +124,13 @@ int client_run(struct client *client) {
 #define OPT_FSNAME 257
 #define OPT_DRAIN 258
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	const struct option long_opts[] = {
 		{ "verbose", no_argument, NULL, 'v' },
 		{ "version", no_argument, NULL, 'V' },
-		{ "help", no_argument, NULL, 'h'},
-		{ "quiet",   no_argument, NULL, 'q' },
+		{ "help", no_argument, NULL, 'h' },
+		{ "quiet", no_argument, NULL, 'q' },
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
 		{ "queue", no_argument, NULL, 'Q' },
@@ -148,10 +153,10 @@ int main(int argc, char *argv[]) {
 	};
 
 	/* parse arguments once first just for config */
-	while ((rc = getopt_long(argc, argv, short_opts,
-				  long_opts, NULL)) != -1) {
+	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=
+	       -1) {
 		if (rc == 'c') {
-			free((void*)client.state.config.confpath);
+			free((void *)client.state.config.confpath);
 			client.state.config.confpath = xstrdup(optarg);
 		}
 	}
@@ -163,12 +168,12 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* we don't want an id for debug client unless set explicitly */
-	free((void*)client.state.config.client_id);
+	free((void *)client.state.config.client_id);
 	client.state.config.client_id = NULL;
 
 	optind = 1;
-	while ((rc = getopt_long(argc, argv, short_opts,
-			         long_opts, NULL)) != -1) {
+	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=
+	       -1) {
 		switch (rc) {
 		case 'c': // parsed above
 			break;
@@ -198,7 +203,7 @@ int main(int argc, char *argv[]) {
 			client.iters = -1;
 			break;
 		case 'I':
-			free((void*)client.state.config.client_id);
+			free((void *)client.state.config.client_id);
 			client.state.config.client_id = strdup(optarg);
 			break;
 		case 'A':
@@ -216,7 +221,8 @@ int main(int argc, char *argv[]) {
 			break;
 		case OPT_FSNAME:
 			if (client.mode != MODE_QUEUE) {
-				LOG_ERROR(-EINVAL, "fsname can only be set after -Q");
+				LOG_ERROR(-EINVAL,
+					  "fsname can only be set after -Q");
 				return EXIT_FAILURE;
 			}
 			client.active_requests.fsname = optarg;

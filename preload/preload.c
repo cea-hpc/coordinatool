@@ -11,7 +11,8 @@
 
 int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 				const char *mnt, int archive_count,
-				int *archives, int rfd_flags UNUSED) {
+				int *archives, int rfd_flags UNUSED)
+{
 	struct hsm_copytool_private *ct;
 	int rc = 0;
 
@@ -91,7 +92,8 @@ err_out:
 	return rc;
 }
 
-int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
+int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv)
+{
 	if (!priv)
 		return -EINVAL;
 
@@ -109,20 +111,23 @@ int llapi_hsm_copytool_unregister(struct hsm_copytool_private **priv) {
 	return 0;
 }
 
-static int process_dones(struct hsm_copytool_private *ct) {
+static int process_dones(struct hsm_copytool_private *ct)
+{
 	int rc = 0, rc_proto = 0;
 	struct notify_done done;
 
-	while ((rc = read(ct->notify_done_fd[0], &done, sizeof(done))) == sizeof(done)) {
+	while ((rc = read(ct->notify_done_fd[0], &done, sizeof(done))) ==
+	       sizeof(done)) {
 		action_delete(ct, &done.key);
 		// XXX remember cookie in another list, free from that list when done_cb kicks in
 		// (repeat cookie in done reply for convenience)
 		// and send that list in ehlo too.
-		rc_proto = protocol_request_done(&ct->state,
-						 done.key.cookie, &done.key.dfid,
-						 done.rc);
+		rc_proto = protocol_request_done(&ct->state, done.key.cookie,
+						 &done.key.dfid, done.rc);
 		if (rc_proto < 0) {
-			LOG_WARN(rc_proto, "Could not send done to client: will resolve on reconnect");
+			LOG_WARN(
+				rc_proto,
+				"Could not send done to client: will resolve on reconnect");
 			// continue
 		}
 	}
@@ -140,7 +145,8 @@ static int process_dones(struct hsm_copytool_private *ct) {
 }
 
 int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
-			    struct hsm_action_list **halh, int *msgsize) {
+			    struct hsm_action_list **halh, int *msgsize)
+{
 	int rc;
 	struct pollfd pollfds[2];
 	json_t *hai_list;
@@ -156,10 +162,11 @@ int llapi_hsm_copytool_recv(struct hsm_copytool_private *ct,
 again:
 	rc = protocol_request_recv(&ct->state);
 	if (rc) {
-		LOG_WARN(rc, "Sending recv request to server failed. Reconnecting.");
+		LOG_WARN(
+			rc,
+			"Sending recv request to server failed. Reconnecting.");
 		goto reconnect;
 	}
-
 
 	ct->msgsize = -1;
 	while (ct->msgsize == -1) {
@@ -169,7 +176,8 @@ again:
 		}
 		if (rc < 0) {
 			rc = -errno;
-			LOG_ERROR(rc, "Poll failed waiting for completion or work");
+			LOG_ERROR(rc,
+				  "Poll failed waiting for completion or work");
 			return rc;
 		}
 		if (pollfds[1].revents & POLLIN) {
@@ -178,17 +186,19 @@ again:
 				goto reconnect;
 			}
 		}
-		if (pollfds[1].revents & (POLLERR|POLLHUP|POLLNVAL)) {
-			LOG_ERROR(-EIO, "pipe done broken? %x", pollfds[1].revents);
+		if (pollfds[1].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+			LOG_ERROR(-EIO, "pipe done broken? %x",
+				  pollfds[1].revents);
 			return -EIO;
 		}
-		if (pollfds[0].revents & (POLLERR|POLLHUP|POLLNVAL)) {
-			LOG_WARN(-EIO, "tcp socket broken? %x. Reconnecting", pollfds[1].revents);
+		if (pollfds[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+			LOG_WARN(-EIO, "tcp socket broken? %x. Reconnecting",
+				 pollfds[1].revents);
 			goto reconnect;
 		}
 
 		// keep looping unless we've got work to do
-		if (! (pollfds[0].revents & POLLIN)) {
+		if (!(pollfds[0].revents & POLLIN)) {
 			continue;
 		}
 
@@ -220,11 +230,12 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 			   const struct hsm_copytool_private *ct,
 			   const struct hsm_action_item *hai,
 			   int restore_mdt_index, int restore_open_flags,
-			   bool is_error) {
+			   bool is_error)
+{
 	static int (*real_action_begin)(struct hsm_copyaction_private **,
-					 const struct hsm_copytool_private *,
-					 const struct hsm_action_item *,
-					 int, int, bool);
+					const struct hsm_copytool_private *,
+					const struct hsm_action_item *, int,
+					int, bool);
 	if (!real_action_begin) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
@@ -248,12 +259,11 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 	return rc;
 }
 
-
 int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
-			 const struct hsm_extent *he, int hp_flags,
-			 int errval) {
+			 const struct hsm_extent *he, int hp_flags, int errval)
+{
 	static int (*real_action_end)(struct hsm_copyaction_private **,
-				       const struct hsm_extent *, int, int);
+				      const struct hsm_extent *, int, int);
 	if (!real_action_end) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
@@ -265,7 +275,6 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 
 	if (!phcp)
 		return -EINVAL;
-
 
 	struct hsm_copyaction_private *hcp = *phcp;
 	const struct hsm_copytool_private *ct = hcp->ct_priv;
@@ -280,12 +289,15 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	rc_done = write(ct->notify_done_fd[1], &done, sizeof(done));
 	if (rc_done < 0) {
 		rc_done = -errno;
-		LOG_WARN(rc_done, "Could not notify coordinatool of done for " DFID " / %lx",
+		LOG_WARN(rc_done,
+			 "Could not notify coordinatool of done for " DFID
+			 " / %lx",
 			 PFID(&done.key.dfid), done.key.cookie);
 	} else if (rc_done != sizeof(done)) {
 		// linux guarnatees this never happens, but better safe...
 		rc_done = -EIO;
-		LOG_WARN(rc_done, "Short write to notif pipe!! (" DFID " / %lx)",
+		LOG_WARN(rc_done,
+			 "Short write to notif pipe!! (" DFID " / %lx)",
 			 PFID(&done.key.dfid), done.key.cookie);
 	} else {
 		rc_done = 0;
