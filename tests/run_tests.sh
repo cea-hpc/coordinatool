@@ -21,6 +21,7 @@ FAILURES=()
 TESTS=0
 SKIPS=0
 ONLY=${ONLY:-}
+SLEEP_FAIL=${SLEEP_FAIL:-}
 ASAN=
 . "${REPO_ROOT}/tests/tests_config.sh"
 if [[ -e "${REPO_ROOT}/tests/tests_config.local.sh" ]]; then
@@ -88,7 +89,7 @@ run_test() {
 		declare -a CLEANUP=( )
 		trap cleanup EXIT
 		"$testcase"
-	) > "$REPO_ROOT/tests/logs.$caseno" 2>&1
+	) 3>&1 > "$REPO_ROOT/tests/logs.$caseno" 2>&1
 	status="$?"
 	if ((status == SKIP_RC)); then
 		echo " SKIP"
@@ -111,6 +112,19 @@ cleanup() {
 	# unset trap if run voluntarly, no more -e
 	trap - EXIT
 	set +e
+
+	# wait if requested
+	if [ "$ret" != 0 ] && [ -n "$SLEEP_FAIL" ]; then
+		set +x
+		touch /tmp/test_failed_sleep
+		printf "%s\n" "" \
+			"Test failed, inspect $REPO_ROOT/tests/logs.$caseno" \
+			"and ${TESTDIR//MNTPATH/${MNTPATH[0]}}" \
+			"Remove /tmp/test_failed_sleep when done" >&3
+		while [ -e /tmp/test_failed_sleep ]; do
+			sleep 1
+		done
+	fi
 
 	indices=( "${!CLEANUP[@]}" )
 	for ((i=${#indices[@]} - 1; i >= 0; i--)); do
