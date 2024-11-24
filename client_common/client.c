@@ -159,6 +159,8 @@ static int config_parse(struct ct_state_config *config, int fail_enoent)
 			continue;
 		if (!strcasecmp(key, "client_grace_ms"))
 			continue;
+		if (!strcasecmp(key, "archive_on_hosts"))
+			continue;
 
 		LOG_WARN(-EINVAL, "skipping unknown key %s in %s (line %zd)",
 			 key, config->confpath, linenum);
