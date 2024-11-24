@@ -342,8 +342,10 @@ int main(int argc, char *argv[])
 	}
 
 	rc = config_init(&state.config);
-	if (rc)
+	if (rc) {
+		rc = EXIT_FAILURE;
 		goto out;
+	}
 
 	optind = 1;
 	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=
@@ -364,11 +366,9 @@ int main(int argc, char *argv[])
 				goto out;
 			}
 			state.config.archives[state.config.archive_cnt] =
-				parse_int(optarg, INT_MAX);
+				parse_int(optarg, INT_MAX, "Archive id");
 			if (state.config.archives[state.config.archive_cnt] <=
 			    0) {
-				LOG_ERROR(-ERANGE, "Archive id %s must be > 0",
-					  optarg);
 				rc = EXIT_FAILURE;
 				goto out;
 			}
@@ -395,11 +395,20 @@ int main(int argc, char *argv[])
 			state.config.redis_host = xstrdup(optarg);
 			break;
 		case OPT_REDIS_PORT:
-			state.config.redis_port = parse_int(optarg, 65535);
+			state.config.redis_port =
+				parse_int(optarg, 65535, "Redis port");
+			if (state.config.redis_port < 0) {
+				rc = EXIT_FAILURE;
+				goto out;
+			}
 			break;
 		case OPT_CLIENT_GRACE:
 			state.config.client_grace_ms =
-				parse_int(optarg, INT_MAX);
+				parse_int(optarg, INT_MAX, "client grace ms");
+			if (state.config.client_grace_ms < 0) {
+				rc = EXIT_FAILURE;
+				goto out;
+			}
 			break;
 		case 'V':
 			print_version();

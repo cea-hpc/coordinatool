@@ -40,7 +40,7 @@ static int config_parse_host_mapping(struct cds_list_head *head, char *val)
 
 static int config_parse(struct state_config *config, int fail_enoent)
 {
-	int rc = 0;
+	int rc = -EINVAL;
 	FILE *conffile = fopen(config->confpath, "r");
 	if (!conffile) {
 		if (errno == ENOENT && !fail_enoent) {
@@ -110,7 +110,10 @@ static int config_parse(struct state_config *config, int fail_enoent)
 			continue;
 		}
 		if (!strcasecmp(key, "redis_port")) {
-			config->redis_port = parse_int(val, 65535);
+			config->redis_port =
+				parse_int(val, 65535, "redis_port");
+			if (config->redis_port < 0)
+				goto err;
 			LOG_INFO("config setting redis_port to %d",
 				 config->redis_port);
 			continue;
@@ -119,37 +122,25 @@ static int config_parse(struct state_config *config, int fail_enoent)
 			if (config->archive_cnt >=
 			    LL_HSM_MAX_ARCHIVES_PER_AGENT) {
 				LOG_ERROR(-E2BIG, "too many archive id given");
-				rc = EXIT_FAILURE;
-				goto out;
+				goto err;
 			}
 			config->archives[config->archive_cnt] =
-				parse_int(val, INT_MAX);
-			if (config->archives[config->archive_cnt] <= 0) {
-				LOG_ERROR(-ERANGE,
-					  "%s:%zd: Archive id %s must be > 0",
-					  config->confpath, linenum, val);
-				rc = EXIT_FAILURE;
-				goto out;
-			}
+				parse_int(val, INT_MAX, "archive_id");
+			if (config->archives[config->archive_cnt] <= 0)
+				goto err;
 			config->archive_cnt++;
 			continue;
 		}
 		if (!strcasecmp(key, "archive_on_hosts")) {
-			rc = config_parse_host_mapping(
-				&config->archive_mappings, val);
-			if (rc < 0) {
-				/* note val has likely been modified and will only contain
-				 * the first word, but that's better than nothing. */
-				LOG_ERROR(rc,
-					  "%s:%zd: Could not parse %s (%s)\n",
-					  config->confpath, linenum, key, val);
-				rc = EXIT_FAILURE;
-				goto out;
+			if (config_parse_host_mapping(&config->archive_mappings,
+						      val) < 0) {
+				goto err;
 			}
 			continue;
 		}
 		if (!strcasecmp(key, "client_grace_ms")) {
-			config->client_grace_ms = parse_int(val, INT_MAX);
+			config->client_grace_ms =
+				parse_int(val, INT_MAX, "client_grace_ms");
 			LOG_INFO("config setting client_grace_ms to %d",
 				 config->client_grace_ms);
 			continue;
@@ -158,7 +149,7 @@ static int config_parse(struct state_config *config, int fail_enoent)
 			int intval = str_to_verbose(val);
 			if (intval < 0) {
 				rc = intval;
-				goto out;
+				goto err;
 			}
 			config->verbose = intval;
 			llapi_msg_set_level(config->verbose);
@@ -179,12 +170,18 @@ static int config_parse(struct state_config *config, int fail_enoent)
 		LOG_WARN(-EINVAL, "skipping unknown key %s in %s (line %zd)",
 			 key, config->confpath, linenum);
 	}
+	rc = 0;
 	if (n < 0 && errno != 0) {
 		rc = -errno;
 		LOG_ERROR(rc, "getline failed reading %s", config->confpath);
 	}
 
-out:
+	if (0) {
+err:
+		/* note line is not intact but should contain key */
+		LOG_ERROR(-EINVAL, "%s:%zd: Could not parse config '%s'\n",
+			  config->confpath, linenum, line ?: "");
+	}
 	free(line);
 	(void)fclose(conffile);
 	return rc;

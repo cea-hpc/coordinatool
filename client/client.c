@@ -211,13 +211,19 @@ int main(int argc, char *argv[])
 				client.state.archive_ids = json_array();
 				assert(client.state.archive_ids);
 			}
-			rc = parse_int(optarg, INT_MAX);
+			rc = parse_int(optarg, INT_MAX, "archive id");
+			if (rc < 0)
+				goto out;
 			rc = json_array_append_new(client.state.archive_ids,
 						   json_integer(rc));
 			assert(rc == 0);
 			break;
 		case 'i':
-			client.iters = parse_int(optarg, INT_MAX);
+			client.iters = parse_int(optarg, INT_MAX, "iterations");
+			if (client.iters < 0) {
+				rc = 1;
+				goto out;
+			}
 			break;
 		case OPT_FSNAME:
 			if (client.mode != MODE_QUEUE) {

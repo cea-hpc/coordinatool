@@ -84,7 +84,7 @@ static inline int64_t gettime_ns(void)
 }
 
 /* parsing */
-static inline long parse_int(const char *arg, long max)
+static inline long parse_int(const char *arg, long max, const char *what)
 {
 	long rc;
 	char *endptr;
@@ -92,11 +92,12 @@ static inline long parse_int(const char *arg, long max)
 	rc = strtol(arg, &endptr, 0);
 	if (rc < 0 || rc > max) {
 		rc = -ERANGE;
-		LOG_ERROR(rc, "argument %s too big", arg);
+		LOG_ERROR(rc, "%s '%s' is negative or too big (> %ld)", what,
+			  arg, max);
 	}
 	if (*endptr != '\0') {
 		rc = -EINVAL;
-		LOG_ERROR(rc, "argument %s contains (trailing) garbage", arg);
+		LOG_ERROR(rc, "%s '%s' contains (trailing) garbage", what, arg);
 	}
 	return rc;
 }
