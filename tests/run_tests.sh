@@ -5,7 +5,7 @@
 # shellcheck disable=SC1091,SC2030,SC2031,SC2317
 
 error() {
-	printf "%s\n" "$@" >&2
+	printf "ERROR: %s\n" "$@" >&2
 	if [[ "$-" = *i* ]]; then
 		return 1;
 	else
@@ -88,17 +88,17 @@ run_test() {
 		declare -a CLEANUP=( )
 		trap cleanup EXIT
 		"$testcase"
-	)
+	) > "$REPO_ROOT/tests/logs.$caseno" 2>&1
 	status="$?"
 	if ((status == SKIP_RC)); then
-		echo SKIP
+		echo " SKIP"
 		((SKIPS++))
 	elif ((status)); then
-		echo FAIL
+		echo " FAIL"
 		((FATAL)) && exit 1
 		FAILURES+=( "$caseno: $testcase" )
 	else
-		echo Ok
+		echo " Ok"
 	fi
 	return "$status"
 }

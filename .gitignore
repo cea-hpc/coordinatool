@@ -4,3 +4,4 @@ build*
 cscope.*
 *.tar.xz
 /tests/tests_config.local.sh
+/tests/logs.*
