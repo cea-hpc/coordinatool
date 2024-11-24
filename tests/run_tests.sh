@@ -645,7 +645,7 @@ data_normal() {
 	client_reset 3
 	# our test lhsmtool_cmd archives at $ARCHIVEDIR/{ctdata}{fid}
 	# since it split command's words afte expansion we need to escape spaces
-	archive_data='some\ data'
+	archive_data='some data'
 	restore_data="$archive_data"
 	remove_data="$archive_data"
 	client_archive_n 3 1
@@ -666,7 +666,7 @@ data_restart() {
 	# start only coordinatool with no agent to queue a request
 
 	client_reset 3
-	archive_data='some\ data'
+	archive_data='some data'
 	client_archive_n_req 3 100
 
 	# wait for server to have processed requests, then flush cached data
@@ -692,7 +692,7 @@ data_restore_active_requests() {
 	# XXX lustre only lists up to 5 chars in active_requests:
 	# longer data is lost!!!
 	# (this test will fail if more is restored)
-	archive_data='d\ at fails due to spaces'
+	archive_data='da ta_anything longer is lost'
 	client_archive_n_req 3 100
 
 	# wait for server to have processed requests, then flush cached data
@@ -706,8 +706,10 @@ data_restore_active_requests() {
 	mds_requeue_active_requests 1
 	do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
-	do_client 1 "ls ${ARCHIVEDIR@Q}/d\ at*" \
+	do_client 1 "ls ${ARCHIVEDIR@Q}/da\ ta*" \
 		|| error "archive data was lost?"
+	do_client 1 "! ls ${ARCHIVEDIR@Q}/da\ ta_*" \
+		|| error "restore from active_requests restored more than 5 chars?"
 }
 run_test 32 data_restore_active_requests
 
