@@ -151,7 +151,7 @@ do_coordinatool_service() {
 	local i="$1"
 	local action="$2"
 
-	do_client "$i" "systemctl $action ctest_coordinatool@${i}.service" || :
+	do_client "$i" "systemctl --no-pager $action ctest_coordinatool@${i}.service" || :
 }
 
 do_lhsmtoolcmd_start() {
@@ -191,7 +191,7 @@ do_lhsmtoolcmd_service() {
 	local i="$1"
 	local action="$2"
 
-	do_client "$i" "systemctl $action ctest_lhsmtool_cmd@${i}.service"
+	do_client "$i" "systemctl --no-pager $action ctest_lhsmtool_cmd@${i}.service"
 }
 
 do_coordinatool_client() {
@@ -528,7 +528,7 @@ redis_restart() {
 
 	# XXX empirical: xfers aren't yet over in 0.5s...
 	sleep 0.5
-	do_client 0 "systemctl restart redis"
+	do_client 0 "systemctl --no-pager restart redis"
 
 	client_archive_n_wait 3 100
 	# XXX check redis db is empty after this?
