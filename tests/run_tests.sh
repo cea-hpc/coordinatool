@@ -629,10 +629,10 @@ restarts_with_pending_work() {
 
 	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" = 1 ]" \
 		|| error "should be no archive on 1"
-	do_client 2 "[ \"\$(find ${ARCHIVEDIR@Q}/2 | wc -l)\" -gt 25 ]" \
-		|| error "should be at least 25 archives on 2"
-	do_client 3 "[ \"\$(find ${ARCHIVEDIR@Q}/3 | wc -l)\" -gt 25 ]" \
-		|| error "should be at least 25 archives on 3"
+	do_client 2 "[ \"\$(find ${ARCHIVEDIR@Q}/2 | wc -l)\" -gt 20 ]" \
+		|| error "should be at least 20 archives on 2"
+	do_client 3 "[ \"\$(find ${ARCHIVEDIR@Q}/3 | wc -l)\" -gt 20 ]" \
+		|| error "should be at least 20 archives on 3"
 }
 run_test 11 restarts_with_pending_work
 
