@@ -138,7 +138,6 @@ void client_free(struct client *client)
 			hsm_action_enqueue(han, NULL);
 		}
 	}
-	ct_schedule();
 	free((void *)client->id);
 	free((void *)client->archives);
 	free(client);
@@ -175,7 +174,29 @@ void client_disconnect(struct client *client)
 	}
 }
 
-int handle_client_connect()
+static struct client *client_alloc(void)
+{
+	size_t client_size =
+		sizeof(struct client) +
+		state->config.batch_slots * sizeof(struct client_batch);
+
+	struct client *client = xcalloc(client_size, 1);
+
+	CDS_INIT_LIST_HEAD(&client->active_requests);
+#ifdef DEBUG_ACTION_NODE
+	CDS_INIT_LIST_HEAD(&client->node_clients);
+#endif
+	hsm_action_queues_init(&client->queues);
+
+	int i;
+	for (i = 0; i < state->config.batch_slots; i++) {
+		CDS_INIT_LIST_HEAD(&client->batch[i].waiting_archive);
+	}
+
+	return client;
+}
+
+int handle_client_connect(void)
 {
 	int fd, rc;
 	struct sockaddr_storage peer_addr;
@@ -189,18 +210,11 @@ int handle_client_connect()
 		return rc;
 	}
 
-	struct client *client = xcalloc(sizeof(*client), 1);
+	struct client *client = client_alloc();
 
 	client->fd = fd;
 	client->id = sockaddr2str(&peer_addr, peer_addr_len);
-	CDS_INIT_LIST_HEAD(&client->active_requests);
-#ifdef DEBUG_ACTION_NODE
-	CDS_INIT_LIST_HEAD(&client->node_clients);
-#endif
 	cds_list_add(&client->node_clients, &state->stats.clients);
-	CDS_INIT_LIST_HEAD(&client->queues.waiting_restore);
-	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
-	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
 	client->status = CLIENT_INIT;
 	state->stats.clients_connected++;
 
@@ -219,18 +233,11 @@ int handle_client_connect()
 struct client *client_new_disconnected(const char *id)
 {
 	/* create client in disconnected state for recovery */
-	struct client *client = xcalloc(sizeof(*client), 1);
+	struct client *client = client_alloc();
 
 	client->fd = -1;
 	client->id = xstrdup(id);
-	CDS_INIT_LIST_HEAD(&client->active_requests);
-#ifdef DEBUG_ACTION_NODE
-	CDS_INIT_LIST_HEAD(&client->node_clients);
-#endif
 	cds_list_add(&client->node_clients, &state->stats.disconnected_clients);
-	CDS_INIT_LIST_HEAD(&client->queues.waiting_restore);
-	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
-	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
 	client->status = CLIENT_DISCONNECTED;
 	client->disconnected_timestamp = gettime_ns();
 	timer_rearm();

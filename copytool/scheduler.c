@@ -2,8 +2,8 @@
 
 #include "coordinatool.h"
 
-/* schedule decision helper */
-
+/* schedule decision helper.
+ * sub-helpers return > 0 if scheduled, 0 if skipped */
 struct client *find_client(struct cds_list_head *clients_list,
 			   const char *hostname)
 {
@@ -24,10 +24,17 @@ struct client *find_client(struct cds_list_head *clients_list,
 struct cds_list_head *schedule_on_client(struct client *client,
 					 struct hsm_action_node *han)
 {
+	/* for archive, respect slots if used. Otherwise just get queue */
+	if (han->info.action == HSMA_ARCHIVE) {
+		struct cds_list_head *list =
+			schedule_batch_slot_on_client(client, han);
+		if (list)
+			return list;
+	}
 	return get_queue_list(&client->queues, han);
 }
 
-static struct cds_list_head *schedule_on_host(struct hsm_action_node *han)
+static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 {
 	/* only doing this for archive for now */
 	if (han->info.action != HSMA_ARCHIVE)
@@ -78,7 +85,19 @@ struct cds_list_head *hsm_action_node_schedule(struct hsm_action_node *han)
 {
 	struct cds_list_head *list;
 
-	list = schedule_on_host(han);
+	/* If host mapping is active with multiple candidates, we'd need to
+	 * look for slots in all matches first so just look for currently
+	 * running slots first. If host mapping is removed the two schedule
+	 * batch slot functions can likely be merged together */
+	list = schedule_batch_slot_active(han);
+	if (list)
+		return list;
+
+	list = schedule_host_mapping(han);
+	if (list)
+		return list;
+
+	list = schedule_batch_slot_new(han);
 	if (list)
 		return list;
 
@@ -93,19 +112,16 @@ struct cds_list_head *hsm_action_node_schedule(struct hsm_action_node *han)
  * if needed later we can make this return a decision enum
  * OK/NEXT_ACTION/NEXT_CLIENT
  */
-static bool schedule_can_send(struct client *client UNUSED,
-			      struct hsm_action_node *han UNUSED)
+static bool schedule_can_send(struct client *client,
+			      struct hsm_action_node *han)
 {
+	if (!batch_slot_can_send(client, han))
+		return false;
 #if HAVE_PHOBOS
 	return phobos_can_send(client, han);
 #else
 	return true;
 #endif
-	// XXX2, also probably want to signal if we want to requeue
-	// at start or not?
-	// just adding a ts and letting it be automatic in this case would
-	// probably be ok: in most case we're inserting at start so insertion
-	// would be O(1). For very long lists it might get slow though.
 }
 
 /* enqueue to json list */
@@ -185,14 +201,30 @@ void ct_schedule_client(struct client *client)
 		&client->queues.waiting_remove, &state->queues.waiting_remove,
 		NULL
 	};
+	/* for archives we either only use the "global" lists or the batch lists,
+	 * this is a config-time switch. */
 	struct cds_list_head *schedule_archive_lists[] = {
 		&client->queues.waiting_archive, &state->queues.waiting_archive,
 		NULL
 	};
+	/* VLAs are bad, but batch_slots is supposed to be tiny.. */
+	struct cds_list_head
+		*schedule_archive_batch_lists[state->config.batch_slots + 1];
+	int i;
+	for (i = 0; i < state->config.batch_slots; i++) {
+		schedule_archive_batch_lists[i] =
+			&client->batch[i].waiting_archive;
+	}
+	schedule_archive_batch_lists[state->config.batch_slots] = NULL;
+
+	/* move anything we can from client archive queue to each batch */
+	batch_reschedule_client(client);
+
 	struct cds_list_head **schedule_lists[] = {
 		schedule_restore_lists,
 		schedule_remove_lists,
-		schedule_archive_lists,
+		state->config.batch_slots ? schedule_archive_batch_lists :
+					    schedule_archive_lists,
 	};
 	int *max_action[] = { &client->max_restore, &client->max_remove,
 			      &client->max_archive };
@@ -283,4 +315,6 @@ void ct_schedule(void)
 			caa_container_of(n, struct client, waiting_node);
 		ct_schedule_client(client);
 	}
+
+	timer_rearm();
 }

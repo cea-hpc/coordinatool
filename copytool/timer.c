@@ -45,6 +45,10 @@ int timer_rearm(void)
 			closest_ns = ns;
 	}
 
+	ns = batch_next_expiry();
+	if (closest_ns > ns)
+		closest_ns = ns;
+
 	if (closest_ns == INT64_MAX) {
 		return 0;
 	}
@@ -65,7 +69,7 @@ int timer_rearm(void)
 void handle_expired_timers(void)
 {
 	struct cds_list_head *n, *nnext;
-	int64_t ns = gettime_ns(), junk;
+	int64_t now_ns = gettime_ns(), junk;
 
 	/* clear timer fd event, normally one u64 worth to read
 	 * saying how many time the timer expired. We don't care. */
@@ -76,12 +80,18 @@ void handle_expired_timers(void)
 	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
-		if (ns < client->disconnected_timestamp +
-				 state->config.client_grace_ms * NS_IN_MSEC)
+		if (now_ns < client->disconnected_timestamp +
+				     state->config.client_grace_ms * NS_IN_MSEC)
 			continue;
 
 		client_disconnect(client);
 	}
+
+	/* something happened, reschedule main queue */
+	ct_schedule();
+
+	/* clear expired batches to avoid retrigger loops */
+	batch_clear_expired(now_ns);
 
 	timer_rearm();
 }
