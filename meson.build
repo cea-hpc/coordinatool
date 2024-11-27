@@ -122,6 +122,7 @@ lhsmd_coordinatool_sources = [
 	'copytool/queue.c',
 	'copytool/redis.c',
 	'copytool/scheduler.c',
+	'copytool/batch.c',
 	'copytool/tcp.c',
 	'copytool/timer.c',
 ]

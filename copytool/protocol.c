@@ -580,9 +580,12 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	/* requeue anything left */
 	cds_list_for_each_safe(n, nnext, &free_hai)
 	{
-		struct hsm_action_node *node =
+		struct hsm_action_node *han =
 			caa_container_of(n, struct hsm_action_node, node);
-		hsm_action_enqueue(node, NULL);
+#ifdef DEBUG_ACTION_NODE
+		cds_list_del(&han->node);
+#endif
+		hsm_action_enqueue(han, NULL);
 	}
 
 	return protocol_reply_ehlo(client, 0, NULL);

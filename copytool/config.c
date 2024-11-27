@@ -142,6 +142,37 @@ static int config_parse(struct state_config *config, int fail_enoent)
 			}
 			continue;
 		}
+		if (!strcasecmp(key, "batch_archives_slices_sec")) {
+			char *space = strchr(val, ' ');
+			if (space)
+				*space = '\0';
+			config->batch_slice_idle = parse_int(
+				val, LONG_MAX / NS_IN_SEC,
+				"batches_archives_slices_sec idle time");
+			if (config->batch_slice_idle < 0)
+				goto err;
+			config->batch_slice_idle *= NS_IN_SEC;
+
+			config->batch_slice_max = 0;
+			if (space) {
+				val = space + 1;
+				config->batch_slice_max = parse_int(
+					val, LONG_MAX / NS_IN_SEC,
+					"batches_archives_slices_sec max time");
+				if (config->batch_slice_max < 0)
+					goto err;
+				config->batch_slice_max *= NS_IN_SEC;
+			}
+			continue;
+		}
+		if (!strcasecmp(key, "batch_archives_slots_per_client")) {
+			config->batch_slots =
+				parse_int(val, INT_MAX,
+					  "batch_archives_slots_per_client");
+			if (config->batch_slots < 0)
+				goto err;
+			continue;
+		}
 		if (!strcasecmp(key, "client_grace_ms")) {
 			config->client_grace_ms =
 				parse_int(val, INT_MAX, "client_grace_ms");
@@ -202,6 +233,7 @@ int config_init(struct state_config *config)
 	config->redis_port = 6379;
 	config->client_grace_ms = 600000; /* 10 mins */
 	config->verbose = LLAPI_MSG_NORMAL;
+	config->batch_slots = 1;
 	llapi_msg_set_level(config->verbose);
 
 	/* verbose from env once first to debug config.. */
@@ -231,6 +263,10 @@ int config_init(struct state_config *config)
 	rc = getenv_verbose("COORDINATOOL_VERBOSE", &config->verbose);
 	if (rc < 0)
 		return rc;
+
+	/* make slots 0 if idle time is 0 (feature disabled) to simplify code */
+	if (config->batch_slice_idle == 0)
+		config->batch_slots = 0;
 
 	return 0;
 }

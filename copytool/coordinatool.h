@@ -132,6 +132,13 @@ struct host_mapping {
 };
 
 /* common types */
+struct client_batch {
+	uint64_t expire_max_ns;
+	uint64_t expire_idle_ns;
+	char *hint;
+	struct cds_list_head waiting_archive;
+};
+
 struct client {
 	const char *id; /* id sent by the client during EHLO, or addr */
 	bool id_set; /* set if clients introduce themselves */
@@ -161,6 +168,7 @@ struct client {
 		int64_t disconnected_timestamp;
 		struct cds_list_head waiting_node;
 	};
+	struct client_batch batch[];
 };
 
 struct ct_stats {
@@ -191,6 +199,9 @@ struct state {
 		int archive_cnt;
 		int archives[LL_HSM_MAX_ARCHIVES_PER_AGENT];
 		struct cds_list_head archive_mappings;
+		int64_t batch_slice_idle;
+		int64_t batch_slice_max;
+		int batch_slots;
 	} config;
 	/* options: command line switches only */
 	const char *mntpath;
@@ -296,6 +307,17 @@ int redis_deassign_request(struct hsm_action_node *han);
 int redis_delete_request(uint64_t cookie, struct lu_fid *dfid);
 int redis_recovery(void);
 
+/* batch */
+struct cds_list_head *schedule_batch_slot_active(struct hsm_action_node *han);
+struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han);
+struct cds_list_head *
+schedule_batch_slot_on_client(struct client *client,
+			      struct hsm_action_node *han);
+void batch_reschedule_client(struct client *client);
+bool batch_slot_can_send(struct client *client, struct hsm_action_node *han);
+uint64_t batch_next_expiry(void);
+void batch_clear_expired(uint64_t now_ns);
+
 /* scheduler */
 
 struct client *find_client(struct cds_list_head *clients, const char *hostname);
@@ -319,6 +341,7 @@ int timer_init(void);
 int timer_rearm(void);
 void handle_expired_timers(void);
 
+/* phobos */
 #if HAVE_PHOBOS
 int phobos_enrich(struct hsm_action_node *han);
 struct cds_list_head *phobos_schedule(struct hsm_action_node *han);

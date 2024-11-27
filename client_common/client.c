@@ -161,6 +161,10 @@ static int config_parse(struct ct_state_config *config, int fail_enoent)
 			continue;
 		if (!strcasecmp(key, "archive_on_hosts"))
 			continue;
+		if (!strcasecmp(key, "batch_archives_slices_sec"))
+			continue;
+		if (!strcasecmp(key, "batch_archives_slots_per_client"))
+			continue;
 
 		LOG_WARN(-EINVAL, "skipping unknown key %s in %s (line %zd)",
 			 key, config->confpath, linenum);
