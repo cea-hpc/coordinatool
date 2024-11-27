@@ -30,7 +30,7 @@ static int tree_compare(const void *a, const void *b)
 	return memcmp(&va->dfid, &vb->dfid, sizeof(va->dfid));
 }
 
-static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup)
+static void _hsm_action_free(struct hsm_action_node *han, bool final_cleanup)
 {
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
@@ -53,9 +53,9 @@ static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup)
 	free(han);
 }
 
-void queue_node_free(struct hsm_action_node *han)
+void hsm_action_free(struct hsm_action_node *han)
 {
-	_queue_node_free(han, false);
+	_hsm_action_free(han, false);
 }
 
 static void tree_free_cb(void *nodep)
@@ -65,7 +65,7 @@ static void tree_free_cb(void *nodep)
 	struct hsm_action_node *han =
 		caa_container_of(item_info, struct hsm_action_node, info);
 
-	_queue_node_free(han, true);
+	_hsm_action_free(han, true);
 }
 
 void hsm_action_free_all(void)
@@ -130,7 +130,7 @@ int hsm_action_requeue(struct hsm_action_node *han, bool start)
 	default:
 		// free expects a list in good shape
 		CDS_INIT_LIST_HEAD(&han->node);
-		queue_node_free(han);
+		hsm_action_free(han);
 		return -EINVAL;
 	}
 

@@ -258,7 +258,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		 client->id, client->fd, PFID(&han->info.dfid), cookie, status);
 
 	int action = han->info.action;
-	queue_node_free(han);
+	hsm_action_free(han);
 
 	/* adjust running action count */
 	switch (action) {
