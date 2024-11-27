@@ -11,39 +11,67 @@ int phobos_enrich(struct hsm_action_node *han)
 {
 	char oid[XATTR_SIZE_MAX + 1];
 	int rc, save_errno, fd;
-	char *hostname;
 	ssize_t oidlen;
 
-	han->info.hsm_fuid = NULL;
+	/* only enrich restore */
 	if (han->info.action != HSMA_RESTORE)
-		/* only enrich restore */
 		return 0;
 
 	fd = llapi_open_by_fid(state->mntpath, &han->info.dfid,
 			       O_RDONLY | O_NOATIME | O_NOFOLLOW);
-	if (fd < 0)
-		return -errno;
+	if (fd < 0) {
+		rc = -errno;
+		LOG_WARN(rc, "Could not open " DFID " (phobos enrich)",
+			 PFID(&han->info.dfid));
+		return rc;
+	}
 
 	oidlen = fgetxattr(fd, "trusted.hsm_fuid", oid, XATTR_SIZE_MAX);
 	save_errno = errno;
 	close(fd);
-	if (oidlen < 0)
-		return (save_errno == ENODATA || save_errno == ENOTSUP) ?
-			       0 :
-			       -save_errno;
+	if (oidlen < 0) {
+		/* missing xattr, not using with phobos? */
+		if (save_errno == ENODATA || save_errno == ENOTSUP)
+			return 0;
+
+		rc = -save_errno;
+		LOG_WARN(rc, "Could not getxattr trusted.hsm_fuid " DFID,
+			 PFID(&han->info.dfid));
+		return rc;
+	}
 
 	oid[oidlen] = '\0';
+	han->info.hsm_fuid = xstrdup(oid);
+
+	return 0;
+}
+
+int phobos_schedule(struct hsm_action_node *han)
+{
+	int rc;
+	char *hostname;
+
+	/* only enrich restore */
+	if (han->info.action != HSMA_RESTORE)
+		return 0;
+
+	/* not in phobos */
+	if (!han->info.hsm_fuid)
+		return 0;
 
 #if HAVE_PHOBOS_1_95
 	int nb_new_lock;
-	rc = phobos_locate(oid, NULL, 0, NULL, &hostname, &nb_new_lock);
+	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, NULL, &hostname,
+			   &nb_new_lock);
 #else
-	rc = phobos_locate(oid, NULL, 0, &hostname);
+	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, &hostname);
 #endif
-	if (rc)
+	if (rc) {
+		LOG_ERROR(rc, "phobos: failed to locate " DFID " (oid %s)",
+			  PFID(&han->info.dfid), han->info.hsm_fuid);
 		return rc;
+	}
 
-	han->info.hsm_fuid = xstrdup(oid);
 	if (hostname == NULL)
 		return 0;
 
@@ -57,8 +85,12 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 	char *hostname;
 	int rc;
 
+	/* only restore are enriched */
 	if (han->info.action != HSMA_RESTORE)
-		/* only restore are enriched */
+		return true;
+
+	/* not in phobos */
+	if (!han->info.hsm_fuid)
 		return true;
 
 	// TODO If we just received the request, we don't need to do a locate

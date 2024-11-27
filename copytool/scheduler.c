@@ -67,19 +67,13 @@ static int schedule_on_host(struct hsm_action_node *han)
 }
 
 /* fill in static action item informations */
-void hsm_action_node_enrich(struct hsm_action_node *han)
+void hsm_action_node_schedule(struct hsm_action_node *han)
 {
 	if (schedule_on_host(han) > 0)
 		return;
 
 #if HAVE_PHOBOS
-	int rc = phobos_enrich(han);
-	if (rc < 0) {
-		LOG_ERROR(rc, "phobos: failed to enrich %s request for " DFID,
-			  ct_action2str(han->info.action),
-			  PFID(&han->info.dfid));
-		return;
-	}
+	phobos_schedule(han);
 #endif
 }
 

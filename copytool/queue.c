@@ -197,7 +197,10 @@ static int hsm_action_enqueue_common(struct hsm_action_node *han)
 		return -EEXIST;
 	}
 
-	hsm_action_node_enrich(han);
+#if HAVE_PHOBOS
+	(void)phobos_enrich(han);
+#endif
+	hsm_action_node_schedule(han);
 
 	redis_store_request(han);
 

@@ -291,7 +291,7 @@ int redis_recovery(void);
 
 int schedule_on_client(struct cds_list_head *clients,
 		       struct hsm_action_node *han, const char *hostname);
-void hsm_action_node_enrich(struct hsm_action_node *han);
+void hsm_action_node_schedule(struct hsm_action_node *han);
 void ct_schedule(void);
 void ct_schedule_client(struct client *client);
 
@@ -311,6 +311,7 @@ void handle_expired_timers(void);
 
 #if HAVE_PHOBOS
 int phobos_enrich(struct hsm_action_node *han);
+int phobos_schedule(struct hsm_action_node *han);
 bool phobos_can_send(struct client *client, struct hsm_action_node *han);
 #endif
 
