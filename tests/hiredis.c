@@ -13,9 +13,9 @@ int hsm_action_enqueue_json(struct state *state UNUSED, json_t *json UNUSED,
 {
 	return 0;
 }
-struct hsm_action_node *
-hsm_action_search_queue(struct hsm_action_queues *queues UNUSED,
-			unsigned long cookie UNUSED, struct lu_fid *dfid UNUSED)
+struct hsm_action_node *hsm_action_search(struct state *state UNUSED,
+					  unsigned long cookie UNUSED,
+					  struct lu_fid *dfid UNUSED)
 {
 	return NULL;
 }

@@ -125,7 +125,6 @@ struct hsm_action_queues {
 	struct cds_list_head waiting_restore;
 	struct cds_list_head waiting_archive;
 	struct cds_list_head waiting_remove;
-	void *actions_tree;
 	struct state *state;
 };
 
@@ -210,6 +209,7 @@ struct state {
 	int signal_fd;
 	bool terminating;
 	struct hsm_action_queues queues;
+	void *hsm_actions_tree;
 	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
 };
@@ -277,9 +277,9 @@ int hsm_action_enqueue(struct state *state, struct hsm_action_item *hai,
 		       int64_t timestamp);
 void hsm_action_assign(struct hsm_action_queues *queues,
 		       struct hsm_action_node *han, struct client *client);
-struct hsm_action_node *
-hsm_action_search_queue(struct hsm_action_queues *queues, unsigned long cookie,
-			struct lu_fid *dfid);
+struct hsm_action_node *hsm_action_search(struct state *state,
+					  unsigned long cookie,
+					  struct lu_fid *dfid);
 
 /* redis */
 

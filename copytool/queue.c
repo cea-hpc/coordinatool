@@ -12,7 +12,6 @@ void hsm_action_queues_init(struct state *state,
 	CDS_INIT_LIST_HEAD(&queues->waiting_restore);
 	CDS_INIT_LIST_HEAD(&queues->waiting_archive);
 	CDS_INIT_LIST_HEAD(&queues->waiting_remove);
-	queues->actions_tree = NULL;
 	queues->state = state;
 }
 
@@ -47,8 +46,7 @@ static void _queue_node_free(struct hsm_action_node *han, bool final_cleanup)
 #if HAVE_PHOBOS
 		free(han->info.hsm_fuid);
 #endif
-		if (!tdelete(&han->info,
-			     &han->queues->state->queues.actions_tree,
+		if (!tdelete(&han->info, &han->queues->state->hsm_actions_tree,
 			     tree_compare))
 			abort();
 	}
@@ -75,18 +73,18 @@ static void tree_free_cb(void *nodep)
 
 void hsm_action_free_all(struct state *state)
 {
-	tdestroy(state->queues.actions_tree, tree_free_cb);
+	tdestroy(state->hsm_actions_tree, tree_free_cb);
 }
 
-struct hsm_action_node *
-hsm_action_search_queue(struct hsm_action_queues *queues, unsigned long cookie,
-			struct lu_fid *dfid)
+struct hsm_action_node *hsm_action_search(struct state *state,
+					  unsigned long cookie,
+					  struct lu_fid *dfid)
 {
 	struct item_info search_item = {
 		.cookie = cookie,
 		.dfid = *dfid,
 	};
-	void *key = tfind(&search_item, &queues->actions_tree, tree_compare);
+	void *key = tfind(&search_item, &state->hsm_actions_tree, tree_compare);
 
 	if (!key)
 		return NULL;
@@ -193,8 +191,7 @@ static int hsm_action_enqueue_common(struct state *state,
 {
 	struct item_info **tree_key;
 
-	tree_key =
-		tsearch(&han->info, &han->queues->actions_tree, tree_compare);
+	tree_key = tsearch(&han->info, &state->hsm_actions_tree, tree_compare);
 	if (!tree_key)
 		abort();
 	if (*tree_key != &han->info) {

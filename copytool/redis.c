@@ -486,7 +486,7 @@ static int redis_scan_assigned(struct state *state, const char *key,
 	LOG_DEBUG("%s: Cookie %lx running", client_id, cookie);
 
 	struct hsm_action_node *han;
-	han = hsm_action_search_queue(&state->queues, cookie, &dfid);
+	han = hsm_action_search(state, cookie, &dfid);
 	if (!han) {
 		LOG_WARN(
 			-EINVAL,

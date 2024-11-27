@@ -251,8 +251,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg)
 	if (json_hsm_action_key_get(json, &cookie, &dfid))
 		return protocol_reply_done(
 			client, EINVAL, "cookie or fid not set -- old client?");
-	struct hsm_action_node *han =
-		hsm_action_search_queue(&state->queues, cookie, &dfid);
+	struct hsm_action_node *han = hsm_action_search(state, cookie, &dfid);
 	if (!han)
 		return protocol_reply_done(client, EINVAL, "Request not found");
 
@@ -560,8 +559,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg)
 			 * automatically remove it from free_hai list.
 			 */
 			struct hsm_action_node *han;
-			han = hsm_action_search_queue(&state->queues, cookie,
-						      &dfid);
+			han = hsm_action_search(state, cookie, &dfid);
 			if (han) {
 #ifdef DEBUG_ACTION_NODE
 				LOG_DEBUG(
