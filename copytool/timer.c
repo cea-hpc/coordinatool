@@ -4,7 +4,7 @@
 
 #include "coordinatool.h"
 
-int timer_init(struct state *state)
+int timer_init(void)
 {
 	int fd, rc;
 
@@ -22,7 +22,7 @@ int timer_init(struct state *state)
 	return epoll_addfd(state->epoll_fd, fd, (void *)(uintptr_t)fd);
 }
 
-int timer_rearm(struct state *state)
+int timer_rearm(void)
 {
 	struct itimerspec its = { 0 };
 	int64_t closest_ns = INT64_MAX, ns;
@@ -62,7 +62,7 @@ int timer_rearm(struct state *state)
 	return rc;
 }
 
-void handle_expired_timers(struct state *state)
+void handle_expired_timers(void)
 {
 	struct cds_list_head *n, *nnext;
 	int64_t ns = gettime_ns(), junk;
@@ -83,5 +83,5 @@ void handle_expired_timers(struct state *state)
 		client_disconnect(client);
 	}
 
-	timer_rearm(state);
+	timer_rearm();
 }

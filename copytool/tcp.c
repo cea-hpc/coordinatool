@@ -4,7 +4,7 @@
 
 #include "coordinatool.h"
 
-int tcp_listen(struct state *state)
+int tcp_listen(void)
 {
 	struct addrinfo hints;
 	struct addrinfo *result, *rp;
@@ -97,7 +97,7 @@ char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len)
 	return addrstring;
 }
 
-static void client_closefd(struct state *state, struct client *client)
+static void client_closefd(struct client *client)
 {
 	if (client->fd >= 0) {
 		close(client->fd);
@@ -108,7 +108,6 @@ static void client_closefd(struct state *state, struct client *client)
 
 void client_free(struct client *client)
 {
-	struct state *state = client->queues.state;
 	struct cds_list_head *n, *next;
 	struct cds_list_head *lists[] = {
 		&client->active_requests,
@@ -123,7 +122,7 @@ void client_free(struct client *client)
 		LOG_DEBUG("Clients: freeing anonymous %s (%d)", client->id,
 			  client->fd);
 	}
-	client_closefd(state, client);
+	client_closefd(client);
 	cds_list_del(&client->node_clients);
 	if (client->status == CLIENT_WAITING)
 		cds_list_del(&client->waiting_node);
@@ -136,7 +135,7 @@ void client_free(struct client *client)
 			hsm_action_move(&state->queues, node, true);
 		}
 	}
-	ct_schedule(state);
+	ct_schedule();
 	free((void *)client->id);
 	free((void *)client->archives);
 	free(client);
@@ -144,8 +143,6 @@ void client_free(struct client *client)
 
 void client_disconnect(struct client *client)
 {
-	struct state *state = client->queues.state;
-
 	/* no point in keeping client around if it has no id */
 	if (!client->id_set) {
 		client_free(client);
@@ -160,12 +157,12 @@ void client_disconnect(struct client *client)
 		if (client->status == CLIENT_WAITING)
 			cds_list_del(&client->waiting_node);
 		client->status = CLIENT_DISCONNECTED;
-		client_closefd(state, client);
+		client_closefd(client);
 		client->disconnected_timestamp = gettime_ns();
 		cds_list_del(&client->node_clients);
 		cds_list_add(&client->node_clients,
 			     &state->stats.disconnected_clients);
-		timer_rearm(state);
+		timer_rearm();
 		break;
 	default:
 		/* clients who never sent ehlo or aren't actually connected
@@ -175,7 +172,7 @@ void client_disconnect(struct client *client)
 	}
 }
 
-int handle_client_connect(struct state *state)
+int handle_client_connect()
 {
 	int fd, rc;
 	struct sockaddr_storage peer_addr;
@@ -202,7 +199,6 @@ int handle_client_connect(struct state *state)
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_archive);
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
 	client->status = CLIENT_INIT;
-	client->queues.state = state;
 	state->stats.clients_connected++;
 
 	LOG_DEBUG("Clients: new connection %s (%d)", client->id, client->fd);
@@ -217,7 +213,7 @@ int handle_client_connect(struct state *state)
 	return rc;
 }
 
-struct client *client_new_disconnected(struct state *state, const char *id)
+struct client *client_new_disconnected(const char *id)
 {
 	/* create client in disconnected state for recovery */
 	struct client *client = xcalloc(sizeof(*client), 1);
@@ -234,8 +230,7 @@ struct client *client_new_disconnected(struct state *state, const char *id)
 	CDS_INIT_LIST_HEAD(&client->queues.waiting_remove);
 	client->status = CLIENT_DISCONNECTED;
 	client->disconnected_timestamp = gettime_ns();
-	client->queues.state = state;
-	timer_rearm(state);
+	timer_rearm();
 
 	LOG_INFO("Clients: restore from redis %s", id);
 

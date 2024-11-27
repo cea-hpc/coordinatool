@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <sys/xattr.h>
 
-int phobos_enrich(struct state *state, struct hsm_action_node *han)
+int phobos_enrich(struct hsm_action_node *han)
 {
 	char oid[XATTR_SIZE_MAX + 1];
 	int rc, save_errno, fd;
@@ -79,7 +79,7 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 
 	struct cds_list_head *n;
 
-	cds_list_for_each(n, &client->queues.state->stats.clients)
+	cds_list_for_each(n, &state->stats.clients)
 	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
@@ -91,7 +91,7 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 	}
 
 	/* move the request back into the main queue */
-	hsm_action_move(&han->queues->state->queues, han, true);
+	hsm_action_move(&state->queues, han, true);
 
 	return false;
 }

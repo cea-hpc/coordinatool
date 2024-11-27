@@ -29,7 +29,7 @@ static const char *pretty_data(struct hsm_action_item *hai)
 	return buf;
 }
 
-int handle_ct_event(struct state *state)
+int handle_ct_event(void)
 {
 	struct hsm_action_list *hal;
 	int msgsize, rc;
@@ -70,7 +70,7 @@ int handle_ct_event(struct state *state)
 	unsigned int i = 0;
 	int64_t timestamp = gettime_ns();
 	while (++i <= hal->hal_count) {
-		rc = hsm_action_enqueue(state, hai, hal->hal_archive_id,
+		rc = hsm_action_enqueue(hai, hal->hal_archive_id,
 					hal->hal_flags, timestamp);
 		if (rc < 0)
 			return rc;
@@ -87,12 +87,12 @@ int handle_ct_event(struct state *state)
 
 		hai = hai_next(hai);
 	}
-	ct_schedule(state);
+	ct_schedule();
 
 	return hal->hal_count;
 }
 
-int ct_register(struct state *state)
+int ct_register(void)
 {
 	int rc;
 	char fsname[LUSTRE_MAXFSNAME + 1];

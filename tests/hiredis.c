@@ -5,27 +5,25 @@
 
 #include "../copytool/coordinatool.h"
 
+struct state *state;
+
 /* fill in dummy requirements to copytool/redis.c */
-int hsm_action_enqueue_json(struct state *state UNUSED, json_t *json UNUSED,
-			    int64_t timestamp UNUSED,
+int hsm_action_enqueue_json(json_t *json UNUSED, int64_t timestamp UNUSED,
 			    struct hsm_action_node **han_out UNUSED,
 			    const char *requestor UNUSED)
 {
 	return 0;
 }
-struct hsm_action_node *hsm_action_search(struct state *state UNUSED,
-					  unsigned long cookie UNUSED,
+struct hsm_action_node *hsm_action_search(unsigned long cookie UNUSED,
 					  struct lu_fid *dfid UNUSED)
 {
 	return NULL;
 }
-struct client *client_new_disconnected(struct state *state UNUSED,
-				       const char *id UNUSED)
+struct client *client_new_disconnected(const char *id UNUSED)
 {
 	return NULL;
 }
-void hsm_action_assign(struct hsm_action_queues *queues UNUSED,
-		       struct hsm_action_node *han UNUSED,
+void hsm_action_assign(struct hsm_action_node *han UNUSED,
 		       struct client *client UNUSED)
 {
 	return;
@@ -218,26 +216,27 @@ void cb_del(redisAsyncContext *ac, void *_reply, void *privdata)
 #define MAX_EVENTS 10
 int main(void)
 {
-	struct state state;
+	struct state mstate;
 	struct testdata testdata = { 0 };
 	int rc;
 
 	/* if debugging this, increase log level here to LLAPI_MSG_DEBUG */
 	llapi_msg_set_level(LLAPI_MSG_INFO);
+	state = &mstate;
 
-	state.epoll_fd = epoll_create1(0);
-	if (state.epoll_fd < 0) {
+	mstate.epoll_fd = epoll_create1(0);
+	if (mstate.epoll_fd < 0) {
 		LOG_ERROR(-errno, "could not create epoll fd");
-		return 1;
+		exit(1);
 	}
 
 	// XXX take from env like coordinatool config or something
-	state.config.redis_host = "localhost";
-	state.config.redis_port = 6379;
-	rc = redis_connect(&state);
+	mstate.config.redis_host = "localhost";
+	mstate.config.redis_port = 6379;
+	rc = redis_connect();
 	if (rc < 0) {
 		LOG_ERROR(rc, "could not redis_connect");
-		return 1;
+		exit(1);
 	}
 
 	/* note subscribe works, but then any other command fails as
@@ -245,40 +244,40 @@ int main(void)
 	 * We'd need to reconnect on a dedicated connection for it.
 	 */
 	/* this will start the callback chain for tests */
-	rc = redisAsyncCommand(state.redis_ac, cb_initial_delete, &testdata,
+	rc = redisAsyncCommand(mstate.redis_ac, cb_initial_delete, &testdata,
 			       "del testList");
 	if (rc) {
 		LOG_ERROR(-EIO, "redisAsyncCommand failed: %d/%d", rc, errno);
-		return 1;
+		exit(1);
 	}
 
 	struct epoll_event events[MAX_EVENTS];
 	int nfds;
 	while (!testdata.stop) {
-		nfds = epoll_wait(state.epoll_fd, events, MAX_EVENTS, -1);
+		nfds = epoll_wait(mstate.epoll_fd, events, MAX_EVENTS, -1);
 		if (nfds < 0 && errno == EINTR)
 			continue;
 		if (nfds < 0) {
 			rc = -errno;
 			LOG_ERROR(rc, "epoll_wait failed");
-			return 1;
+			exit(1);
 		}
 		int n;
 		for (n = 0; n < nfds; n++) {
 			if (events[n].events & (EPOLLERR | EPOLLHUP)) {
 				LOG_INFO("%d on error/hup", events[n].data.fd);
 			}
-			assert(events[n].data.ptr == state.redis_ac);
+			assert(events[n].data.ptr == mstate.redis_ac);
 
 			if (events[n].events & EPOLLIN)
-				redisAsyncHandleRead(state.redis_ac);
+				redisAsyncHandleRead(mstate.redis_ac);
 			// EPOLLOUT is only requested when we have something
 			// to send
 			if (events[n].events & EPOLLOUT)
-				redisAsyncHandleWrite(state.redis_ac);
+				redisAsyncHandleWrite(mstate.redis_ac);
 		}
 	}
 
-	redisAsyncDisconnect(state.redis_ac);
-	return testdata.rc;
+	redisAsyncDisconnect(mstate.redis_ac);
+	exit(testdata.rc);
 }

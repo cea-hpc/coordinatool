@@ -13,10 +13,9 @@
  * STATUS
  */
 
-static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg)
+static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg UNUSED)
 {
 	struct client *client = fd_arg;
-	struct state *state = arg;
 
 	return protocol_reply_status(client, &state->stats, 0, NULL);
 }
@@ -152,10 +151,9 @@ out_freereply:
  * RECV
  */
 
-static int recv_cb(void *fd_arg, json_t *json, void *arg)
+static int recv_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 {
 	struct client *client = fd_arg;
-	struct state *state = arg;
 	client->max_bytes =
 		protocol_getjson_int(json, "max_bytes", 1024 * 1024);
 	client->max_restore = protocol_getjson_int(json, "max_restore", -1);
@@ -183,7 +181,7 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg)
 	cds_list_add(&client->waiting_node, &state->waiting_clients);
 	client->status = CLIENT_WAITING;
 	/* schedule immediately in case work is available */
-	ct_schedule_client(state, client);
+	ct_schedule_client(client);
 	return 0;
 }
 
@@ -240,10 +238,9 @@ out_freereply:
 /**
  * DONE
  */
-static int done_cb(void *fd_arg, json_t *json, void *arg)
+static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 {
 	struct client *client = fd_arg;
-	struct state *state = arg;
 
 	uint64_t cookie;
 	struct lu_fid dfid;
@@ -251,7 +248,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg)
 	if (json_hsm_action_key_get(json, &cookie, &dfid))
 		return protocol_reply_done(
 			client, EINVAL, "cookie or fid not set -- old client?");
-	struct hsm_action_node *han = hsm_action_search(state, cookie, &dfid);
+	struct hsm_action_node *han = hsm_action_search(cookie, &dfid);
 	if (!han)
 		return protocol_reply_done(client, EINVAL, "Request not found");
 
@@ -288,7 +285,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg)
 	}
 
 	if (client->status == CLIENT_WAITING) {
-		ct_schedule_client(state, client);
+		ct_schedule_client(client);
 	}
 
 	return protocol_reply_done(client, 0, NULL);
@@ -325,10 +322,9 @@ out_freereply:
  * QUEUE
  */
 
-static int queue_cb(void *fd_arg, json_t *json, void *arg)
+static int queue_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 {
 	struct client *client = fd_arg;
-	struct state *state = arg;
 	int enqueued = 0, skipped = 0;
 	int rc, final_rc = 0;
 
@@ -353,8 +349,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg)
 	json_array_foreach(json_items, count, item)
 	{
 		struct hsm_action_node *han;
-		rc = hsm_action_enqueue_json(state, item, timestamp, &han,
-					     client->id);
+		rc = hsm_action_enqueue_json(item, timestamp, &han, client->id);
 		if (rc < 0) {
 			final_rc = rc;
 			continue;
@@ -406,7 +401,7 @@ out_freereply:
 	return rc;
 }
 
-static bool ehlo_is_id_unique(struct state *state, const char *id)
+static bool ehlo_is_id_unique(const char *id)
 {
 	struct cds_list_head *n;
 	cds_list_for_each(n, &state->stats.clients)
@@ -427,10 +422,9 @@ static bool ehlo_is_id_unique(struct state *state, const char *id)
 	return true;
 }
 
-static int ehlo_cb(void *fd_arg, json_t *json, void *arg)
+static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 {
 	struct client *client = fd_arg;
-	struct state *state = arg;
 	const char *id;
 	json_t *json_archives;
 
@@ -467,7 +461,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg)
 	}
 
 	id = protocol_getjson_str(json, "id", NULL, NULL);
-	if (!ehlo_is_id_unique(state, id ? id : client->id)) {
+	if (!ehlo_is_id_unique(id ? id : client->id)) {
 		LOG_INFO("Clients: duplicate id '%s' refused for %s (%d)",
 			 id ? id : client->id, client->id, client->fd);
 		return protocol_reply_ehlo(client, EEXIST,
@@ -559,7 +553,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg)
 			 * automatically remove it from free_hai list.
 			 */
 			struct hsm_action_node *han;
-			han = hsm_action_search(state, cookie, &dfid);
+			han = hsm_action_search(cookie, &dfid);
 			if (han) {
 #ifdef DEBUG_ACTION_NODE
 				LOG_DEBUG(
@@ -574,7 +568,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg)
 			}
 			/* Otherwise create new one. Use enqueue to enrich it just in case.
 			 * Note that requires a dequeue to immediately get it off waiting list */
-			if (hsm_action_enqueue_json(state, hai, timestamp, &han,
+			if (hsm_action_enqueue_json(hai, timestamp, &han,
 						    client->id) < 0 ||
 			    !han) {
 				/* ignore bad items in hai list */
@@ -586,7 +580,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg)
 				client->id, client->fd, (void *)han,
 				(void *)&client->active_requests);
 #endif
-			hsm_action_assign(&state->queues, han, client);
+			hsm_action_assign(han, client);
 		}
 	}
 

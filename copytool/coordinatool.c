@@ -17,6 +17,8 @@
 #include <phobos_store.h>
 #endif
 
+struct state *state;
+
 int epoll_addfd(int epoll_fd, int fd, void *data)
 {
 	struct epoll_event ev;
@@ -69,7 +71,7 @@ static void print_version(void)
 	printf("Coordinatool version %s\n", VERSION);
 }
 
-static int signal_init(struct state *state)
+static int signal_init(void)
 {
 	int rc;
 	sigset_t ss;
@@ -120,7 +122,7 @@ static void signal_log(int signal_fd)
 		 siginfo.ssi_pid);
 }
 
-static void initiate_termination(struct state *state)
+static void initiate_termination(void)
 {
 	struct cds_list_head *n, *nnext;
 	state->terminating = true;
@@ -162,7 +164,7 @@ static int random_init(void)
 }
 
 #define MAX_EVENTS 10
-static int ct_start(struct state *state)
+static int ct_start(void)
 {
 	int rc;
 	struct epoll_event events[MAX_EVENTS];
@@ -179,30 +181,30 @@ static int ct_start(struct state *state)
 	if (rc < 0)
 		return rc;
 
-	rc = timer_init(state);
+	rc = timer_init();
 	if (rc < 0)
 		return rc;
 
-	rc = signal_init(state);
+	rc = signal_init();
 	if (rc < 0)
 		return rc;
 
-	hsm_action_queues_init(state, &state->queues);
+	hsm_action_queues_init(&state->queues);
 
-	rc = redis_connect(state);
+	rc = redis_connect();
 	if (rc < 0)
 		return rc;
 
 	/* we need to run this before other fds have been added to epoll */
-	rc = redis_recovery(state);
+	rc = redis_recovery();
 	if (rc < 0)
 		return rc;
 
-	rc = tcp_listen(state);
+	rc = tcp_listen();
 	if (rc < 0)
 		return rc;
 
-	rc = ct_register(state);
+	rc = ct_register();
 	if (rc < 0)
 		return rc;
 
@@ -222,9 +224,9 @@ static int ct_start(struct state *state)
 				LOG_INFO("%d on error/hup", events[n].data.fd);
 			}
 			if (events[n].data.fd == state->hsm_fd) {
-				handle_ct_event(state);
+				handle_ct_event();
 			} else if (events[n].data.fd == state->listen_fd) {
-				handle_client_connect(state);
+				handle_client_connect();
 			} else if (events[n].data.ptr == state->redis_ac) {
 				if (events[n].events & EPOLLIN) {
 					redisAsyncHandleRead(state->redis_ac);
@@ -247,10 +249,10 @@ static int ct_start(struct state *state)
 						"Connection to redis server failed, trying to reconnect");
 					// XXX check rc
 					// XXX if server isn't up we'll busy loop on this...
-					redis_connect(state);
+					redis_connect();
 				}
 			} else if (events[n].data.fd == state->timer_fd) {
-				handle_expired_timers(state);
+				handle_expired_timers();
 			} else if (events[n].data.fd == state->signal_fd) {
 				signal_log(state->signal_fd);
 
@@ -262,7 +264,7 @@ static int ct_start(struct state *state)
 						"Got killed twice, no longer waiting for redis");
 					return 0;
 				}
-				initiate_termination(state);
+				initiate_termination();
 
 				/* The loop will stop when redis is done */
 				if (state->redis_ac) {
@@ -286,7 +288,7 @@ static int ct_start(struct state *state)
 				struct client *client = events[n].data.ptr;
 				if (protocol_read_command(
 					    client->fd, client->id, client,
-					    protocol_cbs, state) < 0) {
+					    protocol_cbs, NULL) < 0) {
 					client_disconnect(client);
 				}
 			}
@@ -323,25 +325,26 @@ int main(int argc, char *argv[])
 #endif
 
 	// state init
-	struct state state = {
+	struct state mstate = {
 		.listen_fd = -1,
 		.timer_fd = -1,
 	};
-	CDS_INIT_LIST_HEAD(&state.config.archive_mappings);
-	CDS_INIT_LIST_HEAD(&state.stats.clients);
-	CDS_INIT_LIST_HEAD(&state.stats.disconnected_clients);
-	CDS_INIT_LIST_HEAD(&state.waiting_clients);
+	state = &mstate;
+	CDS_INIT_LIST_HEAD(&mstate.config.archive_mappings);
+	CDS_INIT_LIST_HEAD(&mstate.stats.clients);
+	CDS_INIT_LIST_HEAD(&mstate.stats.disconnected_clients);
+	CDS_INIT_LIST_HEAD(&mstate.waiting_clients);
 
 	/* parse arguments once first just for config */
 	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=
 	       -1) {
 		if (rc == 'c') {
-			free((void *)state.config.confpath);
-			state.config.confpath = xstrdup(optarg);
+			free((void *)mstate.config.confpath);
+			mstate.config.confpath = xstrdup(optarg);
 		}
 	}
 
-	rc = config_init(&state.config);
+	rc = config_init(&mstate.config);
 	if (rc) {
 		rc = EXIT_FAILURE;
 		goto out;
@@ -356,56 +359,56 @@ int main(int argc, char *argv[])
 		case 'A':
 			if (first_archive_id) {
 				/* reset any value defined in config */
-				state.config.archive_cnt = 0;
+				mstate.config.archive_cnt = 0;
 				first_archive_id = false;
 			}
-			if (state.config.archive_cnt >=
+			if (mstate.config.archive_cnt >=
 			    LL_HSM_MAX_ARCHIVES_PER_AGENT) {
 				LOG_ERROR(-E2BIG, "too many archive id given");
 				rc = EXIT_FAILURE;
 				goto out;
 			}
-			state.config.archives[state.config.archive_cnt] =
+			mstate.config.archives[mstate.config.archive_cnt] =
 				parse_int(optarg, INT_MAX, "Archive id");
-			if (state.config.archives[state.config.archive_cnt] <=
+			if (mstate.config.archives[mstate.config.archive_cnt] <=
 			    0) {
 				rc = EXIT_FAILURE;
 				goto out;
 			}
-			state.config.archive_cnt++;
+			mstate.config.archive_cnt++;
 			break;
 		case 'v':
-			state.config.verbose++;
-			llapi_msg_set_level(state.config.verbose);
+			mstate.config.verbose++;
+			llapi_msg_set_level(mstate.config.verbose);
 			break;
 		case 'q':
-			state.config.verbose--;
-			llapi_msg_set_level(state.config.verbose);
+			mstate.config.verbose--;
+			llapi_msg_set_level(mstate.config.verbose);
 			break;
 		case 'H':
-			free((void *)state.config.host);
-			state.config.host = xstrdup(optarg);
+			free((void *)mstate.config.host);
+			mstate.config.host = xstrdup(optarg);
 			break;
 		case 'p':
-			free((void *)state.config.port);
-			state.config.port = xstrdup(optarg);
+			free((void *)mstate.config.port);
+			mstate.config.port = xstrdup(optarg);
 			break;
 		case OPT_REDIS_HOST:
-			free((void *)state.config.redis_host);
-			state.config.redis_host = xstrdup(optarg);
+			free((void *)mstate.config.redis_host);
+			mstate.config.redis_host = xstrdup(optarg);
 			break;
 		case OPT_REDIS_PORT:
-			state.config.redis_port =
+			mstate.config.redis_port =
 				parse_int(optarg, 65535, "Redis port");
-			if (state.config.redis_port < 0) {
+			if (mstate.config.redis_port < 0) {
 				rc = EXIT_FAILURE;
 				goto out;
 			}
 			break;
 		case OPT_CLIENT_GRACE:
-			state.config.client_grace_ms =
+			mstate.config.client_grace_ms =
 				parse_int(optarg, INT_MAX, "client grace ms");
-			if (state.config.client_grace_ms < 0) {
+			if (mstate.config.client_grace_ms < 0) {
 				rc = EXIT_FAILURE;
 				goto out;
 			}
@@ -429,22 +432,22 @@ int main(int argc, char *argv[])
 		rc = EXIT_FAILURE;
 		goto out;
 	}
-	state.mntpath = argv[optind];
+	mstate.mntpath = argv[optind];
 
-	rc = ct_start(&state);
+	rc = ct_start();
 	rc = rc ? EXIT_FAILURE : EXIT_SUCCESS;
 
 out:
-	if (state.redis_ac) {
+	if (mstate.redis_ac) {
 		LOG_WARN(
 			EISCONN,
 			"redis connection was not closed completely, some requests will likely not be remembered");
 	}
-	if (state.ctdata) {
-		llapi_hsm_copytool_unregister(&state.ctdata);
+	if (mstate.ctdata) {
+		llapi_hsm_copytool_unregister(&mstate.ctdata);
 	}
-	hsm_action_free_all(&state);
-	config_free(&state.config);
-	free((void *)state.fsname);
+	hsm_action_free_all();
+	config_free(&mstate.config);
+	free((void *)mstate.fsname);
 	return rc;
 }

@@ -5,9 +5,8 @@
 
 #include "coordinatool.h"
 
-static void redis_addwrite(void *_state)
+static void redis_addwrite(void *arg UNUSED)
 {
-	struct state *state = _state;
 	struct epoll_event ev;
 
 	ev.events = EPOLLIN | EPOLLOUT;
@@ -20,9 +19,8 @@ static void redis_addwrite(void *_state)
 			 "Could not listen redis fd for write: redis broken!");
 }
 
-static void redis_delwrite(void *_state)
+static void redis_delwrite(void *arg UNUSED)
 {
-	struct state *state = _state;
 	struct epoll_event ev;
 
 	ev.events = EPOLLIN;
@@ -58,19 +56,16 @@ static int redis_error_to_errno(int err)
 	}
 }
 
-static void redis_disconnect_cb(const struct redisAsyncContext *ac,
+static void redis_disconnect_cb(const struct redisAsyncContext *ac UNUSED,
 				int status UNUSED)
 {
-	struct state *state = ac->data;
-
 	LOG_INFO("Redis disconnected");
 	state->redis_ac = NULL;
 }
 
-static void redis_connect_cb(const struct redisAsyncContext *ac, int status)
+static void redis_connect_cb(const struct redisAsyncContext *ac UNUSED,
+			     int status)
 {
-	struct state *state = ac->data;
-
 	if (status == REDIS_OK) {
 		return;
 	}
@@ -79,7 +74,7 @@ static void redis_connect_cb(const struct redisAsyncContext *ac, int status)
 	state->redis_ac = NULL;
 }
 
-int redis_connect(struct state *state)
+int redis_connect(void)
 {
 	int rc;
 	redisAsyncContext *ac;
@@ -100,9 +95,6 @@ int redis_connect(struct state *state)
 	}
 	state->redis_ac = ac;
 
-	/* hiredis provides a data field that's not used internally,
-	 * use it for disconnect cleanup as that doesn't pass any argument */
-	ac->data = state;
 	redisAsyncSetDisconnectCallback(ac, redis_disconnect_cb);
 	/* ... and that disconnect callback will NOT be called if connect
 	 * failed: we need to handle these failures on connect callback */
@@ -111,7 +103,6 @@ int redis_connect(struct state *state)
 	/* We have our own event loop, so we need to register our own callbacks...
 	 * Switch to libev(ent) at some point?
 	 * For now it's just as easy to use directly... */
-	ac->ev.data = state;
 	ac->ev.addWrite = redis_addwrite;
 	ac->ev.delWrite = redis_delwrite;
 	// delRead never used
@@ -203,8 +194,8 @@ static void cb_insert(redisAsyncContext *ac, void *_reply, void *private)
 	// but we don't really care so not checking.
 }
 
-static int redis_insert(struct state *state, const char *hash, uint64_t cookie,
-			struct lu_fid *dfid, const char *data)
+static int redis_insert(const char *hash, uint64_t cookie, struct lu_fid *dfid,
+			const char *data)
 {
 	int rc;
 	char key[KEY_SIZE];
@@ -236,8 +227,7 @@ static void cb_delete(redisAsyncContext *ac, void *_reply, void *private)
 	// without checking if it's in: skip check
 }
 
-static int redis_delete(struct state *state, const char *hash, const char *key,
-			uint64_t cookie)
+static int redis_delete(const char *hash, const char *key, uint64_t cookie)
 {
 	int rc;
 
@@ -255,7 +245,7 @@ static int redis_delete(struct state *state, const char *hash, const char *key,
 	return 0;
 }
 
-int redis_store_request(struct state *state, struct hsm_action_node *han)
+int redis_store_request(struct hsm_action_node *han)
 {
 	char *hai_json_str;
 	int rc;
@@ -270,31 +260,28 @@ int redis_store_request(struct state *state, struct hsm_action_node *han)
 			 PFID(&han->info.dfid));
 	}
 
-	rc = redis_insert(state, "coordinatool_requests", han->info.cookie,
+	rc = redis_insert("coordinatool_requests", han->info.cookie,
 			  &han->info.dfid, hai_json_str);
 	free(hai_json_str);
 
 	return rc;
 }
 
-int redis_assign_request(struct state *state, struct client *client,
-			 struct hsm_action_node *han)
+int redis_assign_request(struct client *client, struct hsm_action_node *han)
 {
-	return redis_insert(state, "coordinatool_assigned", han->info.cookie,
+	return redis_insert("coordinatool_assigned", han->info.cookie,
 			    &han->info.dfid, client->id);
 }
 
-int redis_deassign_request(struct state *state, struct hsm_action_node *han)
+int redis_deassign_request(struct hsm_action_node *han)
 {
 	char key[KEY_SIZE];
 
 	format_key(key, han->info.cookie, &han->info.dfid);
-	return redis_delete(state, "coordinatool_assigned", key,
-			    han->info.cookie);
+	return redis_delete("coordinatool_assigned", key, han->info.cookie);
 }
 
-int redis_delete_request(struct state *state, uint64_t cookie,
-			 struct lu_fid *dfid)
+int redis_delete_request(uint64_t cookie, struct lu_fid *dfid)
 {
 	char key[KEY_SIZE];
 
@@ -302,18 +289,17 @@ int redis_delete_request(struct state *state, uint64_t cookie,
 
 	// note we won't bother sending second request if first failed
 	// as that likely means connection is broken
-	return redis_delete(state, "coordinatool_requests", key, cookie) ||
-	       redis_delete(state, "coordinatool_assigned", key, cookie);
+	return redis_delete("coordinatool_requests", key, cookie) ||
+	       redis_delete("coordinatool_assigned", key, cookie);
 }
 
 struct redis_wait {
-	struct state *state;
 	int done;
 	const char *hash;
-	int (*cb)(struct state *state, const char *key, const char *value);
+	int (*cb)(const char *key, const char *value);
 };
 
-static int redis_wait_done(struct state *state, int *done)
+static int redis_wait_done(int *done)
 {
 	/* when this function runs the epoll loop is not live yet,
 	 * so run our own.
@@ -419,7 +405,7 @@ static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private)
 		}
 		const char *key = key_reply->str;
 		const char *value = value_reply->str;
-		rc = wait->cb(wait->state, key, value);
+		rc = wait->cb(key, value);
 		if (rc) {
 			wait->done = rc;
 			return;
@@ -442,8 +428,7 @@ static void redis_scan_cb(redisAsyncContext *ac, void *_reply, void *private)
 	}
 }
 
-static int redis_scan_requests(struct state *state, const char *key UNUSED,
-			       const char *value)
+static int redis_scan_requests(const char *key UNUSED, const char *value)
 {
 	int rc;
 	json_error_t json_error;
@@ -457,8 +442,7 @@ static int redis_scan_requests(struct state *state, const char *key UNUSED,
 	}
 
 	struct hsm_action_node *han;
-	rc = hsm_action_enqueue_json(state, json_hai, 0, &han,
-				     "redis (recovery)");
+	rc = hsm_action_enqueue_json(json_hai, 0, &han, "redis (recovery)");
 	json_decref(json_hai);
 	if (rc < 0)
 		return rc;
@@ -469,8 +453,7 @@ static int redis_scan_requests(struct state *state, const char *key UNUSED,
 	return 0;
 }
 
-static int redis_scan_assigned(struct state *state, const char *key,
-			       const char *client_id)
+static int redis_scan_assigned(const char *key, const char *client_id)
 {
 	struct cds_list_head *n;
 	bool found = false;
@@ -486,14 +469,13 @@ static int redis_scan_assigned(struct state *state, const char *key,
 	LOG_DEBUG("%s: Cookie %lx running", client_id, cookie);
 
 	struct hsm_action_node *han;
-	han = hsm_action_search(state, cookie, &dfid);
+	han = hsm_action_search(cookie, &dfid);
 	if (!han) {
 		LOG_WARN(
 			-EINVAL,
 			"%s: cookie %lx assigned but wasn't in request list, cleaning up",
 			client_id, cookie);
-		return redis_delete(state, "coordinatool_assigned", key,
-				    cookie);
+		return redis_delete("coordinatool_assigned", key, cookie);
 	}
 
 	cds_list_for_each(n, &state->stats.disconnected_clients)
@@ -505,7 +487,7 @@ static int redis_scan_assigned(struct state *state, const char *key,
 		}
 	}
 	if (!found) {
-		client = client_new_disconnected(state, client_id);
+		client = client_new_disconnected(client_id);
 	}
 
 #ifdef DEBUG_ACTION_NODE
@@ -516,20 +498,18 @@ static int redis_scan_assigned(struct state *state, const char *key,
 	// could already be enqueued.
 	// This will work (list del is the same) but stats will be wrong
 	// we need to add some han state to fix this
-	hsm_action_assign(&state->queues, han, client);
+	hsm_action_assign(han, client);
 
 	return 0;
 }
 
-int redis_recovery(struct state *state)
+int redis_recovery(void)
 {
 	struct redis_wait wait[2] = { {
-					      .state = state,
 					      .cb = redis_scan_requests,
 					      .hash = "coordinatool_requests",
 				      },
 				      {
-					      .state = state,
 					      .cb = redis_scan_assigned,
 					      .hash = "coordinatool_assigned",
 				      } };
@@ -559,7 +539,7 @@ int redis_recovery(struct state *state)
 				  wait[i].hash);
 			return rc;
 		}
-		rc = redis_wait_done(state, &wait[i].done);
+		rc = redis_wait_done(&wait[i].done);
 		if (rc < 0)
 			return rc;
 	}

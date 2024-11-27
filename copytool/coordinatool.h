@@ -112,7 +112,7 @@ struct hsm_action_node {
 		char *hsm_fuid;
 #endif
 	} info;
-	/* queue han will be enqueued to */
+	/* actual list han will be enqueued to */
 	struct hsm_action_queues *queues;
 	/* if sent to a client, remember who for eventual cancel (not implemented) */
 	struct client *client;
@@ -125,7 +125,6 @@ struct hsm_action_queues {
 	struct cds_list_head waiting_restore;
 	struct cds_list_head waiting_archive;
 	struct cds_list_head waiting_remove;
-	struct state *state;
 };
 
 struct host_mapping {
@@ -221,13 +220,15 @@ void config_free(struct state_config *config);
 
 /* coordinatool */
 
+extern struct state *state;
+
 int epoll_addfd(int epoll_fd, int fd, void *data);
 int epoll_delfd(int epoll_fd, int fd);
 
 /* lhsm */
 
-int handle_ct_event(struct state *state);
-int ct_register(struct state *state);
+int handle_ct_event(void);
+int ct_register(void);
 
 /* protocol */
 
@@ -263,59 +264,53 @@ int protocol_reply_ehlo(struct client *client, int status, char *error);
 /* queue */
 
 void queue_node_free(struct hsm_action_node *han);
-void hsm_action_free_all(struct state *state);
-void hsm_action_queues_init(struct state *state,
-			    struct hsm_action_queues *queues);
+void hsm_action_free_all(void);
+void hsm_action_queues_init(struct hsm_action_queues *queues);
 int hsm_action_requeue(struct hsm_action_node *han, bool start);
 void hsm_action_move(struct hsm_action_queues *queues,
 		     struct hsm_action_node *han, bool start);
-int hsm_action_enqueue_json(struct state *state, json_t *json_hai,
-			    int64_t timestamp, struct hsm_action_node **han_out,
+int hsm_action_enqueue_json(json_t *json_hai, int64_t timestamp,
+			    struct hsm_action_node **han_out,
 			    const char *requestor);
-int hsm_action_enqueue(struct state *state, struct hsm_action_item *hai,
-		       uint32_t archive_id, uint64_t hal_flags,
-		       int64_t timestamp);
-void hsm_action_assign(struct hsm_action_queues *queues,
-		       struct hsm_action_node *han, struct client *client);
-struct hsm_action_node *hsm_action_search(struct state *state,
-					  unsigned long cookie,
+int hsm_action_enqueue(struct hsm_action_item *hai, uint32_t archive_id,
+		       uint64_t hal_flags, int64_t timestamp);
+void hsm_action_assign(struct hsm_action_node *han, struct client *client);
+struct hsm_action_node *hsm_action_search(unsigned long cookie,
 					  struct lu_fid *dfid);
 
 /* redis */
 
-int redis_connect(struct state *state);
-int redis_store_request(struct state *state, struct hsm_action_node *han);
-int redis_assign_request(struct state *state, struct client *client,
-			 struct hsm_action_node *han);
-int redis_deassign_request(struct state *state, struct hsm_action_node *han);
-int redis_delete_request(struct state *state, uint64_t cookie,
-			 struct lu_fid *dfid);
-int redis_recovery(struct state *state);
+int redis_connect(void);
+int redis_store_request(struct hsm_action_node *han);
+int redis_assign_request(struct client *client, struct hsm_action_node *han);
+int redis_deassign_request(struct hsm_action_node *han);
+int redis_delete_request(uint64_t cookie, struct lu_fid *dfid);
+int redis_recovery(void);
 
 /* scheduler */
 
 int schedule_on_client(struct cds_list_head *clients,
 		       struct hsm_action_node *han, const char *hostname);
-void hsm_action_node_enrich(struct state *state, struct hsm_action_node *han);
-void ct_schedule(struct state *state);
-void ct_schedule_client(struct state *state, struct client *client);
+void hsm_action_node_enrich(struct hsm_action_node *han);
+void ct_schedule(void);
+void ct_schedule_client(struct client *client);
 
 /* tcp */
 
-int tcp_listen(struct state *state);
+int tcp_listen(void);
 char *sockaddr2str(struct sockaddr_storage *addr, socklen_t len);
-int handle_client_connect(struct state *state);
-struct client *client_new_disconnected(struct state *state, const char *id);
+int handle_client_connect(void);
+struct client *client_new_disconnected(const char *id);
 void client_free(struct client *client);
 void client_disconnect(struct client *client);
 
 /* timer */
-int timer_init(struct state *state);
-int timer_rearm(struct state *state);
-void handle_expired_timers(struct state *state);
+int timer_init(void);
+int timer_rearm(void);
+void handle_expired_timers(void);
 
 #if HAVE_PHOBOS
-int phobos_enrich(struct state *state, struct hsm_action_node *han);
+int phobos_enrich(struct hsm_action_node *han);
 bool phobos_can_send(struct client *client, struct hsm_action_node *han);
 #endif
 

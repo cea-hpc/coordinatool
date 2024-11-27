@@ -24,7 +24,7 @@ int schedule_on_client(struct cds_list_head *clients_list,
 	return 0;
 }
 
-static int schedule_on_host(struct state *state, struct hsm_action_node *han)
+static int schedule_on_host(struct hsm_action_node *han)
 {
 	/* only doing this for archive for now */
 	if (han->info.action != HSMA_ARCHIVE)
@@ -67,13 +67,13 @@ static int schedule_on_host(struct state *state, struct hsm_action_node *han)
 }
 
 /* fill in static action item informations */
-void hsm_action_node_enrich(struct state *state, struct hsm_action_node *han)
+void hsm_action_node_enrich(struct hsm_action_node *han)
 {
-	if (schedule_on_host(state, han) > 0)
+	if (schedule_on_host(han) > 0)
 		return;
 
 #if HAVE_PHOBOS
-	int rc = phobos_enrich(state, han);
+	int rc = phobos_enrich(han);
 	if (rc < 0) {
 		LOG_ERROR(rc, "phobos: failed to enrich %s request for " DFID,
 			  ct_action2str(han->info.action),
@@ -173,7 +173,7 @@ static bool accept_archive_id(int *archives, int archive_id)
 	    p = cds_twolists_next(pos, head1, head2);      \
 	     pos != (head2); pos = p, p = cds_twolists_next(p, head1, head2))
 
-void ct_schedule_client(struct state *state, struct client *client)
+void ct_schedule_client(struct client *client)
 {
 	if (client->status != CLIENT_WAITING)
 		return;
@@ -209,7 +209,6 @@ void ct_schedule_client(struct state *state, struct client *client)
 	for (size_t i = 0; i < countof(max_action); i++) {
 		unsigned int enqueued_pass = 0,
 			     pending_pass = *pending_count[i];
-		struct hsm_action_queues *queues = &client->queues;
 		struct cds_list_head *n, *nnext;
 		cds_twolists_for_each_safe(n, nnext, client_waiting_lists[i],
 					   state_waiting_lists[i])
@@ -249,14 +248,14 @@ void ct_schedule_client(struct state *state, struct client *client)
 			LOG_INFO("%s (%d): Sending " DFID " (cookie %lx)",
 				 client->id, client->fd, PFID(&han->info.dfid),
 				 han->info.cookie);
-			redis_assign_request(state, client, han);
+			redis_assign_request(client, han);
 #ifdef DEBUG_ACTION_NODE
 			LOG_DEBUG(
 				"%s (%d): moving node %p to %p (active requests)",
 				client->id, client->fd, (void *)han,
 				(void *)&client->active_requests);
 #endif
-			hsm_action_assign(queues, han, client);
+			hsm_action_assign(han, client);
 			enqueued_pass++;
 			/* don't hand in too much work if other clients waiting */
 			if (enqueued_pass >
@@ -283,7 +282,7 @@ void ct_schedule_client(struct state *state, struct client *client)
 	}
 }
 
-void ct_schedule(struct state *state)
+void ct_schedule(void)
 {
 	struct cds_list_head *n, *nnext;
 
@@ -291,6 +290,6 @@ void ct_schedule(struct state *state)
 	{
 		struct client *client =
 			caa_container_of(n, struct client, waiting_node);
-		ct_schedule_client(state, client);
+		ct_schedule_client(client);
 	}
 }
