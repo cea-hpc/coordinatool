@@ -46,18 +46,18 @@ int phobos_enrich(struct hsm_action_node *han)
 	return 0;
 }
 
-int phobos_schedule(struct hsm_action_node *han)
+static char *phobos_find_host(struct hsm_action_node *han)
 {
 	int rc;
 	char *hostname;
 
 	/* only enrich restore */
 	if (han->info.action != HSMA_RESTORE)
-		return 0;
+		return NULL;
 
 	/* not in phobos */
 	if (!han->info.hsm_fuid)
-		return 0;
+		return NULL;
 
 #if HAVE_PHOBOS_1_95
 	int nb_new_lock;
@@ -69,45 +69,33 @@ int phobos_schedule(struct hsm_action_node *han)
 	if (rc) {
 		LOG_ERROR(rc, "phobos: failed to locate " DFID " (oid %s)",
 			  PFID(&han->info.dfid), han->info.hsm_fuid);
-		return rc;
+		return NULL;
 	}
+	return hostname;
+}
 
+int phobos_schedule(struct hsm_action_node *han)
+{
+	char *hostname = phobos_find_host(han);
 	if (hostname == NULL)
 		return 0;
 
-	return schedule_on_client(&state->stats.clients, han, hostname) ||
-	       schedule_on_client(&state->stats.disconnected_clients, han,
-				  hostname);
+	int rc = schedule_on_client(&state->stats.clients, han, hostname) ||
+		 schedule_on_client(&state->stats.disconnected_clients, han,
+				    hostname);
+	free(hostname);
+	return rc;
 }
 
 bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 {
-	char *hostname;
-	int rc;
-
-	/* only restore are enriched */
-	if (han->info.action != HSMA_RESTORE)
-		return true;
-
-	/* not in phobos */
-	if (!han->info.hsm_fuid)
-		return true;
-
-	// TODO If we just received the request, we don't need to do a locate
-	// here.
-#if HAVE_PHOBOS_1_95
-	int nb_new_lock;
-	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, NULL, &hostname,
-			   &nb_new_lock);
-#else
-	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, &hostname);
-#endif
-	if (rc)
-		/* do not prevent sending a request if Phobos fails */
-		return true;
+	char *hostname = phobos_find_host(han);
+	bool rc = true;
 
 	if (hostname == NULL || !strcmp(client->id, hostname))
-		return true;
+		goto out;
+
+	rc = false;
 
 	struct cds_list_head *n;
 
@@ -118,12 +106,14 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 
 		if (!strcmp(hostname, client->id)) {
 			hsm_action_move(&client->queues, han, true);
-			return false;
+			goto out;
 		}
 	}
 
 	/* move the request back into the main queue */
 	hsm_action_move(&state->queues, han, true);
 
-	return false;
+out:
+	free(hostname);
+	return rc;
 }
