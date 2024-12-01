@@ -8,9 +8,9 @@
 struct state *state;
 
 /* fill in dummy requirements to copytool/redis.c */
-int hsm_action_enqueue_json(json_t *json UNUSED, int64_t timestamp UNUSED,
-			    struct hsm_action_node **han_out UNUSED,
-			    const char *requestor UNUSED)
+int hsm_action_new_json(json_t *json UNUSED, int64_t timestamp UNUSED,
+			struct hsm_action_node **han_out UNUSED,
+			const char *requestor UNUSED)
 {
 	return 0;
 }
@@ -23,8 +23,8 @@ struct client *client_new_disconnected(const char *id UNUSED)
 {
 	return NULL;
 }
-void hsm_action_assign(struct hsm_action_node *han UNUSED,
-		       struct client *client UNUSED)
+void hsm_action_start(struct hsm_action_node *han UNUSED,
+		      struct client *client UNUSED)
 {
 	return;
 }

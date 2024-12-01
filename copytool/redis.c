@@ -442,7 +442,7 @@ static int redis_scan_requests(const char *key UNUSED, const char *value)
 	}
 
 	struct hsm_action_node *han;
-	rc = hsm_action_enqueue_json(json_hai, 0, &han, "redis (recovery)");
+	rc = hsm_action_new_json(json_hai, 0, &han, "redis (recovery)");
 	json_decref(json_hai);
 	if (rc < 0)
 		return rc;
@@ -498,7 +498,7 @@ static int redis_scan_assigned(const char *key, const char *client_id)
 	// could already be enqueued.
 	// This will work (list del is the same) but stats will be wrong
 	// we need to add some han state to fix this
-	hsm_action_assign(han, client);
+	hsm_action_start(han, client);
 
 	return 0;
 }

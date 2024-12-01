@@ -112,8 +112,6 @@ struct hsm_action_node {
 		char *hsm_fuid;
 #endif
 	} info;
-	/* actual list han will be enqueued to */
-	struct hsm_action_queues *queues;
 	/* if sent to a client, remember who for eventual cancel (not implemented) */
 	struct client *client;
 	/* json representation of hai */
@@ -263,20 +261,32 @@ int protocol_reply_ehlo(struct client *client, int status, char *error);
 
 /* queue */
 
+// create new actions (foom json or lustre)
+int hsm_action_new_json(json_t *json_hai, int64_t timestamp,
+			struct hsm_action_node **han_out,
+			const char *requestor);
+int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
+			  uint64_t hal_flags, int64_t timestamp);
+// free one action
 void hsm_action_free(struct hsm_action_node *han);
+// free all actions (cleanup on shutdown)
 void hsm_action_free_all(void);
-void hsm_action_queues_init(struct hsm_action_queues *queues);
-int hsm_action_requeue(struct hsm_action_node *han, bool start);
-void hsm_action_move(struct hsm_action_queues *queues,
-		     struct hsm_action_node *han, bool start);
-int hsm_action_enqueue_json(json_t *json_hai, int64_t timestamp,
-			    struct hsm_action_node **han_out,
-			    const char *requestor);
-int hsm_action_enqueue(struct hsm_action_item *hai, uint32_t archive_id,
-		       uint64_t hal_flags, int64_t timestamp);
-void hsm_action_assign(struct hsm_action_node *han, struct client *client);
+// enqueue action on specific list
+// (remove from current list it's in and update stats)
+// if list is empty, try to schedule action
+int hsm_action_enqueue(struct hsm_action_node *han, struct cds_list_head *list);
+// start action on given client
+// (add to active_requests and update stats)
+void hsm_action_start(struct hsm_action_node *han, struct client *client);
+// find node by cookie
 struct hsm_action_node *hsm_action_search(unsigned long cookie,
 					  struct lu_fid *dfid);
+
+// init queue lists
+void hsm_action_queues_init(struct hsm_action_queues *queues);
+// get list in queue (by action type)
+struct cds_list_head *get_queue_list(struct hsm_action_queues *queues,
+				     struct hsm_action_node *han);
 
 /* redis */
 
@@ -289,9 +299,10 @@ int redis_recovery(void);
 
 /* scheduler */
 
-int schedule_on_client(struct cds_list_head *clients,
-		       struct hsm_action_node *han, const char *hostname);
-void hsm_action_node_schedule(struct hsm_action_node *han);
+struct client *find_client(struct cds_list_head *clients, const char *hostname);
+struct cds_list_head *schedule_on_client(struct client *client,
+					 struct hsm_action_node *han);
+struct cds_list_head *hsm_action_node_schedule(struct hsm_action_node *han);
 void ct_schedule(void);
 void ct_schedule_client(struct client *client);
 
@@ -311,7 +322,7 @@ void handle_expired_timers(void);
 
 #if HAVE_PHOBOS
 int phobos_enrich(struct hsm_action_node *han);
-int phobos_schedule(struct hsm_action_node *han);
+struct cds_list_head *phobos_schedule(struct hsm_action_node *han);
 bool phobos_can_send(struct client *client, struct hsm_action_node *han);
 #endif
 

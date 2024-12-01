@@ -349,7 +349,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	json_array_foreach(json_items, count, item)
 	{
 		struct hsm_action_node *han;
-		rc = hsm_action_enqueue_json(item, timestamp, &han, client->id);
+		rc = hsm_action_new_json(item, timestamp, &han, client->id);
 		if (rc < 0) {
 			final_rc = rc;
 			continue;
@@ -509,13 +509,6 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		for (unsigned int i = 0; i < countof(old_lists); i++) {
 			cds_list_splice(old_lists[i], new_lists[i]);
 			CDS_INIT_LIST_HEAD(old_lists[i]);
-			struct cds_list_head *han_node;
-			cds_list_for_each(han_node, new_lists[i])
-			{
-				struct hsm_action_node *han = caa_container_of(
-					han_node, struct hsm_action_node, node);
-				han->queues = &client->queues;
-			}
 		}
 
 		// we no longer need it, free it immediately (unset id_set to lower debug message)
@@ -549,8 +542,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 				continue;
 			}
 
-			/* Look for existing action node first: if found this will
-			 * automatically remove it from free_hai list.
+			/* Look for existing action node first: if found move it to
+			 * current client's list
 			 */
 			struct hsm_action_node *han;
 			han = hsm_action_search(cookie, &dfid);
@@ -568,8 +561,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 			}
 			/* Otherwise create new one. Use enqueue to enrich it just in case.
 			 * Note that requires a dequeue to immediately get it off waiting list */
-			if (hsm_action_enqueue_json(hai, timestamp, &han,
-						    client->id) < 0 ||
+			if (hsm_action_new_json(hai, timestamp, &han,
+						client->id) < 0 ||
 			    !han) {
 				/* ignore bad items in hai list */
 				continue;
@@ -580,7 +573,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 				client->id, client->fd, (void *)han,
 				(void *)&client->active_requests);
 #endif
-			hsm_action_assign(han, client);
+			hsm_action_start(han, client);
 		}
 	}
 
@@ -589,8 +582,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	{
 		struct hsm_action_node *node =
 			caa_container_of(n, struct hsm_action_node, node);
-		cds_list_del(n);
-		hsm_action_requeue(node, true);
+		hsm_action_enqueue(node, NULL);
 	}
 
 	return protocol_reply_ehlo(client, 0, NULL);
