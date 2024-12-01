@@ -70,7 +70,7 @@ int handle_ct_event(void)
 	unsigned int i = 0;
 	int64_t timestamp = gettime_ns();
 	while (++i <= hal->hal_count) {
-		rc = hsm_action_enqueue(hai, hal->hal_archive_id,
+		rc = hsm_action_new_lustre(hai, hal->hal_archive_id,
 					hal->hal_flags, timestamp);
 		if (rc < 0)
 			return rc;

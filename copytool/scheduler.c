@@ -4,10 +4,8 @@
 
 /* schedule decision helper */
 
-/* XXX differentiate scheduling early (enrich time: just assign to client queue)
- * and reschedule (can_send time: move to another queue) better */
-int schedule_on_client(struct cds_list_head *clients_list,
-		       struct hsm_action_node *han, const char *hostname)
+struct client *find_client(struct cds_list_head *clients_list,
+			   const char *hostname)
 {
 	struct cds_list_head *n;
 
@@ -17,18 +15,23 @@ int schedule_on_client(struct cds_list_head *clients_list,
 			caa_container_of(n, struct client, node_clients);
 
 		if (!strcmp(hostname, client->id)) {
-			han->queues = &client->queues;
-			return 1;
+			return client;
 		}
 	}
-	return 0;
+	return NULL;
 }
 
-static int schedule_on_host(struct hsm_action_node *han)
+struct cds_list_head *schedule_on_client(struct client *client,
+					 struct hsm_action_node *han)
+{
+	return get_queue_list(&client->queues, han);
+}
+
+static struct cds_list_head *schedule_on_host(struct hsm_action_node *han)
 {
 	/* only doing this for archive for now */
 	if (han->info.action != HSMA_ARCHIVE)
-		return 0;
+		return NULL;
 
 	struct cds_list_head *n;
 	struct host_mapping *mapping;
@@ -44,17 +47,18 @@ static int schedule_on_host(struct hsm_action_node *han)
 	}
 
 	if (!found)
-		return 0;
+		return NULL;
 
 	int first_idx = rand() % mapping->count;
-	int idx = first_idx, rc;
+	int idx = first_idx;
 	const char *hostname = mapping->hosts[idx];
 	struct cds_list_head *clients = &state->stats.clients;
+	struct client *client;
 	/* try all configured hosts until one found online,
 	 * tand if none all hosts again with disconnected clients:
 	 * we don't want to send to another client if there are chances
 	 * an acceptable mover will come back */
-	while ((rc = schedule_on_client(clients, han, hostname)) == 0) {
+	while ((client = find_client(clients, hostname)) == NULL) {
 		idx = (idx + 1) % mapping->count;
 		if (idx == first_idx) {
 			if (clients == &state->stats.disconnected_clients)
@@ -63,17 +67,23 @@ static int schedule_on_host(struct hsm_action_node *han)
 		}
 		hostname = mapping->hosts[idx];
 	}
-	return rc;
+	if (!client)
+		return NULL;
+
+	return schedule_on_client(client, han);
 }
 
 /* fill in static action item informations */
-void hsm_action_node_schedule(struct hsm_action_node *han)
+struct cds_list_head *hsm_action_node_schedule(struct hsm_action_node *han)
 {
-	if (schedule_on_host(han) > 0)
-		return;
+	struct cds_list_head *list;
+
+	list = schedule_on_host(han);
+	if (list)
+		return list;
 
 #if HAVE_PHOBOS
-	phobos_schedule(han);
+	return phobos_schedule(han);
 #endif
 }
 
@@ -242,14 +252,7 @@ void ct_schedule_client(struct client *client)
 			LOG_INFO("%s (%d): Sending " DFID " (cookie %lx)",
 				 client->id, client->fd, PFID(&han->info.dfid),
 				 han->info.cookie);
-			redis_assign_request(client, han);
-#ifdef DEBUG_ACTION_NODE
-			LOG_DEBUG(
-				"%s (%d): moving node %p to %p (active requests)",
-				client->id, client->fd, (void *)han,
-				(void *)&client->active_requests);
-#endif
-			hsm_action_assign(han, client);
+			hsm_action_start(han, client);
 			enqueued_pass++;
 			/* don't hand in too much work if other clients waiting */
 			if (enqueued_pass >

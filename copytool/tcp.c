@@ -130,9 +130,12 @@ void client_free(struct client *client)
 	for (unsigned int i = 0; i < countof(lists); i++) {
 		cds_list_for_each_safe(n, next, lists[i])
 		{
-			struct hsm_action_node *node = caa_container_of(
+			struct hsm_action_node *han = caa_container_of(
 				n, struct hsm_action_node, node);
-			hsm_action_move(&state->queues, node, true);
+#ifdef DEBUG_ACTION_NODE
+			cds_list_del(&han->node);
+#endif
+			hsm_action_enqueue(han, NULL);
 		}
 	}
 	ct_schedule();

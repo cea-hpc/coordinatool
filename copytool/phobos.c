@@ -74,17 +74,21 @@ static char *phobos_find_host(struct hsm_action_node *han)
 	return hostname;
 }
 
-int phobos_schedule(struct hsm_action_node *han)
+struct cds_list_head *phobos_schedule(struct hsm_action_node *han)
 {
 	char *hostname = phobos_find_host(han);
 	if (hostname == NULL)
-		return 0;
+		return NULL;
 
-	int rc = schedule_on_client(&state->stats.clients, han, hostname) ||
-		 schedule_on_client(&state->stats.disconnected_clients, han,
-				    hostname);
-	free(hostname);
-	return rc;
+	struct client *client = find_client(&state->stats.clients, hostname);
+	if (!client) {
+		client = find_client(&state->stats.disconnected_clients,
+				     hostname);
+	}
+	if (!client) {
+		return NULL;
+	}
+	return schedule_on_client(client, han);
 }
 
 bool phobos_can_send(struct client *client, struct hsm_action_node *han)
@@ -97,7 +101,7 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 
 	rc = false;
 
-	struct cds_list_head *n;
+	struct cds_list_head *n, *found = NULL;
 
 	cds_list_for_each(n, &state->stats.clients)
 	{
@@ -105,13 +109,17 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 			caa_container_of(n, struct client, node_clients);
 
 		if (!strcmp(hostname, client->id)) {
-			hsm_action_move(&client->queues, han, true);
-			goto out;
+			found = schedule_on_client(client, han);
+			break;
 		}
 	}
+	if (!found)
+		found = get_queue_list(&state->queues, han);
+	assert(found);
 
 	/* move the request back into the main queue */
-	hsm_action_move(&state->queues, han, true);
+	cds_list_del(&han->node);
+	hsm_action_enqueue(han, found);
 
 out:
 	free(hostname);

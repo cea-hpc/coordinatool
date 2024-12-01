@@ -13,6 +13,26 @@ void hsm_action_queues_init(struct hsm_action_queues *queues)
 	CDS_INIT_LIST_HEAD(&queues->waiting_remove);
 }
 
+struct cds_list_head *get_queue_list(struct hsm_action_queues *queues,
+				     struct hsm_action_node *han)
+{
+	switch (han->info.action) {
+	case HSMA_RESTORE:
+		return &queues->waiting_restore;
+	case HSMA_ARCHIVE:
+		return &queues->waiting_archive;
+	case HSMA_REMOVE:
+		return &queues->waiting_remove;
+	default:
+		LOG_ERROR(-EINVAL,
+			  "han %lx for " DFID
+			  " was neither restore, archive nor remove: %#x",
+			  han->info.cookie, PFID(&han->info.dfid),
+			  han->info.action);
+		return NULL;
+	}
+}
+
 static int tree_compare(const void *a, const void *b)
 {
 	const struct item_info *va = a, *vb = b;
@@ -96,93 +116,70 @@ struct hsm_action_node *hsm_action_search(unsigned long cookie,
 }
 
 /* actually inserts action node to its queue */
-int hsm_action_requeue(struct hsm_action_node *han, bool start)
+int hsm_action_enqueue(struct hsm_action_node *han, struct cds_list_head *list)
 {
-	struct cds_list_head *head;
-	struct hsm_action_queues *queues = han->queues;
-	bool was_running = (han->client != NULL);
-
-	// in theory we're only queueing at start if it was already running
-	assert(was_running == start);
-	han->client = NULL;
-	if (was_running)
-		redis_deassign_request(han);
-
-	switch (han->info.action) {
-	case HSMA_RESTORE:
-		head = &queues->waiting_restore;
-		state->stats.pending_restore++;
-		if (was_running)
-			state->stats.running_restore--;
-		break;
-	case HSMA_ARCHIVE:
-		head = &queues->waiting_archive;
-		state->stats.pending_archive++;
-		if (was_running)
-			state->stats.running_archive--;
-		break;
-	case HSMA_REMOVE:
-		head = &queues->waiting_remove;
-		state->stats.pending_remove++;
-		if (was_running)
-			state->stats.running_remove--;
-		break;
-	default:
-		// free expects a list in good shape
+	if (!list)
+		list = hsm_action_node_schedule(han);
+	if (!list)
+		list = get_queue_list(&state->queues, han);
+	if (!list) {
+		/* We're losing track of the action here, free it.
+		 * (it should never happen, get queue list logged error)
+		 * free expects a list in good shape */
 		CDS_INIT_LIST_HEAD(&han->node);
 		hsm_action_free(han);
 		return -EINVAL;
 	}
 
-	LOG_DEBUG("Inserting han for " DFID " node %p at %s of %p",
-		  PFID(&han->info.dfid), (void *)&han->node,
-		  start ? "start" : "tail", (void *)head);
-#ifdef DEBUG_ACTION_NODE
-	assert(han->magic == DEBUG_ACTION_NODE);
-#endif
-	if (start)
-		cds_list_add(&han->node, head);
-	else
-		cds_list_add_tail(&han->node, head);
-	return 1;
-}
+	/* bookkeeping:
+	 * - was running if han->client is set
+	 * - otherwise was only already pending if han->node is zero (fresh calloc)
+	 */
+	bool was_running = (han->client != NULL);
+	bool was_pending = !was_running || han->node.next != NULL;
 
-/* move an hsm action node to another queue */
-void hsm_action_move(struct hsm_action_queues *queues,
-		     struct hsm_action_node *han, bool start)
-{
-	struct cds_list_head *head;
+	if (was_running) {
+		/* unset client anyway, we're pending now! */
+		han->client = NULL;
+		redis_deassign_request(han);
+	}
 
-	/* we can't use requeue as we don't want to update stats... */
 	switch (han->info.action) {
 	case HSMA_RESTORE:
-		head = &queues->waiting_restore;
+		if (!was_pending)
+			state->stats.pending_restore++;
+		if (was_running)
+			state->stats.running_restore--;
 		break;
 	case HSMA_ARCHIVE:
-		head = &queues->waiting_archive;
+		if (!was_pending)
+			state->stats.pending_archive++;
+		if (was_running)
+			state->stats.running_archive--;
 		break;
 	case HSMA_REMOVE:
-		head = &queues->waiting_remove;
+		if (!was_pending)
+			state->stats.pending_remove++;
+		if (was_running)
+			state->stats.running_remove--;
 		break;
 	default:
-		/* we got this out of another queue,
-		 * this should never happen
-		 */
-		abort();
+		return -EINVAL;
 	}
 
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
+	LOG_DEBUG("Inserting han for " DFID " node %p in %p",
+		  PFID(&han->info.dfid), (void *)&han->node, (void *)list);
 #endif
-	cds_list_del(&han->node);
-	han->queues = queues;
-	if (start)
-		cds_list_add(&han->node, head);
-	else
-		cds_list_add_tail(&han->node, head);
+	// XXX insert at timestamp-appropriate position in list
+	// - if timestamp later than tail add last
+	// - otherwise start comparing from head
+	cds_list_add_tail(&han->node, list);
+	return 1;
 }
 
-static int hsm_action_enqueue_common(struct hsm_action_node *han)
+static int hsm_action_new_common(struct hsm_action_node *han)
 {
 	struct item_info **tree_key;
 
@@ -200,16 +197,13 @@ static int hsm_action_enqueue_common(struct hsm_action_node *han)
 #if HAVE_PHOBOS
 	(void)phobos_enrich(han);
 #endif
-	hsm_action_node_schedule(han);
-
 	redis_store_request(han);
 
-	return hsm_action_requeue(han, false);
+	return hsm_action_enqueue(han, NULL);
 }
 
-int hsm_action_enqueue_json(json_t *json_hai, int64_t timestamp,
-			    struct hsm_action_node **han_out,
-			    const char *requestor)
+int hsm_action_new_json(json_t *json_hai, int64_t timestamp,
+			struct hsm_action_node **han_out, const char *requestor)
 {
 	struct hsm_action_node *han;
 	struct hsm_action_item hai;
@@ -229,7 +223,6 @@ int hsm_action_enqueue_json(json_t *json_hai, int64_t timestamp,
 	han->magic = DEBUG_ACTION_NODE;
 	CDS_INIT_LIST_HEAD(&han->node);
 #endif
-	han->queues = &state->queues;
 	han->info.cookie = hai.hai_cookie;
 	han->info.action = hai.hai_action;
 	han->info.dfid = hai.hai_dfid;
@@ -265,7 +258,7 @@ int hsm_action_enqueue_json(json_t *json_hai, int64_t timestamp,
 	han->info.data = xstrdup(data);
 	han->hai = json_incref(json_hai);
 
-	rc = hsm_action_enqueue_common(han);
+	rc = hsm_action_new_common(han);
 	if (rc < 0 && rc != -EEXIST) {
 		return rc;
 	}
@@ -278,8 +271,8 @@ int hsm_action_enqueue_json(json_t *json_hai, int64_t timestamp,
 }
 
 /* checks for duplicate, and if unique enrich and insert node */
-int hsm_action_enqueue(struct hsm_action_item *hai, uint32_t archive_id,
-		       uint64_t hal_flags, int64_t timestamp)
+int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
+			  uint64_t hal_flags, int64_t timestamp)
 {
 	struct hsm_action_node *han;
 	int rc;
@@ -307,7 +300,6 @@ int hsm_action_enqueue(struct hsm_action_item *hai, uint32_t archive_id,
 		free(han);
 		return -ENOMEM;
 	}
-	han->queues = &state->queues;
 	han->info.cookie = hai->hai_cookie;
 	han->info.action = hai->hai_action;
 	han->info.dfid = hai->hai_dfid;
@@ -320,7 +312,7 @@ int hsm_action_enqueue(struct hsm_action_item *hai, uint32_t archive_id,
 	// order wrong on recovery
 	(void)protocol_setjson_int(han->hai, "timestamp", timestamp);
 
-	rc = hsm_action_enqueue_common(han);
+	rc = hsm_action_new_common(han);
 	// ignore duplicates
 	if (rc < 0 && rc != -EEXIST) {
 		return rc;
@@ -329,11 +321,12 @@ int hsm_action_enqueue(struct hsm_action_item *hai, uint32_t archive_id,
 	return rc < 0 ? 0 : 1;
 }
 
-/* remove action node from its queue */
-void hsm_action_assign(struct hsm_action_node *han, struct client *client)
+void hsm_action_start(struct hsm_action_node *han, struct client *client)
 {
 #ifdef DEBUG_ACTION_NODE
 	assert(han->magic == DEBUG_ACTION_NODE);
+	LOG_DEBUG("%s (%d): moving node %p to %p (active requests)", client->id,
+		  client->fd, (void *)han, (void *)&client->active_requests);
 #endif
 	switch (han->info.action) {
 	case HSMA_RESTORE:
@@ -349,10 +342,14 @@ void hsm_action_assign(struct hsm_action_node *han, struct client *client)
 		state->stats.running_remove++;
 		break;
 	default:
-		LOG_ERROR(-EINVAL, "requested to dequeue %s",
-			  ct_action2str(han->info.action));
+		LOG_ERROR(-EINVAL,
+			  "starting han %lx for " DFID
+			  " was neither restore, archive nor remove: %#x",
+			  han->info.cookie, PFID(&han->info.dfid),
+			  han->info.action);
 	}
 
+	redis_assign_request(client, han);
 	cds_list_del(&han->node);
 	han->client = client;
 	cds_list_add_tail(&han->node, &client->active_requests);
