@@ -34,6 +34,10 @@ static int config_parse_host_mapping(struct cds_list_head *head, char *val)
 					   mapping->count * sizeof(void *));
 		mapping->hosts[mapping->count - 1] = xstrdup(host);
 	}
+
+#ifdef DEBUG_ACTION_NODE
+	CDS_INIT_LIST_HEAD(&mapping->node);
+#endif
 	cds_list_add(&mapping->node, head);
 	return 0;
 }
