@@ -10,14 +10,13 @@
 #include <linux/lustre/lustre_idl.h>
 #include <lustre/lustreapi.h>
 #include <sys/socket.h>
-#include <urcu/compiler.h>
-#include <urcu/list.h>
 #include <hiredis/async.h>
 
 #include "config.h"
 #include "logs.h"
 #include "protocol.h"
 #include "utils.h"
+#include "list_utils.h"
 
 /* uncomment to add magic checks for han and list sanity checks */
 // #define DEBUG_ACTION_NODE 0x12349876abcd1234ULL

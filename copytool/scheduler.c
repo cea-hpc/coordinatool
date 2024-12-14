@@ -165,18 +165,6 @@ static bool accept_archive_id(int *archives, int archive_id)
 	return rc;
 }
 
-/* scheduling would normally use cds_list_for_each_safe here but
- * we want to chain both queues, so cheat a bit:
- * this is cds_list_for_each_safe with starting condition from
- * first list, end condition with second list head and
- * a bridge from first to second list when first list ends */
-#define cds_twolists_next(p, head1, head2) \
-	((p)->next == (head1) ? (head2)->next : (p)->next)
-#define cds_twolists_for_each_safe(pos, p, head1, head2)   \
-	for (pos = cds_twolists_next(head1, head1, head2), \
-	    p = cds_twolists_next(pos, head1, head2);      \
-	     pos != (head2); pos = p, p = cds_twolists_next(p, head1, head2))
-
 void ct_schedule_client(struct client *client)
 {
 	if (client->status != CLIENT_WAITING)
@@ -189,15 +177,22 @@ void ct_schedule_client(struct client *client)
 	/* check if there are pending requests
 	 * priority restore > remove > archive is hardcoded for now */
 	size_t enqueued_bytes = 0;
-	struct cds_list_head *client_waiting_lists[] = {
-		&client->queues.waiting_restore,
-		&client->queues.waiting_remove,
-		&client->queues.waiting_archive,
+	struct cds_list_head *schedule_restore_lists[] = {
+		&client->queues.waiting_restore, &state->queues.waiting_restore,
+		NULL
 	};
-	struct cds_list_head *state_waiting_lists[] = {
-		&state->queues.waiting_restore,
-		&state->queues.waiting_remove,
-		&state->queues.waiting_archive,
+	struct cds_list_head *schedule_remove_lists[] = {
+		&client->queues.waiting_remove, &state->queues.waiting_remove,
+		NULL
+	};
+	struct cds_list_head *schedule_archive_lists[] = {
+		&client->queues.waiting_archive, &state->queues.waiting_archive,
+		NULL
+	};
+	struct cds_list_head **schedule_lists[] = {
+		schedule_restore_lists,
+		schedule_remove_lists,
+		schedule_archive_lists,
 	};
 	int *max_action[] = { &client->max_restore, &client->max_remove,
 			      &client->max_archive };
@@ -214,8 +209,7 @@ void ct_schedule_client(struct client *client)
 		unsigned int enqueued_pass = 0,
 			     pending_pass = *pending_count[i];
 		struct cds_list_head *n, *nnext;
-		cds_twolists_for_each_safe(n, nnext, client_waiting_lists[i],
-					   state_waiting_lists[i])
+		cds_manylists_for_each_safe(n, nnext, schedule_lists[i])
 		{
 			if (enqueued_bytes >
 			    client->max_bytes - HAI_SIZE_MARGIN) {
