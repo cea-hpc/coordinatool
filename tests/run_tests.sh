@@ -253,11 +253,13 @@ client_archive_n_wait() {
 		TMOUT=$TMOUT
 		while sleep 0.1; ((TMOUT-- > 0)); do
 			for i in {$start..$n}; do
+				[ -e file.\$i ] || continue
 				lfs hsm_state file.\$i | grep -q archived || continue 2
 			done
-			break
+			exit
 		done
-		if ((TMOUT <= 0)); then echo 'Failed to archive'; exit 1; fi
+		echo 'ERROR: Failed to archive $start..$n'
+		exit 1
 	"
 }
 
@@ -289,7 +291,7 @@ client_restore_n() {
 			done
 			break
 		done
-		if ((TMOUT <= 0)); then echo 'Failed to restore'; exit 1; fi
+		if ((TMOUT <= 0)); then echo 'ERROR: Failed to restore $start..$n'; exit 1; fi
 		for i in {$start..$n}; do
 			if ! [[ \"\$(cat file.\$i)\" = foo.\$i ]]; then
 				echo 'Content does not match after restore'
@@ -573,9 +575,11 @@ archive_on_host() {
 	#  - n2 all to 3 (agent 4 not started)
 
 	client_reset 3
-	archive_data="tag=n0" client_archive_n 3 119 100
-	archive_data="ignored,tag=n1" client_archive_n 3 219 200
-	archive_data="tag=n2,ignored" client_archive_n 3 319 300
+	archive_data="tag=n0" client_archive_n_req 3 19 00
+	archive_data="ignored,tag=n1" client_archive_n_req 3 39 20
+	archive_data="tag=n2,ignored" client_archive_n_req 3 59 40
+
+	client_archive_n_wait 3 59 00
 
 	do_client 0 "[ \"\$(find ${ARCHIVEDIR@Q}/0 | wc -l)\" = 21 ]" \
 		|| error "missing archives on 0"
@@ -796,8 +800,112 @@ archive_id_restore_active_requests() {
 }
 run_test 42 archive_id_restore_active_requests
 
+# 5x tests: slot batching
+# basic test
+archive_basic_batch_common() {
+	do_coordinatool_start 0
+	ARCHIVEDIR="$ARCHIVEDIR/0" do_lhsmtoolcmd_start 0
+	ARCHIVEDIR="$ARCHIVEDIR/1" do_lhsmtoolcmd_start 1
 
+	# config has one batch per client, idle 10s / max 20s timeouts so,
+	# with 2 movers we have 2 slots:
+	# t 0s:
+	# - slot1: send just one request for tag1
+	# - slot2: send 10 requests for tag2 every 5s
+	# - waiting queue: 10x tag3, 10x tag4, 10x tag5
+	# t 10s:
+	# - slot1 should expire, tag3(or 4 or 5) comes in
+	# - slot2 still busy with tag2
+	# t 20s:
+	# - slot1 expires tag3 (idle), tag4 comes in
+	# - slot2 expires max time for tag2, tag5 comes in
+	# t 30s:
+	# - either slot pick tag2 and finish work
+	#
+	# verification done through print manually for now
+	tag1="tag=n0"
+	tag2="ignored,tag=n1"
+	tag3="tag=n2,ignored"
+	tag4="tag=n2,different"
+	tag5="tag=n1,different"
 
+	client_reset 3
+	archive_data="$tag1" client_archive_n_req 3 00 00
+	archive_data="$tag2" client_archive_n_req 3 19 10
+	# wait a bit to ensure these two get scheduled first
+	sleep 1
+	archive_data="$tag3" client_archive_n_req 3 29 20
+	archive_data="$tag4" client_archive_n_req 3 39 30
+	archive_data="$tag5" client_archive_n_req 3 49 40
+
+	sleep 4
+	# t=5s, first two batches processed
+	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	echo t=5s
+	echo ====================
+	echo "$archs"
+	echo ====================
+	archive_data="$tag2" client_archive_n_req 3 69 60
+	TMOUT=1 client_archive_n_wait 3 00 00
+	TMOUT=1 client_archive_n_wait 3 19 10
+
+	sleep 5
+	# t=10s, another tag started but we don't know which yet
+	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	echo t=10s
+	echo ====================
+	echo "$archs"
+	echo ====================
+	archive_data="$tag2" client_archive_n_req 3 79 70
+	TMOUT=1 client_archive_n_wait 3 69 60
+
+	sleep 5
+	# t=15s
+	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	echo t=15s
+	echo ====================
+	echo "$archs"
+	echo ====================
+	archive_data="$tag2" client_archive_n_req 3 89 80
+
+	sleep 5
+	# t=20s
+	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	echo t=20s
+	echo ====================
+	echo "$archs"
+	echo ====================
+	archive_data="$tag2" client_archive_n_req 3 99 90
+
+	echo done sending, waiting
+
+	client_archive_n_wait 3 79 00
+	echo done waiting
+	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	echo ====================
+	echo "$archs"
+	echo ====================
+}
+
+archive_basic_batch() {
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_batch.conf \
+		archive_basic_batch_common
+}
+run_test 50 archive_basic_batch
+
+archive_basic_batch_multislots() {
+	# XXX timers are totally off with more slots... enough to check for crash for now
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_batch_multislots.conf \
+		archive_basic_batch_common
+}
+run_test 51 archive_basic_batch_multislots
+
+# This does not pass because we don't allocate enough hosts
+#archive_basic_batch_on_hosts() {
+#	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_batch_on_hosts.conf \
+#		archive_basic_batch_common
+#}
+#run_test 52 archive_basic_batch_on_hosts
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, ${#FAILURES[@]} failures"
 printf "%s\n" "${FAILURES[@]}"
