@@ -156,7 +156,6 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 		return -ERANGE;
 
 	json_array_append(hai_list, han->hai);
-	(*current_count)++;
 	(*enqueued_bytes) += sizeof(struct hsm_action_item) + han->info.hai_len;
 
 	return 0;

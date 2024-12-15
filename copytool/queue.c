@@ -136,7 +136,8 @@ int hsm_action_enqueue(struct hsm_action_node *han, struct cds_list_head *list)
 	 * - otherwise was only already pending if han->node is zero (fresh calloc)
 	 */
 	bool was_running = (han->client != NULL);
-	bool was_pending = !was_running || han->node.next != NULL;
+	bool was_pending = !was_running && (han->node.next != NULL ||
+					    cds_list_empty(&han->node));
 
 	if (was_running) {
 		/* unset client anyway, we're pending now! */
@@ -328,18 +329,36 @@ void hsm_action_start(struct hsm_action_node *han, struct client *client)
 	LOG_DEBUG("%s (%d): moving node %p to %p (active requests)", client->id,
 		  client->fd, (void *)han, (void *)&client->active_requests);
 #endif
+
+	/* same as hsm_action_enqueue */
+	bool was_running = (han->client != NULL);
+	bool was_pending = !was_running && (han->node.next != NULL ||
+					    cds_list_empty(&han->node));
+
 	switch (han->info.action) {
 	case HSMA_RESTORE:
-		state->stats.pending_restore--;
-		state->stats.running_restore++;
+		if (was_pending)
+			state->stats.pending_restore--;
+		if (!was_running) {
+			state->stats.running_restore++;
+			client->current_restore++;
+		}
 		break;
 	case HSMA_ARCHIVE:
-		state->stats.pending_archive--;
-		state->stats.running_archive++;
+		if (was_pending)
+			state->stats.pending_archive--;
+		if (!was_running) {
+			state->stats.running_archive++;
+			client->current_archive++;
+		}
 		break;
 	case HSMA_REMOVE:
-		state->stats.pending_remove--;
-		state->stats.running_remove++;
+		if (was_pending)
+			state->stats.pending_remove--;
+		if (!was_running) {
+			state->stats.running_remove++;
+			client->current_remove++;
+		}
 		break;
 	default:
 		LOG_ERROR(-EINVAL,

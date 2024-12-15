@@ -660,9 +660,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 					client->id, client->fd, (void *)han,
 					(void *)&client->active_requests);
 #endif
-				cds_list_del(&han->node);
-				cds_list_add_tail(&han->node,
-						  &client->active_requests);
+				hsm_action_start(han, client);
 				continue;
 			}
 			/* Otherwise create new one. Use enqueue to enrich it just in case.
