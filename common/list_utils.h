@@ -27,3 +27,15 @@ cds_manylists_next(struct cds_list_head *node, struct cds_list_head ***heads_p)
 	for (pos = cds_manylists_next(heads[0], &heads), \
 	    p = cds_manylists_next(pos, &heads);         \
 	     pos; pos = p, p = cds_manylists_next(p, &heads))
+
+/* count number of items in list */
+static inline int cds_list_count(struct cds_list_head *list)
+{
+	struct cds_list_head *n;
+	int count = 0;
+	cds_list_for_each(n, list)
+	{
+		count++;
+	}
+	return count;
+}

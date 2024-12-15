@@ -13,11 +13,13 @@
  * STATUS
  */
 
-static int status_cb(void *fd_arg, json_t *json UNUSED, void *arg UNUSED)
+static int status_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 {
 	struct client *client = fd_arg;
 
-	return protocol_reply_status(client, &state->stats, 0, NULL);
+	int verbose = protocol_getjson_int(json, "verbose", LLAPI_MSG_NORMAL);
+
+	return protocol_reply_status(client, verbose, 0, NULL);
 }
 
 static const char *client_status_to_str(enum client_status status)
@@ -36,8 +38,34 @@ static const char *client_status_to_str(enum client_status status)
 	}
 }
 
+static int protocol_reply_status_dump_list(json_t *parent, const char *key,
+					   struct cds_list_head *list)
+{
+	json_t *items = json_array();
+	if (!items)
+		abort();
+
+	struct hsm_action_node *han;
+	int rc;
+	cds_list_for_each_entry(han, list, node)
+	{
+		json_t *i = json_pack("{so,sI,ss}", "hai_fid",
+				      json_fid(&han->info.dfid), "hai_cookie",
+				      han->info.cookie, "hai_data",
+				      han->info.data);
+		if (!i)
+			abort();
+		if ((rc = protocol_setjson_array_append(items, i))) {
+			json_decref(items);
+			return rc;
+		}
+	}
+
+	return protocol_setjson(parent, key, items);
+}
+
 static int protocol_reply_status_client(json_t *clients,
-					struct cds_list_head *head)
+					struct cds_list_head *head, int verbose)
 {
 	struct cds_list_head *n;
 	int rc;
@@ -64,7 +92,56 @@ static int protocol_reply_status_client(json_t *clients,
 					       client->done_remove)) ||
 		    (rc = protocol_setjson_str(
 			     c, "status",
-			     client_status_to_str(client->status)))) {
+			     client_status_to_str(client->status))) ||
+		    (verbose >= LLAPI_MSG_DEBUG &&
+		     ((rc = protocol_reply_status_dump_list(
+			       c, "active_requests",
+			       &client->active_requests)) ||
+		      (rc = protocol_reply_status_dump_list(
+			       c, "waiting_restore",
+			       &client->queues.waiting_restore)) ||
+		      (rc = protocol_reply_status_dump_list(
+			       c, "waiting_remove",
+			       &client->queues.waiting_remove)) ||
+		      (rc = protocol_reply_status_dump_list(
+			       c, "waiting_archive",
+			       &client->queues.waiting_archive))))) {
+			json_decref(c);
+			return rc;
+		}
+
+		json_t *batches = json_array();
+		if (!batches)
+			abort();
+		for (int i = 0; i < state->config.batch_slots; i++) {
+			struct client_batch *batch = &client->batch[i];
+			json_t *b = json_object();
+			if (!b)
+				abort();
+			if ((rc = protocol_setjson_str(b, "hint",
+						       batch->hint)) ||
+			    (rc = protocol_setjson_int(b, "expire_idle_s",
+						       batch->expire_idle_ns /
+							       NS_IN_SEC)) ||
+			    (rc = protocol_setjson_int(b, "expire_max_s",
+						       batch->expire_max_ns /
+							       NS_IN_SEC)) ||
+			    (verbose >= LLAPI_MSG_DEBUG &&
+			     (rc = protocol_reply_status_dump_list(
+				      b, "waiting_archive",
+				      &batch->waiting_archive)))) {
+				json_decref(b);
+				json_decref(batches);
+				json_decref(c);
+				return rc;
+			}
+			if ((rc = protocol_setjson_array_append(batches, b))) {
+				json_decref(batches);
+				json_decref(c);
+				return rc;
+			}
+		}
+		if ((rc = protocol_setjson(c, "batches", batches))) {
 			json_decref(c);
 			return rc;
 		}
@@ -76,15 +153,18 @@ static int protocol_reply_status_client(json_t *clients,
 			return rc;
 		}
 
-		json_array_append_new(clients, c);
+		if ((rc = protocol_setjson_array_append(clients, c))) {
+			return rc;
+		}
 	}
 	return 0;
 }
 
-int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
-			  int status, char *error)
+int protocol_reply_status(struct client *client, int verbose, int status,
+			  char *error)
 {
 	json_t *reply, *clients = NULL;
+	struct ct_stats *ct_stats = &state->stats;
 	int rc;
 
 	reply = json_object();
@@ -119,18 +199,31 @@ int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 	if (!clients)
 		abort();
 
-	rc = protocol_reply_status_client(clients, &ct_stats->clients);
+	rc = protocol_reply_status_client(clients, &ct_stats->clients, verbose);
 	if (rc) {
-		goto out_freereply;
+		goto out_freereply_clients;
 	}
-	rc = protocol_reply_status_client(clients,
-					  &ct_stats->disconnected_clients);
+	rc = protocol_reply_status_client(
+		clients, &ct_stats->disconnected_clients, verbose);
 	if (rc) {
+		goto out_freereply_clients;
+	}
+
+	if ((rc = protocol_setjson(reply, "clients", clients))) {
 		goto out_freereply;
 	}
 
-	if ((rc = protocol_setjson(reply, "clients", clients)))
+	if (verbose >= LLAPI_MSG_DEBUG &&
+	    ((rc = protocol_reply_status_dump_list(
+		      reply, "waiting_restore",
+		      &state->queues.waiting_restore)) ||
+	     (rc = protocol_reply_status_dump_list(
+		      reply, "waiting_remove", &state->queues.waiting_remove)) ||
+	     (rc = protocol_reply_status_dump_list(
+		      reply, "waiting_archive",
+		      &state->queues.waiting_archive)))) {
 		goto out_freereply;
+	}
 
 	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
 		char *json_str = json_dumps(reply, 0);
@@ -141,8 +234,9 @@ int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
 		goto out_freereply;
 	};
 
-out_freereply:
+out_freereply_clients:
 	json_decref(clients);
+out_freereply:
 	json_decref(reply);
 	return rc;
 }

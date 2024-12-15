@@ -44,7 +44,7 @@ int protocol_checkerror(json_t *json);
  * @return 0 on success, -errno on error
  */
 int protocol_archive_ids(int archive_count, int *archives, json_t **out);
-int protocol_request_status(const struct ct_state *state);
+int protocol_request_status(const struct ct_state *state, int verbose);
 int protocol_request_recv(const struct ct_state *state);
 int protocol_request_done(const struct ct_state *state, uint64_t cookie,
 			  struct lu_fid *dfid, int status);

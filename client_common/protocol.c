@@ -16,12 +16,12 @@ int protocol_checkerror(json_t *reply)
 	return rc;
 }
 
-int protocol_request_status(const struct ct_state *state)
+int protocol_request_status(const struct ct_state *state, int verbose)
 {
 	json_t *request;
 	int rc = 0;
 
-	request = json_pack("{ss}", "command", "status");
+	request = json_pack("{ss,si}", "command", "status", "verbose", verbose);
 	if (!request) {
 		rc = -ENOMEM;
 		LOG_ERROR(rc, "Could not pack status request");

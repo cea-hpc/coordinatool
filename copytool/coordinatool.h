@@ -259,8 +259,8 @@ extern protocol_read_cb protocol_cbs[];
  * @param error nul-terminated error string, can be NULL
  * @return 0 on success, -errno on error
  */
-int protocol_reply_status(struct client *client, struct ct_stats *ct_stats,
-			  int status, char *error);
+int protocol_reply_status(struct client *client, int verbose, int status,
+			  char *error);
 int protocol_reply_recv(struct client *client, const char *fsname,
 			uint32_t archive_id, uint64_t hal_flags,
 			json_t *hai_list, int status, char *error);

@@ -76,7 +76,7 @@ int client_run(struct client *client)
 
 	switch (client->mode) {
 	case MODE_STATUS:
-		rc = protocol_request_status(state);
+		rc = protocol_request_status(state, state->config.verbose);
 		break;
 	case MODE_QUEUE:
 		client->active_requests.hai_list = json_array();

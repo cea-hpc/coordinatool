@@ -56,6 +56,7 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  * - STATUS command: query runtime information
  *   request properties:
  *     command = "status"
+ *     verbose = int, higher levels dump more details
  *   reply properties (any omitted integer means 0):
  *     command = "status"
  *     status = int (0 on success, errno on failure)
@@ -64,6 +65,7 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *     done_{archive,restore,remove} = integer (u64)
  *     clients_connected = integer (u32)
  *     clients: list of clients with their properties e.g. client_id, status...
+ *     queues: object with name: queue content for all pending queues
  *
  * example:
  * CLIENT: { "command": "status" }
@@ -185,6 +187,15 @@ static inline int protocol_setjson(json_t *obj, const char *key, json_t *val)
 	return 0;
 }
 
+static inline int protocol_setjson_array_append(json_t *obj, json_t *value)
+{
+	if (json_array_append_new(obj, value)) {
+		LOG_ERROR(-ENOMEM, "Could not append value to array");
+		return -ENOMEM;
+	}
+	return 0;
+}
+
 static inline int protocol_setjson_str(json_t *obj, const char *key,
 				       const char *val)
 {
@@ -256,14 +267,15 @@ static inline json_int_t protocol_getjson_int(json_t *obj, const char *key,
 	return val;
 }
 
-static inline bool protocol_getjson_bool(json_t *obj, const char *key)
+static inline bool protocol_getjson_bool(json_t *obj, const char *key,
+					 bool defval)
 {
 	json_t *json_val = json_object_get(obj, key);
 	if (!json_val)
-		return false;
+		return defval;
 
 	if (!json_is_boolean(json_val))
-		return false;
+		return defval;
 	return json_is_true(json_val);
 }
 
