@@ -22,8 +22,7 @@ static bool batch_still_reserved(struct client_batch *batch, uint64_t now_ns)
 
 /* Find a matching slot.
  * Does not check deadlines. */
-static struct client_batch *batch_find_slot(struct client *client,
-					    struct hsm_action_node *han)
+static int batch_find_slot(struct client *client, struct hsm_action_node *han)
 {
 	int i;
 	for (i = 0; i < state->config.batch_slots; i++) {
@@ -33,17 +32,24 @@ static struct client_batch *batch_find_slot(struct client *client,
 		}
 		if (strcmp(client->batch[i].hint, han->info.data))
 			continue;
-		return &client->batch[i];
+		return i;
 	}
-	return NULL;
+	return -1;
 }
 
 /* return list, if han was given this is a new batch so populate hint & start time */
-static struct cds_list_head *batch_slot_list(struct client_batch *batch,
+static struct cds_list_head *batch_slot_list(struct client *client,
+					     int batch_index,
 					     struct hsm_action_node *han,
 					     uint64_t now_ns)
 {
+	struct client_batch *batch = &client->batch[batch_index];
+
 	if (han) {
+		LOG_INFO(
+			"Batches: client %s (%d): new batch for '%s' (was '%s')",
+			client->id, client->fd, han->info.data,
+			batch->hint ?: "(free)");
 		free(batch->hint);
 		batch->hint = xstrdup(han->info.data);
 		batch->expire_max_ns =
@@ -80,20 +86,20 @@ struct cds_list_head *schedule_batch_slot_active(struct hsm_action_node *han)
 	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
-		struct client_batch *batch = batch_find_slot(client, han);
+		int i = batch_find_slot(client, han);
 
-		if (!batch)
+		if (i < 0)
 			continue;
 
 		/* found a batch, if still reserved use it. */
-		if (batch_still_reserved(batch, now_ns))
-			return batch_slot_list(batch, NULL, now_ns);
+		if (batch_still_reserved(&client->batch[i], now_ns))
+			return batch_slot_list(client, i, NULL, now_ns);
 
 		/* batch is expired... If no other work waiting re-use it anyway for better
 		 * locality. */
 		if (cds_list_empty(&client->queues.waiting_archive))
 			/* pass han to re-set start time */
-			return batch_slot_list(batch, han, now_ns);
+			return batch_slot_list(client, i, han, now_ns);
 	}
 	return NULL;
 }
@@ -131,7 +137,7 @@ struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han)
 
 			/* free slot! */
 			if (!batch->hint)
-				return batch_slot_list(batch, han, now_ns);
+				return batch_slot_list(client, i, han, now_ns);
 
 			/* expired and no pending work */
 			if (batch_still_reserved(batch, now_ns))
@@ -139,7 +145,7 @@ struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han)
 			if (!cds_list_empty(&batch->waiting_archive))
 				continue;
 
-			return batch_slot_list(batch, han, now_ns);
+			return batch_slot_list(client, i, han, now_ns);
 		}
 	}
 	/* Second pass identical, except any expired batch's pending work is
@@ -164,7 +170,7 @@ struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han)
 			cds_list_splice(&batch->waiting_archive,
 					&state->queues.waiting_archive);
 			CDS_INIT_LIST_HEAD(&batch->waiting_archive);
-			return batch_slot_list(batch, han, now_ns);
+			return batch_slot_list(client, i, han, now_ns);
 		}
 	}
 
@@ -176,24 +182,23 @@ struct cds_list_head *schedule_batch_slot_on_client(struct client *client,
 						    struct hsm_action_node *han)
 {
 	/* check for matches first */
-	struct client_batch *batch = batch_find_slot(client, han);
-	if (batch) {
+	int i = batch_find_slot(client, han);
+	if (i >= 0) {
 		uint64_t now_ns = gettime_ns();
 
 		/* if still reserved use just use it,
 		 * otherwise refresh start time and use it anyway */
-		if (batch_still_reserved(batch, now_ns))
-			return batch_slot_list(batch, NULL, now_ns);
+		if (batch_still_reserved(&client->batch[i], now_ns))
+			return batch_slot_list(client, i, NULL, now_ns);
 
-		return batch_slot_list(batch, han, now_ns);
+		return batch_slot_list(client, i, han, now_ns);
 	}
 
 	/* any empty or expired slot? */
-	int i;
 	for (i = 0; i < state->config.batch_slots; i++) {
 		if (client->batch[i].hint)
 			continue;
-		return batch_slot_list(&client->batch[i], han, gettime_ns());
+		return batch_slot_list(client, i, han, gettime_ns());
 	}
 
 	return NULL;
@@ -235,7 +240,7 @@ void batch_reschedule_client(struct client *client)
 		CDS_INIT_LIST_HEAD(&batch->waiting_archive);
 
 		struct cds_list_head *list =
-			batch_slot_list(batch, han, now_ns);
+			batch_slot_list(client, i, han, now_ns);
 		hsm_action_requeue(han, list);
 
 		/* find all other pending actions that could match */
