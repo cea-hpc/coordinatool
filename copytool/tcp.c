@@ -123,6 +123,10 @@ void client_free(struct client *client)
 	hsm_action_requeue_all(&client->queues.waiting_restore);
 	hsm_action_requeue_all(&client->queues.waiting_archive);
 	hsm_action_requeue_all(&client->queues.waiting_remove);
+	for (int i = 0; i < state->config.batch_slots; i++) {
+		hsm_action_requeue_all(&client->batch[i].waiting_archive);
+		free(client->batch[i].hint);
+	}
 	free((void *)client->id);
 	free((void *)client->archives);
 	free(client);

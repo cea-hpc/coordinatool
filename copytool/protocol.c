@@ -511,6 +511,18 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 			CDS_INIT_LIST_HEAD(old_lists[i]);
 		}
 
+		/* .. and batch slots too */
+		for (int i = 0; i < state->config.batch_slots; i++) {
+			client->batch[i] = old_client->batch[i];
+			CDS_INIT_LIST_HEAD(&client->batch[i].waiting_archive);
+			cds_list_splice(&old_client->batch[i].waiting_archive,
+					&client->batch[i].waiting_archive);
+			/* avoid frees */
+			old_client->batch[i].hint = NULL;
+			CDS_INIT_LIST_HEAD(
+				&old_client->batch[i].waiting_archive);
+		}
+
 		// we no longer need it, free it immediately (unset id_set to lower debug message)
 		// note we cannot free it right here as queued entries
 		old_client->id_set = false;
