@@ -285,6 +285,31 @@ void hsm_action_free_all(void);
 // (remove from current list it's in and update stats)
 // if list is empty, try to schedule action
 int hsm_action_enqueue(struct hsm_action_node *han, struct cds_list_head *list);
+// same as above but remove han from old list first
+static inline int hsm_action_requeue(struct hsm_action_node *han,
+				     struct cds_list_head *list)
+{
+	cds_list_del(&han->node);
+	return hsm_action_enqueue(han, list);
+}
+// same as above but for iterating through a list
+static inline int hsm_action_requeue_all(struct cds_list_head *list)
+{
+	struct cds_list_head *n, *next;
+	int rc, total = 0;
+
+	cds_list_for_each_safe(n, next, list)
+	{
+		struct hsm_action_node *han =
+			caa_container_of(n, struct hsm_action_node, node);
+		rc = hsm_action_requeue(han, NULL);
+		if (rc < 0)
+			total = rc;
+		else if (total >= 0)
+			total += rc;
+	}
+	return total;
+}
 // start action on given client
 // (add to active_requests and update stats)
 void hsm_action_start(struct hsm_action_node *han, struct client *client);

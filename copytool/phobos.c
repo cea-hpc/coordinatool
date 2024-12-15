@@ -118,8 +118,8 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 	assert(found);
 
 	/* move the request back into the main queue */
-	cds_list_del(&han->node);
-	hsm_action_enqueue(han, found);
+	/* XXX: cannot report errors back.. */
+	hsm_action_requeue(han, found);
 
 out:
 	free(hostname);

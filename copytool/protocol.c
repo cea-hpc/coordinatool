@@ -479,7 +479,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	client->id = xstrdup(id);
 	client->id_set = true;
 
-	struct cds_list_head *n, *nnext;
+	struct cds_list_head *n;
 	cds_list_for_each(n, &state->stats.disconnected_clients)
 	{
 		struct client *old_client =
@@ -578,15 +578,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	}
 
 	/* requeue anything left */
-	cds_list_for_each_safe(n, nnext, &free_hai)
-	{
-		struct hsm_action_node *han =
-			caa_container_of(n, struct hsm_action_node, node);
-#ifdef DEBUG_ACTION_NODE
-		cds_list_del(&han->node);
-#endif
-		hsm_action_enqueue(han, NULL);
-	}
+	hsm_action_requeue_all(&free_hai);
 
 	return protocol_reply_ehlo(client, 0, NULL);
 }

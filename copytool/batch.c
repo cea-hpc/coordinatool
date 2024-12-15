@@ -159,7 +159,7 @@ struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han)
 			 * probably something like:
 			 * - splice this to temporary list head
 			 * - reallocate this batch through batch_slot_list for current han
-			 * - then we can call hsm_action_enqueue() on all items in the temporary
+			 * - then we can call hsm_action_requeue() on all items in the temporary
 			 *   list */
 			cds_list_splice(&batch->waiting_archive,
 					&state->queues.waiting_archive);
@@ -236,8 +236,7 @@ void batch_reschedule_client(struct client *client)
 
 		struct cds_list_head *list =
 			batch_slot_list(batch, han, now_ns);
-		cds_list_del(&han->node);
-		hsm_action_enqueue(han, list);
+		hsm_action_requeue(han, list);
 
 		/* find all other pending actions that could match */
 		struct cds_list_head *n, *nnext;
@@ -246,8 +245,7 @@ void batch_reschedule_client(struct client *client)
 			han = caa_container_of(n, struct hsm_action_node, node);
 			if (strcmp(batch->hint, han->info.data))
 				continue;
-			cds_list_del(&han->node);
-			hsm_action_enqueue(han, list);
+			hsm_action_requeue(han, list);
 		}
 
 		/* get a new han for next slot */
@@ -289,8 +287,7 @@ bool batch_slot_can_send(struct client *client, struct hsm_action_node *han)
 		return true;
 	}
 
-	cds_list_del(&han->node);
-	hsm_action_enqueue(han, NULL);
+	hsm_action_requeue(han, NULL);
 	return false;
 }
 

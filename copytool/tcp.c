@@ -108,14 +108,6 @@ static void client_closefd(struct client *client)
 
 void client_free(struct client *client)
 {
-	struct cds_list_head *n, *next;
-	struct cds_list_head *lists[] = {
-		&client->active_requests,
-		&client->queues.waiting_restore,
-		&client->queues.waiting_archive,
-		&client->queues.waiting_remove,
-	};
-
 	if (client->id_set) {
 		LOG_INFO("Clients: freeing %s (%d)", client->id, client->fd);
 	} else {
@@ -127,17 +119,10 @@ void client_free(struct client *client)
 	if (client->status == CLIENT_WAITING)
 		cds_list_del(&client->waiting_node);
 	// reassign any request that would be lost
-	for (unsigned int i = 0; i < countof(lists); i++) {
-		cds_list_for_each_safe(n, next, lists[i])
-		{
-			struct hsm_action_node *han = caa_container_of(
-				n, struct hsm_action_node, node);
-#ifdef DEBUG_ACTION_NODE
-			cds_list_del(&han->node);
-#endif
-			hsm_action_enqueue(han, NULL);
-		}
-	}
+	hsm_action_requeue_all(&client->active_requests);
+	hsm_action_requeue_all(&client->queues.waiting_restore);
+	hsm_action_requeue_all(&client->queues.waiting_archive);
+	hsm_action_requeue_all(&client->queues.waiting_remove);
 	free((void *)client->id);
 	free((void *)client->archives);
 	free(client);
