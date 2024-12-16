@@ -166,9 +166,10 @@ struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han)
 			 * - splice this to temporary list head
 			 * - reallocate this batch through batch_slot_list for current han
 			 * - then we can call hsm_action_requeue() on all items in the temporary
-			 *   list */
+			 *   list
+			 * Until then requeue to same client for archive_on_host setting */
 			cds_list_splice(&batch->waiting_archive,
-					&state->queues.waiting_archive);
+					&client->queues.waiting_archive);
 			CDS_INIT_LIST_HEAD(&batch->waiting_archive);
 			return batch_slot_list(client, i, han, now_ns);
 		}
@@ -234,9 +235,18 @@ void batch_reschedule_client(struct client *client)
 
 		if (batch->hint && batch_still_reserved(batch, now_ns))
 			continue;
-		/* XXX reschedule these earlier than next loop? */
+		/* move back only to client queue, not global queue:
+		 * - we can't call hsm_action_requeue(_all) here until
+		 * after batch_slot_list has been called to overtake the slot
+		 * - if we don't schedule and just happend to global queue when
+		 * archive_on_host is set, another host will be able to take these
+		 * requests and we don't want that
+		 * For now just requeue on same host, it might be suboptimal and
+		 * lead to batches being split if more same requests come but this
+		 * will require some rework to improve
+		 */
 		cds_list_splice(&batch->waiting_archive,
-				&state->queues.waiting_archive);
+				&client->queues.waiting_archive);
 		CDS_INIT_LIST_HEAD(&batch->waiting_archive);
 
 		struct cds_list_head *list =
