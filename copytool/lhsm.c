@@ -11,8 +11,12 @@ static const char *pretty_data(struct hsm_action_item *hai)
 	int i;
 	int end = hai->hai_len - sizeof(*hai);
 
-	if (end >= (int)sizeof(buf))
+	if (end >= (int)sizeof(buf)) {
+		LOG_WARN_ONCE(-ERANGE,
+			      "hsm data too big (%d bytes): truncated to %zd",
+			      end, sizeof(buf) - 1);
 		end = sizeof(buf) - 1;
+	}
 
 	for (i = 0; i < end; i++) {
 		if (isprint(hai->hai_data[i]))

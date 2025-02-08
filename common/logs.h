@@ -8,6 +8,21 @@
 #include <sys/time.h>
 #include <sys/syscall.h>
 
+#define IF_ONCE                       \
+	({                            \
+		static bool _once;    \
+		bool _ret = false;    \
+		if (!_once) {         \
+			_once = true; \
+			_ret = true;  \
+		}                     \
+		_ret;                 \
+	})
+
+#define LOG_WARN_ONCE(_rc, _format, ...) \
+	if (IF_ONCE)                     \
+	LOG_WARN(_rc, _format, ##__VA_ARGS__)
+
 #define LOG_ERROR(_rc, _format, ...)                                        \
 	llapi_error(LLAPI_MSG_ERROR, _rc, "ERROR %s:%d " _format, __FILE__, \
 		    __LINE__, ##__VA_ARGS__)
