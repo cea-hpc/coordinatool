@@ -7,7 +7,7 @@
 
 static const char *pretty_data(struct hsm_action_item *hai)
 {
-	static char buf[32];
+	static char buf[128];
 	int i;
 	int end = hai->hai_len - sizeof(*hai);
 
