@@ -255,7 +255,8 @@ void batch_reschedule_client(struct client *client)
 
 		/* find all other pending actions that could match */
 		struct cds_list_head *n, *nnext;
-		cds_manylists_for_each_safe(n, nnext, archive_lists)
+		int j UNUSED, jnext UNUSED;
+		cds_manylists_for_each_safe(n, j, nnext, jnext, archive_lists)
 		{
 			han = caa_container_of(n, struct hsm_action_node, node);
 			if (strcmp(batch->hint, han->info.data))

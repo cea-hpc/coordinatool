@@ -120,6 +120,8 @@ static int protocol_reply_status_client(json_t *clients,
 				abort();
 			if ((rc = protocol_setjson_str(b, "hint",
 						       batch->hint)) ||
+			    (rc = protocol_setjson_int(b, "current_count",
+						       batch->current_count)) ||
 			    (rc = protocol_setjson_int(b, "expire_idle_s",
 						       batch->expire_idle_ns /
 							       NS_IN_SEC)) ||
@@ -254,6 +256,14 @@ static int recv_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	client->max_archive = protocol_getjson_int(json, "max_archive", -1);
 	client->max_remove = protocol_getjson_int(json, "max_remove", -1);
 
+	if (client->max_archive > 0 && state->config.batch_slots &&
+	    client->max_archive % state->config.batch_slots != 0) {
+		LOG_WARN(
+			-EINVAL,
+			"Client max_archive %d is not divisible by batch slot count %d, will not be fair to later slot(s)",
+			client->max_archive, state->config.batch_slots);
+	}
+
 	if (client->status != CLIENT_READY) {
 		return protocol_reply_recv(
 			client, NULL, 0, 0, NULL, EINVAL,
@@ -352,6 +362,8 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		 client->id, client->fd, PFID(&han->info.dfid), cookie, status);
 
 	int action = han->info.action;
+	if (han->current_count)
+		(*han->current_count)--;
 	hsm_action_free(han);
 
 	/* adjust running action count */

@@ -113,6 +113,8 @@ struct hsm_action_node {
 	} info;
 	/* if sent to a client, remember who for eventual cancel (not implemented) */
 	struct client *client;
+	/* counter to decrease on done -- used for queues current count */
+	int *current_count;
 	/* json representation of hai */
 	json_t *hai;
 };
@@ -136,6 +138,7 @@ struct client_batch {
 	uint64_t expire_max_ns;
 	uint64_t expire_idle_ns;
 	char *hint;
+	int current_count;
 	struct cds_list_head waiting_archive;
 };
 
