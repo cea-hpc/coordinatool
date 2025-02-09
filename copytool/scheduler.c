@@ -26,6 +26,7 @@ struct client *find_client(struct cds_list_head *clients_list,
 struct cds_list_head *schedule_on_client(struct client *client,
 					 struct hsm_action_node *han)
 {
+	report_action(REPORT_ASSIGN_REQUEST, han, client);
 	/* for archive, respect slots if used. Otherwise just get queue */
 	if (han->info.action == HSMA_ARCHIVE) {
 		struct cds_list_head *list =
@@ -295,6 +296,7 @@ void ct_schedule_client(struct client *client)
 					 &enqueued_bytes)) {
 				break;
 			}
+			report_action(REPORT_SEND_REQUEST, han, client);
 			LOG_INFO("%s (%d): Sending " DFID " (cookie %lx)",
 				 client->id, client->fd, PFID(&han->info.dfid),
 				 han->info.cookie);

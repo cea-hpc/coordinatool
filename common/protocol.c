@@ -174,25 +174,6 @@ out_freebuf:
 	return rc;
 }
 
-static int write_full(int fd, const char *buf, size_t count)
-{
-	ssize_t n;
-
-	while (count > 0) {
-		n = write(fd, buf, count);
-		if (n < 0 && errno == EINTR)
-			continue;
-		if (n < 0) {
-			return -errno;
-		}
-		if ((size_t)n > count) {
-			return -ERANGE;
-		}
-		count -= n;
-	}
-	return 0;
-}
-
 static int json_dump_cb(const char *buffer, size_t _size, void *data)
 {
 	struct load_cb_data *cbdata = data;

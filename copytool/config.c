@@ -180,6 +180,24 @@ static int config_parse(struct state_config *config, int fail_enoent)
 				 config->client_grace_ms);
 			continue;
 		}
+		if (!strcasecmp(key, "reporting_hint")) {
+			free((void *)config->reporting_hint);
+			/* add trailing = now */
+			int len = strlen(val);
+			char *copy = xmalloc(len + 2);
+			memcpy(copy, val, len);
+			copy[len] = '=';
+			copy[len + 1] = '\0';
+			LOG_INFO("config setting reporting_hint to '%s'", copy);
+			config->reporting_hint = copy;
+			continue;
+		}
+		if (!strcasecmp(key, "reporting_dir")) {
+			free((void *)config->reporting_dir);
+			config->reporting_dir = xstrdup(val);
+			LOG_INFO("config setting reporting_dir to '%s'", val);
+			continue;
+		}
 		if (!strcasecmp(key, "verbose")) {
 			int intval = str_to_verbose(val);
 			if (intval < 0) {
@@ -277,6 +295,8 @@ void config_free(struct state_config *config)
 	free((void *)config->host);
 	free((void *)config->port);
 	free((void *)config->redis_host);
+	free((void *)config->reporting_dir);
+	free((void *)config->reporting_hint);
 
 	struct cds_list_head *n, *nnext;
 	cds_list_for_each_safe(n, nnext, &config->archive_mappings)
