@@ -212,8 +212,7 @@ int hsm_action_new_json(json_t *json_hai, int64_t timestamp,
 	int rc;
 
 	rc = json_hsm_action_item_get(json_hai, &hai, sizeof(hai), &data);
-	// overflow is ok: we don't care about hai_data as we reuse the json
-	if (rc && rc != -EOVERFLOW) {
+	if (rc) {
 		LOG_WARN(rc, "%s: Could not process invalid hai: skipping",
 			 requestor);
 		return rc;
@@ -256,7 +255,7 @@ int hsm_action_new_json(json_t *json_hai, int64_t timestamp,
 	}
 
 	// allocations last
-	han->info.data = xstrdup(data);
+	han->info.data = xmemdup0(data, han_data_len(han));
 	han->hai = json_incref(json_hai);
 
 	rc = hsm_action_new_common(han);
@@ -307,7 +306,7 @@ int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
 	 * we logged hai_fid in lhsm.c... */
 	han->info.dfid = hai->hai_dfid;
 	han->info.hai_len = hai->hai_len;
-	han->info.data = xstrndup(hai->hai_data, hai->hai_len - sizeof(*hai));
+	han->info.data = xmemdup0(hai->hai_data, han_data_len(han));
 	han->info.archive_id = archive_id;
 	han->info.hal_flags = hal_flags;
 	han->info.timestamp = timestamp;
