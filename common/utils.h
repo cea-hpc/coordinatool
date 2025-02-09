@@ -44,11 +44,11 @@ static inline char *xstrdup(const char *s)
 	return val;
 }
 
-static inline char *xstrndup(const char *s, size_t n)
+static inline char *xmemdup0(const char *s, size_t n)
 {
-	char *val = strndup(s, n);
-	if (!val)
-		abort();
+	char *val = xmalloc(n+1);
+	memcpy(val, s, n);
+	val[n] = 0;
 	return val;
 }
 
