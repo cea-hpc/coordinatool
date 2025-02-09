@@ -303,6 +303,8 @@ int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
 	}
 	han->info.cookie = hai->hai_cookie;
 	han->info.action = hai->hai_action;
+	/* XXX check usage of hai_fid vs. hai_dfid (in particular for logs,
+	 * we logged hai_fid in lhsm.c... */
 	han->info.dfid = hai->hai_dfid;
 	han->info.hai_len = hai->hai_len;
 	han->info.data = xstrndup(hai->hai_data, hai->hai_len - sizeof(*hai));
