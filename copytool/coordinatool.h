@@ -238,6 +238,11 @@ int epoll_delfd(int epoll_fd, int fd);
 
 /* lhsm */
 
+static inline int han_data_len(struct hsm_action_node *han)
+{
+	return han->info.hai_len - sizeof(struct hsm_action_item);
+}
+
 int handle_ct_event(void);
 int ct_register(void);
 
