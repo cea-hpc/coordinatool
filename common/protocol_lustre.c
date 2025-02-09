@@ -91,8 +91,15 @@ int json_hsm_action_item_get(json_t *json, struct hsm_action_item *hai,
 	hai->hai_extent.length = unpack.hai_extent.length;
 	hai->hai_cookie = unpack.hai_cookie;
 	hai->hai_gid = unpack.hai_gid;
-	if (pdata)
+
+	if (pdata) {
+		/* This won't actually be used as an hsm_action_item,
+		 * don't add padding so caller knows safely accessible
+		 * length. */
+		hai->hai_len = sizeof(*hai) + data_len;
 		*pdata = data;
+		return 0;
+	}
 
 	hai->hai_len = __ALIGN_KERNEL_MASK(sizeof(*hai) + data_len, 7);
 	if (hai_len < hai->hai_len) {
