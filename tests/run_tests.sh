@@ -907,6 +907,107 @@ run_test 51 archive_basic_batch_multislots
 #}
 #run_test 52 archive_basic_batch_on_hosts
 
+
+reporting_basic_test() {
+
+	do_client 0 "rm -rf MNTPATH/.reporting"
+
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_reporting.conf \
+		do_coordinatool_start 0
+
+	# need to wait a bit so copytool can connect immeditely...
+	sleep 0.5
+	client_reset 3
+
+	# we have max_archive=3
+	# - send 5 requests to fill in agent 1 waiting queue
+	# - wait a bit
+	# - start 2nd agent
+	# - send 3 more requests with another tag
+	# - wait a bit and check
+	# - unblock agent 1 & wait
+	# - check only first report got cleaned up
+	# - unblock agent 2 & wait
+	# - chcek all is clean
+
+	WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
+	archive_data="cr=report00" client_archive_n_req 3 04 00
+
+	# wait a bit to get messages...
+	sleep 1
+	WAIT_FILE="$ARCHIVEDIR/wait_2" do_lhsmtoolcmd_start 2
+	# (wait till repot00 requests get sent to agent_2)
+	sleep 1
+	archive_data="foo,cr=report01,bar" client_archive_n_req 3 12 10
+
+	sleep 1
+	do_client 0 "[ \"\$(grep -c agent_1 MNTPATH/.reporting/report00)\" = 3 ]" \
+		|| error "Unexpected number of agent_1 in report00"
+	do_client 0 "[ \"\$(grep -c agent_2 MNTPATH/.reporting/report00)\" = 2 ]" \
+		|| error "Unexpected number of agent_2 in report00"
+	do_client 0 "[ \"\$(grep -c agent_2 MNTPATH/.reporting/report01)\" = 1 ]" \
+		|| error "Unexpected number of agent_2 in report01"
+	do_client 0 "[ \"\$(grep -c new MNTPATH/.reporting/report01)\" = 3 ]" \
+		|| error "Unexpected number of new in report01"
+
+	touch $ARCHIVEDIR/wait_2
+	client_archive_n_wait 3 12 10
+
+
+	do_client 0 'test ! -e MNTPATH/.reporting/report01' \
+		|| error "report01 was not removed"
+	do_client 0 'test -e MNTPATH/.reporting/report00' \
+		|| error "report01 was incorrectly removed"
+
+	touch $ARCHIVEDIR/wait_1
+	client_archive_n_wait 3 04 00
+
+	do_client 0 'test ! -e MNTPATH/.reporting/report00' \
+		|| error "report00 was not removed"
+
+}
+run_test 60 reporting_basic_test
+
+reporting_normal_requests() {
+	# archive data and restore data must match because our archive script
+	# prefixes archive by data, so if it doesn't match file is not found..
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_reporting.conf \
+	archive_data="cr=report01" \
+	restore_data="cr=report01" \
+	remove_data="cr=report01" \
+		normal_requests
+}
+run_test 61 reporting_normal_requests
+
+reporting_reuse_tags() {
+	do_client 0 "rm -rf MNTPATH/.reporting"
+
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_reporting.conf \
+		do_coordinatool_start 0
+
+	do_lhsmtoolcmd_start 1
+	do_lhsmtoolcmd_start 2
+
+	client_reset 3
+
+	archive_data="cr=report01" \
+		client_archive_n_req 3 09 00
+	archive_data="cr=report02,foo" \
+		client_archive_n_req 3 19 10
+	archive_data="foo,cr=report01,test" \
+		client_archive_n_req 3 29 20
+
+	client_archive_n_wait 3 29 00
+	archive_data="bar,cr=report01" \
+		client_archive_n 3 39 30
+
+	do_client 0 'test ! -e MNTPATH/.reporting/report01' \
+		|| error "report01 was not removed"
+	do_client 0 'test ! -e MNTPATH/.reporting/report02' \
+		|| error "report02 was not removed"
+}
+run_test 62 reporting_reuse_tags
+
 echo "Summary: ran $TESTS tests, $SKIPS skipped, ${#FAILURES[@]} failures"
 printf "%s\n" "${FAILURES[@]}"
 
