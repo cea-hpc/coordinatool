@@ -21,12 +21,10 @@ cds_manylists_next(struct cds_list_head *node, struct cds_list_head ***heads_p)
 }
 
 /* It's a bit of a pain to chain multiple lists in cds_for_each(_safe) manually,
- * so this helper takes a list of lists and walks through them all. */
-#define cds_manylists_for_each_safe(pos, p, heads_init)  \
-	struct cds_list_head **heads = (heads_init);     \
-	for (pos = cds_manylists_next(heads[0], &heads), \
-	    p = cds_manylists_next(pos, &heads);         \
-	     pos; pos = p, p = cds_manylists_next(p, &heads))
+ * so this helper just loops over each lists */
+#define cds_manylists_for_each_safe(j, n, nnext, heads) \
+	for (j = 0; heads[j]; j++)                      \
+	cds_list_for_each_safe(n, nnext, heads[j])
 
 /* count number of items in list */
 static inline int cds_list_count(struct cds_list_head *list)

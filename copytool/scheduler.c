@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
+#include <assert.h>
+
 #include "coordinatool.h"
 
 /* schedule decision helper.
@@ -240,14 +242,32 @@ void ct_schedule_client(struct client *client)
 		unsigned int enqueued_pass = 0,
 			     pending_pass = *pending_count[i];
 		struct cds_list_head *n, *nnext;
-		cds_manylists_for_each_safe(n, nnext, schedule_lists[i])
+		int j;
+		cds_manylists_for_each_safe(j, n, nnext, schedule_lists[i])
 		{
+			int *extra_count = NULL;
+			int extra_max = 0;
+			if (client->max_archive >= 0 &&
+			    state->config.batch_slots &&
+			    max_action[i] == &client->max_archive) {
+				/* this is a batch */
+				assert(j < state->config.batch_slots);
+				extra_count = &client->batch[j].current_count;
+				/* round up... */
+				extra_max = (*max_action[i] +
+					     state->config.batch_slots - 1) /
+					    state->config.batch_slots;
+			}
 			if (enqueued_bytes >
 			    client->max_bytes - HAI_SIZE_MARGIN) {
 				break;
 			}
 			if (*max_action[i] >= 0 &&
 			    *max_action[i] <= *current_count[i]) {
+				break;
+			}
+			if (extra_max >= 0 && extra_count &&
+			    *extra_count >= extra_max) {
 				break;
 			}
 
@@ -277,6 +297,7 @@ void ct_schedule_client(struct client *client)
 			LOG_INFO("%s (%d): Sending " DFID " (cookie %lx)",
 				 client->id, client->fd, PFID(&han->info.dfid),
 				 han->info.cookie);
+			han->current_count = extra_count;
 			hsm_action_start(han, client);
 			enqueued_pass++;
 			/* don't hand in too much work if other clients waiting */
