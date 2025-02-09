@@ -115,14 +115,15 @@ client_common = static_library(
 subdir('tests')
 
 lhsmd_coordinatool_sources = [
+	'copytool/batch.c',
 	'copytool/config.c',
 	'copytool/coordinatool.c',
 	'copytool/lhsm.c',
 	'copytool/protocol.c',
 	'copytool/queue.c',
 	'copytool/redis.c',
+	'copytool/reporting.c',
 	'copytool/scheduler.c',
-	'copytool/batch.c',
 	'copytool/tcp.c',
 	'copytool/timer.c',
 ]

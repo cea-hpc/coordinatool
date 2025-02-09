@@ -68,6 +68,7 @@ static void _hsm_action_free(struct hsm_action_node *han, bool final_cleanup)
 			abort();
 	}
 	free((void *)han->info.data);
+	report_free_action(han);
 	if (han->hai)
 		json_decref(han->hai);
 	free(han);
@@ -194,6 +195,8 @@ static int hsm_action_new_common(struct hsm_action_node *han)
 		free(han);
 		return -EEXIST;
 	}
+
+	report_new_action(han);
 
 #if HAVE_PHOBOS
 	(void)phobos_enrich(han);
