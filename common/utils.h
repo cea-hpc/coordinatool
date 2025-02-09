@@ -3,9 +3,11 @@
 #ifndef COORDINATOOL_UTILS_H
 #define COORDINATOOL_UTILS_H
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #define UNUSED __attribute__((unused))
 
@@ -50,6 +52,25 @@ static inline char *xmemdup0(const char *s, size_t n)
 	memcpy(val, s, n);
 	val[n] = 0;
 	return val;
+}
+
+static inline int write_full(int fd, const char *buf, size_t count)
+{
+	ssize_t n;
+
+	while (count > 0) {
+		n = write(fd, buf, count);
+		if (n < 0 && errno == EINTR)
+			continue;
+		if (n < 0) {
+			return -errno;
+		}
+		if ((size_t)n > count) {
+			return -ERANGE;
+		}
+		count -= n;
+	}
+	return 0;
 }
 
 /* time */
@@ -100,6 +121,22 @@ static inline long parse_int(const char *arg, long max, const char *what)
 		LOG_ERROR(rc, "%s '%s' contains (trailing) garbage", what, arg);
 	}
 	return rc;
+}
+
+/* cleanup */
+#define _cleanup_(f) __attribute__((cleanup(f)))
+
+static inline void freep(void *ptr)
+{
+	free(*(void **)ptr);
+}
+
+static inline void closep(int *fd)
+{
+	if (*fd < 3)
+		return;
+	close(*fd);
+	*fd = -1;
 }
 
 #endif

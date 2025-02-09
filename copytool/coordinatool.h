@@ -88,8 +88,25 @@ static inline int check_list(struct cds_list_head *h)
 	} while (0)
 #endif
 
-/* queue types */
+enum report_step {
+	REPORT_NEW_REQUEST,
+	REPORT_ASSIGN_REQUEST,
+	REPORT_SEND_REQUEST,
+	REPORT_MOVER_PROGRESS,
+};
 
+struct reporting {
+	/* name given in hint */
+	const char *hint;
+	/* hint length, needed to compare without modifying hai value
+	 * that might not have a trailing nul byte. Actual hint has a
+	 * nul byte at hint[hint_len] for safe filesystem use. */
+	int hint_len;
+	/* refcount to cleanup reporting file when no request left */
+	int refcount;
+};
+
+/* queue types */
 struct hsm_action_node {
 #ifdef DEBUG_ACTION_NODE
 	int64_t magic;
@@ -115,6 +132,8 @@ struct hsm_action_node {
 	struct client *client;
 	/* counter to decrease on done -- used for queues current count */
 	int *current_count;
+	/* reporting info if any */
+	struct reporting *reporting;
 	/* json representation of hai */
 	json_t *hai;
 };
@@ -195,6 +214,8 @@ struct state {
 		const char *confpath;
 		const char *host;
 		const char *port;
+		const char *reporting_hint;
+		const char *reporting_dir;
 		const char *redis_host;
 		int redis_port;
 		enum llapi_message_level verbose;
@@ -215,11 +236,13 @@ struct state {
 	int epoll_fd;
 	int hsm_fd;
 	int listen_fd;
+	int reporting_dir_fd;
 	int timer_fd;
 	int signal_fd;
 	bool terminating;
 	struct hsm_action_queues queues;
 	void *hsm_actions_tree;
+	void *reporting_tree;
 	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
 };
@@ -350,6 +373,15 @@ void batch_reschedule_client(struct client *client);
 bool batch_slot_can_send(struct client *client, struct hsm_action_node *han);
 uint64_t batch_next_expiry(void);
 void batch_clear_expired(uint64_t now_ns);
+
+/* reporting */
+int reporting_init(void);
+void reporting_cleanup(void);
+int report_new_action(struct hsm_action_node *han);
+int report_free_action(struct hsm_action_node *han);
+int report_action(enum report_step step, struct hsm_action_node *han,
+		  struct client *client);
+int report_client(enum report_step step, struct client *client);
 
 /* scheduler */
 
