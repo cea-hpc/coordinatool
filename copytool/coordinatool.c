@@ -191,6 +191,10 @@ static int ct_start(void)
 
 	hsm_action_queues_init(&state->queues);
 
+	rc = reporting_init();
+	if (rc < 0)
+		return rc;
+
 	rc = redis_connect();
 	if (rc < 0)
 		return rc;
@@ -328,6 +332,7 @@ int main(int argc, char *argv[])
 	struct state mstate = {
 		.listen_fd = -1,
 		.timer_fd = -1,
+		.reporting_dir_fd = -1,
 	};
 	state = &mstate;
 	CDS_INIT_LIST_HEAD(&mstate.config.archive_mappings);
@@ -447,6 +452,7 @@ out:
 		llapi_hsm_copytool_unregister(&mstate.ctdata);
 	}
 	hsm_action_free_all();
+	reporting_cleanup();
 	config_free(&mstate.config);
 	free((void *)mstate.fsname);
 	return rc;
