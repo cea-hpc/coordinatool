@@ -46,6 +46,30 @@
       },
       "revId": "90b32dafb61becb03000ea770efd3cd382807d5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec0210d9_1faff973",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T12:39:06Z",
+      "side": 1,
+      "message": "My bad. I saw the -EINVAL and interpreted it as \"we send an error to the client\". I should pay more attention when reading code...",
+      "parentUuid": "3183b52f_3c02d8a3",
+      "range": {
+        "startLine": 263,
+        "startChar": 67,
+        "endLine": 263,
+        "endChar": 97
+      },
+      "revId": "90b32dafb61becb03000ea770efd3cd382807d5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
