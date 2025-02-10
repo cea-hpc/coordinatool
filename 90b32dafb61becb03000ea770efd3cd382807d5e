@@ -22,6 +22,30 @@
       },
       "revId": "90b32dafb61becb03000ea770efd3cd382807d5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3183b52f_3c02d8a3",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T12:34:49Z",
+      "side": 1,
+      "message": "I think it\u0027s fine as a warning. We\u0027re rounding up, so in practice there\u0027ll always be a chance for each slot; e.g. if you have 3 slots and 5 max archives you\u0027ll get 2/2/1, if you have 3 slots and 2 max you\u0027ll get 1/1/0 (and finally process the last slots\u0027 requests if either first are idle), but it\u0027s not like you could expect 3 slots to be processed in parallel with such a limit anyway.\n\nAnd I think it\u0027s better to accept a client with a slightly sub-optimal value and process requests, rather than not process anything :)",
+      "parentUuid": "507a5489_65acce99",
+      "range": {
+        "startLine": 263,
+        "startChar": 67,
+        "endLine": 263,
+        "endChar": 97
+      },
+      "revId": "90b32dafb61becb03000ea770efd3cd382807d5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
