@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a62db260_6c0688d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T11:54:25Z",
+      "side": 1,
+      "message": "Thanks for the review!",
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f5202ce_2c9b042d",
@@ -14,6 +31,30 @@
       "writtenOn": "2025-02-10T10:37:13Z",
       "side": 1,
       "message": "nit: indent",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 24,
+        "endChar": 10
+      },
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "988ba7a4_b1881f9e",
+        "filename": "common/logs.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T11:54:25Z",
+      "side": 1,
+      "message": "Yes this is weird, but it\u0027s what clang-format generates for this, so it is what it is...\n(I\u0027ve not documented this but I\u0027m running clang-format as part of CI checks now, so fixing this would mean trying to figure out how to configure this properly in the .clang-format syntax..)",
+      "parentUuid": "2f5202ce_2c9b042d",
       "range": {
         "startLine": 24,
         "startChar": 1,
@@ -71,6 +112,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29b77e2e_c2d066db",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T11:54:25Z",
+      "side": 1,
+      "message": "Yes, sorry, wanted to keep the \"bad\" value first to test log before increasing the limit.\n\nFWIW the actual values Stéphane uses right now are around 50 chars",
+      "parentUuid": "8fdbb430_0605130d",
+      "range": {
+        "startLine": 10,
+        "startChar": 13,
+        "endLine": 10,
+        "endChar": 20
+      },
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20a0885b_05030363",
@@ -84,6 +149,30 @@
       "writtenOn": "2025-02-10T10:37:13Z",
       "side": 1,
       "message": "nit: not sure this is clear what \"wanted 1024\" means. Maybe something like\n\nhsm data too big (%d bytes): truncated to 31 bytes",
+      "range": {
+        "startLine": 15,
+        "startChar": 44,
+        "endLine": 15,
+        "endChar": 53
+      },
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ee9e2c9_a1c13900",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T11:54:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20a0885b_05030363",
       "range": {
         "startLine": 15,
         "startChar": 44,
