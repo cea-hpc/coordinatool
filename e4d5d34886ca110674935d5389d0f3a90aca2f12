@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0476a7d1_51afd48c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T14:07:32Z",
+      "side": 1,
+      "message": "There is one thing that the client doesn\u0027t know is whether the request failed or not (which is the main reason for the increased verbosity that we ask from the coordinatool). So having at least a report saying \"your request has failed\" (with the error code would be even better) would be nice.\n\nEventually, the client can infer that the request is finished as you said by looking at the inode or if the file is removed for instance. But in practice, it might be easier to have an explict error. Now, one objection to this is that if there is only one request or if its the last one from the batch that fails, the file will be removed by the coordinatool and the error message is not there anyway...\n\nWriting this makes me realise that this is unrealistic in most cases to have an error report since the file is removed by the coordinatool. Maybe a seperate file to report errors would be useful. For instance, `/mnt/lustre/.hsm_reports/report_1234` and `/mnt/lustre/.hsm_reports/report_1234.errors`. The coordinatool would remove the report_1234 file but leave the error file removal to the client reading the report. This is more complexity for not much improvement though...\n\nOr leave the removal of the report_1234 file to the client that is looking at it? And in case the client command is killed, we just remove the file before dying. I don\u0027t know if that\u0027s a better solution.",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 25,
+        "endChar": 51
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e9560bce_51e4a5b6",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -65,6 +88,29 @@
         "startChar": 29,
         "endLine": 39,
         "endChar": 35
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e05f377_7b118579",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T14:07:32Z",
+      "side": 1,
+      "message": "I don\u0027t know if this is what you mean by this but ideally what we would like is to have an output like this:\n\n```\n$ restore ./myfile\nrequest send to server\nrequest 756/756\n...\nrequest 438/864\n...\nrequest 1/780\nrequest send to copytool for transfer\nfile restored\n```",
+      "range": {
+        "startLine": 38,
+        "startChar": 60,
+        "endLine": 39,
+        "endChar": 54
       },
       "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
