@@ -47,6 +47,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fdbb430_0605130d",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T10:37:55Z",
+      "side": 1,
+      "message": "Nevermind, I\u0027ve seen the next patch...",
+      "parentUuid": "d03a1bc6_1130908e",
+      "range": {
+        "startLine": 10,
+        "startChar": 13,
+        "endLine": 10,
+        "endChar": 20
+      },
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20a0885b_05030363",
