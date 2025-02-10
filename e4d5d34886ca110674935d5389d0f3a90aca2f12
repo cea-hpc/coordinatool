@@ -1,0 +1,234 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ef2925d_47e4ebac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "Just a thought for later. There is also the function llapi_hsm_action_progress that can be used to track copytool progress. IIRC the coordinatool does not override this function in the preload library. Adding this in the preload library (and actually using it in the phobos copytool) could also help us track the progress of a request.",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 41
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c24c847a_24c4ddf5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "typo: to the file",
+      "range": {
+        "startLine": 22,
+        "startChar": 36,
+        "endLine": 22,
+        "endChar": 43
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9560bce_51e4a5b6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "typo: closer I think",
+      "range": {
+        "startLine": 39,
+        "startChar": 29,
+        "endLine": 39,
+        "endChar": 35
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa782bac_d60a4041",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "I didn\u0027t see this state. If I understand correctly, the mover progress can\u0027t be implemented right now. But the new request could, right?",
+      "range": {
+        "startLine": 92,
+        "startChar": 9,
+        "endLine": 92,
+        "endChar": 14
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33216c35_c3382409",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand this. If the hint is inside the hai_data as the first sentence suggests, then it may not have a nul byte. For instance, if the hint is `foo,ct\u003dbar,moo`, then the last byte of the hint would be \u0027,\u0027. Is the hint member a copy of the content of the reporting hint\u0027s value in hai_data?",
+      "range": {
+        "startLine": 101,
+        "startChar": 4,
+        "endLine": 103,
+        "endChar": 55
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6b83a6a_82d2e6c9",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "nit: maybe split the lines for readability.",
+      "range": {
+        "startLine": 63,
+        "startChar": 32,
+        "endLine": 63,
+        "endChar": 34
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae2777d3_c061d983",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "I think you should also check that the first byte after the needle is \u0027\u003d\u0027. Otherwise you might miss the actual hint. For instance: `tag\u003dtest,credit\u003d1,cr\u003dtest`. This would result in the coordinatool thinking that there is no hint provided.",
+      "range": {
+        "startLine": 67,
+        "startChar": 32,
+        "endLine": 67,
+        "endChar": 47
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f14085aa_c033ede2",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "nit: maybe a log before abort. We can see the issue in the coredump but if they are not activated we won\u0027t know why it crashed.",
+      "range": {
+        "startLine": 121,
+        "startChar": 3,
+        "endLine": 121,
+        "endChar": 11
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f8d53e2_6c76da40",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "nit: same as the other abort",
+      "range": {
+        "startLine": 143,
+        "startChar": 2,
+        "endLine": 143,
+        "endChar": 6
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6628edf1_f2b6d250",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T13:49:24Z",
+      "side": 1,
+      "message": "comment: this log message is fine by itself. I\u0027m just wondering if it is necessary to add extra \"human readable\" info. In practice, we will probably want to read these messages and convert them to more user friendly ones (e.g. `your restoration request has been sent to the server for scheduling`). And probably display the path to users instead of the FID. So my point is that the `fid ` part is not strictly necessary. FID + state is fine. But leaving it is also fine. As you prefer.",
+      "range": {
+        "startLine": 169,
+        "startChar": 34,
+        "endLine": 169,
+        "endChar": 38
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
