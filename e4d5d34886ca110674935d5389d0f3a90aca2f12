@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "53c8056c_c291de2c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "Oh I had forgotten about this one!\n\nCouldn\u0027t ccc_hsm just get the real lustre action progress directly from lustre?\nI\u0027ll play with it next time slot I can find",
+      "parentUuid": "4ef2925d_47e4ebac",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 41
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c24c847a_24c4ddf5",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -60,6 +84,30 @@
       "writtenOn": "2025-02-10T14:07:32Z",
       "side": 1,
       "message": "There is one thing that the client doesn\u0027t know is whether the request failed or not (which is the main reason for the increased verbosity that we ask from the coordinatool). So having at least a report saying \"your request has failed\" (with the error code would be even better) would be nice.\n\nEventually, the client can infer that the request is finished as you said by looking at the inode or if the file is removed for instance. But in practice, it might be easier to have an explict error. Now, one objection to this is that if there is only one request or if its the last one from the batch that fails, the file will be removed by the coordinatool and the error message is not there anyway...\n\nWriting this makes me realise that this is unrealistic in most cases to have an error report since the file is removed by the coordinatool. Maybe a seperate file to report errors would be useful. For instance, `/mnt/lustre/.hsm_reports/report_1234` and `/mnt/lustre/.hsm_reports/report_1234.errors`. The coordinatool would remove the report_1234 file but leave the error file removal to the client reading the report. This is more complexity for not much improvement though...\n\nOr leave the removal of the report_1234 file to the client that is looking at it? And in case the client command is killed, we just remove the file before dying. I don\u0027t know if that\u0027s a better solution.",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 25,
+        "endChar": 51
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "601c3f3d_5bea816b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "Ideally the file should be root owned (one-way communication) and not delete-able by user:\n- the user requesting file restore is not necessarily the file owner and we can\u0027t trust the hint to get uid either, so afaik we have no way of knowing which uid to give the file to (I guess with the random tag model we could make the file 666...)\n- for removal, it\u0027s not the file but the directory that needs write access, so we either need 733 or 1733 (the later needs file to be user-owned to delete); in either case user would be able to also create whatever they want in that directory which I don\u0027t think we want... :/\n\nso this is all a bit difficult; we could have some sort of keep-alive from coordinatool and be aggressive with a cleanup cron but it\u0027s a bit ugly.\n\nAlternatively we have timers in coordinatool, we could delay deletion by e.g. 5min (or coordinatool shutdown) and that\u0027d be good enough in practice?\n\nOTOH, I agree having some sort of error feedback would be interesting. The lustre strategy is that it never fails, but if transfer fails the user has no way of knowing when it should send another request (to retry) or give up, this isn\u0027t great..\nTechnically with this interface we could get done/error for non-last file, and if report file is gone + lustre file is not online then the client can deduce there was an error (or a request is stuck in lustre without having been sent to coordinatool), but they don\u0027t know what... Better to have some report.\n\nI\u0027ll give this all some thought!",
+      "parentUuid": "0476a7d1_51afd48c",
       "range": {
         "startLine": 23,
         "startChar": 2,
@@ -118,6 +166,47 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "de54486b_02f556c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "Yes that was the idea; just not done yet.\n\nI was thinking hooking at the done cb from mover, but I didn\u0027t want too run through all pending requests... Still thinking this through.",
+      "parentUuid": "3e05f377_7b118579",
+      "range": {
+        "startLine": 38,
+        "startChar": 60,
+        "endLine": 39,
+        "endChar": 54
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ac12758_3ea748fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "Thanks for the review!",
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aa782bac_d60a4041",
         "filename": "copytool/coordinatool.h",
         "patchSetId": 1
@@ -129,6 +218,30 @@
       "writtenOn": "2025-02-10T13:49:24Z",
       "side": 1,
       "message": "I didn\u0027t see this state. If I understand correctly, the mover progress can\u0027t be implemented right now. But the new request could, right?",
+      "range": {
+        "startLine": 92,
+        "startChar": 9,
+        "endLine": 92,
+        "endChar": 14
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4484cd7_65b4e291",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "new request is done immediately in report_new_action() when request is first received",
+      "parentUuid": "aa782bac_d60a4041",
       "range": {
         "startLine": 92,
         "startChar": 9,
@@ -152,6 +265,30 @@
       "writtenOn": "2025-02-10T13:49:24Z",
       "side": 1,
       "message": "I\u0027m not sure I understand this. If the hint is inside the hai_data as the first sentence suggests, then it may not have a nul byte. For instance, if the hint is `foo,ct\u003dbar,moo`, then the last byte of the hint would be \u0027,\u0027. Is the hint member a copy of the content of the reporting hint\u0027s value in hai_data?",
+      "range": {
+        "startLine": 101,
+        "startChar": 4,
+        "endLine": 103,
+        "endChar": 55
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdced0fe_7c3e2ac3",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "hai_data is not nul terminated :/\n(In practice it\u0027s zero-padded so a length not multiple of 8 will be terminated, but a length of n*8 will be followed by another hai with no padding afair)\n\nSo once we\u0027re looking at the copy in this struct we have a nul terminated string and all is fine, but when we\u0027re looking at hai_data directly we need to specify the end manually, hence memcmp and not strcmp.",
+      "parentUuid": "33216c35_c3382409",
       "range": {
         "startLine": 101,
         "startChar": 4,
@@ -210,6 +347,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "176a469f_d14702f2",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "I was lazy with config and this code is expecting the hint to contain the `\u003d` sign, so the memmem already found it and it doesn\u0027t need a separate check\n\n(Could enforce this at config parsing time perhaps)\n\nI\u0027ll add a comment when updating",
+      "parentUuid": "ae2777d3_c061d983",
+      "range": {
+        "startLine": 67,
+        "startChar": 32,
+        "endLine": 67,
+        "endChar": 47
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f14085aa_c033ede2",
         "filename": "copytool/reporting.c",
         "patchSetId": 1
@@ -221,6 +382,30 @@
       "writtenOn": "2025-02-10T13:49:24Z",
       "side": 1,
       "message": "nit: maybe a log before abort. We can see the issue in the coredump but if they are not activated we won\u0027t know why it crashed.",
+      "range": {
+        "startLine": 121,
+        "startChar": 3,
+        "endLine": 121,
+        "endChar": 11
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "505cb800_8139bb59",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "I guess we could add an xabort macro that at least logs FILE/LINE, and perhaps even backtrace()... \nThere\u0027s plenty of abort in the code so considering this comment out of scope.\n\nMy stance on this is that coredumps must be gathered (and that aborts are only used in places were it shouldn\u0027t fail in the first place anyway, even with bad input; failing here in the current coordinatool code would be a libc bug...)",
+      "parentUuid": "f14085aa_c033ede2",
       "range": {
         "startLine": 121,
         "startChar": 3,
@@ -267,6 +452,30 @@
       "writtenOn": "2025-02-10T13:49:24Z",
       "side": 1,
       "message": "comment: this log message is fine by itself. I\u0027m just wondering if it is necessary to add extra \"human readable\" info. In practice, we will probably want to read these messages and convert them to more user friendly ones (e.g. `your restoration request has been sent to the server for scheduling`). And probably display the path to users instead of the FID. So my point is that the `fid ` part is not strictly necessary. FID + state is fine. But leaving it is also fine. As you prefer.",
+      "range": {
+        "startLine": 169,
+        "startChar": 34,
+        "endLine": 169,
+        "endChar": 38
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18602233_3fab711a",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-10T18:22:27Z",
+      "side": 1,
+      "message": "I agree this output isn\u0027t meant to be read directly, I like having identifiers for machine actually!\n(so it could parse the file one word at a time)\n\nBut in that sense it\u0027d be better to write it the other way around actually, if we start with \u0027new\u0027 then it\u0027s not ambiguous. I\u0027ll update the messages\n```\nnew \u003cfid\u003e\nassign \u003cfid\u003e \u003cmover\u003e\nsend \u003cfid\u003e \u003cmover\u003e\nprogress \u003cfid\u003e \u003cmover\u003e \u003ccurrent\u003e \u003cmax\u003e ? TBD\n```",
+      "parentUuid": "6628edf1_f2b6d250",
       "range": {
         "startLine": 169,
         "startChar": 34,
