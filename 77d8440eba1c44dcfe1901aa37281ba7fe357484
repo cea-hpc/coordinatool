@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f5202ce_2c9b042d",
+        "filename": "common/logs.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T10:37:13Z",
+      "side": 1,
+      "message": "nit: indent",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 24,
+        "endChar": 10
+      },
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d03a1bc6_1130908e",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T10:37:13Z",
+      "side": 1,
+      "message": "question: I understand that this is just for logging but I assume that the data passed to Phobos by Stephane is usually bigger than that? Would it make sense to increase it a bit (256 for instance)?",
+      "range": {
+        "startLine": 10,
+        "startChar": 13,
+        "endLine": 10,
+        "endChar": 20
+      },
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20a0885b_05030363",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T10:37:13Z",
+      "side": 1,
+      "message": "nit: not sure this is clear what \"wanted 1024\" means. Maybe something like\n\nhsm data too big (%d bytes): truncated to 31 bytes",
+      "range": {
+        "startLine": 15,
+        "startChar": 44,
+        "endLine": 15,
+        "endChar": 53
+      },
+      "revId": "77d8440eba1c44dcfe1901aa37281ba7fe357484",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
