@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "236ccaa0_1a2e8e40",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T12:34:35Z",
+      "side": 1,
+      "message": "Looking at the HPSS copytool, they log both when the request is first received alongside a request ID that is unique to each request. This request ID is then used in other logs to track it. Maybe you can use a similar approach by using the memory address of the HAI for instance.\n\nThe copytool also uses the \"fuid\" (trusted.hsm_fuid xattr). But this would mean reading an extra attribute just for logging. So maybe not the best approach.",
+      "range": {
+        "startLine": 9,
+        "startChar": 27,
+        "endLine": 9,
+        "endChar": 56
+      },
+      "revId": "a73c8da301f8ec156de0feb0f3cc44cf3109d7af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
