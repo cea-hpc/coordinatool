@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "507a5489_65acce99",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-10T12:20:16Z",
+      "side": 1,
+      "message": "nit1: this seems like an error rather than just a warning\nnit2: to make the log a bit more explicit, maybe you can add \"Refusing recv request, update client configuration\"",
+      "range": {
+        "startLine": 263,
+        "startChar": 67,
+        "endLine": 263,
+        "endChar": 97
+      },
+      "revId": "90b32dafb61becb03000ea770efd3cd382807d5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
