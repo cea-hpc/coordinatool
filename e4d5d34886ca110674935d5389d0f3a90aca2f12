@@ -72,6 +72,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d037df4_cc0d811b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Ok, thanks for checking!\nI thought the cancels could be unsolicited at any time (obtained as an action in recv), and I\u0027m curious at what the coordinator would do from progress information itself, but I\u0027ll look at this after queue position",
+      "parentUuid": "d664045f_ff5c5b9b",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 41
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c24c847a_24c4ddf5",
@@ -85,6 +109,30 @@
       "writtenOn": "2025-02-10T13:49:24Z",
       "side": 1,
       "message": "typo: to the file",
+      "range": {
+        "startLine": 22,
+        "startChar": 36,
+        "endLine": 22,
+        "endChar": 43
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6195d1cd_c7bc3d12",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c24c847a_24c4ddf5",
       "range": {
         "startLine": 22,
         "startChar": 36,
@@ -262,6 +310,54 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3ca7cff4_050cf737",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Just ideas at this point but right now I\u0027m leaning towards timers instead of hooking up the done cb:\n- timers will show the lack of progress as well as progress (e.g. coordinatool is alive but transfers are sloooow)\n- conversely if transfers are fast we\u0027d avoid counting too often\n- we\u0027ll be able to use timers for delayed cleanup and add error reporting\n\nso I\u0027ll probably walk all lists every minute or so as a first step until some refactoring can be done to keep track of position directly; if we only do this for restores it\u0027s probably not too expensive.",
+      "parentUuid": "7fbd97a1_7ee60a47",
+      "range": {
+        "startLine": 38,
+        "startChar": 60,
+        "endLine": 39,
+        "endChar": 54
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c153933_dd2d73c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9560bce_51e4a5b6",
+      "range": {
+        "startLine": 39,
+        "startChar": 29,
+        "endLine": 39,
+        "endChar": 35
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3ac12758_3ea748fb",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -395,6 +491,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "084a761e_8bbbd808",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d694544f_fbf20e67",
+      "range": {
+        "startLine": 101,
+        "startChar": 4,
+        "endLine": 103,
+        "endChar": 55
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6b83a6a_82d2e6c9",
@@ -408,6 +528,30 @@
       "writtenOn": "2025-02-10T13:49:24Z",
       "side": 1,
       "message": "nit: maybe split the lines for readability.",
+      "range": {
+        "startLine": 63,
+        "startChar": 32,
+        "endLine": 63,
+        "endChar": 34
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "196255ce_56cabe3b",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6b83a6a_82d2e6c9",
       "range": {
         "startLine": 63,
         "startChar": 32,
@@ -489,6 +633,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6329551_0743b926",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "if we\u0027re going to check might as well add the `\u003d` directly in config parsing, I\u0027ve done that and added comment here.",
+      "parentUuid": "ed7092b5_746ff2df",
+      "range": {
+        "startLine": 67,
+        "startChar": 32,
+        "endLine": 67,
+        "endChar": 47
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f14085aa_c033ede2",
@@ -559,6 +727,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32822e93_89c47be4",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7f8d53e2_6c76da40",
+      "range": {
+        "startLine": 143,
+        "startChar": 2,
+        "endLine": 143,
+        "endChar": 6
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6628edf1_f2b6d250",
@@ -596,6 +788,30 @@
       "side": 1,
       "message": "I agree this output isn\u0027t meant to be read directly, I like having identifiers for machine actually!\n(so it could parse the file one word at a time)\n\nBut in that sense it\u0027d be better to write it the other way around actually, if we start with \u0027new\u0027 then it\u0027s not ambiguous. I\u0027ll update the messages\n```\nnew \u003cfid\u003e\nassign \u003cfid\u003e \u003cmover\u003e\nsend \u003cfid\u003e \u003cmover\u003e\nprogress \u003cfid\u003e \u003cmover\u003e \u003ccurrent\u003e \u003cmax\u003e ? TBD\n```",
       "parentUuid": "6628edf1_f2b6d250",
+      "range": {
+        "startLine": 169,
+        "startChar": 34,
+        "endLine": 169,
+        "endChar": 38
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db76566d_7bb29ea0",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-11T22:30:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18602233_3fab711a",
       "range": {
         "startLine": 169,
         "startChar": 34,
