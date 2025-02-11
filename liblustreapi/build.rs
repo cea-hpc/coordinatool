@@ -17,6 +17,8 @@ fn main() {
         // hsm_copy debug trait doesn't work (depends on another struct that
         // cannot have debug), skip it.
         .no_debug("hsm_copy")
+        // el9 ships rust 1.79 not supported by default, explicitly opt for support
+        .rust_target(bindgen::RustTarget::stable(79, 0).map_err(|_| ()).unwrap())
         // The input header we would like to generate
         // bindings for.
         .header("src/wrapper.h")

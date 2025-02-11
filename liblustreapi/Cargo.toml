@@ -6,6 +6,7 @@ license = "LGPL2"
 repository = "https://github.com/cea-hpc/coordinatool"
 
 [dependencies]
+anyhow = "1.0.95"
 
 [build-dependencies]
 bindgen = "0.71.1"
