@@ -1,0 +1,4 @@
+[workspace]
+members = ["liblustreapi"]
+default-members = ["liblustreapi"]
+resolver = "2"

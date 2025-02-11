@@ -1,0 +1,11 @@
+[package]
+name = "liblustreapi"
+version = "0.1.0"
+edition = "2021"
+license = "LGPL2"
+repository = "https://github.com/cea-hpc/coordinatool"
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.71.1"

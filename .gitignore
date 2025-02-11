@@ -1,7 +1,8 @@
-build*
+/build*
 *.swo
 *.swp
 cscope.*
 *.tar.xz
 /tests/tests_config.local.sh
 /tests/logs.*
+/target
