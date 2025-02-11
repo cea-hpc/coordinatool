@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d664045f_ff5c5b9b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-11T08:42:07Z",
+      "side": 1,
+      "message": "\u003e Couldn\u0027t ccc_hsm just get the real lustre action progress directly from lustre?\n\nMy understanding is that this function is used by copytools to report how many bytes have been transfered. And in the response, the MDT\u0027s coordinator can notify the copytool that the request has been canceled. So I don\u0027t think it can be used by clients to get the current state of the request. I don\u0027t think there is a way to get the current state of a request currently (it would be nice though...).",
+      "parentUuid": "53c8056c_c291de2c",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 41
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c24c847a_24c4ddf5",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -108,6 +132,30 @@
       "side": 1,
       "message": "Ideally the file should be root owned (one-way communication) and not delete-able by user:\n- the user requesting file restore is not necessarily the file owner and we can\u0027t trust the hint to get uid either, so afaik we have no way of knowing which uid to give the file to (I guess with the random tag model we could make the file 666...)\n- for removal, it\u0027s not the file but the directory that needs write access, so we either need 733 or 1733 (the later needs file to be user-owned to delete); in either case user would be able to also create whatever they want in that directory which I don\u0027t think we want... :/\n\nso this is all a bit difficult; we could have some sort of keep-alive from coordinatool and be aggressive with a cleanup cron but it\u0027s a bit ugly.\n\nAlternatively we have timers in coordinatool, we could delay deletion by e.g. 5min (or coordinatool shutdown) and that\u0027d be good enough in practice?\n\nOTOH, I agree having some sort of error feedback would be interesting. The lustre strategy is that it never fails, but if transfer fails the user has no way of knowing when it should send another request (to retry) or give up, this isn\u0027t great..\nTechnically with this interface we could get done/error for non-last file, and if report file is gone + lustre file is not online then the client can deduce there was an error (or a request is stuck in lustre without having been sent to coordinatool), but they don\u0027t know what... Better to have some report.\n\nI\u0027ll give this all some thought!",
       "parentUuid": "0476a7d1_51afd48c",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 25,
+        "endChar": 51
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51ab0eba_50c8ed74",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-11T08:42:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "601c3f3d_5bea816b",
       "range": {
         "startLine": 23,
         "startChar": 2,
@@ -178,6 +226,30 @@
       "side": 1,
       "message": "Yes that was the idea; just not done yet.\n\nI was thinking hooking at the done cb from mover, but I didn\u0027t want too run through all pending requests... Still thinking this through.",
       "parentUuid": "3e05f377_7b118579",
+      "range": {
+        "startLine": 38,
+        "startChar": 60,
+        "endLine": 39,
+        "endChar": 54
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fbd97a1_7ee60a47",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-11T08:42:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "de54486b_02f556c0",
       "range": {
         "startLine": 38,
         "startChar": 60,
@@ -301,6 +373,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d694544f_fbf20e67",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-11T08:42:07Z",
+      "side": 1,
+      "message": "Ok, so reporting::hint is a copy of the hint value inside the hai_data and is nul terminated.",
+      "parentUuid": "bdced0fe_7c3e2ac3",
+      "range": {
+        "startLine": 101,
+        "startChar": 4,
+        "endLine": 103,
+        "endChar": 55
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f6b83a6a_82d2e6c9",
         "filename": "copytool/reporting.c",
         "patchSetId": 1
@@ -359,6 +455,30 @@
       "side": 1,
       "message": "I was lazy with config and this code is expecting the hint to contain the `\u003d` sign, so the memmem already found it and it doesn\u0027t need a separate check\n\n(Could enforce this at config parsing time perhaps)\n\nI\u0027ll add a comment when updating",
       "parentUuid": "ae2777d3_c061d983",
+      "range": {
+        "startLine": 67,
+        "startChar": 32,
+        "endLine": 67,
+        "endChar": 47
+      },
+      "revId": "e4d5d34886ca110674935d5389d0f3a90aca2f12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed7092b5_746ff2df",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-02-11T08:42:07Z",
+      "side": 1,
+      "message": "Either way is fine as long as the format is mentionned in the doc of the config. I see that you did use an \u003d sign in the config. So we can either check that it does end with \u0027\u003d\u0027 in the config or parse it without \u0027\u003d\u0027 here.",
+      "parentUuid": "176a469f_d14702f2",
       "range": {
         "startLine": 67,
         "startChar": 32,
