@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+// XXX only needed for older rust (128 bit FFI)
+#![allow(improper_ctypes)]
 // non-standard names generated
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]

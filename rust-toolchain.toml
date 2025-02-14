@@ -1,0 +1,4 @@
+# dev with same version as el9 by default
+[toolchain]
+channel = "1.79.0"
+components = ["rustfmt", "clippy"]
