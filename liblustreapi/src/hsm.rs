@@ -12,6 +12,7 @@ pub struct HsmCopytool {
     fsname: String,
 }
 
+#[derive(Debug, PartialEq)]
 pub enum HsmCopytoolAction {
     None = hsm_copytool_action_HSMA_NONE as isize,
     Archive = hsm_copytool_action_HSMA_ARCHIVE as isize,
@@ -34,6 +35,7 @@ impl TryFrom<u32> for HsmCopytoolAction {
     }
 }
 
+#[derive(Debug)]
 pub struct OwnedHsmActionItem {
     pub action: HsmCopytoolAction,
     pub fid: lu_fid,
@@ -208,5 +210,36 @@ impl Drop for HsmCopytool {
         unsafe {
             llapi_hsm_copytool_unregister(&mut self.ct_priv);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use anyhow::Result;
+
+    #[test]
+    fn lustre_hsm() -> Result<()> {
+        let Ok(mntpath) = std::env::var("LUSTRE_MNTPATH") else {
+            return Ok(());
+        };
+
+        let mut ct = HsmCopytool::new(&mntpath, vec![])?;
+
+        // ugly test: fork lfs hsm_archive command manually until we implement better...
+        let filename = std::path::PathBuf::from(&mntpath).join("moo");
+        std::fs::write(&filename, "Some data")?;
+        std::process::Command::new("lfs")
+            .args(["hsm_archive", filename.to_str().unwrap()])
+            .output()
+            .expect("hsm archive failed");
+
+        let items = ct.recv()?;
+        assert_eq!(items.len(), 1);
+        let hai = &items[0];
+        println!("{:?}", hai);
+        assert_eq!(hai.action, HsmCopytoolAction::Archive);
+
+        Ok(())
     }
 }

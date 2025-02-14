@@ -25,6 +25,7 @@ mod tests {
     use crate::bindings::*;
     use std::ffi::CString;
 
+    // until that finds a better place...
     #[test]
     fn log() {
         unsafe {
@@ -32,5 +33,15 @@ mod tests {
             let msg = CString::new("test").unwrap();
             llapi_error(llapi_message_level_LLAPI_MSG_INFO, -22, msg.as_ptr())
         }
+    }
+
+    /// Since rust does not have a way to skip test, we'll skip tests that require
+    /// env vars by making the tests succeed.
+    /// This test leaves an actionable trace for user to notice that without having all tests
+    /// fail in a noisy way
+    #[test]
+    fn check_env() {
+        assert!(std::env::var("LUSTRE_MNTPATH").is_ok());
+        assert!(std::env::var("LUSTRE_FSNAME").is_ok());
     }
 }

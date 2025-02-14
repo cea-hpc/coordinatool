@@ -36,9 +36,14 @@ mod tests {
 
     #[test]
     fn search() {
-        // XXX this test expects a fs to be mounted with fixed name in fixed location,
-        // use env vars?
-        let name = search_fsname("/mnt/lustre0").unwrap();
-        assert_eq!(&name, "testfs0");
+        let Ok(mntpath) = std::env::var("LUSTRE_MNTPATH") else {
+            return;
+        };
+        let Ok(fsname) = std::env::var("LUSTRE_FSNAME") else {
+            return;
+        };
+
+        let name = search_fsname(&mntpath).unwrap();
+        assert_eq!(&name, &fsname);
     }
 }
