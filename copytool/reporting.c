@@ -7,7 +7,6 @@
 
 #include "coordinatool.h"
 
-#define REPORTING_INTERVAL_NS (60 * NS_IN_SEC)
 static int64_t reporting_schedule_ns;
 
 /* dir_fd is guaranteed to be valid in these two functions */
@@ -263,7 +262,9 @@ void report_pending_receives(void)
 
 	/* prepare rearm or disable */
 	if (found_work)
-		reporting_schedule_ns = gettime_ns() + REPORTING_INTERVAL_NS;
+		reporting_schedule_ns =
+			gettime_ns() +
+			state->config.reporting_schedule_interval_ns;
 	else
 		reporting_schedule_ns = 0;
 }
