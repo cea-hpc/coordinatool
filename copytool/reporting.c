@@ -139,7 +139,7 @@ int report_new_action(struct hsm_action_node *han)
 		timer_rearm();
 	}
 
-	return report_action(REPORT_NEW_REQUEST, han, NULL, 0, 0);
+	return report_action(han, "new " DFID "\n", PFID(&han->info.dfid));
 }
 
 int report_free_action(struct hsm_action_node *han)
@@ -163,8 +163,7 @@ int report_free_action(struct hsm_action_node *han)
 	return 0;
 }
 
-int report_action(enum report_step step, struct hsm_action_node *han,
-		  struct client *client, int current_pos, int waiting_count)
+int report_action(struct hsm_action_node *han, const char *format, ...)
 {
 	char buf[128];
 	int rc;
@@ -180,39 +179,21 @@ int report_action(enum report_step step, struct hsm_action_node *han,
 	static_assert(32 > strlen("fid  assigned \n"),
 		      "longest message estimation is too short");
 
-	int n;
-	switch (step) {
-	case REPORT_NEW_REQUEST:
-		n = snprintf(buf, sizeof(buf), "new " DFID "\n",
-			     PFID(&han->info.dfid));
-		break;
-	case REPORT_ASSIGN_REQUEST:
-		assert(client);
-		n = snprintf(buf, sizeof(buf), "assign " DFID " %s\n",
-			     PFID(&han->info.dfid), client->id);
-		break;
-	case REPORT_SEND_REQUEST:
-		assert(client);
-		n = snprintf(buf, sizeof(buf), "sent " DFID " %s\n",
-			     PFID(&han->info.dfid), client->id);
-		break;
-	case REPORT_MOVER_PROGRESS:
-		n = snprintf(buf, sizeof(buf), "progress " DFID " %s %d/%d\n",
-			     PFID(&han->info.dfid),
-			     client ? client->id : "global_queue", current_pos,
-			     waiting_count);
-		break;
-	}
+	va_list args;
+	va_start(args, format);
+	int n = vsnprintf(buf, sizeof(buf), format, args);
+	va_end(args);
+
 	if (n < 0) {
 		rc = -errno;
-		LOG_WARN(rc, "printf failed?");
+		LOG_WARN(rc, "printf failed (format '%s')", format);
 		return rc;
 	}
 	if (n >= (int)sizeof(buf)) {
 		LOG_WARN(
 			-EOVERFLOW,
-			"report_action: could not fit message in temporary buffer (wanted %d bytes)",
-			n);
+			"report_action: could not fit message in temporary buffer (wanted %d bytes for '%s')",
+			n, format);
 		return -EOVERFLOW;
 	}
 
@@ -254,7 +235,9 @@ static bool report_pending_receives_one(struct client *client,
 		if (!han->reporting)
 			continue;
 
-		report_action(REPORT_MOVER_PROGRESS, han, client, current_pos,
+		report_action(han, "progress " DFID " %s %d/%d\n",
+			      PFID(&han->info.dfid),
+			      client ? client->id : "global_queue", current_pos,
 			      waiting_count);
 	}
 	return true;
