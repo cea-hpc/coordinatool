@@ -106,7 +106,7 @@ void handle_expired_timers(void)
 	batch_clear_expired(now_ns);
 
 	/* report any pending recv */
-	report_pending_receives();
+	report_pending_receives(now_ns);
 
 	timer_rearm();
 }
