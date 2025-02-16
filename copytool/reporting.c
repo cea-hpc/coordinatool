@@ -7,6 +7,9 @@
 
 #include "coordinatool.h"
 
+#define REPORTING_INTERVAL_NS (60 * NS_IN_SEC)
+static int64_t reporting_schedule_ns;
+
 /* dir_fd is guaranteed to be valid in these two functions */
 static int reporting_write_to_fs(const char *hint, const char *message)
 {
@@ -130,7 +133,13 @@ int report_new_action(struct hsm_action_node *han)
 
 	LOG_DEBUG("Reporting %s refcount++ %d", report->hint, report->refcount);
 
-	return report_action(REPORT_NEW_REQUEST, han, NULL);
+	/* arm timer if it was inactive */
+	if (reporting_schedule_ns == 0) {
+		reporting_schedule_ns = gettime_ns() + REPORTING_INTERVAL_NS;
+		timer_rearm();
+	}
+
+	return report_action(REPORT_NEW_REQUEST, han, NULL, 0, 0);
 }
 
 int report_free_action(struct hsm_action_node *han)
@@ -155,7 +164,7 @@ int report_free_action(struct hsm_action_node *han)
 }
 
 int report_action(enum report_step step, struct hsm_action_node *han,
-		  struct client *client)
+		  struct client *client, int current_pos, int waiting_count)
 {
 	char buf[128];
 	int rc;
@@ -188,9 +197,10 @@ int report_action(enum report_step step, struct hsm_action_node *han,
 			     PFID(&han->info.dfid), client->id);
 		break;
 	case REPORT_MOVER_PROGRESS:
-		assert(client);
-		n = snprintf(buf, sizeof(buf), "progress %s TODO\n",
-			     client->id);
+		n = snprintf(buf, sizeof(buf), "progress " DFID " %s %d/%d\n",
+			     PFID(&han->info.dfid),
+			     client ? client->id : "global_queue", current_pos,
+			     waiting_count);
 		break;
 	}
 	if (n < 0) {
@@ -209,10 +219,70 @@ int report_action(enum report_step step, struct hsm_action_node *han,
 	return reporting_write_to_fs(han->reporting->hint, buf);
 }
 
-int report_client(enum report_step step UNUSED, struct client *client UNUSED)
+int64_t report_next_schedule(void)
 {
-	/* XXX not implemented */
-	return 0;
+	/* timer disabled */
+	if (reporting_schedule_ns == 0)
+		return INT64_MAX;
+
+	return reporting_schedule_ns;
+}
+
+static bool report_pending_receives_one(struct client *client,
+					struct cds_list_head *list)
+{
+	struct hsm_action_node *han;
+	bool client_found = false;
+	int waiting_count = 0, current_pos = 0;
+
+	/* walk list once to count, a second time to report if needed */
+	cds_list_for_each_entry(han, list, node)
+	{
+		waiting_count++;
+
+		if (!han->reporting)
+			continue;
+		client_found = true;
+	}
+	if (!client_found)
+		return false;
+
+	cds_list_for_each_entry(han, list, node)
+	{
+		current_pos++;
+
+		if (!han->reporting)
+			continue;
+
+		report_action(REPORT_MOVER_PROGRESS, han, client, current_pos,
+			      waiting_count);
+	}
+	return true;
+}
+
+void report_pending_receives(void)
+{
+	/* timer disabled */
+	if (reporting_schedule_ns == 0)
+		return;
+
+	bool found_work = false;
+
+	struct client *client;
+	cds_list_for_each_entry(client, &state->stats.clients, node_clients)
+	{
+		if (report_pending_receives_one(
+			    client, &client->queues.waiting_restore))
+			found_work = true;
+	}
+	if (report_pending_receives_one(NULL, &state->queues.waiting_restore))
+		found_work = true;
+
+	/* prepare rearm or disable */
+	if (found_work)
+		reporting_schedule_ns = gettime_ns() + REPORTING_INTERVAL_NS;
+	else
+		reporting_schedule_ns = 0;
 }
 
 int reporting_init(void)
