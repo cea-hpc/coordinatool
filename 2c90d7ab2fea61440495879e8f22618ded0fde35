@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a693794_6e7b47b8",
+        "filename": "copytool/reporting.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-02-16T22:34:27Z",
+      "side": 1,
+      "message": "(just added some debug logs to ensure tests work properly without fixing tests \"cleanup\" part; there was no problem here but these are probably good to keep)",
+      "revId": "2c90d7ab2fea61440495879e8f22618ded0fde35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
