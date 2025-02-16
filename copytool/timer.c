@@ -49,6 +49,10 @@ int timer_rearm(void)
 	if (closest_ns > ns)
 		closest_ns = ns;
 
+	ns = report_next_schedule();
+	if (closest_ns > ns)
+		closest_ns = ns;
+
 	if (closest_ns == INT64_MAX) {
 		return 0;
 	}
@@ -100,6 +104,9 @@ void handle_expired_timers(void)
 
 	/* clear expired batches to avoid retrigger loops */
 	batch_clear_expired(now_ns);
+
+	/* report any pending recv */
+	report_pending_receives();
 
 	timer_rearm();
 }
