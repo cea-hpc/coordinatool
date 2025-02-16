@@ -209,6 +209,7 @@ struct state {
 		const char *port;
 		const char *reporting_hint;
 		const char *reporting_dir;
+		int64_t reporting_schedule_interval_ns;
 		const char *redis_host;
 		int redis_port;
 		enum llapi_message_level verbose;
