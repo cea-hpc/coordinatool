@@ -9,6 +9,24 @@
 
 static int64_t reporting_schedule_ns;
 
+static void reporting_fix_schedule(bool force)
+{
+	/* no background jobs */
+	if (!state->config.reporting_schedule_interval_ns)
+		return;
+
+	bool was_zero = reporting_schedule_ns == 0;
+
+	if (force || was_zero) {
+		reporting_schedule_ns =
+			gettime_ns() +
+			state->config.reporting_schedule_interval_ns;
+	}
+	/* ensure timer is right if it was zero */
+	if (was_zero)
+		timer_rearm();
+}
+
 /* dir_fd is guaranteed to be valid in these two functions */
 static int reporting_write_to_fs(const char *hint, const char *message)
 {
@@ -29,15 +47,6 @@ static int reporting_write_to_fs(const char *hint, const char *message)
 	}
 
 	return rc;
-}
-
-static int reporting_unlink(const char *hint)
-{
-	/* don't unlink on shutdown */
-	if (state->terminating)
-		return 0;
-
-	return unlinkat(state->reporting_dir_fd, hint, 0);
 }
 
 static int reporting_compare(const void *a, const void *b)
@@ -120,6 +129,8 @@ int report_new_action(struct hsm_action_node *han)
 		new->hint = new_hint;
 		new->hint_len = data_len;
 		new->refcount = 0;
+		CDS_INIT_LIST_HEAD(&new->node);
+
 		found = tsearch(new, &state->reporting_tree, reporting_compare);
 		if (!found)
 			abort();
@@ -127,24 +138,37 @@ int report_new_action(struct hsm_action_node *han)
 	}
 	struct reporting *report = *found;
 
+	/* if slated for deletion, remove from list and reset refcount */
+	if (!cds_list_empty(&report->node)) {
+		report->refcount = 0;
+		cds_list_del_init(&report->node);
+	}
+
 	report->refcount++;
 	han->reporting = report;
 
 	LOG_DEBUG("Reporting %s refcount++ %d", report->hint, report->refcount);
 
 	/* arm timer if it was inactive */
-	if (reporting_schedule_ns == 0) {
-		reporting_schedule_ns = gettime_ns() + REPORTING_INTERVAL_NS;
-		timer_rearm();
-	}
+	reporting_fix_schedule(false);
 
 	return report_action(han, "new " DFID "\n", PFID(&han->info.dfid));
+}
+
+void reporting_really_free(struct reporting *report)
+{
+	cds_list_del(&report->node);
+	if (!tdelete(report, &state->reporting_tree, reporting_compare))
+		abort();
+
+	free(report);
 }
 
 int report_free_action(struct hsm_action_node *han)
 {
 	if (!han->reporting)
 		return 0;
+
 	han->reporting->refcount--;
 
 	LOG_DEBUG("Reporting %s refcount-- %d", han->reporting->hint,
@@ -153,12 +177,19 @@ int report_free_action(struct hsm_action_node *han)
 	if (han->reporting->refcount != 0)
 		return 0;
 
-	reporting_unlink(han->reporting->hint);
+	/* don't actually free, just add to list for later cleanup unless terminating
+	 * (or no scheduling) */
+	if (state->terminating ||
+	    !state->config.reporting_schedule_interval_ns) {
+		reporting_really_free(han->reporting);
+	} else {
+		cds_list_add(&han->reporting->node,
+			     &state->reporting_cleanup_list);
+		/* timers might have turned themselves off if all actions were sent
+		 * for a while (e.g. no waiting receives) */
+		reporting_fix_schedule(false);
+	}
 
-	if (!tdelete(han->reporting, &state->reporting_tree, reporting_compare))
-		abort();
-
-	free(han->reporting);
 	return 0;
 }
 
@@ -242,10 +273,14 @@ static bool report_pending_receives_one(struct client *client,
 	return true;
 }
 
-void report_pending_receives(void)
+void report_pending_receives(int64_t now_ns)
 {
 	/* timer disabled */
 	if (reporting_schedule_ns == 0)
+		return;
+
+	/* not our turn */
+	if (now_ns > reporting_schedule_ns)
 		return;
 
 	bool found_work = false;
@@ -260,11 +295,23 @@ void report_pending_receives(void)
 	if (report_pending_receives_one(NULL, &state->queues.waiting_restore))
 		found_work = true;
 
+	struct reporting *report, *nreport;
+	cds_list_for_each_entry_safe(report, nreport,
+				     &state->reporting_cleanup_list, node)
+	{
+		found_work = true;
+		/* delay actual remove by 1, so we always have 1-2 periods of time before unlink */
+		report->refcount--;
+		if (report->refcount == -2) {
+			LOG_DEBUG("Reporting: removing %s", report->hint);
+			unlinkat(state->reporting_dir_fd, report->hint, 0);
+			reporting_really_free(report);
+		}
+	}
+
 	/* prepare rearm or disable */
 	if (found_work)
-		reporting_schedule_ns =
-			gettime_ns() +
-			state->config.reporting_schedule_interval_ns;
+		reporting_fix_schedule(true);
 	else
 		reporting_schedule_ns = 0;
 }
@@ -325,6 +372,7 @@ again_mkdir:
 
 void reporting_cleanup(void)
 {
+	/* state->reporting_cleanup_list are still in tree so we can just ignore the list here */
 	tdestroy(state->reporting_tree, free);
 
 	if (state->reporting_dir_fd < 0)
