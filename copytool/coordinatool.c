@@ -339,6 +339,7 @@ int main(int argc, char *argv[])
 	CDS_INIT_LIST_HEAD(&mstate.stats.clients);
 	CDS_INIT_LIST_HEAD(&mstate.stats.disconnected_clients);
 	CDS_INIT_LIST_HEAD(&mstate.waiting_clients);
+	CDS_INIT_LIST_HEAD(&mstate.reporting_cleanup_list);
 
 	/* parse arguments once first just for config */
 	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=

@@ -97,6 +97,8 @@ struct reporting {
 	int hint_len;
 	/* refcount to cleanup reporting file when no request left */
 	int refcount;
+	/* for unlink when refcount hits zero... */
+	struct cds_list_head node;
 };
 
 /* queue types */
@@ -237,6 +239,7 @@ struct state {
 	struct hsm_action_queues queues;
 	void *hsm_actions_tree;
 	void *reporting_tree;
+	struct cds_list_head reporting_cleanup_list;
 	struct cds_list_head waiting_clients;
 	struct ct_stats stats;
 };
@@ -376,7 +379,7 @@ int report_free_action(struct hsm_action_node *han);
 int report_action(struct hsm_action_node *han, const char *format, ...)
 	__attribute__((format(printf, 2, 3)));
 int64_t report_next_schedule(void);
-void report_pending_receives(void);
+void report_pending_receives(int64_t now_ns);
 
 /* scheduler */
 
