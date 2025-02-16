@@ -380,8 +380,9 @@ void reporting_cleanup(void);
 int report_new_action(struct hsm_action_node *han);
 int report_free_action(struct hsm_action_node *han);
 int report_action(enum report_step step, struct hsm_action_node *han,
-		  struct client *client);
-int report_client(enum report_step step, struct client *client);
+		  struct client *client, int current_pos, int waiting_count);
+int64_t report_next_schedule(void);
+void report_pending_receives(void);
 
 /* scheduler */
 
