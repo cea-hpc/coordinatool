@@ -7,8 +7,25 @@
 
 #include "coordinatool.h"
 
-#define REPORTING_INTERVAL_NS (60 * NS_IN_SEC)
 static int64_t reporting_schedule_ns;
+
+static void reporting_fix_schedule(bool force)
+{
+	/* no background jobs */
+	if (!state->config.reporting_schedule_interval_ns)
+		return;
+
+	bool was_zero = reporting_schedule_ns == 0;
+
+	if (force || was_zero) {
+		reporting_schedule_ns =
+			gettime_ns() +
+			state->config.reporting_schedule_interval_ns;
+	}
+	/* ensure timer is right if it was zero */
+	if (was_zero)
+		timer_rearm();
+}
 
 /* dir_fd is guaranteed to be valid in these two functions */
 static int reporting_write_to_fs(const char *hint, const char *message)
@@ -134,10 +151,7 @@ int report_new_action(struct hsm_action_node *han)
 	LOG_DEBUG("Reporting %s refcount++ %d", report->hint, report->refcount);
 
 	/* arm timer if it was inactive */
-	if (reporting_schedule_ns == 0) {
-		reporting_schedule_ns = gettime_ns() + REPORTING_INTERVAL_NS;
-		timer_rearm();
-	}
+	reporting_fix_schedule(false);
 
 	return report_action(han, "new " DFID "\n", PFID(&han->info.dfid));
 }
@@ -263,7 +277,7 @@ void report_pending_receives(void)
 
 	/* prepare rearm or disable */
 	if (found_work)
-		reporting_schedule_ns = gettime_ns() + REPORTING_INTERVAL_NS;
+		reporting_fix_schedule(true);
 	else
 		reporting_schedule_ns = 0;
 }
