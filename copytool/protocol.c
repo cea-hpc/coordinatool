@@ -361,6 +361,8 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		 " (cookie %lx): status %d",
 		 client->id, client->fd, PFID(&han->info.dfid), cookie, status);
 
+	report_action(han, "done " DFID " %d\n", PFID(&han->info.dfid), status);
+
 	int action = han->info.action;
 	if (han->current_count)
 		(*han->current_count)--;
