@@ -176,6 +176,8 @@ static int config_parse(struct state_config *config, int fail_enoent)
 		if (!strcasecmp(key, "client_grace_ms")) {
 			config->client_grace_ms =
 				parse_int(val, INT_MAX, "client_grace_ms");
+			if (config->client_grace_ms < 0)
+				goto err;
 			LOG_INFO("config setting client_grace_ms to %d",
 				 config->client_grace_ms);
 			continue;
