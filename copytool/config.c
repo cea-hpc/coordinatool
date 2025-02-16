@@ -200,6 +200,21 @@ static int config_parse(struct state_config *config, int fail_enoent)
 			LOG_INFO("config setting reporting_dir to '%s'", val);
 			continue;
 		}
+		if (!strcasecmp(key, "reporting_schedule_interval")) {
+			config->reporting_schedule_interval_ns =
+				parse_int(val, LONG_MAX / NS_IN_MSEC,
+					  "reporting_schedule_interval");
+			if (config->reporting_schedule_interval_ns < 0)
+				goto err;
+
+			LOG_INFO(
+				"config setting reporting_schedule_interval to %ld",
+				config->reporting_schedule_interval_ns);
+			if (config->reporting_schedule_interval_ns > 0)
+				config->reporting_schedule_interval_ns *=
+					NS_IN_MSEC;
+			continue;
+		}
 		if (!strcasecmp(key, "verbose")) {
 			int intval = str_to_verbose(val);
 			if (intval < 0) {
@@ -252,6 +267,7 @@ int config_init(struct state_config *config)
 	config->redis_host = xstrdup("localhost");
 	config->redis_port = 6379;
 	config->client_grace_ms = 600000; /* 10 mins */
+	config->reporting_schedule_interval_ns = 60 * NS_IN_SEC; /* 1 min */
 	config->verbose = LLAPI_MSG_NORMAL;
 	config->batch_slots = 1;
 	llapi_msg_set_level(config->verbose);
