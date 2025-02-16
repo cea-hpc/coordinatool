@@ -53,11 +53,19 @@ int timer_rearm(void)
 		return 0;
 	}
 
+	/* rate limit: don't call this more often than 1/s */
+	int64_t now = gettime_ns();
+	if (now + NS_IN_SEC < closest_ns) {
+		LOG_DEBUG(
+			"Delaying scheduling, planned for %ld up to %lld (1s from now)",
+			closest_ns, now + NS_IN_SEC);
+		closest_ns = now + NS_IN_SEC;
+	}
+
 	ts_from_ns(&its.it_value, closest_ns);
 	rc = timerfd_settime(state->timer_fd, TFD_TIMER_ABSTIME, &its, NULL);
 	if (rc < 0) {
 		rc = -errno;
-		int64_t now = gettime_ns();
 		LOG_ERROR(
 			rc,
 			"Could not set timerfd expiration time %li.%09li (now %li)",
