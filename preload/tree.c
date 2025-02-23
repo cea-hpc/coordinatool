@@ -34,8 +34,20 @@ void action_insert(struct hsm_copytool_private *ct,
 
 void action_delete(struct hsm_copytool_private *ct, struct action_key *key)
 {
+	/* We need to use find first to get the node and free it: tdelete()
+	 * returns a pointer to the parent node that is not useful... */
+	void **pnode = tfind(key, &ct->actions_tree, tree_compare);
+	if (!pnode)
+		abort();
+
+	/* must read *pnode before tdelete! */
+	struct action_tree_node *node = *pnode;
+
 	if (!tdelete(key, &ct->actions_tree, tree_compare))
 		abort();
+
+	json_decref(node->hai);
+	free(node);
 }
 
 /* would want to use twalk_r but that was introduced in glibc 2.30
