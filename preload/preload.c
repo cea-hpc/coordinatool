@@ -294,7 +294,7 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 			 " / %lx",
 			 PFID(&done.key.dfid), done.key.cookie);
 	} else if (rc_done != sizeof(done)) {
-		// linux guarnatees this never happens, but better safe...
+		// linux guarantees this never happens, but better safe...
 		rc_done = -EIO;
 		LOG_WARN(rc_done,
 			 "Short write to notif pipe!! (" DFID " / %lx)",
