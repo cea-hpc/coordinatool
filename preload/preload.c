@@ -9,12 +9,35 @@
 
 #include "preload.h"
 
+static int (*real_action_end)(struct hsm_copyaction_private **,
+			      const struct hsm_extent *, int, int);
+static int (*real_action_begin)(struct hsm_copyaction_private **,
+				const struct hsm_copytool_private *,
+				const struct hsm_action_item *, int, int, bool);
+
 int llapi_hsm_copytool_register(struct hsm_copytool_private **priv,
 				const char *mnt, int archive_count,
 				int *archives, int rfd_flags UNUSED)
 {
 	struct hsm_copytool_private *ct;
 	int rc = 0;
+
+	if (!real_action_begin) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+		real_action_begin = dlsym(RTLD_NEXT, "llapi_hsm_action_begin");
+#pragma GCC diagnostic pop
+		if (!real_action_begin)
+			return -EIO;
+	}
+	if (!real_action_end) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+		real_action_end = dlsym(RTLD_NEXT, "llapi_hsm_action_end");
+#pragma GCC diagnostic pop
+		if (!real_action_end)
+			return -EIO;
+	}
 
 	ct = xcalloc(sizeof(*ct), 1);
 
@@ -232,18 +255,6 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 			   int restore_mdt_index, int restore_open_flags,
 			   bool is_error)
 {
-	static int (*real_action_begin)(struct hsm_copyaction_private **,
-					const struct hsm_copytool_private *,
-					const struct hsm_action_item *, int,
-					int, bool);
-	if (!real_action_begin) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-		real_action_begin = dlsym(RTLD_NEXT, "llapi_hsm_action_begin");
-#pragma GCC diagnostic pop
-		if (!real_action_begin)
-			return -EIO;
-	}
 	int rc = real_action_begin(phcp, ct, hai, restore_mdt_index,
 				   restore_open_flags, is_error);
 
@@ -262,17 +273,6 @@ int llapi_hsm_action_begin(struct hsm_copyaction_private **phcp,
 int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 			 const struct hsm_extent *he, int hp_flags, int errval)
 {
-	static int (*real_action_end)(struct hsm_copyaction_private **,
-				      const struct hsm_extent *, int, int);
-	if (!real_action_end) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-		real_action_end = dlsym(RTLD_NEXT, "llapi_hsm_action_end");
-#pragma GCC diagnostic pop
-		if (!real_action_end)
-			return -EIO;
-	}
-
 	if (!phcp)
 		return -EINVAL;
 
