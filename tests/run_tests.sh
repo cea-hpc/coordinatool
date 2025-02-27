@@ -803,12 +803,13 @@ run_test 42 archive_id_restore_active_requests
 # 5x tests: slot batching
 # basic test
 archive_basic_batch_common() {
-	do_coordinatool_start 0
-	ARCHIVEDIR="$ARCHIVEDIR/0" do_lhsmtoolcmd_start 0
-	ARCHIVEDIR="$ARCHIVEDIR/1" do_lhsmtoolcmd_start 1
+	local mover tag1 tag2 tag3 tag4 tag5 count
 
-	# config has one batch per client, idle 10s / max 20s timeouts so,
-	# with 2 movers we have 2 slots:
+	for mover; do
+		ARCHIVEDIR="$ARCHIVEDIR/$mover" do_lhsmtoolcmd_start $mover
+	done
+
+	# test expects 2 slots, idle 10s / max 20s timeouts
 	# t 0s:
 	# - slot1: send just one request for tag1
 	# - slot2: send 10 requests for tag2 every 5s
@@ -830,73 +831,81 @@ archive_basic_batch_common() {
 	tag5="tag=n1,different"
 
 	client_reset 3
-	archive_data="$tag1" client_archive_n_req 3 00 00
-	archive_data="$tag2" client_archive_n_req 3 19 10
+	archive_data="$tag1" client_archive_n_req 3 100 100
+	archive_data="$tag2" client_archive_n_req 3 209 200
 	# wait a bit to ensure these two get scheduled first
 	sleep 1
-	archive_data="$tag3" client_archive_n_req 3 29 20
-	archive_data="$tag4" client_archive_n_req 3 39 30
-	archive_data="$tag5" client_archive_n_req 3 49 40
+	archive_data="$tag3" client_archive_n_req 3 309 300
+	archive_data="$tag4" client_archive_n_req 3 409 400
+	archive_data="$tag5" client_archive_n_req 3 509 500
 
 	sleep 4
 	# t=5s, first two batches processed
-	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	archs=$(for mover; do do_client $mover "find ${ARCHIVEDIR@Q}/$mover" || exit; done)
 	echo t=5s
 	echo ====================
 	echo "$archs"
 	echo ====================
-	archive_data="$tag2" client_archive_n_req 3 69 60
-	TMOUT=1 client_archive_n_wait 3 00 00
-	TMOUT=1 client_archive_n_wait 3 19 10
+	archive_data="$tag2" client_archive_n_req 3 219 210
+	TMOUT=1 client_archive_n_wait 3 100 100
+	TMOUT=1 client_archive_n_wait 3 209 200
+	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.300 | grep -q archived" && error "tag3 already processed"
+	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.400 | grep -q archived" && error "tag4 already processed"
+	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.500 | grep -q archived" && error "tag5 already processed"
 
 	sleep 5
 	# t=10s, another tag started but we don't know which yet
-	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	archs=$(for mover; do do_client $mover "find ${ARCHIVEDIR@Q}/$mover" || exit; done)
 	echo t=10s
 	echo ====================
 	echo "$archs"
 	echo ====================
-	archive_data="$tag2" client_archive_n_req 3 79 70
-	TMOUT=1 client_archive_n_wait 3 69 60
+	archive_data="$tag2" client_archive_n_req 3 229 220
+	TMOUT=1 client_archive_n_wait 3 219 200
+	count=0
+	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.300 | grep -q archived" && count=$((count+1))
+	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.400 | grep -q archived" && count=$((count+1))
+	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.500 | grep -q archived" && count=$((count+1))
+	[ "$count" = 1 ] || error "more or less than 1 extra tag processed? $count"
 
 	sleep 5
 	# t=15s
-	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	archs=$(for mover; do do_client $mover "find ${ARCHIVEDIR@Q}/$mover" || exit; done)
 	echo t=15s
 	echo ====================
 	echo "$archs"
 	echo ====================
-	archive_data="$tag2" client_archive_n_req 3 89 80
+	archive_data="$tag2" client_archive_n_req 3 239 230
 
 	sleep 5
 	# t=20s
-	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	archs=$(for mover; do do_client $mover "find ${ARCHIVEDIR@Q}/$mover" || exit; done)
 	echo t=20s
 	echo ====================
 	echo "$archs"
 	echo ====================
-	archive_data="$tag2" client_archive_n_req 3 99 90
+	archive_data="$tag2" client_archive_n_req 3 249 240
 
 	echo done sending, waiting
 
-	client_archive_n_wait 3 79 00
+	client_archive_n_wait 3 800 100
 	echo done waiting
-	archs=$(do_client 0 "find ${ARCHIVEDIR@Q}/0" && do_client 1 "find ${ARCHIVEDIR@Q}/1")
+	archs=$(for mover; do do_client $mover "find ${ARCHIVEDIR@Q}/$mover" || exit; done)
 	echo ====================
 	echo "$archs"
 	echo ====================
 }
-
 archive_basic_batch() {
 	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_batch.conf \
-		archive_basic_batch_common
+		do_coordinatool_start 0
+	archive_basic_batch_common 0 1
 }
 run_test 50 archive_basic_batch
 
 archive_basic_batch_multislots() {
-	# XXX timers are totally off with more slots... enough to check for crash for now
 	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_batch_multislots.conf \
-		archive_basic_batch_common
+		do_coordinatool_start 0
+	archive_basic_batch_common 0
 }
 run_test 51 archive_basic_batch_multislots
 
