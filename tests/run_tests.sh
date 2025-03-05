@@ -174,6 +174,7 @@ do_lhsmtoolcmd_start() {
 	local LHSMCMD_CONF="${LHSMCMD_CONF:-${BUILDDIR}/tests/lhsm_cmd.conf}"
 	local ARCHIVEDIR="${ARCHIVEDIR:-/tmp/archive}"
 	local WAIT_FILE="${WAIT_FILE:-}"
+	local CTDATA_PATH="${CTDATA_PATH:-}"
 	# see coordinatool_start comment for CTOOL_ENV for usage (string -> assoc array)
 	declare -A AGENT_ENV=${AGENT_ENV:-( )}
 	local env="" var
@@ -194,6 +195,7 @@ do_lhsmtoolcmd_start() {
 			-E LD_PRELOAD=${ASAN:+${ASAN}:}${BUILDDIR@Q}/libcoordinatool_client.so \
 			-E ARCHIVEDIR=${ARCHIVEDIR@Q} \
 			-E WAIT_FILE=${WAIT_FILE@Q} \
+			-E CTDATA_PATH=${CTDATA_PATH@Q} \
 			${BUILDDIR@Q}/tests/lhsmtool_cmd -vv \
 				--config ${LHSMCMD_CONF@Q} \
 				MNTPATH ${*@Q}
@@ -268,11 +270,10 @@ client_archive_n() {
 	client_archive_n_wait "$@"
 }
 
-client_restore_n() {
+client_restore_n_req() {
 	local i="$1"
 	local n="$2"
 	local start=${3:-1}
-	local TMOUT="${TMOUT:-100}"
 	local release_data="${release_data:-}"
 	local restore_data="${restore_data:-}"
 
@@ -284,6 +285,17 @@ client_restore_n() {
 		for i in {$start..$n}; do
 			lfs hsm_restore ${restore_data:+--data ${restore_data@Q} }file.\$i
 		done
+		"
+}
+
+client_restore_n_wait() {
+	local i="$1"
+	local n="$2"
+	local start=${3:-1}
+	local TMOUT="${TMOUT:-100}"
+
+	do_client "$i" "
+		cd ${TESTDIR@Q}
 		TMOUT=$TMOUT
 		while sleep 0.1; ((TMOUT-- > 0)); do
 			for i in {$start..$n}; do
@@ -299,6 +311,10 @@ client_restore_n() {
 			fi
 		done
 	"
+}
+client_restore_n() {
+	client_restore_n_req "$@"
+	client_restore_n_wait "$@"
 }
 
 client_remove_n() {
@@ -644,11 +660,11 @@ run_test 11 restarts_with_pending_work
 # normal copies
 data_normal() {
 	do_coordinatool_start 0
-	do_lhsmtoolcmd_start 1
+	CTDATA_PATH=1 do_lhsmtoolcmd_start 1
 
 	client_reset 3
 	# our test lhsmtool_cmd archives at $ARCHIVEDIR/{ctdata}{fid}
-	# since it split command's words afte expansion we need to escape spaces
+	# since it split command's words after expansion we need to escape spaces
 	archive_data='some data'
 	restore_data="$archive_data"
 	remove_data="$archive_data"
@@ -676,7 +692,7 @@ data_restart() {
 	# wait for server to have processed requests, then flush cached data
 	sleep 1
 
-	do_coordinatool_service 0 restart
+	CTDATA_PATH=1 do_coordinatool_service 0 restart
 
 	# make sure service really restarted before processing requests
 	do_lhsmtoolcmd_start 1
@@ -702,7 +718,7 @@ data_restore_active_requests() {
 	# wait for server to have processed requests, then flush cached data
 	sleep 1
 
-	do_coordinatool_service 0 restart
+	CTDATA_PATH=1 do_coordinatool_service 0 restart
 
 	# make sure service really restarted before requeueing active requests
 	sleep 1
@@ -806,7 +822,8 @@ archive_basic_batch_common() {
 	local mover tag1 tag2 tag3 tag4 tag5 count
 
 	for mover; do
-		ARCHIVEDIR="$ARCHIVEDIR/$mover" do_lhsmtoolcmd_start $mover
+		CTDATA_PATH=1 ARCHIVEDIR="$ARCHIVEDIR/$mover" \
+			do_lhsmtoolcmd_start $mover
 	done
 
 	# test expects 2 slots, idle 10s / max 20s timeouts
@@ -918,7 +935,6 @@ run_test 51 archive_basic_batch_multislots
 
 
 reporting_basic_test() {
-
 	do_client 0 "rm -rf MNTPATH/.reporting"
 
 	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_reporting.conf \
@@ -945,7 +961,7 @@ reporting_basic_test() {
 	# wait a bit to get messages...
 	sleep 1
 	WAIT_FILE="$ARCHIVEDIR/wait_2" do_lhsmtoolcmd_start 2
-	# (wait till repot00 requests get sent to agent_2)
+	# (wait till report00 requests gets sent to agent_2)
 	sleep 1
 	archive_data="foo,cr=report01,bar" client_archive_n_req 3 12 10
 
@@ -959,18 +975,21 @@ reporting_basic_test() {
 	do_client 0 "[ \"\$(grep -c new MNTPATH/.reporting/report01)\" = 3 ]" \
 		|| error "Unexpected number of new in report01"
 
+	sleep 4
 	touch $ARCHIVEDIR/wait_2
 	client_archive_n_wait 3 12 10
 
 
-	do_client 0 'test ! -e MNTPATH/.reporting/report01' \
-		|| error "report01 was not removed"
 	do_client 0 'test -e MNTPATH/.reporting/report00' \
 		|| error "report01 was incorrectly removed"
 
 	touch $ARCHIVEDIR/wait_1
 	client_archive_n_wait 3 04 00
 
+	# wait for delayed unlink
+	sleep 3
+	do_client 0 'test ! -e MNTPATH/.reporting/report01' \
+		|| error "report01 was not removed"
 	do_client 0 'test ! -e MNTPATH/.reporting/report00' \
 		|| error "report00 was not removed"
 
@@ -1010,12 +1029,55 @@ reporting_reuse_tags() {
 	archive_data="bar,cr=report01" \
 		client_archive_n 3 39 30
 
+	# wait for delayed cleanup
+	sleep 3
 	do_client 0 'test ! -e MNTPATH/.reporting/report01' \
 		|| error "report01 was not removed"
 	do_client 0 'test ! -e MNTPATH/.reporting/report02' \
 		|| error "report02 was not removed"
 }
 run_test 62 reporting_reuse_tags
+
+reporting_restore_progress() {
+	do_client 0 "rm -rf MNTPATH/.reporting"
+
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_reporting.conf \
+		do_coordinatool_start 0
+
+	# need to wait a bit so copytool can connect immeditely...
+	sleep 0.5
+	client_reset 3
+
+	# archive/release some files, then block restores a bit and see how progresses are reported
+	WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
+	sleep 0.5
+	touch "$ARCHIVEDIR/wait_1"
+	client_archive_n 3 09 00
+
+	rm -f "$ARCHIVEDIR/wait_1"
+	restore_data="foo,cr=report00,bar" client_restore_n_req 3 09 00
+
+	# wait a bit to get messages...
+	sleep 3
+	do_client 0 "[ \"\$(grep -c new MNTPATH/.reporting/report00)\" = 10 ]" \
+		|| error "Unexpected number of new in report00"
+	do_client 0 "[ \"\$(grep -c sent MNTPATH/.reporting/report00)\" = 3 ]" \
+		|| error "Unexpected number of sent in report00"
+	# more than 10 ensures there are repeats
+	do_client 0 "[ \"\$(grep -c progress MNTPATH/.reporting/report00)\" -gt 10 ]" \
+		|| error "Unexpected number of progress in report00"
+
+	touch $ARCHIVEDIR/wait_1
+	client_restore_n_wait 3 09 00
+	do_client 0 "[ \"\$(grep -c done MNTPATH/.reporting/report00)\" = 10 ]" \
+		|| error "Unexpected number of done in report00"
+
+	# wait for delayed unlink
+	sleep 3
+	do_client 0 'test ! -e MNTPATH/.reporting/report00' \
+		|| error "report00 was not removed"
+}
+run_test 63 reporting_restore_progress
 
 echo "Summary: ran $TESTS tests, $SKIPS skipped, ${#FAILURES[@]} failures"
 printf "%s\n" "${FAILURES[@]}"

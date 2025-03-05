@@ -16,6 +16,9 @@ if [ -n "$WAIT_FILE" ]; then
 	done
 fi
 
+# only use $data in path if requested
+[ -n "$CTDATA_PATH" ] || data=""
+
 case "$fn" in
 	archive)
 		dd if="/proc/self/fd/$fd" of="$ARCHIVEDIR/$data$fid" bs=1M
