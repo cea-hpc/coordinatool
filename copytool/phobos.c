@@ -60,8 +60,23 @@ static char *phobos_find_host(struct hsm_action_node *han)
 		return NULL;
 
 #if HAVE_PHOBOS_1_95
+	/* pick least busy host for focus host in case it helps */
+	struct client *client;
+	const char *focus_host = NULL;
+	int min_busy = INT_MAX;
+	cds_list_for_each_entry(client, &state->stats.clients, node_clients)
+	{
+		if (client->current_restore < min_busy) {
+			min_busy = client->current_restore;
+			focus_host = client->id;
+		} else if (client->current_restore == min_busy) {
+			/* not a fair random pick but doesn't matter */
+			if (rand() % 1000 > 500)
+				focus_host = client->id;
+		}
+	}
 	int nb_new_lock;
-	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, NULL, &hostname,
+	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, focus_host, &hostname,
 			   &nb_new_lock);
 #else
 	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, &hostname);
