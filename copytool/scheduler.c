@@ -243,11 +243,20 @@ void ct_schedule_client(struct client *client)
 		unsigned int enqueued_pass = 0,
 			     pending_pass = *pending_count[i];
 		struct cds_list_head *n, *nnext;
-		int j;
+		int j, stuck = 0;
 		cds_manylists_for_each_safe(j, n, nnext, schedule_lists[i])
 		{
 			int *extra_count = NULL;
 			int extra_max = 0;
+			if (stuck++ > 100) {
+				/* this is a poor workaround until a better solution
+				 * is ready: at least the can send callback can re-enqueue
+				 * in the same queue we're pulling from, making this loop never
+				 * end. Just stop after 100 items, we can always send more work
+				 * in next iteration if it was actually progressing.
+				 */
+				break;
+			}
 			if (client->max_archive >= 0 &&
 			    state->config.batch_slots &&
 			    max_action[i] == &client->max_archive) {
