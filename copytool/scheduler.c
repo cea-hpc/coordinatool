@@ -237,8 +237,7 @@ void ct_schedule_client(struct client *client)
 	unsigned int *pending_count[] = { &state->stats.pending_restore,
 					  &state->stats.pending_remove,
 					  &state->stats.pending_archive };
-	/* archive_id cannot be 0, use it as check */
-	uint32_t archive_id = 0;
+	uint32_t archive_id;
 	uint64_t hal_flags;
 	for (size_t i = 0; i < countof(max_action); i++) {
 		unsigned int enqueued_pass = 0,
@@ -275,12 +274,6 @@ void ct_schedule_client(struct client *client)
 
 			struct hsm_action_node *han = caa_container_of(
 				n, struct hsm_action_node, node);
-			if (archive_id != 0 &&
-			    (archive_id != han->info.archive_id ||
-			     hal_flags != han->info.hal_flags)) {
-				/* can only send one archive id at a time */
-				continue;
-			}
 			if (enqueued_bytes == 0) {
 				if (!accept_archive_id(client->archives,
 						       han->info.archive_id)) {
@@ -288,6 +281,11 @@ void ct_schedule_client(struct client *client)
 				}
 				archive_id = han->info.archive_id;
 				hal_flags = han->info.hal_flags;
+			}
+			if ((archive_id != han->info.archive_id ||
+			     hal_flags != han->info.hal_flags)) {
+				/* can only send one archive id at a time */
+				continue;
 			}
 			if (!schedule_can_send(client, han)) {
 				continue;
@@ -311,7 +309,7 @@ void ct_schedule_client(struct client *client)
 		}
 	}
 
-	if (!archive_id) {
+	if (!enqueued_bytes) {
 		json_decref(hai_list);
 		return;
 	}
