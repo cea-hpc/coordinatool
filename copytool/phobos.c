@@ -72,6 +72,8 @@ static char *phobos_find_host(struct hsm_action_node *han)
 			  PFID(&han->info.dfid), han->info.hsm_fuid);
 		return NULL;
 	}
+	LOG_DEBUG("phobos: locate " DFID " on %s", PFID(&han->info.dfid),
+		  hostname ?: "(null)");
 	return hostname;
 }
 
@@ -87,6 +89,10 @@ struct cds_list_head *phobos_schedule(struct hsm_action_node *han)
 				     hostname);
 	}
 	if (!client) {
+		LOG_WARN(-ENOENT,
+			 "phobos: locate " DFID
+			 " requested %s, but no such host found",
+			 PFID(&han->info.dfid), hostname);
 		return NULL;
 	}
 	return schedule_on_client(client, han);
@@ -100,6 +106,9 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 	if (hostname == NULL || !strcmp(client->id, hostname))
 		goto out;
 
+	LOG_NORMAL("phobos: " DFID
+		   " locate requested %s, refusing to send to %s",
+		   PFID(&han->info.dfid), hostname, client->id);
 	rc = false;
 
 	struct cds_list_head *n, *found = NULL;
