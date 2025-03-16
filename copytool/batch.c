@@ -187,11 +187,11 @@ struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han)
 struct cds_list_head *schedule_batch_slot_on_client(struct client *client,
 						    struct hsm_action_node *han)
 {
+	uint64_t now_ns = gettime_ns();
+
 	/* check for matches first */
 	int i = batch_find_slot(client, han);
 	if (i >= 0) {
-		uint64_t now_ns = gettime_ns();
-
 		/* if still reserved use just use it,
 		 * otherwise refresh start time and use it anyway */
 		if (batch_still_reserved(&client->batch[i], now_ns))
@@ -202,9 +202,10 @@ struct cds_list_head *schedule_batch_slot_on_client(struct client *client,
 
 	/* any empty or expired slot? */
 	for (i = 0; i < state->config.batch_slots; i++) {
-		if (client->batch[i].hint)
+		if (client->batch[i].hint &&
+		    batch_still_reserved(&client->batch[i], now_ns))
 			continue;
-		return batch_slot_list(client, i, han, gettime_ns());
+		return batch_slot_list(client, i, han, now_ns);
 	}
 
 	return NULL;
