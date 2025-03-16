@@ -231,7 +231,7 @@ struct client *client_new_disconnected(const char *id)
 	client->disconnected_timestamp = gettime_ns();
 	timer_rearm();
 
-	LOG_INFO("Clients: restore from redis %s", id);
+	LOG_INFO("Clients: disconnected create %s", id);
 
 	return client;
 }

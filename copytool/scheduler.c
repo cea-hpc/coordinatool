@@ -66,9 +66,10 @@ static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 	struct cds_list_head *clients = &state->stats.clients;
 	struct client *client;
 	/* try all configured hosts until one found online,
-	 * tand if none all hosts again with disconnected clients:
-	 * we don't want to send to another client if there are chances
-	 * an acceptable mover will come back */
+	 * and if none all hosts again with disconnected clients,
+	 * and if none of that either we'll create a dummy disconnected
+	 * client for this request: if host settings are set this should
+	 * never go to a global queue. */
 	while ((client = find_client(clients, hostname)) == NULL) {
 		idx = (idx + 1) % mapping->count;
 		if (idx == first_idx) {
@@ -78,8 +79,12 @@ static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 		}
 		hostname = mapping->hosts[idx];
 	}
-	if (!client)
-		return NULL;
+	if (!client) {
+		/* note: it's a disconnected client with expiry, but if it expires
+		 * without any client connecting then requests here will be rescheduled
+		 * through this function again, and that'll recreate a new client.. */
+		client = client_new_disconnected(mapping->hosts[idx]);
+	}
 
 	return schedule_on_client(client, han);
 }
