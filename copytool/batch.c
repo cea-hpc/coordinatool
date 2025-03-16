@@ -46,10 +46,15 @@ static struct cds_list_head *batch_slot_list(struct client *client,
 	struct client_batch *batch = &client->batch[batch_index];
 
 	if (han) {
-		LOG_INFO(
-			"Batches: client %s (%d): new batch for '%s' (was '%s')",
-			client->id, client->fd, han->info.data,
-			batch->hint ?: "(free)");
+		if (batch->hint && !strcmp(han->info.data, batch->hint))
+			LOG_INFO(
+				"Batches: client %s (%d): refreshing batch '%s'",
+				client->id, client->fd, han->info.data);
+		else
+			LOG_INFO(
+				"Batches: client %s (%d): new batch for '%s' (was '%s')",
+				client->id, client->fd, han->info.data,
+				batch->hint ?: "(free)");
 		free(batch->hint);
 		batch->hint = xstrdup(han->info.data);
 		batch->expire_max_ns =
