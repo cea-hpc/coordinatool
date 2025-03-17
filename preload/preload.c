@@ -285,7 +285,8 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 	// note: this frees hcp
 	rc = real_action_end(phcp, he, hp_flags, errval);
 
-	done.rc = rc;
+	/* errval must be positive but action_end return value is -errno */
+	done.rc = errval ?: -rc;
 	rc_done = write(ct->notify_done_fd[1], &done, sizeof(done));
 	if (rc_done < 0) {
 		rc_done = -errno;
