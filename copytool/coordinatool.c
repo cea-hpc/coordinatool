@@ -14,7 +14,7 @@
 #include "version.h"
 
 #if HAVE_PHOBOS_INIT
-#include <phobos_store.h>
+#include "coordinatool_phobos_store.h"
 #endif
 
 struct state *state;

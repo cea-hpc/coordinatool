@@ -70,9 +70,10 @@
 #include <sys/xattr.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
-#include <lustre/lustreapi.h>
 
 #include <glib.h>
+
+#include <lustre/lustreapi.h>
 
 /* Progress reporting period */
 #define REPORT_INTERVAL_DEFAULT 30

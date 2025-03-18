@@ -1,11 +1,12 @@
 /* SPDX-License-Identifier: LGPL-3.0-or-later */
 
-#include "coordinatool.h"
-#include "config.h"
-
-#include <phobos_store.h>
 #include <fcntl.h>
 #include <sys/xattr.h>
+
+#include "config.h"
+
+#include "coordinatool.h"
+#include "coordinatool_phobos_store.h"
 
 int phobos_enrich(struct hsm_action_node *han)
 {
