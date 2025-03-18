@@ -47,7 +47,8 @@ int phobos_enrich(struct hsm_action_node *han)
 	return 0;
 }
 
-static char *phobos_find_host(struct hsm_action_node *han)
+static char *phobos_find_host(struct hsm_action_node *han,
+			      struct client *focus_client)
 {
 	int rc;
 	char *hostname;
@@ -65,15 +66,20 @@ static char *phobos_find_host(struct hsm_action_node *han)
 	struct client *client;
 	const char *focus_host = NULL;
 	int min_busy = INT_MAX;
-	cds_list_for_each_entry(client, &state->stats.clients, node_clients)
-	{
-		if (client->current_restore < min_busy) {
-			min_busy = client->current_restore;
-			focus_host = client->id;
-		} else if (client->current_restore == min_busy) {
-			/* not a fair random pick but doesn't matter */
-			if (rand() % 1000 > 500)
+	if (focus_client) {
+		focus_host = focus_client->id;
+	} else {
+		cds_list_for_each_entry(client, &state->stats.clients,
+					node_clients)
+		{
+			if (client->current_restore < min_busy) {
+				min_busy = client->current_restore;
 				focus_host = client->id;
+			} else if (client->current_restore == min_busy) {
+				/* not a fair random pick but doesn't matter */
+				if (rand() % 1000 > 500)
+					focus_host = client->id;
+			}
 		}
 	}
 	int nb_new_lock;
@@ -94,7 +100,7 @@ static char *phobos_find_host(struct hsm_action_node *han)
 
 struct cds_list_head *phobos_schedule(struct hsm_action_node *han)
 {
-	char *hostname = phobos_find_host(han);
+	char *hostname = phobos_find_host(han, NULL);
 	if (hostname == NULL)
 		return NULL;
 
@@ -115,7 +121,7 @@ struct cds_list_head *phobos_schedule(struct hsm_action_node *han)
 
 bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 {
-	char *hostname = phobos_find_host(han);
+	char *hostname = phobos_find_host(han, client);
 	bool rc = true;
 
 	if (hostname == NULL || !strcmp(client->id, hostname))
