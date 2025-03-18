@@ -22,6 +22,30 @@
       },
       "revId": "a73c8da301f8ec156de0feb0f3cc44cf3109d7af",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22727f62_13c65010",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-03-18T13:45:33Z",
+      "side": 1,
+      "message": "Thank you!\n\nRight now most lifecycle logs (enqueue/send) log dfid+cookie (which is unique.. per mdt?)\nI think admins like fids the most because it\u0027s easy to get the path back from it, might just need to add hai_fid as well as dfid at enqueue time so the info is there if it is useful\n\nI agree we probably don\u0027t want to get the fuid xattr, especially since it might not be set yet (afaiu the archive request will set it?)\n\nFor now Stéphane hasn\u0027t complained about this so I\u0027ll just assume the current fid being logged is good enough and forget about this :p",
+      "parentUuid": "236ccaa0_1a2e8e40",
+      "range": {
+        "startLine": 9,
+        "startChar": 27,
+        "endLine": 9,
+        "endChar": 56
+      },
+      "revId": "a73c8da301f8ec156de0feb0f3cc44cf3109d7af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
