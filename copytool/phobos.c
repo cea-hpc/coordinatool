@@ -108,7 +108,7 @@ struct cds_list_head *phobos_schedule(struct hsm_action_node *han)
 			 "phobos: locate " DFID
 			 " requested %s, but no such host found",
 			 PFID(&han->info.dfid), hostname);
-		return NULL;
+		client = client_new_disconnected(hostname);
 	}
 	return schedule_on_client(client, han);
 }
