@@ -59,7 +59,7 @@ int timer_rearm(void)
 
 	/* rate limit: don't call this more often than 1/s */
 	int64_t now = gettime_ns();
-	if (now + NS_IN_SEC < closest_ns) {
+	if (now + NS_IN_SEC > closest_ns) {
 		LOG_DEBUG(
 			"Delaying scheduling, planned for %ld up to %lld (1s from now)",
 			closest_ns, now + NS_IN_SEC);
@@ -100,7 +100,7 @@ void handle_expired_timers(void)
 	}
 
 	/* something happened, reschedule main queue */
-	ct_schedule();
+	ct_schedule(false);
 
 	/* clear expired batches to avoid retrigger loops */
 	batch_clear_expired(now_ns);

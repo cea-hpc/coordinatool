@@ -387,7 +387,7 @@ struct client *find_client(struct cds_list_head *clients, const char *hostname);
 struct cds_list_head *schedule_on_client(struct client *client,
 					 struct hsm_action_node *han);
 struct cds_list_head *hsm_action_node_schedule(struct hsm_action_node *han);
-void ct_schedule(void);
+void ct_schedule(bool rearm_timers);
 void ct_schedule_client(struct client *client);
 
 /* tcp */
