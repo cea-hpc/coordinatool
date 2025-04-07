@@ -99,15 +99,6 @@ int handle_ct_event(void)
 int ct_register(void)
 {
 	int rc;
-	char fsname[LUSTRE_MAXFSNAME + 1];
-
-	rc = llapi_search_fsname(state->mntpath, fsname);
-	if (rc < 0) {
-		LOG_ERROR(rc, "cannot find a Lustre filesystem mounted at '%s'",
-			  state->mntpath);
-		return rc;
-	}
-	state->fsname = xstrdup(fsname);
 
 	rc = llapi_hsm_copytool_register(&state->ctdata, state->mntpath,
 					 state->config.archive_cnt,

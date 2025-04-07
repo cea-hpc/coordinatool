@@ -163,12 +163,32 @@ static int random_init(void)
 	return 0;
 }
 
+static int lustre_get_fsname(void)
+{
+	char fsname[LUSTRE_MAXFSNAME + 1];
+	int rc;
+
+	rc = llapi_search_fsname(state->mntpath, fsname);
+	if (rc < 0) {
+		LOG_ERROR(rc, "cannot find a Lustre filesystem mounted at '%s'",
+			  state->mntpath);
+		return rc;
+	}
+
+	state->fsname = xstrdup(fsname);
+	return 0;
+}
+
 #define MAX_EVENTS 10
 static int ct_start(void)
 {
 	int rc;
 	struct epoll_event events[MAX_EVENTS];
 	int nfds;
+
+	rc = lustre_get_fsname();
+	if (rc)
+		return rc;
 
 	state->epoll_fd = epoll_create1(0);
 	if (state->epoll_fd < 0) {
