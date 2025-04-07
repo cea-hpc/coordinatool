@@ -341,7 +341,7 @@ void ct_schedule_client(struct client *client)
 	}
 }
 
-void ct_schedule(void)
+void ct_schedule(bool rearm_timers)
 {
 	struct cds_list_head *n, *nnext;
 
@@ -352,5 +352,6 @@ void ct_schedule(void)
 		ct_schedule_client(client);
 	}
 
-	timer_rearm();
+	if (rearm_timers)
+		timer_rearm();
 }

@@ -91,7 +91,7 @@ int handle_ct_event(void)
 
 		hai = hai_next(hai);
 	}
-	ct_schedule();
+	ct_schedule(true);
 
 	return hal->hal_count;
 }

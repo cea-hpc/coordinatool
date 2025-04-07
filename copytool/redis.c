@@ -320,6 +320,14 @@ static int redis_wait_done(int *done)
 		if (event.events & (EPOLLERR | EPOLLHUP)) {
 			LOG_INFO("%d on error/hup", event.data.fd);
 		}
+		if (event.data.fd == state->timer_fd) {
+			LOG_DEBUG("timer fd ready during redis recovery, ignoring it");
+			int64_t  junk;
+
+			while (read(state->timer_fd, &junk, sizeof(junk)) > 0)
+				;
+			continue;
+		}
 		if (event.data.ptr != state->redis_ac) {
 			LOG_ERROR(-EINVAL,
 				  "fd other than redis fd ready?! Giving up");
