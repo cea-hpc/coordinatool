@@ -442,7 +442,7 @@ static int redis_scan_requests(const char *key UNUSED, const char *value)
 	json_error_t json_error;
 	json_t *json_hai;
 
-	json_hai = json_loads(value, 0, &json_error);
+	json_hai = json_loads(value, JSON_ALLOW_NUL, &json_error);
 	if (!json_hai) {
 		LOG_ERROR(-EINVAL, "Invalid json from redis (%s): %s", value,
 			  json_error.text);
