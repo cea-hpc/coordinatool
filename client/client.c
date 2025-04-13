@@ -25,6 +25,7 @@ void print_help(char *argv[])
 	printf("--recv/-R: (debug tool) ask for receiving work\n");
 	printf("           note the work will be reclaimed when client disconnects\n");
 	printf("--drain: (debug tool) recv and mark done everything one can get\n");
+	printf("--client-id/-I: force client name (useful to drain specific host)\n");
 	printf("--archive/-A: archive id (repeatable). Only makes sense for recv\n");
 	printf("--iters/-i: number of replies to expect (can be used to exit immediately after\n");
 	printf("            receiving work)\n");
