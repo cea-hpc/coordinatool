@@ -1,7 +1,7 @@
 project(
 	'coordinatool',
 	'c',
-	version: '0.3',
+	version: '0.4',
 	license: 'LGPL3.0-or-later',
 	default_options: [
 		'warning_level=3',
@@ -56,6 +56,19 @@ if have_phobos
 		name : 'phobos_locate 1.95 check',
 		dependencies: [glib, phobos])
 	conf_data.set10('HAVE_PHOBOS_1_95', have_phobos_1_95)
+
+	have_phobos_3 = cc.compiles(
+		'''
+		#include <phobos_store.h>
+		void func() {
+			char *hostname;
+			int nb_new_lock;
+			phobos_locate("obj", NULL, 0, NULL, NULL, &hostname, &nb_new_lock);
+		}
+		''',
+		name : 'phobos_locate 3 check',
+		dependencies: [glib, phobos])
+	conf_data.set10('HAVE_PHOBOS_3', have_phobos_3)
 endif
 
 have_gettid = cc.has_function(
