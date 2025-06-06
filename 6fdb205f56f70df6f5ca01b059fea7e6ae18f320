@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80efd780_c94c6e8f",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2025-06-06T12:59:34Z",
+      "side": 1,
+      "message": "suggest: rather than having boolean variables here, setting a `PHOBOS_VERSION` variable here would make the checks later easier I think, with a simple `#if PHOBOS_VERSION \u003e\u003d 195` and `#if PHOBOS_VERSION \u003e\u003d 300` and such",
+      "range": {
+        "startLine": 47,
+        "startChar": 1,
+        "endLine": 71,
+        "endChar": 48
+      },
+      "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
