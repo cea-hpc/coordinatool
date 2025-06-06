@@ -61,7 +61,7 @@ static char *phobos_find_host(struct hsm_action_node *han,
 	if (!han->info.hsm_fuid)
 		return NULL;
 
-#if HAVE_PHOBOS_1_95
+#if PHOBOS_VERSION >= 195
 	/* pick least busy host for focus host in case it helps */
 	struct client *client;
 	const char *focus_host = NULL;
@@ -82,9 +82,17 @@ static char *phobos_find_host(struct hsm_action_node *han,
 			}
 		}
 	}
+
 	int nb_new_lock;
+
+#if PHOBOS_VERSION >= 300
+	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, focus_host, NULL,
+			   &hostname, &nb_new_lock);
+#else
 	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, focus_host, &hostname,
 			   &nb_new_lock);
+#endif
+
 #else
 	rc = phobos_locate(han->info.hsm_fuid, NULL, 0, &hostname);
 #endif
