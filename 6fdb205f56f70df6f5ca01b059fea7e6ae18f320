@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8097d72_434d2689",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-06-08T08:41:28Z",
+      "side": 1,
+      "message": "(style?) I\u0027d prefer this and the spec change to go in a separate commit, so there\u0027s a clear \"version 0.4\" commit in git log (the phobos compat change would go just before it)",
+      "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "80efd780_c94c6e8f",
         "filename": "meson.build",
         "patchSetId": 1
@@ -14,6 +31,30 @@
       "writtenOn": "2025-06-06T12:59:34Z",
       "side": 1,
       "message": "suggest: rather than having boolean variables here, setting a `PHOBOS_VERSION` variable here would make the checks later easier I think, with a simple `#if PHOBOS_VERSION \u003e\u003d 195` and `#if PHOBOS_VERSION \u003e\u003d 300` and such",
+      "range": {
+        "startLine": 47,
+        "startChar": 1,
+        "endLine": 71,
+        "endChar": 48
+      },
+      "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58879d50_04ff6d79",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-06-08T08:41:28Z",
+      "side": 1,
+      "message": "Ah, I was just commenting the same on the `#if HAVE_PHOBOS_1_95 || HAVE_PHOBOS_3` line -- I think it\u0027d be much simpler if phobos were to provide such a define, but short of that we can emulate it for phobos 1.95 and 3.00 by using `conf_data.set` and a number e.g.\n```\nif have_phobos_3\n   conf_data.set(\u0027HAVE_PHOBOS_VERSION\u0027, 300)\nelif have_phobos_1_95\n   conf_data.set(\u0027HAVE_PHOBOS_VERSION\u0027, 195)\nendif\n```",
+      "parentUuid": "80efd780_c94c6e8f",
       "range": {
         "startLine": 47,
         "startChar": 1,
