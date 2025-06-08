@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eb6223b5_65894a24",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-06-08T08:47:40Z",
+      "side": 1,
+      "message": "Also would it make sense to write a bit about the other patches recently merged?\n- archive batching\n- reporting for restores\n\nIf we\u0027re going to make a \"bump version\" commit I\u0027d also prefer to merge the last few open patches, I\u0027ve just added everyone to the top commit and made CI run to be ready to merge:\nhttps://review.gerrithub.io/q/project:cea-hpc/coordinatool+is:open",
+      "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d8097d72_434d2689",
         "filename": "meson.build",
         "patchSetId": 1
