@@ -58,7 +58,7 @@ standalone coordinatool client to interact with the server
 %postun lib -p /sbin/ldconfig
 
 %changelog
-* Upcoming
+* Thu Jun 12 2025 Patrice Lucas <patrice.lucas@cea.fr> - 0.4-1
 - Update to new Phobos 3 API (phobos_locate has a new "copy-name" argument)
 - archive batching
 - restore reporting
