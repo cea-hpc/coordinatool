@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45f3fe7e_fce33f5a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-06-11T06:53:00Z",
+      "side": 1,
+      "message": "In most cases this is true. But there can be a race where the first locate selects host1, host1 uses the tape and then unloads it to do something else. Then the best host for this request might change. We are thinking about adding some info during the locate to make the tape stay on host1 but the current implementation does not enforce anything.",
+      "range": {
+        "startLine": 10,
+        "startChar": 21,
+        "endLine": 11,
+        "endChar": 22
+      },
+      "revId": "38415392a46395a67fa83d13600ecaaceca4a5d7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
