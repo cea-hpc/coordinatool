@@ -72,6 +72,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "121b8a65_73e9f717",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-06-12T14:45:07Z",
+      "side": 1,
+      "message": "I put \"Upcoming\" as a line.",
+      "parentUuid": "c6638f04_01dc51bb",
+      "range": {
+        "startLine": 61,
+        "startChar": 3,
+        "endLine": 61,
+        "endChar": 62
+      },
+      "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb6223b5_65894a24",

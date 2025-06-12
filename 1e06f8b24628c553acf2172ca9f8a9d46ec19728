@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cb8a7cc_8c72ac0d",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-06-12T14:45:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8404d4a_6b80c592",
+      "range": {
+        "startLine": 88,
+        "startChar": 4,
+        "endLine": 88,
+        "endChar": 29
+      },
+      "revId": "1e06f8b24628c553acf2172ca9f8a9d46ec19728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "306db80f_cb4ad4c3",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-06-12T11:38:03Z",
       "side": 1,
       "message": "nit: `PHOBOS_VERSION`, no need for the `HAVE`",
+      "range": {
+        "startLine": 72,
+        "startChar": 17,
+        "endLine": 72,
+        "endChar": 36
+      },
+      "revId": "1e06f8b24628c553acf2172ca9f8a9d46ec19728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "659b25b9_82afe935",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-06-12T14:45:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "306db80f_cb4ad4c3",
       "range": {
         "startLine": 72,
         "startChar": 17,
