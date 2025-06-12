@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61b0d80b_ecfc9bcd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-06-12T12:57:18Z",
+      "side": 1,
+      "message": "Overall agree with Yoann\u0027s comments but still looks functional so OK either way.",
+      "revId": "1e06f8b24628c553acf2172ca9f8a9d46ec19728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8404d4a_6b80c592",

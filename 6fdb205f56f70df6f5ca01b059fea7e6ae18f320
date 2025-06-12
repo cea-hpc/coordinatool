@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6638f04_01dc51bb",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-06-12T12:57:18Z",
+      "side": 1,
+      "message": "It\u0027s not: `error: bad date in %changelog: Upcoming`\n\nThe rpm is still built, but it results in a rpm with an empty changelog. If we want to do this we\u0027d need to format it like a real version update e.g.\n```\n* Fri Oct 20 2023 Patrice Lucas \u003cpatrice.lucas@cea.fr\u003e - 0.3-1.next\n- blabla\n```\nwould have worked (even if the version doesn\u0027t match)\n\nAnyway, as you pointed out it\u0027s changed immediately, but if we want to keep the changelog updated continuously it\u0027d be better to settle on something that doesn\u0027t give an error...",
+      "parentUuid": "6d469c1b_b549dd14",
+      "range": {
+        "startLine": 61,
+        "startChar": 3,
+        "endLine": 61,
+        "endChar": 62
+      },
+      "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb6223b5_65894a24",
@@ -79,6 +103,24 @@
       "side": 1,
       "message": "It is better to update continuously the changelog than trying to understand afterward what was done.\n\nI merged the last few open patches and rebase on top of them.\n\nI add the \"archive batching\" and \"reporting for restores\" to changelog.",
       "parentUuid": "eb6223b5_65894a24",
+      "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4971087c_ab1ad51c",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-06-12T12:57:18Z",
+      "side": 1,
+      "message": "Thank you",
+      "parentUuid": "a62bb025_e8237516",
       "revId": "6fdb205f56f70df6f5ca01b059fea7e6ae18f320",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
