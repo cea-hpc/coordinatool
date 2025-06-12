@@ -61,6 +61,8 @@ standalone coordinatool client to interact with the server
 * Thu Jun 12 2025 Patrice Lucas <patrice.lucas@cea.fr> - 0.3-1.next
 - Upcoming
 - Update to new Phobos 3 API (phobos_locate has a new "copy-name" argument)
+- archive batching
+- restore reporting
 
 * Fri Oct 20 2023 Patrice Lucas <patrice.lucas@cea.fr> - 0.3-1
 - Update to new Phobos 1.95 API (phobos_init and phobos_locate)
