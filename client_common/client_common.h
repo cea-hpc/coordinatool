@@ -50,6 +50,7 @@ int protocol_request_done(const struct ct_state *state, uint64_t cookie,
 			  struct lu_fid *dfid, int status);
 int protocol_request_queue(const struct ct_state *state, json_t *hai_list);
 int protocol_request_ehlo(const struct ct_state *state, json_t *hai_list);
+int protocol_request_lock(const struct ct_state *state, bool locked);
 extern protocol_read_cb protocol_ehlo_cbs[];
 
 #endif
