@@ -236,6 +236,7 @@ struct state {
 	int timer_fd;
 	int signal_fd;
 	bool terminating;
+	bool locked;
 	struct hsm_action_queues queues;
 	void *hsm_actions_tree;
 	void *reporting_tree;
@@ -292,10 +293,10 @@ int protocol_reply_status(struct client *client, int verbose, int status,
 int protocol_reply_recv(struct client *client, const char *fsname,
 			uint32_t archive_id, uint64_t hal_flags,
 			json_t *hai_list, int status, char *error);
-int protocol_reply_done(struct client *client, int status, char *error);
 int protocol_reply_queue(struct client *client, int enqueued, int skipped,
 			 int status, char *error);
-int protocol_reply_ehlo(struct client *client, int status, char *error);
+int protocol_reply_simple(struct client *client, const char *cmd, int status,
+			  char *error);
 
 /* queue */
 

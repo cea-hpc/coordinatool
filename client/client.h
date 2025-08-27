@@ -13,6 +13,7 @@ enum client_mode {
 	MODE_QUEUE,
 	MODE_RECV,
 	MODE_DRAIN,
+	MODE_LOCK,
 };
 
 struct active_requests_state {
@@ -30,6 +31,8 @@ struct client {
 			struct active_requests_state active_requests;
 			int sent_items;
 		};
+		// lock
+		bool locked;
 	};
 };
 
