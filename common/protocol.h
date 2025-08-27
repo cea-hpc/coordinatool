@@ -24,6 +24,7 @@ enum protocol_commands {
 	DONE,
 	QUEUE,
 	EHLO,
+	LOCK,
 	PROTOCOL_COMMANDS_MAX,
 };
 
@@ -166,9 +167,19 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  */
 
 /**
+ * - LOCK command: pause sending requests to copytools
+ *   Intended to be able to finish pending transfers cleanly before maintenance operations
+ *   request properties:
+ *     command = "lock"
+ *     locked = bool
+ *   reply properties:
+ *     command = "lock"
+ *     status = int (0 on success, errno on failure)
+ *     error = string (extra error message)
+ */
+
+/**
  * - future command ideas:
- *   * dump (list all started and pending requests, list clients)
- *   * lock/unlock
  *   * change some config value on the fly? could be a single command
  *     that sets lock property above
  */

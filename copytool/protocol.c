@@ -350,11 +350,13 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	struct lu_fid dfid;
 
 	if (json_hsm_action_key_get(json, &cookie, &dfid))
-		return protocol_reply_done(
-			client, EINVAL, "cookie or fid not set -- old client?");
+		return protocol_reply_simple(
+			client, "done", EINVAL,
+			"cookie or fid not set -- old client?");
 	struct hsm_action_node *han = hsm_action_search(cookie, &dfid);
 	if (!han)
-		return protocol_reply_done(client, EINVAL, "Request not found");
+		return protocol_reply_simple(client, "done", EINVAL,
+					     "Request not found");
 
 	int status = protocol_getjson_int(json, "status", 0);
 	LOG_INFO("%s (%d): Finished processing " DFID
@@ -396,34 +398,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		ct_schedule_client(client);
 	}
 
-	return protocol_reply_done(client, 0, NULL);
-}
-
-int protocol_reply_done(struct client *client, int status, char *error)
-{
-	json_t *reply;
-	int rc;
-
-	reply = json_object();
-	if (!reply)
-		abort();
-	if ((rc = protocol_setjson_str(reply, "command", "done")) ||
-	    (rc = protocol_setjson_int(reply, "status", status)) ||
-	    (rc = protocol_setjson_str(reply, "error", error)))
-		goto out_freereply;
-
-	if (protocol_write(reply, client->fd, client->id, 0) != 0) {
-		char *json_str = json_dumps(reply, 0);
-		rc = -EIO;
-		LOG_ERROR(rc, "%s (%d): Could not write reply: %s", client->id,
-			  client->fd, json_str);
-		free(json_str);
-		goto out_freereply;
-	};
-
-out_freereply:
-	json_decref(reply);
-	return rc;
+	return protocol_reply_simple(client, "done", 0, NULL);
 }
 
 /**
@@ -537,8 +512,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	json_t *json_archives;
 
 	if (client->status != CLIENT_INIT) {
-		return protocol_reply_ehlo(client, EINVAL,
-					   "Client cannot send EHLO twice");
+		return protocol_reply_simple(client, "ehlo", EINVAL,
+					     "Client cannot send EHLO twice");
 	}
 
 	json_archives = json_object_get(json, "archive_ids");
@@ -558,8 +533,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 					-EINVAL,
 					"%s (%d): Client sent invalid archive id: %lld",
 					client->id, client->fd, id);
-				return protocol_reply_ehlo(
-					client, EINVAL,
+				return protocol_reply_simple(
+					client, "done", EINVAL,
 					"Bad archive id in list");
 			}
 			client->archives[i] = id;
@@ -572,13 +547,14 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	if (!ehlo_is_id_unique(id ? id : client->id)) {
 		LOG_INFO("Clients: duplicate id '%s' refused for %s (%d)",
 			 id ? id : client->id, client->id, client->fd);
-		return protocol_reply_ehlo(client, EEXIST,
-					   "id already used by another client");
+		return protocol_reply_simple(
+			client, "ehlo", EEXIST,
+			"id already used by another client");
 	}
 	client->status = CLIENT_READY;
 	if (!id) {
 		// no id: no special treatment
-		return protocol_reply_ehlo(client, 0, NULL);
+		return protocol_reply_simple(client, "ehlo", 0, NULL);
 	}
 
 	LOG_INFO("Clients: '%s' renamed to %s (%d)", client->id, id,
@@ -698,10 +674,24 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	/* requeue anything left */
 	hsm_action_requeue_all(&free_hai);
 
-	return protocol_reply_ehlo(client, 0, NULL);
+	return protocol_reply_simple(client, "ehlo", 0, NULL);
 }
 
-int protocol_reply_ehlo(struct client *client, int status, char *error)
+static int lock_cb(void *fd_arg, json_t *json, void *arg UNUSED)
+{
+	struct client *client = fd_arg;
+	bool locked = protocol_getjson_bool(json, "locked", false);
+
+	state->locked = locked;
+	if (!locked) {
+		ct_schedule(true);
+	}
+
+	return protocol_reply_simple(client, "lock", 0, NULL);
+}
+
+int protocol_reply_simple(struct client *client, const char *cmd, int status,
+			  char *error)
 {
 	json_t *reply;
 	int rc;
@@ -709,7 +699,7 @@ int protocol_reply_ehlo(struct client *client, int status, char *error)
 	reply = json_object();
 	if (!reply)
 		abort();
-	if ((rc = protocol_setjson_str(reply, "command", "ehlo")) ||
+	if ((rc = protocol_setjson_str(reply, "command", cmd)) ||
 	    (rc = protocol_setjson_int(reply, "status", status)) ||
 	    (rc = protocol_setjson_str(reply, "error", error)))
 		goto out_freereply;
@@ -730,5 +720,5 @@ out_freereply:
 
 protocol_read_cb protocol_cbs[PROTOCOL_COMMANDS_MAX] = {
 	[STATUS] = status_cb, [RECV] = recv_cb, [DONE] = done_cb,
-	[QUEUE] = queue_cb,   [EHLO] = ehlo_cb,
+	[QUEUE] = queue_cb,   [EHLO] = ehlo_cb, [LOCK] = lock_cb,
 };
