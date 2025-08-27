@@ -21,6 +21,7 @@ void print_help(char *argv[])
 	printf("--config/-c: alternative config file\n");
 	printf("--host/-H: server to connect to\n");
 	printf("--port/-p: port to connect to\n");
+	printf("--lock/--unlock: temporarily suspend sending requests from coordinatool to workers\n");
 	printf("--queue/-Q: queue active_requests from stdin\n");
 	printf("--recv/-R: (debug tool) ask for receiving work\n");
 	printf("           note the work will be reclaimed when client disconnects\n");
@@ -101,6 +102,9 @@ int client_run(struct client *client)
 		rc = protocol_request_queue(state,
 					    client->active_requests.hai_list);
 		break;
+	case MODE_LOCK:
+		rc = protocol_request_lock(state, client->locked);
+		break;
 	case MODE_RECV:
 	case MODE_DRAIN:
 		rc = protocol_request_recv(state);
@@ -124,6 +128,8 @@ int client_run(struct client *client)
 
 #define OPT_FSNAME 257
 #define OPT_DRAIN 258
+#define OPT_LOCK 259
+#define OPT_UNLOCK 260
 
 int main(int argc, char *argv[])
 {
@@ -134,6 +140,8 @@ int main(int argc, char *argv[])
 		{ "quiet", no_argument, NULL, 'q' },
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
+		{ "lock", no_argument, NULL, OPT_LOCK },
+		{ "unlock", no_argument, NULL, OPT_UNLOCK },
 		{ "queue", no_argument, NULL, 'Q' },
 		{ "fsname", required_argument, NULL, OPT_FSNAME },
 		{ "drain", no_argument, NULL, OPT_DRAIN },
@@ -191,6 +199,14 @@ int main(int argc, char *argv[])
 			break;
 		case 'p':
 			client.state.config.port = optarg;
+			break;
+		case OPT_LOCK:
+			client.mode = MODE_LOCK;
+			client.locked = true;
+			break;
+		case OPT_UNLOCK:
+			client.mode = MODE_LOCK;
+			client.locked = false;
 			break;
 		case 'Q':
 			client.mode = MODE_QUEUE;

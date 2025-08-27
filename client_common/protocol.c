@@ -193,6 +193,30 @@ out_free:
 	return rc;
 }
 
+int protocol_request_lock(const struct ct_state *state, bool locked)
+{
+	json_t *request;
+	int rc = 0;
+
+	request = json_pack("{ss,sb}", "command", "lock", "locked", locked);
+	if (!request) {
+		rc = -ENOMEM;
+		LOG_ERROR(rc, "Could not pack lock request");
+		return rc;
+	}
+
+	LOG_INFO("Sending lock request to %d", state->socket_fd);
+	if (protocol_write(request, state->socket_fd, "lock", 0)) {
+		rc = -EIO;
+		LOG_ERROR(rc, "Could not write lock request");
+		goto out_free;
+	}
+
+out_free:
+	json_decref(request);
+	return rc;
+}
+
 static int ehlo_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED)
 {
 	return protocol_checkerror(json);
