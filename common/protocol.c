@@ -25,6 +25,9 @@ enum protocol_commands protocol_str2command(const char *str)
 	if (strcmp(str, "ehlo") == 0) {
 		return EHLO;
 	}
+	if (strcmp(str, "lock") == 0) {
+		return LOCK;
+	}
 	LOG_ERROR(-EINVAL, "%s is not a valid command", str);
 	return PROTOCOL_COMMANDS_MAX;
 }
@@ -44,6 +47,8 @@ const char *protocol_command2str(enum protocol_commands command)
 		return "queue";
 	case EHLO:
 		return "ehlo";
+	case LOCK:
+		return "lock";
 	default:
 		LOG_ERROR(-EINVAL, "invalid command: %d", command);
 		snprintf(buf, sizeof(buf), "%d", command);

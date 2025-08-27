@@ -345,6 +345,9 @@ void ct_schedule(bool rearm_timers)
 {
 	struct cds_list_head *n, *nnext;
 
+	if (state->locked)
+		return;
+
 	cds_list_for_each_safe(n, nnext, &state->waiting_clients)
 	{
 		struct client *client =
