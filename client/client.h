@@ -32,7 +32,7 @@ struct client {
 			int sent_items;
 		};
 		// lock
-		bool locked;
+		enum protocol_lock locked;
 	};
 };
 
