@@ -193,12 +193,13 @@ out_free:
 	return rc;
 }
 
-int protocol_request_lock(const struct ct_state *state, bool locked)
+int protocol_request_lock(const struct ct_state *state,
+			  enum protocol_lock locked)
 {
 	json_t *request;
 	int rc = 0;
 
-	request = json_pack("{ss,sb}", "command", "lock", "locked", locked);
+	request = json_pack("{ss,si}", "command", "lock", "locked", locked);
 	if (!request) {
 		rc = -ENOMEM;
 		LOG_ERROR(rc, "Could not pack lock request");

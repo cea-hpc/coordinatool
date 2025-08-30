@@ -194,7 +194,8 @@ int protocol_reply_status(struct client *client, int verbose, int status,
 	    (rc = protocol_setjson_int(reply, "done_remove",
 				       ct_stats->done_remove)) ||
 	    (rc = protocol_setjson_int(reply, "clients_connected",
-				       ct_stats->clients_connected)))
+				       ct_stats->clients_connected)) ||
+	    (rc = protocol_setjson_int(reply, "locked", state->locked)))
 		goto out_freereply;
 
 	clients = json_array();
@@ -339,6 +340,14 @@ out_freereply:
 	return rc;
 }
 
+// helper to decide if anything is running
+static bool has_running_xfers(void)
+{
+	return state->stats.running_archive != 0 ||
+	       state->stats.running_restore != 0 ||
+	       state->stats.running_remove != 0;
+}
+
 /**
  * DONE
  */
@@ -398,7 +407,13 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		ct_schedule_client(client);
 	}
 
-	return protocol_reply_simple(client, "done", 0, NULL);
+	int rc = protocol_reply_simple(client, "done", 0, NULL);
+
+	// can't use client after initiate_termination()
+	if (state->locked == CTOOL_LOCK_AND_QUIT && !has_running_xfers())
+		initiate_termination();
+
+	return rc;
 }
 
 /**
@@ -680,14 +695,29 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 static int lock_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 {
 	struct client *client = fd_arg;
-	bool locked = protocol_getjson_bool(json, "locked", false);
+	enum protocol_lock locked = protocol_getjson_int(json, "locked", 0);
+
+	if ((int)locked < 0 || (int)locked >= CTOOL_LOCK_MAX)
+		return protocol_reply_simple(client, "lock", -EINVAL,
+					     "invalid locked value");
+
+	// can't use client after initiate_termination - reply early
+	int rc = protocol_reply_simple(client, "lock", 0, NULL);
 
 	state->locked = locked;
-	if (!locked) {
+	switch (locked) {
+	case CTOOL_LOCK_UNLOCKED:
 		ct_schedule(true);
+		break;
+	case CTOOL_LOCK_AND_QUIT:
+		// if no transfer in progress quit now
+		if (!has_running_xfers())
+			initiate_termination();
+	default:
+		break;
 	}
 
-	return protocol_reply_simple(client, "lock", 0, NULL);
+	return rc;
 }
 
 int protocol_reply_simple(struct client *client, const char *cmd, int status,

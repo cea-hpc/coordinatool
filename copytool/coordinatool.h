@@ -236,7 +236,7 @@ struct state {
 	int timer_fd;
 	int signal_fd;
 	bool terminating;
-	bool locked;
+	enum protocol_lock locked;
 	struct hsm_action_queues queues;
 	void *hsm_actions_tree;
 	void *reporting_tree;
@@ -247,6 +247,7 @@ struct state {
 
 /* config */
 
+void initiate_termination(void);
 int config_init(struct state_config *config);
 void config_free(struct state_config *config);
 
