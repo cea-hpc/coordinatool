@@ -83,16 +83,15 @@ static int queue_cb(void *fd_arg UNUSED, json_t *json, void *arg)
 	return 0;
 }
 
-static int lock_cb(void *fd_arg UNUSED, json_t *json, void *arg)
+static int lock_cb(void *fd_arg UNUSED, json_t *json, void *arg UNUSED)
 {
-	struct client *client = arg;
 	int status = protocol_getjson_int(json, "status", 0);
 	if (status) {
 		printf("error locking: %s\n",
 		       protocol_getjson_str(json, "error", "", NULL));
 		return 0;
 	}
-	printf("%slock ok\n", client->locked ? "" : "un");
+	printf("ok\n");
 	return 0;
 }
 
