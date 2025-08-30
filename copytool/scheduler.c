@@ -194,7 +194,7 @@ void ct_schedule_client(struct client *client)
 	if (client->status != CLIENT_WAITING)
 		return;
 
-	if (state->locked)
+	if (state->locked != CTOOL_LOCK_UNLOCKED)
 		return;
 
 	json_t *hai_list = json_array();
@@ -348,7 +348,7 @@ void ct_schedule(bool rearm_timers)
 {
 	struct cds_list_head *n, *nnext;
 
-	if (state->locked)
+	if (state->locked != CTOOL_LOCK_UNLOCKED)
 		return;
 
 	cds_list_for_each_safe(n, nnext, &state->waiting_clients)

@@ -122,7 +122,7 @@ static void signal_log(int signal_fd)
 		 siginfo.ssi_pid);
 }
 
-static void initiate_termination(void)
+void initiate_termination(void)
 {
 	struct cds_list_head *n, *nnext;
 	state->terminating = true;
@@ -145,6 +145,18 @@ static void initiate_termination(void)
 			caa_container_of(n, struct client, node_clients);
 
 		client_free(client);
+	}
+
+	/* stop redis */
+	if (state->redis_ac) {
+		bool connected = state->redis_ac->c.flags & REDIS_CONNECTED;
+		redisAsyncDisconnect(state->redis_ac);
+		/* if we just initiated connect with no IO, the disconnect
+					 * callback won't be called yet state->redis_ac is freed:
+					 * just clear it here. */
+		if (!connected) {
+			state->redis_ac = NULL;
+		}
 	}
 }
 
@@ -289,25 +301,6 @@ static int ct_start(void)
 					return 0;
 				}
 				initiate_termination();
-
-				/* The loop will stop when redis is done */
-				if (state->redis_ac) {
-					bool connected =
-						state->redis_ac->c.flags &
-						REDIS_CONNECTED;
-					redisAsyncDisconnect(state->redis_ac);
-					/* if we just initiated connect with no IO, the disconnect
-					 * callback won't be called yet state->redis_ac is freed:
-					 * just clear it here. */
-					if (!connected) {
-						state->redis_ac = NULL;
-					}
-				}
-				/* It's also possible asyncDisconnect was immediate if
-				 * no work was pending */
-				if (!state->redis_ac) {
-					return 0;
-				}
 			} else {
 				struct client *client = events[n].data.ptr;
 				if (protocol_read_command(
@@ -315,6 +308,11 @@ static int ct_start(void)
 					    protocol_cbs, NULL) < 0) {
 					client_disconnect(client);
 				}
+			}
+
+			/* We exit this loop */
+			if (state->terminating && !state->redis_ac) {
+				return 0;
 			}
 		}
 	}
