@@ -130,6 +130,7 @@ int client_run(struct client *client)
 #define OPT_DRAIN 258
 #define OPT_LOCK 259
 #define OPT_UNLOCK 260
+#define OPT_LOCK_QUIT 261
 
 int main(int argc, char *argv[])
 {
@@ -141,6 +142,7 @@ int main(int argc, char *argv[])
 		{ "port", required_argument, NULL, 'p' },
 		{ "host", required_argument, NULL, 'H' },
 		{ "lock", no_argument, NULL, OPT_LOCK },
+		{ "lock-quit", no_argument, NULL, OPT_LOCK_QUIT },
 		{ "unlock", no_argument, NULL, OPT_UNLOCK },
 		{ "queue", no_argument, NULL, 'Q' },
 		{ "fsname", required_argument, NULL, OPT_FSNAME },
@@ -202,11 +204,15 @@ int main(int argc, char *argv[])
 			break;
 		case OPT_LOCK:
 			client.mode = MODE_LOCK;
-			client.locked = true;
+			client.locked = CTOOL_LOCK_LOCKED;
 			break;
 		case OPT_UNLOCK:
 			client.mode = MODE_LOCK;
-			client.locked = false;
+			client.locked = CTOOL_LOCK_UNLOCKED;
+			break;
+		case OPT_LOCK_QUIT:
+			client.mode = MODE_LOCK;
+			client.locked = CTOOL_LOCK_AND_QUIT;
 			break;
 		case 'Q':
 			client.mode = MODE_QUEUE;

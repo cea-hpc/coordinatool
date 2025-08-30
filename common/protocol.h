@@ -28,6 +28,13 @@ enum protocol_commands {
 	PROTOCOL_COMMANDS_MAX,
 };
 
+enum protocol_lock {
+	CTOOL_LOCK_UNLOCKED = 0,
+	CTOOL_LOCK_LOCKED = 1,
+	CTOOL_LOCK_AND_QUIT = 2,
+	CTOOL_LOCK_MAX,
+};
+
 /**
  * enum to string conversion helpers
  */
@@ -171,7 +178,7 @@ int protocol_write(json_t *json, int fd, const char *id, size_t flags);
  *   Intended to be able to finish pending transfers cleanly before maintenance operations
  *   request properties:
  *     command = "lock"
- *     locked = bool
+ *     locked = enum protocol_lock value
  *   reply properties:
  *     command = "lock"
  *     status = int (0 on success, errno on failure)
