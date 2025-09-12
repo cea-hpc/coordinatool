@@ -8,6 +8,8 @@
 #include "coordinatool.h"
 #include "coordinatool_phobos_store.h"
 
+static const char *const PHOBOS_FAKE_HOST = "phobos_error_dummy_host";
+
 int phobos_enrich(struct hsm_action_node *han)
 {
 	char oid[XATTR_SIZE_MAX + 1];
@@ -114,7 +116,15 @@ static char *phobos_find_host(struct hsm_action_node *han,
 	if (rc) {
 		LOG_ERROR(rc, "phobos: failed to locate " DFID " (oid %s)",
 			  PFID(&han->info.dfid), han->info.hsm_fuid);
-		return NULL;
+		/* if phobos_locate() failed, it's likely the transfer will fail if we
+		 * just pick an hostt at random (which is what would happen if we return
+		 * NULL)
+		 * Instead, return a dummy hostname that will create a disconnected client
+		 * and prevent any scheduling of this file.
+		 * The disconnected client will expire and trigger a new locate after grace
+		 * time elapses (default 10 minutes) */
+		hostname = xstrdup(PHOBOS_FAKE_HOST);
+		return hostname;
 	}
 	LOG_DEBUG("phobos: locate " DFID " on %s", PFID(&han->info.dfid),
 		  hostname ?: "(null)");
