@@ -139,6 +139,7 @@ struct cds_list_head *phobos_schedule(struct hsm_action_node *han)
 			 PFID(&han->info.dfid), hostname);
 		client = client_new_disconnected(hostname);
 	}
+	free(hostname);
 	return schedule_on_client(client, han);
 }
 
