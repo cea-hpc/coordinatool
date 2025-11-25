@@ -9,7 +9,8 @@
 
 static const char *SPACES = " \t\n\r\f\v";
 
-static int config_parse_host_mapping(struct cds_list_head *head, char *val)
+static int config_parse_host_mapping(struct cds_list_head *head, char *val,
+				     const char *key)
 {
 	char *data_pattern = strtok(val, SPACES);
 	if (!data_pattern) {
@@ -25,6 +26,8 @@ static int config_parse_host_mapping(struct cds_list_head *head, char *val)
 	struct host_mapping *mapping =
 		xmalloc(sizeof(*mapping) + sizeof(void *));
 	mapping->tag = xstrdup(data_pattern);
+	mapping->consistent_hash = strcmp(key, "archive_on_hosts_ch") == 0 ?
+					  true : false;
 	mapping->count = 1;
 	mapping->hosts[0] = xstrdup(host);
 	while ((host = strtok(NULL, SPACES))) {
@@ -135,9 +138,10 @@ static int config_parse(struct state_config *config, int fail_enoent)
 			config->archive_cnt++;
 			continue;
 		}
-		if (!strcasecmp(key, "archive_on_hosts")) {
+		if (!strcasecmp(key, "archive_on_hosts") ||
+		    !strcasecmp(key, "archive_on_hosts_ch")) {
 			if (config_parse_host_mapping(&config->archive_mappings,
-						      val) < 0) {
+						      val, key) < 0) {
 				goto err;
 			}
 			continue;

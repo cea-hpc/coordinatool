@@ -144,6 +144,7 @@ struct host_mapping {
 	struct cds_list_head node;
 	const char *tag;
 	int count;
+	bool consistent_hash;
 	const char *hosts[];
 };
 
