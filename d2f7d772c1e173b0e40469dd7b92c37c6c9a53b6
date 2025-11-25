@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfa3037d_243374ae",
+        "filename": "copytool/coordinatool.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-11-25T10:06:27Z",
+      "side": 1,
+      "message": "style: alignment",
+      "range": {
+        "startLine": 155,
+        "startChar": 2,
+        "endLine": 156,
+        "endChar": 30
+      },
+      "revId": "d2f7d772c1e173b0e40469dd7b92c37c6c9a53b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
