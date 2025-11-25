@@ -22,6 +22,30 @@
       },
       "revId": "d2f7d772c1e173b0e40469dd7b92c37c6c9a53b6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbb590ee_e815954a",
+        "filename": "copytool/coordinatool.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-11-25T12:11:52Z",
+      "side": 1,
+      "message": "woops... That\u0027s what I get for trusting clang-format... Thank you!",
+      "parentUuid": "cfa3037d_243374ae",
+      "range": {
+        "startLine": 155,
+        "startChar": 2,
+        "endLine": 156,
+        "endChar": 30
+      },
+      "revId": "d2f7d772c1e173b0e40469dd7b92c37c6c9a53b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
