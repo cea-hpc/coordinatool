@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c1e89ce_aa6ad258",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-11-25T10:08:01Z",
+      "side": 1,
+      "message": "typo: host",
+      "range": {
+        "startLine": 120,
+        "startChar": 18,
+        "endLine": 120,
+        "endChar": 23
+      },
+      "revId": "c0f97ae7b566919c4cc97ef402a794809a9129f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
