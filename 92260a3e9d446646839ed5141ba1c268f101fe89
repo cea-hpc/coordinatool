@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3f2f71b_773e675e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-11-25T09:58:17Z",
+      "side": 1,
+      "message": "sugest: It would be nice to explain a bit more what is the lock/unlock state in the commit message",
+      "revId": "92260a3e9d446646839ed5141ba1c268f101fe89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
