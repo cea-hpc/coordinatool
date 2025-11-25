@@ -16,6 +16,24 @@
       "message": "style: alignment",
       "revId": "567d47c08206bde76e57472ac6634ff10c9e9e42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51dcef6a_13846f68",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-11-25T12:12:50Z",
+      "side": 1,
+      "message": "(The new line is actually on purpose, I\u0027ve added a blank line instead)",
+      "parentUuid": "d9923220_31af1e4c",
+      "revId": "567d47c08206bde76e57472ac6634ff10c9e9e42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
