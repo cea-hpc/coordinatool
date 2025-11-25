@@ -171,6 +171,8 @@ static int config_parse(struct ct_state_config *config, int fail_enoent)
 			continue;
 		if (!strcasecmp(key, "reporting_schedule_interval_ms"))
 			continue;
+		if (!strcasecmp(key, "grouping_hash"))
+			continue;
 
 		LOG_WARN(-EINVAL, "skipping unknown key %s in %s (line %zd)",
 			 key, config->confpath, linenum);

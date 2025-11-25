@@ -222,6 +222,7 @@ struct state {
 		int64_t batch_slice_idle;
 		int64_t batch_slice_max;
 		int batch_slots;
+		bool grouping_hash;
 	} config;
 	/* options: command line switches only */
 	const char *mntpath;

@@ -123,6 +123,19 @@ static inline long parse_int(const char *arg, long max, const char *what)
 	return rc;
 }
 
+static inline bool parse_bool(const char *arg, const char *what)
+{
+	if (!strcmp(arg, "true"))
+		return true;
+	else if (!strcmp(arg, "false"))
+		return false;
+
+	errno = -EINVAL;
+	LOG_ERROR(errno, "%s '%s' is invalid", what, arg);
+
+	return false;
+}
+
 /* cleanup */
 #define _cleanup_(f) __attribute__((cleanup(f)))
 

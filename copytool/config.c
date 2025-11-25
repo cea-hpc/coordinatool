@@ -225,6 +225,17 @@ static int config_parse(struct state_config *config, int fail_enoent)
 			llapi_msg_set_level(config->verbose);
 			continue;
 		}
+		if (!strcasecmp(key, "grouping_hash")) {
+			config->grouping_hash = parse_bool(val,
+							   "grouping_hash");
+			if (!config->grouping_hash && errno == -EINVAL)
+				goto err;
+
+			LOG_INFO(
+				"config setting grouping_hash to %s",
+				config->grouping_hash ? "true" : "false");
+			continue;
+		}
 		/* skip client only options */
 		if (!strcasecmp(key, "client_id"))
 			continue;
@@ -270,6 +281,7 @@ int config_init(struct state_config *config)
 	config->reporting_schedule_interval_ns = 60 * NS_IN_SEC; /* 1 min */
 	config->verbose = LLAPI_MSG_NORMAL;
 	config->batch_slots = 1;
+	config->grouping_hash = false;
 	llapi_msg_set_level(config->verbose);
 
 	/* verbose from env once first to debug config.. */
