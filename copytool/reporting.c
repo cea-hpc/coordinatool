@@ -68,32 +68,13 @@ int report_new_action(struct hsm_action_node *han)
 	if (state->reporting_dir_fd < 0)
 		return 0;
 
-	const char *hint;
-	const char *data = han->info.data;
 	const char *hint_needle = state->config.reporting_hint;
-	int data_len = han_data_len(han);
-	int needle_len = strlen(hint_needle);
+	const char *hint;
+	int data_len;
 
-	/* can't use strstr on hai data: might contain nul bytes */
-	/* note: needle contains the = separator */
-	while ((hint = memmem(data, data_len, hint_needle, needle_len))) {
-		if (hint == han->info.data || hint[-1] == ',')
-			break;
-		/* false positive, try again */
-		data_len -= hint - data;
-		data = hint;
-	}
+	hint = parse_hint(han, hint_needle, &data_len);
 	if (!hint)
 		return 0;
-
-	/* strip matched prefix */
-	hint += needle_len;
-	data_len -= hint - data;
-
-	char *hint_end = memchr(hint, ',', data_len);
-	if (hint_end) {
-		data_len = hint_end - hint;
-	}
 
 	/* filter any unsafe value:
 	 * - too long
