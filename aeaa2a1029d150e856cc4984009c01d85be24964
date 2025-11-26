@@ -34,6 +34,24 @@
       "parentUuid": "9ace94d8_4ffa0008",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4455a027_7e11e3f3",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-11-26T15:00:31Z",
+      "side": 1,
+      "message": "The “batch_archives” approach could work if we knew the grouping used in advance, but in our use case the grouping will depend on the files to be archived. So we can’t hard-code groupings to match in the configuration.\n\nWhat we want to do is always send requests with the same grouping to the same data mover, without knowing the grouping value beforehand. That’s why we decided to compute the hash and determine the data mover with `clients[hash(grouping) % nb_clients]`",
+      "parentUuid": "c5506fcc_906d68f8",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
