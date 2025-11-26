@@ -52,6 +52,24 @@
       "parentUuid": "c5506fcc_906d68f8",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8e63196_588bbdb0",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-11-26T23:37:56Z",
+      "side": 1,
+      "message": "\u003e No, it\u0027s handled. I renamed the clients list to connected_clients and added a new clients list that contains all clients known to the coordinatool (connected or disconnected). So as long as a client is not free, even if disconnected, it will still be present in the list.\n\nI saw the new list, but I don\u0027t see why disconnected clients won\u0027t be freed after grace time.\nThere\u0027s also all the temporary clients (coordinatool-client commands) that show up in this list while they are active and get freed after a while, I wouldn\u0027t trust this code without extensive testing\n\n\u003e The “batch_archives” approach could work if we knew the grouping used in advance, but in our use case the grouping will depend on the files to be archived. So we can’t hard-code groupings to match in the configuration.\n\nFWIW, Stanford use for grouping is that they have a hint in the robinhood policy configuration and they run with a different policy based on filename, which will give a different hint and generate a different \"group\".\nThis feels identical so far.\n\n\u003e without knowing the grouping value beforehand.\n\nnote this isn\u0027t the \"archive_on_host\" feature with a hardcoded mapping, batching is dynamic based on hint value\n\n\u003e What we want to do is always send requests with the same grouping to the same data mover, without knowing the grouping value beforehand. That’s why we decided to compute the hash and determine the data mover with clients[hash(grouping) % nb_clients]\n\nCould you clarify this point a bit more; what\u0027s the use case to always pick the same mover? More precisely, what\u0027s the benefit to picking the same mover if the tag comes back after another n batches have been processed on that mover meanwhile?\n\nMy rationale to push back here is simple enough: we already have two mechanisms to steer the archives (that actually can be used together), and tests are already complex enough. Adding a third mechanism makes combinations jump up from 4 patterns to 16 and I can\u0027t test this all.\n\nI think we can make the batch mechanism work for what you need though, if the requirement to always pick the same node based on a hash we could add an extra check when looking for a free slot to be stable (... perhaps a similar hash mechanism), but I\u0027d like to understand first",
+      "parentUuid": "4455a027_7e11e3f3",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
