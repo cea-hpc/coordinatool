@@ -38,6 +38,86 @@ struct cds_list_head *schedule_on_client(struct client *client,
 	return get_queue_list(&client->queues, han);
 }
 
+static struct client *
+schedule_host_mapping_find_client(struct host_mapping *mapping)
+{
+	int first_idx = rand() % mapping->count;
+	int idx = first_idx;
+	const char *hostname = mapping->hosts[idx];
+	struct cds_list_head *clients = &state->stats.clients;
+	struct client *client;
+	/* try all configured hosts until one found online,
+	 * and if none all hosts again with disconnected clients,
+	 * and if none of that either we'll create a dummy disconnected
+	 * client for this request: if host settings are set this should
+	 * never go to a global queue. */
+	while ((client = find_client(clients, hostname)) == NULL) {
+		idx = (idx + 1) % mapping->count;
+		if (idx == first_idx) {
+			if (clients == &state->stats.disconnected_clients)
+				break;
+			clients = &state->stats.disconnected_clients;
+		}
+		hostname = mapping->hosts[idx];
+	}
+
+	if (!client) {
+		/* note: it's a disconnected client with expiry, but if it expires
+		 * without any client connecting then requests here will be rescheduled
+		 * through this function again, and that'll recreate a new client.. */
+		client = client_new_disconnected(mapping->hosts[idx]);
+	}
+
+	return client;
+}
+
+static size_t dbj2(const char *buf, size_t size)
+{
+	size_t hash = 5381;
+
+	for (size_t i = 0; i < size; i++)
+		hash = ((hash << 5) + hash) + buf[i];
+
+	return hash;
+}
+
+static struct client *
+schedule_host_mapping_consistent_hash(struct host_mapping *mapping,
+				      struct hsm_action_node *han)
+{
+	struct client *client;
+	const char *hostname;
+	const char *value;
+	int value_len;
+	size_t index;
+	size_t hash;
+
+	int rc = parse_hint(han, mapping->tag, &value, &value_len);
+	/* It should never happen */
+	if (!rc) {
+		LOG_ERROR(-EINVAL, "Consistent hash: failed to find '%s' inside '%s'",
+			  mapping->tag, han->info.data);
+		return NULL;
+	}
+
+	hash = dbj2(value, value_len);
+	index = hash % mapping->count;
+
+	hostname = mapping->hosts[index];
+
+	client = find_client(&state->stats.clients, hostname);
+	if (client)
+		return client;
+
+	client = find_client(&state->stats.disconnected_clients, hostname);
+	if (client)
+		return client;
+
+	client = client_new_disconnected(hostname);
+
+	return client;
+}
+
 static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 {
 	/* only doing this for archive for now */
@@ -60,30 +140,14 @@ static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 	if (!found)
 		return NULL;
 
-	int first_idx = rand() % mapping->count;
-	int idx = first_idx;
-	const char *hostname = mapping->hosts[idx];
-	struct cds_list_head *clients = &state->stats.clients;
 	struct client *client;
-	/* try all configured hosts until one found online,
-	 * and if none all hosts again with disconnected clients,
-	 * and if none of that either we'll create a dummy disconnected
-	 * client for this request: if host settings are set this should
-	 * never go to a global queue. */
-	while ((client = find_client(clients, hostname)) == NULL) {
-		idx = (idx + 1) % mapping->count;
-		if (idx == first_idx) {
-			if (clients == &state->stats.disconnected_clients)
-				break;
-			clients = &state->stats.disconnected_clients;
-		}
-		hostname = mapping->hosts[idx];
-	}
-	if (!client) {
-		/* note: it's a disconnected client with expiry, but if it expires
-		 * without any client connecting then requests here will be rescheduled
-		 * through this function again, and that'll recreate a new client.. */
-		client = client_new_disconnected(mapping->hosts[idx]);
+
+	if (mapping->consistent_hash) {
+		client = schedule_host_mapping_consistent_hash(mapping, han);
+		if (!client)
+			return NULL;
+	} else {
+		client = schedule_host_mapping_find_client(mapping);
 	}
 
 	return schedule_on_client(client, han);

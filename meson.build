@@ -143,6 +143,7 @@ lhsmd_coordinatool_sources = [
 	'copytool/scheduler.c',
 	'copytool/tcp.c',
 	'copytool/timer.c',
+	'copytool/utils.c',
 ]
 
 if have_phobos
