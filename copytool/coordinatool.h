@@ -407,6 +407,10 @@ int timer_init(void);
 int timer_rearm(void);
 void handle_expired_timers(void);
 
+/* utils */
+char *parse_hint(struct hsm_action_node *han, const char *hint_needle,
+		 int *hint_len);
+
 /* phobos */
 #if HAVE_PHOBOS
 int phobos_enrich(struct hsm_action_node *han);
