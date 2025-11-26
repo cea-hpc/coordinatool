@@ -38,6 +38,102 @@ struct cds_list_head *schedule_on_client(struct client *client,
 	return get_queue_list(&client->queues, han);
 }
 
+static struct client *
+schedule_host_mapping_find_client(struct host_mapping *mapping)
+{
+	int first_idx = rand() % mapping->count;
+	int idx = first_idx;
+	const char *hostname = mapping->hosts[idx];
+	struct cds_list_head *clients = &state->stats.clients;
+	struct client *client;
+	/* try all configured hosts until one found online,
+	 * and if none all hosts again with disconnected clients,
+	 * and if none of that either we'll create a dummy disconnected
+	 * client for this request: if host settings are set this should
+	 * never go to a global queue. */
+	while ((client = find_client(clients, hostname)) == NULL) {
+		idx = (idx + 1) % mapping->count;
+		if (idx == first_idx) {
+			if (clients == &state->stats.disconnected_clients)
+				break;
+			clients = &state->stats.disconnected_clients;
+		}
+		hostname = mapping->hosts[idx];
+	}
+
+	if (!client) {
+		/* note: it's a disconnected client with expiry, but if it expires
+		 * without any client connecting then requests here will be rescheduled
+		 * through this function again, and that'll recreate a new client.. */
+		client = client_new_disconnected(mapping->hosts[idx]);
+	}
+
+	return client;
+}
+
+static size_t dbj2(const char *buf, size_t size)
+{
+	size_t hash = 5381;
+
+	for (size_t i = 0; i < size; i++)
+		hash = ((hash << 5) + hash) + buf[i];
+
+	return hash;
+}
+
+static char *find_tag_value(const char *data, const char *tag) {
+	char *_data = strdup(data);
+	char *value = NULL;
+	char *token;
+
+	token = strtok(_data, ",");
+	while (token != NULL) {
+		if (strstr(token, tag)) {
+			char *eq = strchr(token, '=');
+			if (eq) {
+				*eq = '\0';
+				value = strdup(eq + 1);
+			}
+		}
+		token = strtok(NULL, ",");
+	}
+
+	free(_data);
+
+	return value;
+}
+
+static struct client *
+schedule_host_mapping_consistent_hash(struct host_mapping *mapping,
+				      const char *data)
+{
+	struct client *client;
+	const char *hostname;
+	size_t index;
+	size_t hash;
+	char *value;
+
+	value = find_tag_value(data, mapping->tag);
+	hash = dbj2(value, strlen(value));
+	free(value);
+
+	index = hash % mapping->count;
+
+	hostname = mapping->hosts[index];
+
+	client = find_client(&state->stats.clients, hostname);
+	if (client)
+		return client;
+
+	client = find_client(&state->stats.disconnected_clients, hostname);
+	if (client)
+		return client;
+
+	client = client_new_disconnected(hostname);
+
+	return client;
+}
+
 static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 {
 	/* only doing this for archive for now */
@@ -60,31 +156,13 @@ static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 	if (!found)
 		return NULL;
 
-	int first_idx = rand() % mapping->count;
-	int idx = first_idx;
-	const char *hostname = mapping->hosts[idx];
-	struct cds_list_head *clients = &state->stats.clients;
 	struct client *client;
-	/* try all configured hosts until one found online,
-	 * and if none all hosts again with disconnected clients,
-	 * and if none of that either we'll create a dummy disconnected
-	 * client for this request: if host settings are set this should
-	 * never go to a global queue. */
-	while ((client = find_client(clients, hostname)) == NULL) {
-		idx = (idx + 1) % mapping->count;
-		if (idx == first_idx) {
-			if (clients == &state->stats.disconnected_clients)
-				break;
-			clients = &state->stats.disconnected_clients;
-		}
-		hostname = mapping->hosts[idx];
-	}
-	if (!client) {
-		/* note: it's a disconnected client with expiry, but if it expires
-		 * without any client connecting then requests here will be rescheduled
-		 * through this function again, and that'll recreate a new client.. */
-		client = client_new_disconnected(mapping->hosts[idx]);
-	}
+
+	if (mapping->consistent_hash)
+		client = schedule_host_mapping_consistent_hash(mapping,
+							       han->info.data);
+	else
+		client = schedule_host_mapping_find_client(mapping);
 
 	return schedule_on_client(client, han);
 }
