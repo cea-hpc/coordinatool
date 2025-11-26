@@ -16,6 +16,24 @@
       "message": "This isn\u0027t stable if any client disconnects?\n\ne.g. all clients with [mover1, mover2, mover3]\n- your hash is 44%3\u003d2: would pick mover3\n- mover2 disconnects, hash is now 44%2\u003d0, it\u0027d pick mover1\n\nI guess that in practice this doesn\u0027t happen often so for something best effort it\u0027s probably good enough, but I\u0027m sure we can do better...\n\n\nThis feature feels *very* close to what the \"batch_archives\" options do, have you looked at that option?\nCould we discuss the design before the implementation? What\u0027s the goal here?\n\nIf you don\u0027t want to match the whole hint like the current code does, extracting some \"grouping\" sub-hint to decide on the batch would be fine (we just didn\u0027t need to do that in practice)\nConversely if you want the batches to reliably pick the same mover again when it frees up we can make the initial selection some sort of hash, but if there was no request for long enough for the batch to be forgotten I\u0027m not sure how useful that is either.\nAnyway, let\u0027s talk this out a bit before going into implementation details...",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5506fcc_906d68f8",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-11-26T14:56:36Z",
+      "side": 1,
+      "message": "No, it\u0027s handled. I renamed the clients list to connected_clients and added a new clients list that contains all clients known to the coordinatool (connected or disconnected). So as long as a client is not free, even if disconnected, it will still be present in the list.",
+      "parentUuid": "9ace94d8_4ffa0008",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
