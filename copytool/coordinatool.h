@@ -160,6 +160,7 @@ struct client {
 	const char *id; /* id sent by the client during EHLO, or addr */
 	bool id_set; /* set if clients introduce themselves */
 	int fd;
+	struct cds_list_head node_all_clients;
 	struct cds_list_head node_clients;
 	unsigned int done_restore;
 	unsigned int done_archive;
@@ -199,7 +200,10 @@ struct ct_stats {
 	long unsigned int done_archive;
 	long unsigned int done_remove;
 	unsigned int clients_connected;
+	unsigned int nb_clients;
+	/* List of all hostname */
 	struct cds_list_head clients;
+	struct cds_list_head connected_clients;
 	struct cds_list_head disconnected_clients;
 };
 

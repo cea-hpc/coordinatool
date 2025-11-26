@@ -63,7 +63,7 @@ static struct cds_list_head *schedule_host_mapping(struct hsm_action_node *han)
 	int first_idx = rand() % mapping->count;
 	int idx = first_idx;
 	const char *hostname = mapping->hosts[idx];
-	struct cds_list_head *clients = &state->stats.clients;
+	struct cds_list_head *clients = &state->stats.connected_clients;
 	struct client *client;
 	/* try all configured hosts until one found online,
 	 * and if none all hosts again with disconnected clients,

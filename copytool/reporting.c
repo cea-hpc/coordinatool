@@ -286,7 +286,8 @@ void report_pending_receives(int64_t now_ns)
 	bool found_work = false;
 
 	struct client *client;
-	cds_list_for_each_entry(client, &state->stats.clients, node_clients)
+	cds_list_for_each_entry(client, &state->stats.connected_clients,
+				node_clients)
 	{
 		if (report_pending_receives_one(
 			    client, &client->queues.waiting_restore))

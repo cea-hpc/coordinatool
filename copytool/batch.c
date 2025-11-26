@@ -83,7 +83,7 @@ struct cds_list_head *schedule_batch_slot_active(struct hsm_action_node *han)
 		return NULL;
 
 	/* If this becomes a performance problem we can make a hash table... */
-	struct cds_list_head *clients = &state->stats.clients, *n;
+	struct cds_list_head *clients = &state->stats.connected_clients, *n;
 	uint64_t now_ns = gettime_ns();
 
 	/* got a match? */
@@ -126,7 +126,7 @@ struct cds_list_head *schedule_batch_slot_new(struct hsm_action_node *han)
 	 * - then look for expired to take over, we'll try to re-schedule any
 	 * new pending work later
 	 */
-	struct cds_list_head *clients = &state->stats.clients, *n;
+	struct cds_list_head *clients = &state->stats.connected_clients, *n;
 	struct client *client = NULL;
 	struct client_batch *batch = NULL;
 	int i;
@@ -330,7 +330,7 @@ uint64_t batch_next_expiry(void)
 	struct client *client;
 	int i;
 
-	cds_list_for_each(n, &state->stats.clients)
+	cds_list_for_each(n, &state->stats.connected_clients)
 	{
 		client = caa_container_of(n, struct client, node_clients);
 
@@ -364,7 +364,7 @@ void batch_clear_expired(uint64_t now_ns)
 	struct client *client;
 	int i;
 
-	cds_list_for_each(n, &state->stats.clients)
+	cds_list_for_each(n, &state->stats.connected_clients)
 	{
 		client = caa_container_of(n, struct client, node_clients);
 

@@ -116,6 +116,8 @@ void client_free(struct client *client)
 	}
 	client_closefd(client);
 	cds_list_del(&client->node_clients);
+	cds_list_del(&client->node_all_clients);
+	state->stats.nb_clients--;
 	if (client->status == CLIENT_WAITING)
 		cds_list_del(&client->waiting_node);
 	// reassign any request that would be lost
@@ -172,6 +174,7 @@ static struct client *client_alloc(void)
 	struct client *client = xcalloc(client_size, 1);
 
 	CDS_INIT_LIST_HEAD(&client->active_requests);
+
 #ifdef DEBUG_ACTION_NODE
 	CDS_INIT_LIST_HEAD(&client->node_clients);
 #endif
@@ -203,9 +206,11 @@ int handle_client_connect(void)
 
 	client->fd = fd;
 	client->id = sockaddr2str(&peer_addr, peer_addr_len);
-	cds_list_add(&client->node_clients, &state->stats.clients);
+	cds_list_add(&client->node_clients, &state->stats.connected_clients);
+	cds_list_add(&client->node_all_clients, &state->stats.clients);
 	client->status = CLIENT_INIT;
 	state->stats.clients_connected++;
+	state->stats.nb_clients++;
 
 	LOG_DEBUG("Clients: new connection %s (%d)", client->id, client->fd);
 

@@ -132,7 +132,7 @@ static void initiate_termination(void)
 		close(state->listen_fd);
 	if (state->timer_fd >= 0)
 		close(state->timer_fd);
-	cds_list_for_each_safe(n, nnext, &state->stats.clients)
+	cds_list_for_each_safe(n, nnext, &state->stats.connected_clients)
 	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
@@ -356,10 +356,11 @@ int main(int argc, char *argv[])
 	};
 	state = &mstate;
 	CDS_INIT_LIST_HEAD(&mstate.config.archive_mappings);
-	CDS_INIT_LIST_HEAD(&mstate.stats.clients);
+	CDS_INIT_LIST_HEAD(&mstate.stats.connected_clients);
 	CDS_INIT_LIST_HEAD(&mstate.stats.disconnected_clients);
 	CDS_INIT_LIST_HEAD(&mstate.waiting_clients);
 	CDS_INIT_LIST_HEAD(&mstate.reporting_cleanup_list);
+	CDS_INIT_LIST_HEAD(&mstate.stats.clients);
 
 	/* parse arguments once first just for config */
 	while ((rc = getopt_long(argc, argv, short_opts, long_opts, NULL)) !=

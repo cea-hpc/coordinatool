@@ -47,11 +47,78 @@ int phobos_enrich(struct hsm_action_node *han)
 	return 0;
 }
 
+static char* parse_grouping(const char *data) {
+	char *_data = strdup(data);
+	char *grouping = NULL;
+	char *token;
+
+	token = strtok(_data, ",");
+	while (token != NULL) {
+		char *eq = strchr(token, '=');
+		if (eq) {
+			*eq = '\0';
+			if (!strcmp(token, "grouping")) {
+				grouping = strdup(eq + 1);
+				break;
+			}
+		}
+		token = strtok(NULL, ",");
+	}
+
+	free(_data);
+
+	return grouping;
+}
+
+static size_t dbj2(const char *buf, size_t size)
+{
+	size_t hash = 5381;
+
+	for (size_t i = 0; i < size; i++)
+		hash = ((hash << 5) + hash) + buf[i];
+
+	return hash;
+}
+
+static char *phobos_hash_grouping(struct hsm_action_node *han)
+{
+	const char *data = han->info.data;
+	struct client *client;
+	char *hostname = NULL;
+	char *grouping;
+	size_t index;
+	size_t i = 0;
+	size_t hash;
+
+	grouping = parse_grouping(data);
+	if (grouping == NULL)
+		return NULL;
+
+	hash = dbj2(grouping, strlen(grouping));
+	free(grouping);
+	index = hash % state->stats.nb_clients;
+
+	cds_list_for_each_entry(client, &state->stats.clients, node_all_clients)
+	{
+		if (i == index) {
+			hostname = strdup(client->id);
+			break;
+		}
+
+		i++;
+	}
+
+	return hostname;
+}
+
 static char *phobos_find_host(struct hsm_action_node *han,
 			      struct client *focus_client)
 {
 	int rc;
 	char *hostname;
+
+	if (han->info.action == HSMA_ARCHIVE && state->config.grouping_hash)
+		return phobos_hash_grouping(han);
 
 	/* only enrich restore */
 	if (han->info.action != HSMA_RESTORE)
@@ -69,7 +136,7 @@ static char *phobos_find_host(struct hsm_action_node *han,
 	if (focus_client) {
 		focus_host = focus_client->id;
 	} else {
-		cds_list_for_each_entry(client, &state->stats.clients,
+		cds_list_for_each_entry(client, &state->stats.connected_clients,
 					node_clients)
 		{
 			if (client->current_restore < min_busy) {
@@ -112,7 +179,8 @@ struct cds_list_head *phobos_schedule(struct hsm_action_node *han)
 	if (hostname == NULL)
 		return NULL;
 
-	struct client *client = find_client(&state->stats.clients, hostname);
+	struct client *client = find_client(&state->stats.connected_clients,
+					    hostname);
 	if (!client) {
 		client = find_client(&state->stats.disconnected_clients,
 				     hostname);
@@ -142,7 +210,7 @@ bool phobos_can_send(struct client *client, struct hsm_action_node *han)
 
 	struct cds_list_head *n, *found = NULL;
 
-	cds_list_for_each(n, &state->stats.clients)
+	cds_list_for_each(n, &state->stats.connected_clients)
 	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);

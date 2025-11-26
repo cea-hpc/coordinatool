@@ -201,7 +201,8 @@ int protocol_reply_status(struct client *client, int verbose, int status,
 	if (!clients)
 		abort();
 
-	rc = protocol_reply_status_client(clients, &ct_stats->clients, verbose);
+	rc = protocol_reply_status_client(clients, &ct_stats->connected_clients,
+					  verbose);
 	if (rc) {
 		goto out_freereply_clients;
 	}
@@ -512,7 +513,7 @@ out_freereply:
 static bool ehlo_is_id_unique(const char *id)
 {
 	struct cds_list_head *n;
-	cds_list_for_each(n, &state->stats.clients)
+	cds_list_for_each(n, &state->stats.connected_clients)
 	{
 		struct client *client =
 			caa_container_of(n, struct client, node_clients);
