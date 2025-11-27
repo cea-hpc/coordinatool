@@ -70,6 +70,24 @@
       "parentUuid": "4455a027_7e11e3f3",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3c47070_5cec6e28",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-11-27T11:57:53Z",
+      "side": 1,
+      "message": "The issue with the current features for our use case (batches and archive_on_host) is that:\n- we can\u0027t know in advance the name of the grouping (archive_on_host is not usable);\n- we want the same grouping to go to the same copytool since we have different tape libraries on each copytools. We want files with the same grouping in the same library. AFAIK the batched requests only guarantee that the requests from a single batch will go to the same copytool. After a batch is finished or rescheduled due to the time slice expiration, there is no guarantee that the next batch for the same grouping will go to the same copytool. So this doesn\u0027t handle our use case;\n- we can have requests with the same grouping but other hints be different. So we would have to at least extract the grouping as you suggested.\n\nYou are right that disconnections and temporary clients make this code fail. We already knew this for disconnections but I didn\u0027t think about the temporary clients. One solution would be to keep the names of the copytools in the config and do something like this:\n\n```\ncopytool \u003d copytools_from_cfg[hash(grouping) % len(copytools_from_cfg)]\n```\n\nThe length of this list is independant of temporary clients and disconnections. Now this does not guarantee that if we add or remove copytools, we will have the same results. In our mind, this is more a first step to have a simple solution for this problem. This gives us the hability to start using Phobos in production for a few months and take time to figure out a proper solution in Phobos.\n\nThe question that remains is what do we do if the copytool is disconnected. We will have to discuss this internally. One solution would be to simply fail the archive since in our use case, in that situation, a restore would also fail. But that is very specific to our use case. Archives can be restarted by robinhood and applications are not waiting for them to finish.",
+      "parentUuid": "f8e63196_588bbdb0",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
