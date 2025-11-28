@@ -106,6 +106,24 @@
       "parentUuid": "b3c47070_5cec6e28",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "726eae45_395ddeba",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-11-28T09:46:14Z",
+      "side": 1,
+      "message": "-OK for adding the config list of client to manage temporary clients.\n\n-For reusing the archive_on_host mechanism, we still have to rethink on it and to find the right way to do it.",
+      "parentUuid": "646aae29_e23e326a",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
