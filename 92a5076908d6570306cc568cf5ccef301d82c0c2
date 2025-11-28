@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49f41284_b93a69a5",
+        "filename": "common/utils.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-11-28T08:20:47Z",
+      "side": 1,
+      "message": "minor: it seems that errno is never directly used in the coordinatool project as a way to return an error code. (errno is only used if it is set by external API). I suggest to modify the prototype of the parse_bool function to return an error code and set the bool value as parameter by address.",
+      "range": {
+        "startLine": 133,
+        "startChar": 1,
+        "endLine": 133,
+        "endChar": 17
+      },
+      "revId": "92a5076908d6570306cc568cf5ccef301d82c0c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
