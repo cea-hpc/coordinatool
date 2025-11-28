@@ -124,6 +124,24 @@
       "parentUuid": "646aae29_e23e326a",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e2e9a32_04694917",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-11-28T21:49:32Z",
+      "side": 1,
+      "message": "Please don\u0027t think of the two separately, there should only be one setting.\n\nFor example, `archive_on_host_rr grouping\u003d host1 host2 host3` would build a list,\nand `schedule_host_mapping()` can check on it if it is set -- that function is already called exactly when you want (when archive requests are processed, with or without batching).",
+      "parentUuid": "726eae45_395ddeba",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
