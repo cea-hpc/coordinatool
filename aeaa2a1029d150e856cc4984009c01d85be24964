@@ -142,6 +142,24 @@
       "parentUuid": "726eae45_395ddeba",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7c5c4b7_36ad89e3",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-12-01T08:51:52Z",
+      "side": 1,
+      "message": "We’d reached roughly the same conclusion. So the idea would be to extend the `archive_on_hosts` parameter into something like `archive_on_hosts_ch` (ch for consistent hashing). In our case, the configuration would contain be `archive_on_hosts_ch grouping\u003d host1 host2`.\n\nInternally, we would add a boolean in the `host_mapping` structure to indicate whether it’s the extended version with consistent hashing or not. And in `schedule_host_mapping()`, if this boolean is true, we select the client based on the hash of the tag value (the grouping for us, but it could be anything in the end). Otherwise, we keep the current behavior.\n\nWould that work for you?",
+      "parentUuid": "9e2e9a32_04694917",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
