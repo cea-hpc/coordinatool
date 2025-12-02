@@ -880,12 +880,13 @@ archive_basic_batch_common() {
 	archive_data="$tag2" client_archive_n_req 3 229 220
 	TMOUT=1 client_archive_n_wait 3 219 200
 	count=0
+	sleep 1
 	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.300 | grep -q archived" && count=$((count+1))
 	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.400 | grep -q archived" && count=$((count+1))
 	do_client 3 "lfs hsm_state ${TESTDIR@Q}/file.500 | grep -q archived" && count=$((count+1))
 	[ "$count" = 1 ] || error "more or less than 1 extra tag processed? $count"
 
-	sleep 5
+	sleep 4
 	# t=15s
 	archs=$(for mover; do do_client $mover "find ${ARCHIVEDIR@Q}/$mover" || exit; done)
 	echo t=15s
