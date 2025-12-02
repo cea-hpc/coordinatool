@@ -692,10 +692,10 @@ data_restart() {
 	# wait for server to have processed requests, then flush cached data
 	sleep 1
 
-	CTDATA_PATH=1 do_coordinatool_service 0 restart
+	do_coordinatool_service 0 restart
 
 	# make sure service really restarted before processing requests
-	do_lhsmtoolcmd_start 1
+	CTDATA_PATH=1 do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
 	do_client 1 "ls ${ARCHIVEDIR@Q}/some\ data*" \
 		|| error "archive data was lost?"
@@ -718,13 +718,13 @@ data_restore_active_requests() {
 	# wait for server to have processed requests, then flush cached data
 	sleep 1
 
-	CTDATA_PATH=1 do_coordinatool_service 0 restart
+	do_coordinatool_service 0 restart
 
 	# make sure service really restarted before requeueing active requests
 	sleep 1
 	mds_requeue_active_requests 0
 	mds_requeue_active_requests 1
-	do_lhsmtoolcmd_start 1
+	CTDATA_PATH=1 do_lhsmtoolcmd_start 1
 	client_archive_n_wait 3 100
 	do_client 1 "ls ${ARCHIVEDIR@Q}/da\ ta*" \
 		|| error "archive data was lost?"
