@@ -160,6 +160,24 @@
       "parentUuid": "9e2e9a32_04694917",
       "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "852ccfc7_6f7728f1",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:16:31Z",
+      "side": 1,
+      "message": "Thank you, this looks good!",
+      "parentUuid": "c7c5c4b7_36ad89e3",
+      "revId": "aeaa2a1029d150e856cc4984009c01d85be24964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

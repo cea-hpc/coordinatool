@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68dfe083_ef4c21ae",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:16:31Z",
+      "side": 1,
+      "message": "why strstr and not strcmp here?\nThis would match `foogrouping\u003d`",
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c177fbcf_cf008554",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:16:31Z",
+      "side": 1,
+      "message": "(dead code) you don\u0027t need to modify the equal if you only read the value after it?",
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8aa45f6_bdaf9a80",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:16:31Z",
+      "side": 1,
+      "message": "this leaks the old value if there were multiple matches -- that\u0027s not a problem if you\u0027d just return the value immediately (or given there\u0027s a free to do, `break` out of the loop)",
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08c963c9_16f93b01",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:16:31Z",
+      "side": 1,
+      "message": "(major) this segfaults if no value found?\n\nbehavior wise I\u0027m not sure what you want to do in this case, fallback to random assignment?",
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
