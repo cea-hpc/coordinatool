@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a740f956_bc23f33c",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T10:53:54Z",
+      "side": 1,
+      "message": "major: This seems to work perfectly but I am not a big fan to use such a devious course. What about coding a direct way to handle error here ? Returning an error code to this function ? (letting the returned hostname as parameter of the function)\n\nFor example, I see that the phobos_can_send function ends by calling hsm_action_requeue. Isn\u0027t-it a more direct way to manage this error ?",
+      "range": {
+        "startLine": 119,
+        "startChar": 2,
+        "endLine": 127,
+        "endChar": 18
+      },
+      "revId": "16cff30e15c4e29f8b83eddb48996e9b1be48bae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
