@@ -22,6 +22,30 @@
       },
       "revId": "16cff30e15c4e29f8b83eddb48996e9b1be48bae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e997ef0_9777dede",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T11:39:40Z",
+      "side": 1,
+      "message": "\u003e Returning an error code to this function ?\n\nHow should the caller know how to handle such an error?\n(whether to continue scheduling and pick a random host like we currently do with NULL or do something else)\n\nIn this case, we have checked that this file is in phobos (xattr is present), so this is not just an error: we assert that the file is handled by this function, but we can\u0027t pick an host right now for a reason we don\u0027t/can\u0027t handle (logged error), so we\u0027ll want to retry \"later\" -- this is not an error as far as the scheduling mechanism is concerned, phobos_locate made a decision.\n\nI agree the mechanism of using a fake host is ugly, but short of adding a specific \"reschedule later\" queue with its own schedule I don\u0027t see a way around it -- I don\u0027t think it\u0027s worth investing the time in the C codebase for this.\nIn rust, it\u0027d be as easy as returning an enum saying what to do (file not handled by this scheduler, enqueue to this host, retry scheduling later) so I\u0027m sure the new code will be able to do better here.\n\n\u003e For example, I see that the phobos_can_send function ends by calling hsm_action_requeue. Isn\u0027t-it a more direct way to manage this error ?\n\nThat would recurse endlessly as this function is called during enqueue -- phobos_schedule -\u003e hsm_action_requeue -\u003e hsm_action_enqueue -\u003e hsm_action_node_schedule -\u003e phobos_schedule\n(phobos_can_send does not have this problem because it\u0027s only called immediately before sending an already enqueued request)\n\nThat might work if the error is temporary and immediately retrying succeeds, but we can\u0027t know that, so having a delayed mechanism is necessary.",
+      "parentUuid": "a740f956_bc23f33c",
+      "range": {
+        "startLine": 119,
+        "startChar": 2,
+        "endLine": 127,
+        "endChar": 18
+      },
+      "revId": "16cff30e15c4e29f8b83eddb48996e9b1be48bae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
