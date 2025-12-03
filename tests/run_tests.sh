@@ -175,6 +175,7 @@ do_lhsmtoolcmd_start() {
 	local ARCHIVEDIR="${ARCHIVEDIR:-/tmp/archive}"
 	local WAIT_FILE="${WAIT_FILE:-}"
 	local CTDATA_PATH="${CTDATA_PATH:-}"
+	local COORDINATOOL_CONF="${COORDINATOOL_CONF:-}"
 	# see coordinatool_start comment for CTOOL_ENV for usage (string -> assoc array)
 	declare -A AGENT_ENV=${AGENT_ENV:-( )}
 	local env="" var
@@ -187,6 +188,10 @@ do_lhsmtoolcmd_start() {
 	for var in "${!AGENT_ENV[@]}"; do
 		env+=" -E $var=${AGENT_ENV[$var]@Q}"
 	done
+
+	if [ ! -z "${COORDINATOOL_CONF}" ]; then
+		env+=" -E COORDINATOOL_CONF=${COORDINATOOL_CONF@Q}"
+	fi
 
 	do_client "$i" "
 		rm -rf ${ARCHIVEDIR@Q} && mkdir -p ${ARCHIVEDIR@Q}
@@ -223,7 +228,7 @@ client_reset() {
 
 	do_client "$i" "
 		rm -rf ${TESTDIR@Q}
-		lfs mkdir -C -1 ${TESTDIR@Q}
+		lfs mkdir -c -1 ${TESTDIR@Q}
 		"
 	CLEANUP+=( "rm -rf ${TESTDIR@Q}" )
 }
@@ -599,10 +604,13 @@ archive_on_host() {
 
 	do_client 0 "[ \"\$(find ${ARCHIVEDIR@Q}/0 | wc -l)\" = 21 ]" \
 		|| error "missing archives on 0"
-	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" -gt 5 ]" \
-		|| error "missing archives on 1"
-	do_client 2 "[ \"\$(find ${ARCHIVEDIR@Q}/2 | wc -l)\" -gt 5 ]" \
-		|| error "missing archives on 2"
+
+	local nb_client_1=$(find ${ARCHIVEDIR}/1 | wc -l)
+	local nb_client_2=$(find ${ARCHIVEDIR}/2 | wc -l)
+	if [[ $(($nb_client_1 + $nb_client_2)) -ne 22 ]]; then
+		error "missing archives on 1 and 2"
+	fi
+
 	do_client 3 "[ \"\$(find ${ARCHIVEDIR@Q}/3 | wc -l)\" = 21 ]" \
 		|| error "missing archives on 3"
 }
@@ -643,7 +651,8 @@ restarts_with_pending_work() {
 		do_client $client "touch ${ARCHIVEDIR@Q}/wait"
 	done
 
-	client_archive_n_wait 3 119 100
+	# Archive on agent_0 should fails
+	! client_archive_n_wait 3 119 100
 	client_archive_n_wait 3 219 200
 	client_archive_n_wait 3 319 300
 
@@ -955,12 +964,14 @@ reporting_basic_test() {
 	# - unblock agent 2 & wait
 	# - chcek all is clean
 
-	WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
+	COORDINATOOL_CONF="$SOURCEDIR/tests/coordinatool_reporting.conf" \
+		WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
 	archive_data="cr=report00" client_archive_n_req 3 04 00
 
 	# wait a bit to get messages...
 	sleep 1
-	WAIT_FILE="$ARCHIVEDIR/wait_2" do_lhsmtoolcmd_start 2
+	COORDINATOOL_CONF="$SOURCEDIR/tests/coordinatool_reporting.conf" \
+		WAIT_FILE="$ARCHIVEDIR/wait_2" do_lhsmtoolcmd_start 2
 	# (wait till report00 requests gets sent to agent_2)
 	sleep 1
 	archive_data="foo,cr=report01,bar" client_archive_n_req 3 12 10
@@ -1049,7 +1060,8 @@ reporting_restore_progress() {
 	client_reset 3
 
 	# archive/release some files, then block restores a bit and see how progresses are reported
-	WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
+	COORDINATOOL_CONF="$SOURCEDIR/tests/coordinatool_reporting.conf" \
+		WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
 	sleep 0.5
 	touch "$ARCHIVEDIR/wait_1"
 	client_archive_n 3 09 00
