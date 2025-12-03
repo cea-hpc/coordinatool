@@ -49,6 +49,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "218f0b8c_3ebce035",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T15:22:24Z",
+      "side": 1,
+      "message": "(this code has just been moved here so I believe here isn\u0027t really the place to discuss this, but I\u0027ll reply anyway since I wrote that)\n\nI don\u0027t understand \"regularly distribute among all connected clients before moving to disconnected ones\", would you want to wait for disconnected clients rather than send to connected ones?\nI think the current behavior is fine, this just randomly pick any connected client if any, and if there\u0027s none it\u0027ll pick any disconnected client at random.\n\n(In practice I don\u0027t think anyone uses this with multiple hosts anyway..)",
+      "parentUuid": "128af34a_bf9f8309",
+      "range": {
+        "startLine": 55,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 35
+      },
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "595c06ec_00512a29",
         "filename": "copytool/scheduler.c",
         "patchSetId": 2
@@ -60,6 +84,30 @@
       "writtenOn": "2025-12-03T14:56:51Z",
       "side": 1,
       "message": "question: isn\u0027t already a place in the coordinatool where the hints are parsed and you could reuse this code ?",
+      "range": {
+        "startLine": 84,
+        "startChar": 13,
+        "endLine": 84,
+        "endChar": 29
+      },
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78f29ad4_e7e60de5",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T15:22:24Z",
+      "side": 1,
+      "message": "Technically there\u0027s a similar code in copytool/reporting.c `report_new_action()` but it\u0027s not split in a helper.\n\nI guess it\u0027d make sense to share... (especially since that one doesn\u0027t require allocating a dup with strtok)\n\n(tags before that were just strstr\u0027d away and didn\u0027t check comma boundary)",
+      "parentUuid": "595c06ec_00512a29",
       "range": {
         "startLine": 84,
         "startChar": 13,
