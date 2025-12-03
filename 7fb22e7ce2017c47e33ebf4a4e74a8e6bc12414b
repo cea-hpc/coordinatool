@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9cf66dd_2983fce3",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T14:08:56Z",
+      "side": 1,
+      "message": "style: alignment",
+      "range": {
+        "startLine": 13,
+        "startChar": 7,
+        "endLine": 13,
+        "endChar": 11
+      },
+      "revId": "7fb22e7ce2017c47e33ebf4a4e74a8e6bc12414b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dac403f5_8981d669",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T14:08:56Z",
+      "side": 1,
+      "message": "minor: you could restrict the key parameter to a \"const char *\"",
+      "range": {
+        "startLine": 13,
+        "startChar": 10,
+        "endLine": 13,
+        "endChar": 19
+      },
+      "revId": "7fb22e7ce2017c47e33ebf4a4e74a8e6bc12414b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
