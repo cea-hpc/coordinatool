@@ -139,6 +139,8 @@ cleanup() {
 		done
 	fi
 
+	redis_clear_db
+
 	indices=( "${!CLEANUP[@]}" )
 	for ((i=${#indices[@]} - 1; i >= 0; i--)); do
 		eval "${CLEANUP[indices[i]]}"
@@ -741,6 +743,43 @@ lock_and_quit() {
 		|| error "service not stopped after all done"
 }
 run_test 12 lock_and_quit
+
+archive_on_hosts_ch() {
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_archive_on_host.conf \
+		do_coordinatool_start 0
+	sleep 1
+	ARCHIVEDIR="$ARCHIVEDIR/1" do_lhsmtoolcmd_start 1
+	ARCHIVEDIR="$ARCHIVEDIR/2" do_lhsmtoolcmd_start 2
+
+	# wait for copytools to connect
+	# (otherwise requests aren't scheduled)
+	sleep 1
+	echo "done waiting"
+
+	client_reset 3
+	archive_data="grouping=test0" client_archive_n_req 3 19 0
+	archive_data="grouping=test1" client_archive_n_req 3 39 20
+	archive_data="grouping=test2" client_archive_n_req 3 59 40
+
+	sleep 0.5
+	do_lhsmtoolcmd_service 1 restart
+
+	client_archive_check_none 3 19 0
+	client_archive_n_wait 3 59 20
+
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" = 21 ]" \
+		|| error "missing archives on 1"
+	do_client 2 "[ \"\$(find ${ARCHIVEDIR@Q}/2 | wc -l)\" = 21 ]" \
+		|| error "missing archives on 2"
+
+	ARCHIVEDIR="$ARCHIVEDIR/0" do_lhsmtoolcmd_start 0
+	sleep 1
+
+	client_archive_n_wait 3 19 0
+	do_client 0 "[ \"\$(find ${ARCHIVEDIR@Q}/0 | wc -l)\" = 21 ]" \
+		|| error "missing archives on 0"
+}
+run_test 13 archive_on_hosts_ch
 
 # 3x tests: test lfs hsm_* --data
 # normal copies
