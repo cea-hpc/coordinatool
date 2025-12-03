@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e995f83_4075852d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:23:08Z",
+      "side": 1,
+      "message": "(open remark) some tests sleep 0.3, others not at all.. iirc if you don\u0027t wait here the lhsmtoolcmd might try to connect before coordinatool is ready and the connect retry is a bit longer than whatever sleep I was using, but might want to make do_coordinatool_start wait until the socket is open instead...",
+      "revId": "4729280df069d605fbba33fa0690249b2cdd2940",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db879470_e88cb78b",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 676,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:23:08Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be needed with the current code (creating a disconnected client if none is connected)\n\nYou might actually want to wait to start the 2nd lhsmtoolcmd when you restart the first one after sending a few requests to make sure this disconnected client creation code works",
+      "revId": "4729280df069d605fbba33fa0690249b2cdd2940",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86eeefd1_53ea230f",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:23:08Z",
+      "side": 1,
+      "message": "(same comment as previous test commit: might want to start the third mover after this and wait again?)",
+      "revId": "4729280df069d605fbba33fa0690249b2cdd2940",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
