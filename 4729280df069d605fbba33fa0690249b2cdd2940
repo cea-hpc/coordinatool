@@ -50,6 +50,29 @@
       "message": "(same comment as previous test commit: might want to start the third mover after this and wait again?)",
       "revId": "4729280df069d605fbba33fa0690249b2cdd2940",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4753c2e4_1b097670",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T15:10:25Z",
+      "side": 1,
+      "message": "major: I am not familiar with this test environment, so I am not sure to correctly understand every thing in this test but I think you do not test that a request is finally executed when the hash maps to a disconnected client ant that this disconnect client finally reconnects.",
+      "range": {
+        "startLine": 694,
+        "startChar": 1,
+        "endLine": 694,
+        "endChar": 5
+      },
+      "revId": "4729280df069d605fbba33fa0690249b2cdd2940",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
