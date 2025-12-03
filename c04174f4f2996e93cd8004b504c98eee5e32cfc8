@@ -22,6 +22,23 @@
       },
       "revId": "c04174f4f2996e93cd8004b504c98eee5e32cfc8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb915fe9_6a9aea1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T10:31:29Z",
+      "side": 1,
+      "message": "Un petit test pourrait être bien pour valider le fonctionnement de cette nouvelle commande.",
+      "revId": "c04174f4f2996e93cd8004b504c98eee5e32cfc8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
