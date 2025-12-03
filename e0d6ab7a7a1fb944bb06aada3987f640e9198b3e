@@ -1,6 +1,75 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8bee94c_cf5dcb98",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T14:56:51Z",
+      "side": 1,
+      "message": "typo: ch",
+      "range": {
+        "startLine": 15,
+        "startChar": 16,
+        "endLine": 15,
+        "endChar": 19
+      },
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "128af34a_bf9f8309",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T14:56:51Z",
+      "side": 1,
+      "message": "nitpick: by doing that you favor the connected clients that are after disconnected one in the archive_on_host list instead of regularly distribute among all connected clients before moving to disconnected ones.",
+      "range": {
+        "startLine": 55,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 35
+      },
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "595c06ec_00512a29",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-03T14:56:51Z",
+      "side": 1,
+      "message": "question: isn\u0027t already a place in the coordinatool where the hints are parsed and you could reuse this code ?",
+      "range": {
+        "startLine": 84,
+        "startChar": 13,
+        "endLine": 84,
+        "endChar": 29
+      },
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "68dfe083_ef4c21ae",
