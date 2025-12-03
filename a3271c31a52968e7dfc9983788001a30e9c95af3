@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6c65cdc_dcf860b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:03:14Z",
+      "side": 1,
+      "message": "Thank you for the fixes!",
+      "revId": "a3271c31a52968e7dfc9983788001a30e9c95af3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edf66f42_54eaf66f",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-03T14:03:14Z",
+      "side": 1,
+      "message": "I think that leaves requests behind on the MDT so might want to start an agent on 0 after this fails and wait again?\nanyway this is also true of the current test that also fails, so this is a strict improvement",
+      "revId": "a3271c31a52968e7dfc9983788001a30e9c95af3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
