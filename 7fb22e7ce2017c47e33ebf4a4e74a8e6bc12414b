@@ -45,6 +45,54 @@
       },
       "revId": "7fb22e7ce2017c47e33ebf4a4e74a8e6bc12414b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd9180b2_c2b6d655",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-12-04T10:23:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dac403f5_8981d669",
+      "range": {
+        "startLine": 13,
+        "startChar": 10,
+        "endLine": 13,
+        "endChar": 19
+      },
+      "revId": "7fb22e7ce2017c47e33ebf4a4e74a8e6bc12414b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a67cbe72_947a99d3",
+        "filename": "copytool/config.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-12-04T10:23:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9cf66dd_2983fce3",
+      "range": {
+        "startLine": 13,
+        "startChar": 7,
+        "endLine": 13,
+        "endChar": 11
+      },
+      "revId": "7fb22e7ce2017c47e33ebf4a4e74a8e6bc12414b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
