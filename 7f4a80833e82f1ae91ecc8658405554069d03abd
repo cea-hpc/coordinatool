@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fc62b33_5743e384",
+        "filename": "copytool/utils.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-05T13:35:38Z",
+      "side": 1,
+      "message": "hmm, this is an old bug but pointing at hint here will mean memmem() will find the match again immediately and this will loop forever...?\nI\u0027ll fix that in a follow-up commit (and add a unit test now it\u0027s a helper)",
+      "revId": "7f4a80833e82f1ae91ecc8658405554069d03abd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "211b7e26_259c8d17",
+        "filename": "copytool/utils.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-05T13:35:38Z",
+      "side": 1,
+      "message": "this returns 0 if and only if hint was not found, so it could just return char *?\nI think that\u0027d be easier to use (in particular I didn\u0027t like the `if (!rc) return rc` in reporting.c -- I find `if (!hint) return 0` clearer both in what we check (have to think about what is the function supposed to return?) and return value (!rc mean rc is zero, so writing return 0 is more clear than having to check again) -- but admittedly it\u0027s just that this code base does not have much \"return value in arguments\" patterns, either is probably fine.",
+      "revId": "7f4a80833e82f1ae91ecc8658405554069d03abd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18f8417b_13353013",
