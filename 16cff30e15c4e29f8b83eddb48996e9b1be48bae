@@ -46,6 +46,30 @@
       },
       "revId": "16cff30e15c4e29f8b83eddb48996e9b1be48bae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1a74286_a72d1079",
+        "filename": "copytool/phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-05T10:14:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8e997ef0_9777dede",
+      "range": {
+        "startLine": 119,
+        "startChar": 2,
+        "endLine": 127,
+        "endChar": 18
+      },
+      "revId": "16cff30e15c4e29f8b83eddb48996e9b1be48bae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
