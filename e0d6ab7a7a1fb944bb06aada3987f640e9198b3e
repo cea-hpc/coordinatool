@@ -95,6 +95,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b61b609_f1c480f6",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-05T10:03:37Z",
+      "side": 1,
+      "message": "The clients that come after disconnected client in the input list (mapping-\u003ehosts) have more chance to be selected because we randomly pick one among all clients (mapping-\u003ehosts) (connected and disconnected), then we check in the connected list (state-\u003estats.clients) and if we do not find it, we increase the index to the next client (into mapping-\u003ehosts) (before going to disconnected clients) and try to find it again into connected client.\n\nI think it is perfectly find. I was just saying that this method is not 100% fair. If we built the list of connected client among all input clients and then randomly pick, it would be 100% fair.\n\nBut never mind. This code was effectively an already existing and working one. (During my first review, I read this piece of code as if it was newly created and added by this commit.)",
+      "parentUuid": "218f0b8c_3ebce035",
+      "range": {
+        "startLine": 55,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 35
+      },
+      "revId": "e0d6ab7a7a1fb944bb06aada3987f640e9198b3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "595c06ec_00512a29",

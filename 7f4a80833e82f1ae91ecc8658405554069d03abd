@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18f8417b_13353013",
+        "filename": "copytool/utils.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-12-05T10:03:37Z",
+      "side": 1,
+      "message": "typo: tab to delete",
+      "revId": "7f4a80833e82f1ae91ecc8658405554069d03abd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
