@@ -146,7 +146,7 @@ do_coordinatool_start() {
 	# like an associative array definition e.g. "( [COORDINATOOL_CONF]=/path )"
 	# This allows passing multiple arguments, with well defined escaping rules
 	declare -A CTOOL_ENV=${CTOOL_ENV:-( )}
-	local CTOOL_CONF=${CTOOL_CONF:-}
+	local CTOOL_CONF=${CTOOL_CONF-$SOURCEDIR/tests/coordinatool_tests_defaults.conf}
 	local env="" var
 
 	for var in "${!CTOOL_ENV[@]}"; do
@@ -175,7 +175,7 @@ do_lhsmtoolcmd_start() {
 	local ARCHIVEDIR="${ARCHIVEDIR:-/tmp/archive}"
 	local WAIT_FILE="${WAIT_FILE:-}"
 	local CTDATA_PATH="${CTDATA_PATH:-}"
-	local COORDINATOOL_CONF="${COORDINATOOL_CONF:-}"
+	local CTOOL_CONF="${CTOOL_CONF-$SOURCEDIR/tests/coordinatool_tests_defaults.conf}"
 	# see coordinatool_start comment for CTOOL_ENV for usage (string -> assoc array)
 	declare -A AGENT_ENV=${AGENT_ENV:-( )}
 	local env="" var
@@ -189,8 +189,8 @@ do_lhsmtoolcmd_start() {
 		env+=" -E $var=${AGENT_ENV[$var]@Q}"
 	done
 
-	if [ ! -z "${COORDINATOOL_CONF}" ]; then
-		env+=" -E COORDINATOOL_CONF=${COORDINATOOL_CONF@Q}"
+	if [ ! -z "${CTOOL_CONF}" ]; then
+		env+=" -E COORDINATOOL_CONF=${CTOOL_CONF@Q}"
 	fi
 
 	do_client "$i" "
@@ -1007,14 +1007,12 @@ reporting_basic_test() {
 	# - unblock agent 2 & wait
 	# - chcek all is clean
 
-	COORDINATOOL_CONF="$SOURCEDIR/tests/coordinatool_reporting.conf" \
-		WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
+	WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
 	archive_data="cr=report00" client_archive_n_req 3 04 00
 
 	# wait a bit to get messages...
 	sleep 1
-	COORDINATOOL_CONF="$SOURCEDIR/tests/coordinatool_reporting.conf" \
-		WAIT_FILE="$ARCHIVEDIR/wait_2" do_lhsmtoolcmd_start 2
+	WAIT_FILE="$ARCHIVEDIR/wait_2" do_lhsmtoolcmd_start 2
 	# (wait till report00 requests gets sent to agent_2)
 	sleep 1
 	archive_data="foo,cr=report01,bar" client_archive_n_req 3 12 10
@@ -1103,8 +1101,7 @@ reporting_restore_progress() {
 	client_reset 3
 
 	# archive/release some files, then block restores a bit and see how progresses are reported
-	COORDINATOOL_CONF="$SOURCEDIR/tests/coordinatool_reporting.conf" \
-		WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
+	WAIT_FILE="$ARCHIVEDIR/wait_1" do_lhsmtoolcmd_start 1
 	sleep 0.5
 	touch "$ARCHIVEDIR/wait_1"
 	client_archive_n 3 09 00
