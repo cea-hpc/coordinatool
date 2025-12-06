@@ -32,15 +32,17 @@ configure_file(
 	configuration: lhsmcmd_conf_data,
 )
 
-parse_active_requests = executable(
-	'parse_active_requests',
-	sources: [
-		'parse_active_requests.c',
-		],
-	include_directories: include_directories('../common'),
-	link_with: [common],
-)
-test('parse_active_requests', parse_active_requests, args: [meson.current_source_dir() / 'active_requests'])
+parse_tests = [ 'parse_active_requests', 'parse_hint' ]
+
+foreach parse : parse_tests
+	exe = executable(
+		parse,
+		sources: [ parse + '.c' ],
+		include_directories: include_directories('../common', '../copytool'),
+		link_with: [common],
+	)
+	test(parse, exe, args: [meson.current_source_dir() / parse + '.data'])
+endforeach
 
 executable(
 	'json',

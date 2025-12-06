@@ -3,11 +3,11 @@
 #include "coordinatool.h"
 
 char *parse_hint(struct hsm_action_node *han, const char *hint_needle,
-		 int *hint_len)
+		 size_t *hint_len)
 {
 	const char *data = han->info.data;
 	char *hint = NULL;
-	int needle_len;
+	size_t needle_len;
 
 	needle_len = strlen(hint_needle);
 	*hint_len = han_data_len(han);
@@ -19,7 +19,10 @@ char *parse_hint(struct hsm_action_node *han, const char *hint_needle,
 			break;
 		/* false positive, try again */
 		*hint_len -= hint - data;
-		data = hint;
+		if (*hint_len == 0)
+			return NULL;
+		*hint_len -= 1;
+		data = hint + 1;
 	}
 	if (!hint)
 		return NULL;

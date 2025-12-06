@@ -12,7 +12,9 @@
 #include <sys/socket.h>
 #include <hiredis/async.h>
 
+#ifndef NO_CONFIG_H
 #include "config.h"
+#endif
 #include "logs.h"
 #include "protocol.h"
 #include "utils.h"
@@ -409,7 +411,7 @@ void handle_expired_timers(void);
 
 /* utils */
 char *parse_hint(struct hsm_action_node *han, const char *hint_needle,
-		 int *hint_len);
+		 size_t *hint_len);
 
 /* phobos */
 #if HAVE_PHOBOS
