@@ -70,7 +70,7 @@ int report_new_action(struct hsm_action_node *han)
 
 	const char *hint_needle = state->config.reporting_hint;
 	const char *hint;
-	int data_len;
+	size_t data_len;
 
 	hint = parse_hint(han, hint_needle, &data_len);
 	if (!hint)
@@ -81,7 +81,7 @@ int report_new_action(struct hsm_action_node *han)
 	 * - not alnum, - or _ (in particular, no /, . or nul byte allowed)
 	 */
 	if (data_len > 64) {
-		LOG_INFO("fid " DFID " reporting hint was longer than 64 (%d)",
+		LOG_INFO("fid " DFID " reporting hint was longer than 64 (%zd)",
 			 PFID(&han->info.dfid), data_len);
 		return -EINVAL;
 	}
