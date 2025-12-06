@@ -265,9 +265,8 @@ client_archive_n_wait() {
 			done
 			exit
 		done
-		echo 'ERROR: Failed to archive $start..$n'
 		exit 1
-	"
+	" || error "Timed out waiting for archives $start..$n"
 }
 
 client_archive_n() {
@@ -308,14 +307,14 @@ client_restore_n_wait() {
 			done
 			break
 		done
-		if ((TMOUT <= 0)); then echo 'ERROR: Failed to restore $start..$n'; exit 1; fi
+		if ((TMOUT <= 0)); then echo 'ERROR: Timed out'; exit 1; fi
 		for i in {$start..$n}; do
 			if ! [[ \"\$(cat file.\$i)\" = foo.\$i ]]; then
-				echo 'Content does not match after restore'
+				echo 'ERROR: Content does not match after restore'
 				exit 1
 			fi
 		done
-	"
+	" || error "Failed to restore $start..$n"
 }
 client_restore_n() {
 	client_restore_n_req "$@"
@@ -651,10 +650,17 @@ restarts_with_pending_work() {
 		do_client $client "touch ${ARCHIVEDIR@Q}/wait"
 	done
 
-	# Archive on agent_0 should fails
-	! client_archive_n_wait 3 119 100
 	client_archive_n_wait 3 219 200
 	client_archive_n_wait 3 319 300
+
+        # archives with tag=n0 should all have been held back
+        do_client "3" "
+                cd ${TESTDIR@Q}
+                for i in {100..119}; do
+                        lfs hsm_state file.\$i | grep archived && exit 1
+                done
+		true
+        " || error "Incorrectly archived tag=n0 archives"
 
 	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" = 1 ]" \
 		|| error "should be no archive on 1"
