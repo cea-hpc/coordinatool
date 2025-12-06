@@ -165,7 +165,7 @@ do_coordinatool_service() {
 	local i="$1"
 	local action="$2"
 
-	do_client "$i" "systemctl --no-pager $action ctest_coordinatool@${i}.service" || :
+	do_client "$i" "systemctl --no-pager $action ctest_coordinatool@${i}.service"
 }
 
 do_lhsmtoolcmd_start() {
@@ -664,6 +664,42 @@ restarts_with_pending_work() {
 		|| error "should be at least 20 archives on 3"
 }
 run_test 11 restarts_with_pending_work
+
+lock_and_quit() {
+	do_coordinatool_start 0
+	WAIT_FILE="$ARCHIVEDIR/wait" do_lhsmtoolcmd_start 1
+
+	client_reset 3
+
+	# send 10 requests and wait a bit for them to be queued to mover.
+	# with max_archives=3, we'll have 3 requests in progress (waiting)
+	# and 7 queued when we lock
+	client_archive_n_req 3 10
+	sleep 1
+	do_coordinatool_client 0 --lock
+	do_client 1 "touch ${ARCHIVEDIR@Q}/wait"
+	# now unlock and wait for some files
+	sleep 1
+	# 3 files + wait + dir
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 5 ]" \
+		|| error "should be exactly 3 files archived"
+	do_client 1 "rm -f ${ARCHIVEDIR@Q}/wait"
+	do_coordinatool_client 0 --unlock
+	# wait for next 3 requests to be sent to mover
+	sleep 1
+	do_coordinatool_client 0 --lock-quit
+	sleep 1
+	# service is still running (requests not done)
+	do_coordinatool_service 0 status
+	do_client 1 "touch ${ARCHIVEDIR@Q}/wait"
+	sleep 1
+
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 8 ]" \
+		|| error "should be exactly 6 files archived"
+	! do_coordinatool_service 0 status \
+		|| error "service not stopped after all done"
+}
+run_test 12 lock_and_quit
 
 # 3x tests: test lfs hsm_* --data
 # normal copies
