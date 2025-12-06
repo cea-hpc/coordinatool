@@ -88,7 +88,7 @@ schedule_host_mapping_consistent_hash(struct host_mapping *mapping,
 	struct client *client;
 	const char *hostname;
 	const char *value;
-	int value_len;
+	size_t value_len;
 	size_t index;
 	size_t hash;
 
