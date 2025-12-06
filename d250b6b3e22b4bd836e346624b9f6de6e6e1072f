@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe83e147_2e8dcdab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-06T09:27:42Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s worth taking the time to fix lhsmtool_cmd at this point -- please let me know if you disagree.\n\nWith this I think tests no longer randomly fail locally (will leave my branch to run tests a dozen of times overnight to make sure), so I\u0027ll at least make sure to run the full suite on branch tips before merging.\n(It\u0027s a bit too long to run on every commit for me, but once in a while is good, I need to come up with something to ensure I ran it... perhaps my CI script can merge all open patches and run it, will have to think about it)",
+      "revId": "d250b6b3e22b4bd836e346624b9f6de6e6e1072f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
