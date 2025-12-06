@@ -271,10 +271,15 @@ void ct_schedule_client(struct client *client)
 				/* this is a batch */
 				assert(j < state->config.batch_slots);
 				extra_count = &client->batch[j].current_count;
-				/* round up... */
-				extra_max = (*max_action[i] +
-					     state->config.batch_slots - 1) /
-					    state->config.batch_slots;
+				if (*max_action[i] < 0) {
+					extra_max = -1;
+				} else {
+					/* round up... */
+					extra_max = (*max_action[i] +
+						     state->config.batch_slots -
+						     1) /
+						    state->config.batch_slots;
+				}
 			}
 			if (enqueued_bytes >
 			    client->max_bytes - HAI_SIZE_MARGIN) {
@@ -286,7 +291,7 @@ void ct_schedule_client(struct client *client)
 			}
 			if (extra_max >= 0 && extra_count &&
 			    *extra_count >= extra_max) {
-				break;
+				continue;
 			}
 
 			struct hsm_action_node *han = caa_container_of(
