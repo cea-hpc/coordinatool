@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4a93a58_88e0b4f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-06T14:56:59Z",
+      "side": 1,
+      "message": "Sorry, I noticed I hadn\u0027t setup clang-format in CI, but I\u0027ve been using it lately.\n\nYour patches have a couple of errors, it\u0027d be great if you could use it -- CI will not give -1 if there\u0027s an error but I didn\u0027t build the machinery to make comments automatically, copying manually for now...",
+      "revId": "4b4584116440413ece04c2a2a46c13c4cccb2030",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7138895_ed3ffec0",
+        "filename": "copytool/config.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-06T14:56:59Z",
+      "side": 1,
+      "message": "(clang-format)\n```suggestion\n\tmapping-\u003econsistent_hash \u003d\n\t\tstrcmp(key, \"archive_on_hosts_ch\") \u003d\u003d 0 ? true : false;\n```",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 20
+      },
+      "revId": "4b4584116440413ece04c2a2a46c13c4cccb2030",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
