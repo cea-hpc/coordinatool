@@ -321,8 +321,9 @@ static int redis_wait_done(int *done)
 			LOG_INFO("%d on error/hup", event.data.fd);
 		}
 		if (event.data.fd == state->timer_fd) {
-			LOG_DEBUG("timer fd ready during redis recovery, ignoring it");
-			int64_t  junk;
+			LOG_DEBUG(
+				"timer fd ready during redis recovery, ignoring it");
+			int64_t junk;
 
 			while (read(state->timer_fd, &junk, sizeof(junk)) > 0)
 				;
