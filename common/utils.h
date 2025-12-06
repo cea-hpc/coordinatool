@@ -48,7 +48,7 @@ static inline char *xstrdup(const char *s)
 
 static inline char *xmemdup0(const char *s, size_t n)
 {
-	char *val = xmalloc(n+1);
+	char *val = xmalloc(n + 1);
 	memcpy(val, s, n);
 	val[n] = 0;
 	return val;
