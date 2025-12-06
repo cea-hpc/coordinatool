@@ -1,0 +1,6 @@
+{"data": "test", "needle": "test", "match": "" }
+{"data": "test=foo", "needle": "test=", "match": "foo" }
+{"data": "foo,test=foo,bar", "needle": "test=", "match": "foo" }
+{"data": "foo,aatest=foo,bar", "needle": "test=", "match": null }
+{"data": "foo,aatest=foo,test=foo,bar", "needle": "test=", "match": "foo" }
+{"data": "foo,\0,test=foo,bar", "needle": "test=", "match": "foo" }
