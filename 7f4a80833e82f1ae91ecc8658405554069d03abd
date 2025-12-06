@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a330c2d2_dd4cb9e2",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-06T14:57:52Z",
+      "side": 1,
+      "message": "(clang-format)\n```suggestion\n\t\tLOG_ERROR(-EINVAL,\n\t\t\t \"Consistent hash: failed to find \u0027%s\u0027 inside \u0027%s\u0027\",\n```",
+      "revId": "7f4a80833e82f1ae91ecc8658405554069d03abd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7fc62b33_5743e384",
