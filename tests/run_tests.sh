@@ -246,6 +246,20 @@ client_reset() {
 	CLEANUP+=( "rm -rf ${TESTDIR@Q}" )
 }
 
+client_cancel_n_req() {
+	local i="$1"
+	local n="$2"
+	local start=${3:-1}
+	local archive_data="${archive_data:-}"
+
+	do_client "$i" "
+		cd ${TESTDIR@Q}
+		for i in {$start..$n}; do
+			lfs hsm_cancel ${archive_data:+--data ${archive_data@Q} }file.\$i
+		done
+		"
+}
+
 client_archive_n_req() {
 	local i="$1"
 	local n="$2"
@@ -741,6 +755,32 @@ lock_and_quit() {
 		|| error "service not stopped after all done"
 }
 run_test 12 lock_and_quit
+
+hsm_cancel() {
+	do_coordinatool_start 0
+	sleep 0.5
+	WAIT_FILE="$ARCHIVEDIR/wait" do_lhsmtoolcmd_start 1
+
+	client_reset 3
+
+	# send some requests...
+	client_archive_n_req 3 10
+
+	# wait a bit to reach coordinatool/mover and cancel
+	sleep 1
+	client_cancel_n_req 3 10
+
+	# let mover do its work for a bit
+	do_client 1 "touch ${ARCHIVEDIR@Q}/wait"
+	sleep 5
+	# we don't support sending cancel to client, but even if
+	# we did lhsmtoolcmd doesn't handle cancel either, so
+	# fall back to checking we got exactly 3 archives done...
+	# 5 = 3 + wait file + dir itself
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 5 ]" \
+		|| error "Expected exactly 3 archives processed"
+}
+run_test 13 hsm_cancel
 
 # 3x tests: test lfs hsm_* --data
 # normal copies

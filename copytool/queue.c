@@ -281,7 +281,25 @@ int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
 	int rc;
 
 	if (hai->hai_action == HSMA_CANCEL) {
-		// XXX tfind + remove from waiting queue or signal client
+		han = hsm_action_search(hai->hai_cookie, &hai->hai_dfid);
+		if (!han) {
+			LOG_WARN(-ENOENT, "Received cancel for " DFID " / %llx, not in queue -- just done?",
+				 PFID(&hai->hai_dfid), hai->hai_cookie);
+			return 0;
+		}
+		report_action(han, "cancel " DFID, PFID(&han->info.dfid));
+		if (!han->client) {
+			/* not running - just depop */
+			hsm_action_free(han);
+			/* nothing else to do (apparently don't need to report to lustre) */
+			return 0;
+		}
+		// XXX signal cancel to client -- most if not all of the copytool
+		// implementations currently ignore cancels, so this is left for
+		// later
+		LOG_DEBUG("Ignored cancel for " DFID " / %llx currently on client %s (%d)",
+			  PFID(&hai->hai_dfid), hai->hai_cookie, han->client->id,
+			  han->client->fd);
 		return 0;
 	}
 	switch (hai->hai_action) {
