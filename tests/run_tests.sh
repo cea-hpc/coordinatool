@@ -248,6 +248,20 @@ client_reset() {
 	CLEANUP+=( "rm -rf ${TESTDIR@Q}" )
 }
 
+client_cancel_n_req() {
+	local i="$1"
+	local n="$2"
+	local start=${3:-1}
+	local archive_data="${archive_data:-}"
+
+	do_client "$i" "
+		cd ${TESTDIR@Q}
+		for i in {$start..$n}; do
+			lfs hsm_cancel ${archive_data:+--data ${archive_data@Q} }file.\$i
+		done
+		"
+}
+
 client_archive_n_req() {
 	local i="$1"
 	local n="$2"
@@ -791,6 +805,51 @@ archive_on_hosts_ch() {
 		|| error "missing archives on 0 or unexpected archives on 0"
 }
 run_test 13 archive_on_hosts_ch
+
+hsm_cancel() {
+	# special cleanup if there are active requests: we'll check there are none at the end
+	for i in {0..1}; do
+		if [ -z "$(do_mds $i "lctl get_param mdt.*.hsm.active_requests")" ]; then
+			continue
+		fi
+		# set timeout short and wait for expiration
+		do_mds $i "lctl set_param mdt.*.hsm.active_request_timeout=1"
+		sleep 2
+		do_mds $i "lctl set_param mdt.*.hsm.active_request_timeout=3600"
+	done
+
+	do_coordinatool_start 0
+	sleep 0.5
+	WAIT_FILE="$ARCHIVEDIR/wait" do_lhsmtoolcmd_start 1
+
+	client_reset 3
+
+	# send some requests...
+	client_archive_n_req 3 10
+
+	# wait a bit to reach coordinatool/mover and cancel
+	sleep 1
+	client_cancel_n_req 3 10
+	sleep 1
+
+	# let mover do its work for a bit
+	do_client 1 "touch ${ARCHIVEDIR@Q}/wait"
+	sleep 5
+	# we don't support sending cancel to client, but even if
+	# we did lhsmtoolcmd doesn't handle cancel either, so
+	# fall back to checking we got exactly 3 archives done...
+	# 5 = 3 + wait file + dir itself
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 5 ]" \
+		|| error "Expected exactly 3 archives processed"
+	# check all requests have been ack'd
+	for i in {0..1}; do
+		active_reqs=$(do_mds $i "lctl get_param mdt.*.hsm.active_requests")
+		if [ -n "$active_reqs" ]; then
+			error "Some active requests left: $active_reqs"
+		fi
+	done
+}
+run_test 14 hsm_cancel
 
 # 3x tests: test lfs hsm_* --data
 # normal copies

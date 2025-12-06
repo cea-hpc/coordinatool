@@ -131,3 +131,25 @@ int ct_register(void)
 	LOG_INFO("Registered lustre copytool");
 	return 0;
 }
+
+void ct_report_error(struct hsm_action_item *hai, int errcode)
+{
+	struct hsm_copyaction_private *hcp;
+	int flags = HP_FLAG_COMPLETED;
+	int rc;
+
+	rc = llapi_hsm_action_begin(&hcp, state->ctdata, hai, -1, 0, true);
+	if (rc) {
+		LOG_ERROR(rc,
+			  "hsm_action_begin failed for " DFID " (cookie %#llx)",
+			  PFID(&hai->hai_dfid), hai->hai_cookie);
+		return;
+	}
+	LOG_DEBUG("Cancelling request for " DFID " (cookie %#llx)",
+		  PFID(&hai->hai_dfid), hai->hai_cookie);
+	rc = llapi_hsm_action_end(&hcp, &hai->hai_extent, flags, errcode);
+	if (rc)
+		LOG_ERROR(rc,
+			  "hsm_action_end failed for " DFID " (cookie %#llx)",
+			  PFID(&hai->hai_dfid), hai->hai_cookie);
+}

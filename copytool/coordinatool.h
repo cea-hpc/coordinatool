@@ -270,6 +270,7 @@ static inline int han_data_len(struct hsm_action_node *han)
 
 int handle_ct_event(void);
 int ct_register(void);
+void ct_report_error(struct hsm_action_item *hai, int errcode);
 
 /* protocol */
 
