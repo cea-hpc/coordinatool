@@ -372,6 +372,9 @@ void hsm_action_start(struct hsm_action_node *han, struct client *client)
 			  han->info.action);
 	}
 
+	if (han->current_count)
+		(*han->current_count)++;
+
 	redis_assign_request(client, han);
 	cds_list_del(&han->node);
 	han->client = client;

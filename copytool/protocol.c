@@ -613,6 +613,7 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		/* .. and batch slots too */
 		for (int i = 0; i < state->config.batch_slots; i++) {
 			client->batch[i] = old_client->batch[i];
+			client->batch[i].current_count = 0;
 			CDS_INIT_LIST_HEAD(&client->batch[i].waiting_archive);
 			cds_list_splice(&old_client->batch[i].waiting_archive,
 					&client->batch[i].waiting_archive);
