@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a61a478f_1619e62c",
+        "filename": "copytool/utils.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-08T14:41:21Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t int *hint_len)\n```",
+      "revId": "50e59ef9f2d0b9e0d828f0b98e06d44abb8ba216",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
