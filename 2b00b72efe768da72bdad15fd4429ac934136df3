@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "598eb130_41b85636",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-08T14:39:32Z",
+      "side": 1,
+      "message": "(suggestion) if you set CTDATA_PATH\u003d1 on these you can check that $ARCHIVEDIR/1 only has grouping\u003dtest1 and the agent 2 only has the grouping\u003dtest2 instead/as well as counting (I checked manually just now, but I guess counting is good enough for me)",
+      "revId": "2b00b72efe768da72bdad15fd4429ac934136df3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdeff544_e4ccaa6d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-08T14:39:32Z",
+      "side": 1,
+      "message": "(test clarity) I don\u0027t get why these would be held and not others -- well, I assume the hash happens to pick agent_0 for grouping\u003dtest0 but this deserves a comment",
+      "revId": "2b00b72efe768da72bdad15fd4429ac934136df3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de2e2df1_e1d1d88d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-08T14:39:32Z",
+      "side": 1,
+      "message": "(minor) archive_check_none doesn\u0027t wait at all so it should run after archive_n_wait or have an extra sleep after service restart to ensure some transfers have had time to run",
+      "revId": "2b00b72efe768da72bdad15fd4429ac934136df3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82deaf71_e6445dd3",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 776,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-08T14:39:32Z",
+      "side": 1,
+      "message": "(minor) conversely archive_n_wait will wait for up to 10s so this sleep is not needed",
+      "revId": "2b00b72efe768da72bdad15fd4429ac934136df3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
