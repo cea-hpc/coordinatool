@@ -39,6 +39,30 @@
       },
       "revId": "4b4584116440413ece04c2a2a46c13c4cccb2030",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea5f76a3_d226653e",
+        "filename": "copytool/config.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-12-08T13:23:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7138895_ed3ffec0",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 20
+      },
+      "revId": "4b4584116440413ece04c2a2a46c13c4cccb2030",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
