@@ -16,6 +16,24 @@
       "message": "Sorry, I\u0027m breaking that `! client_archive_n_wait` usage in https://review.gerrithub.io/c/cea-hpc/coordinatool/+/1227581\n\nmeaning wise, we want \"none of the files in the 0..19 range have been archived\", while this checks \"not (all of the files in the 0..19 ranges have been archived)\", so sending one archive by mistake would pass -- I believe just that is worth updating to the pattern I wrote in test 11 there. (Since it\u0027s complex enough it might be worth moving to a helper function... But if it\u0027s just the two I don\u0027t mind much either way)",
       "revId": "468ddb4b5fcd821fab1ace2f431d8456aba8afef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "546dccad_2ea29297",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2025-12-08T13:55:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aef09e72_8df91dfc",
+      "revId": "468ddb4b5fcd821fab1ace2f431d8456aba8afef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
