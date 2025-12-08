@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "494faa9b_874211cc",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 772,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-08T15:48:11Z",
+      "side": 1,
+      "message": "(minor?) this find should run in do_client as in theory the test could run on multiple nodes -- in practice this was never tested with anything else than localhost so I\u0027m sure it\u0027ll bug all around the place, so I don\u0027t consider this critical",
+      "revId": "84b6d7aca6f98f4f519fa7a603d5cd6c46b37593",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
