@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b0bdd195_0a16c7fd",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-09T19:59:32Z",
+      "side": 1,
+      "message": "The difference with the HPSS mover is that we haven\u0027t called llapi_hsm_action_begin yet at this point -- my understanding is that the llapi_hsm_action_end is required to free the internal hcp at the very least.\n\nFrom testing, the request is properly removed from the active_requests list on the coordinator, so I think this is correct -- I\u0027ll recheck and update the comment to say we didn\u0027t begin yet.",
+      "parentUuid": "876a8d91_d7c3c2d8",
+      "range": {
+        "startLine": 296,
+        "startChar": 25,
+        "endLine": 296,
+        "endChar": 68
+      },
+      "revId": "4f0fd1d84ece43ef95bdc4a5348f3e8ee9aff3c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8b44bf27_7c7ee09b",
         "filename": "tests/run_tests.sh",
         "patchSetId": 2
@@ -37,6 +61,30 @@
       "writtenOn": "2025-12-09T08:28:23Z",
       "side": 1,
       "message": "Wouldn\u0027t it be better to not start a mover but just the coordinatool? Then you would know that the request is in the wait queue. This would make sure that you are testing the code you wrote.\n\nIf my understanding is correct, I would expect:\n- the original archive to be in the canceled state\n- the cancel request to be in the started state\n\nTo make the cancel request a success, you would need to call `llapi_hsm_action_end` I think.",
+      "range": {
+        "startLine": 759,
+        "startChar": 0,
+        "endLine": 759,
+        "endChar": 10
+      },
+      "revId": "4f0fd1d84ece43ef95bdc4a5348f3e8ee9aff3c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae6ee688_72dab375",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-09T19:59:32Z",
+      "side": 1,
+      "message": "with the WAIT_FILE and the coordinatool.conf with max_archive\u003d3 we \"know\" that with 10 requests we have 3 on the mover and 7 in the internal coordinatool queues\n(or would know if we had a proper wait mechanism... but the problem\u0027s the same without a mover, we need to wait for lustre to send requests to the coordinatool)\n\nSo I think this tests things properly (with no cancel sent to the mover, exactly 3 transfers go through means all the 7 requests in coordinatool were successfully removed)\n\nThe test could check `lctl get_param -n mdt.*.hsm.active_requests` is empty at the end though, I\u0027ll update that next weekish",
+      "parentUuid": "8b44bf27_7c7ee09b",
       "range": {
         "startLine": 759,
         "startChar": 0,
