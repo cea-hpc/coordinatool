@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "876a8d91_d7c3c2d8",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-12-09T08:28:23Z",
+      "side": 1,
+      "message": "IIRC, the cancel has the same kind of state management as any HSM request. When an action is canceled, Lustre marks the cancel request as \"success\" and the original request as \"canceled\". Looking at the HPSS copytool, it calls `llapi_hsm_action_end` with `HP_FLAG_COMPLETED` flags and the `ECANCELED` return code.",
+      "range": {
+        "startLine": 296,
+        "startChar": 25,
+        "endLine": 296,
+        "endChar": 68
+      },
+      "revId": "4f0fd1d84ece43ef95bdc4a5348f3e8ee9aff3c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b44bf27_7c7ee09b",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-12-09T08:28:23Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be better to not start a mover but just the coordinatool? Then you would know that the request is in the wait queue. This would make sure that you are testing the code you wrote.\n\nIf my understanding is correct, I would expect:\n- the original archive to be in the canceled state\n- the cancel request to be in the started state\n\nTo make the cancel request a success, you would need to call `llapi_hsm_action_end` I think.",
+      "range": {
+        "startLine": 759,
+        "startChar": 0,
+        "endLine": 759,
+        "endChar": 10
+      },
+      "revId": "4f0fd1d84ece43ef95bdc4a5348f3e8ee9aff3c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
