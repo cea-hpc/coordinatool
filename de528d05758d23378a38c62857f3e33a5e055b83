@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f1c655d_b2c1f9df",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-12-09T15:46:35Z",
+      "side": 1,
+      "message": "AFAIK, this should not happen since the MDS updates the HSM state before the HSM request record on disk. If llapi_hsm_action_end is really called, you should either see everything correctly or nothing at all... There might also be a bug in Lustre?",
+      "range": {
+        "startLine": 543,
+        "startChar": 3,
+        "endLine": 545,
+        "endChar": 21
+      },
+      "revId": "de528d05758d23378a38c62857f3e33a5e055b83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
