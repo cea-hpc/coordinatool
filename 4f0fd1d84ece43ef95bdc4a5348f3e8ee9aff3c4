@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eb8bb1c0_d07a29ce",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-12-10T08:18:29Z",
+      "side": 1,
+      "message": "The issue is not the request being cancel. This one is updated by the Lustre coordinator when the cancel is sent. The issue, I think, is the cancel request itself. The cancel is marked as a success when the copytool calls llapi_hsm_action_end. If you never call it, I expect the request to be in the started state until the timeout is reached. Looking at the MDS side of the code, I think the expected behavior is to call end on cancel to update the on disk state of the cancel request and generate an HSM changelog as well. Looking at the code on the MDS when llapi_hsm_action_begin is called, I don\u0027t see much being done. So the state of the request should be updated on end I think because the state is initialized before actually sending the request to the copytool.",
+      "parentUuid": "b0bdd195_0a16c7fd",
+      "range": {
+        "startLine": 296,
+        "startChar": 25,
+        "endLine": 296,
+        "endChar": 68
+      },
+      "revId": "4f0fd1d84ece43ef95bdc4a5348f3e8ee9aff3c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8b44bf27_7c7ee09b",
         "filename": "tests/run_tests.sh",
         "patchSetId": 2
