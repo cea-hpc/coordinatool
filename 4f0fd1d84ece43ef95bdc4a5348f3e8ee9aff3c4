@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e7c822e1_f7d70482",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2025-12-11T13:35:21Z",
+      "side": 1,
+      "message": "hmm, I just downloaded the lastest lhsm hpss (1.2.1) from https://sourceforge.net/projects/lustrehpss/ and it doesn\u0027t do llapi_hsm_action_end (nor begin) on the HSMA_CANCEL event?\n\n- got hai from llapi_hsm_copytool_recv()\n- -\u003e handle_action_item()\n- -\u003e if (CANCEL), pthread_create thr_cancel()\n- -\u003e if cancel_action() failed then it reports an error to the coordinator by calling both begin and end, but if cancel worked then it does nothing at all -- the child process does catch SIGTERM and calls action end on the original request though\n\n\nWell, with that said I did re-check `lctl get_param -n mdt.*.hsm.active_requests` now and... the properly cancelled requests are pending there (with canceled\u003d1 set), so I guess the MDS doesn\u0027t really care and just need either event to be acknowleged, but since it\u0027s a request that was never sent out to a mover we need to do something alright... begin/end dance it is...\nI\u0027ll update next week-ish",
+      "parentUuid": "eb8bb1c0_d07a29ce",
+      "range": {
+        "startLine": 296,
+        "startChar": 25,
+        "endLine": 296,
+        "endChar": 68
+      },
+      "revId": "4f0fd1d84ece43ef95bdc4a5348f3e8ee9aff3c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8b44bf27_7c7ee09b",
         "filename": "tests/run_tests.sh",
         "patchSetId": 2
