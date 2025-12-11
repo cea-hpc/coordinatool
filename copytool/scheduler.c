@@ -317,10 +317,17 @@ void ct_schedule_client(struct client *client)
 			     pending_pass = *pending_count[i];
 		struct cds_list_head *n, *nnext;
 		int j, stuck = 0;
+		/* note: cds_manylists_for_each_safe() is a double-for loop, so break
+		 * only breaks up halfway, and goto is used for more flow control:
+		 * - continue: skip to next archive in current list
+		 * - break: skip to next list of the same action type (e.g. next slot)
+		 * - goto real_break: break out of the double-loop and continue to next action
+		 * - goto schedule_done: break out of this (outer) loop and send what was added
+		 *   to client
+		 */
 		cds_manylists_for_each_safe(j, n, nnext, schedule_lists[i])
 		{
 			int *extra_count = NULL;
-			int extra_max = 0;
 			if (stuck++ > 100) {
 				/* this is a poor workaround until a better solution
 				 * is ready: at least the can send callback can re-enqueue
@@ -328,7 +335,7 @@ void ct_schedule_client(struct client *client)
 				 * end. Just stop after 100 items, we can always send more work
 				 * in next iteration if it was actually progressing.
 				 */
-				break;
+				goto real_break;
 			}
 			if (client->max_archive >= 0 &&
 			    state->config.batch_slots &&
@@ -336,22 +343,26 @@ void ct_schedule_client(struct client *client)
 				/* this is a batch */
 				assert(j < state->config.batch_slots);
 				extra_count = &client->batch[j].current_count;
-				/* round up... */
-				extra_max = (*max_action[i] +
-					     state->config.batch_slots - 1) /
-					    state->config.batch_slots;
+				if (*max_action[i] >= 0) {
+					/* check one batch doesn't hog all the actions (round up) */
+					int batch_max =
+						(*max_action[i] +
+						 state->config.batch_slots -
+						 1) /
+						state->config.batch_slots;
+					if (*extra_count >= batch_max) {
+						/* skip to next batch slot */
+						break;
+					}
+				}
 			}
 			if (enqueued_bytes >
 			    client->max_bytes - HAI_SIZE_MARGIN) {
-				break;
+				goto schedule_done;
 			}
 			if (*max_action[i] >= 0 &&
 			    *max_action[i] <= *current_count[i]) {
-				break;
-			}
-			if (extra_max >= 0 && extra_count &&
-			    *extra_count >= extra_max) {
-				break;
+				goto real_break;
 			}
 
 			struct hsm_action_node *han = caa_container_of(
@@ -374,7 +385,7 @@ void ct_schedule_client(struct client *client)
 			}
 			if (recv_enqueue(client, hai_list, han,
 					 &enqueued_bytes)) {
-				break;
+				goto real_break;
 			}
 			report_action(han, "sent " DFID " %s\n",
 				      PFID(&han->info.dfid), client->id);
@@ -389,7 +400,10 @@ void ct_schedule_client(struct client *client)
 			    pending_pass / state->stats.clients_connected)
 				break;
 		}
+real_break:
+		(void)0;
 	}
+schedule_done:
 
 	if (!enqueued_bytes) {
 		json_decref(hai_list);
