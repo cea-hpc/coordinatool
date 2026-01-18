@@ -280,6 +280,37 @@ int hsm_action_new_json(json_t *json_hai, int64_t timestamp,
 	return rc < 0 ? 0 : 1;
 }
 
+void hsm_action_cancel(struct hsm_action_node *han)
+{
+	/* look for original request and free it */
+	struct hsm_action_node *orig_han =
+		hsm_action_search(han->info.cookie, &han->info.dfid);
+	if (!orig_han) {
+		hsm_action_free(han);
+		return;
+	}
+	assert(!orig_han->client);
+	hsm_action_free(orig_han);
+
+	/* build hai to notify lustre.. */
+	struct hsm_action_item hai;
+	const char *data;
+	int rc;
+	/* use external data and reset hai->hai_len because ct_report_error
+                 * does not need hai_data, avoiding having to prepare a larger buffer */
+	rc = json_hsm_action_item_get(han->hai, &hai, sizeof(hai), &data);
+	if (rc) {
+		LOG_WARN(rc, "Could not rebuild hai for " DFID " / %#lx?",
+			 PFID(&han->info.dfid), han->info.cookie);
+		hsm_action_free(han);
+		return;
+	}
+	hai.hai_len = sizeof(hai);
+
+	ct_report_error(&hai, ECANCELED);
+	hsm_action_free(han);
+}
+
 /* checks for duplicate, and if unique enrich and insert node */
 int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
 			  uint64_t hal_flags, int64_t timestamp)

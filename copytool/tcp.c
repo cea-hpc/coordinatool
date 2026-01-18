@@ -127,6 +127,11 @@ void client_free(struct client *client)
 		hsm_action_requeue_all(&client->batch[i].waiting_archive);
 		free(client->batch[i].hint);
 	}
+	struct hsm_action_node *han, *nexthan;
+	cds_list_for_each_entry_safe(han, nexthan, &client->cancels, node)
+	{
+		hsm_action_cancel(han);
+	}
 	free((void *)client->id);
 	free((void *)client->archives);
 	free(client);

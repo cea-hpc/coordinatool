@@ -348,6 +348,8 @@ static inline int hsm_action_requeue_all(struct cds_list_head *list)
 	}
 	return total;
 }
+// handle cancel from han
+void hsm_action_cancel(struct hsm_action_node *han);
 // start action on given client
 // (add to active_requests and update stats)
 void hsm_action_start(struct hsm_action_node *han, struct client *client);

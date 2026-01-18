@@ -821,6 +821,7 @@ hsm_cancel() {
 	do_coordinatool_start 0
 	sleep 0.5
 	WAIT_FILE="$ARCHIVEDIR/wait" do_lhsmtoolcmd_start 1
+	WAIT_FILE="$ARCHIVEDIR/wait2" do_lhsmtoolcmd_start 2
 
 	client_reset 3
 
@@ -828,6 +829,9 @@ hsm_cancel() {
 	client_archive_n_req 3 10
 
 	# wait a bit to reach coordinatool/mover and cancel
+	sleep 1
+	# stop mover and see how it behaves with cancelled requests blocked
+	do_lhsmtoolcmd_service 2 stop
 	sleep 1
 	client_cancel_n_req 3 10
 	sleep 1
