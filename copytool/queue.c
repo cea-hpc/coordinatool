@@ -25,7 +25,7 @@ struct cds_list_head *get_queue_list(struct hsm_action_queues *queues,
 		return &queues->waiting_remove;
 	default:
 		LOG_ERROR(-EINVAL,
-			  "han %lx for " DFID
+			  "han %#lx for " DFID
 			  " was neither restore, archive nor remove: %#x",
 			  han->info.cookie, PFID(&han->info.dfid),
 			  han->info.action);
@@ -366,7 +366,7 @@ void hsm_action_start(struct hsm_action_node *han, struct client *client)
 		break;
 	default:
 		LOG_ERROR(-EINVAL,
-			  "starting han %lx for " DFID
+			  "starting han %#lx for " DFID
 			  " was neither restore, archive nor remove: %#x",
 			  han->info.cookie, PFID(&han->info.dfid),
 			  han->info.action);

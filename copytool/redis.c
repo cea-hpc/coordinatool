@@ -171,13 +171,13 @@ static void cb_common(redisAsyncContext *ac, redisReply *reply,
 		LOG_WARN(-EIO, "Redis error in callback! %d: %s", ac->c.err,
 			 ac->c.errstr[0] ? ac->c.errstr :
 					   "Error string not set");
-		LOG_WARN(-EIO, "Could not %s cookie %lx", action, cookie);
+		LOG_WARN(-EIO, "Could not %s cookie %#lx", action, cookie);
 		redisAsyncDisconnect(ac);
 		return;
 	}
 	if (reply->type == REDIS_REPLY_ERROR) {
 		LOG_WARN(-EIO, "Redis error in callback! %s", reply->str);
-		LOG_WARN(-EIO, "Could not %s cookie %lx", action, cookie);
+		LOG_WARN(-EIO, "Could not %s cookie %#lx", action, cookie);
 		/* do not disconnect in this case: could be bogus request */
 		return;
 	}
@@ -208,7 +208,7 @@ static int redis_insert(const char *hash, uint64_t cookie, struct lu_fid *dfid,
 			       "hset %s %s %s", hash, key, data);
 	if (rc) {
 		rc = redis_error_to_errno(rc);
-		LOG_WARN(rc, "Redis error trying to set cookie %lx in %s",
+		LOG_WARN(rc, "Redis error trying to set cookie %#lx in %s",
 			 cookie, hash);
 		return rc;
 	}
@@ -456,7 +456,8 @@ static int redis_scan_requests(const char *key UNUSED, const char *value)
 	if (rc < 0)
 		return rc;
 	if (rc > 0)
-		LOG_INFO("Enqueued " DFID " (cookie %lx) (from redis recovery)",
+		LOG_INFO("Enqueued " DFID
+			 " (cookie %#lx) (from redis recovery)",
 			 PFID(&han->info.dfid), han->info.cookie);
 
 	return 0;
@@ -475,14 +476,14 @@ static int redis_scan_assigned(const char *key, const char *client_id)
 	if (rc)
 		return rc;
 
-	LOG_DEBUG("%s: Cookie %lx running", client_id, cookie);
+	LOG_DEBUG("%s: Cookie %#lx running", client_id, cookie);
 
 	struct hsm_action_node *han;
 	han = hsm_action_search(cookie, &dfid);
 	if (!han) {
 		LOG_WARN(
 			-EINVAL,
-			"%s: cookie %lx assigned but wasn't in request list, cleaning up",
+			"%s: cookie %#lx assigned but wasn't in request list, cleaning up",
 			client_id, cookie);
 		return redis_delete("coordinatool_assigned", key, cookie);
 	}

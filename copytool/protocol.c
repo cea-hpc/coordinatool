@@ -369,7 +369,7 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 
 	int status = protocol_getjson_int(json, "status", 0);
 	LOG_INFO("%s (%d): Finished processing " DFID
-		 " (cookie %lx): status %d",
+		 " (cookie %#lx): status %d",
 		 client->id, client->fd, PFID(&han->info.dfid), cookie, status);
 
 	report_action(han, "done " DFID " %d\n", PFID(&han->info.dfid), status);
@@ -455,7 +455,7 @@ static int queue_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		if (rc > 0) {
 			enqueued++;
 			LOG_INFO("Enqueued " DFID
-				 " (cookie %lx) (from queue request)",
+				 " (cookie %#lx) (from queue request)",
 				 PFID(&han->info.dfid), han->info.cookie);
 		} else {
 			skipped++;

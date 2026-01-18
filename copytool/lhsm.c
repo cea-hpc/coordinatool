@@ -84,7 +84,7 @@ int handle_ct_event(void)
 		/* memcpy to avoid unaligned accesses */
 		memcpy(&fid, &hai->hai_fid, sizeof(fid));
 		LOG_INFO("enqueued (%d): %s on " DFID
-			 " (cookie %llx, #%d, data %s)",
+			 " (cookie %#llx, #%d, data %s)",
 			 i, ct_action2str(hai->hai_action), PFID(&fid),
 			 hai->hai_cookie, hal->hal_archive_id,
 			 pretty_data(hai));

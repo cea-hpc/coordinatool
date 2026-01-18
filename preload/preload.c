@@ -292,13 +292,13 @@ int llapi_hsm_action_end(struct hsm_copyaction_private **phcp,
 		rc_done = -errno;
 		LOG_WARN(rc_done,
 			 "Could not notify coordinatool of done for " DFID
-			 " / %lx",
+			 " / %#lx",
 			 PFID(&done.key.dfid), done.key.cookie);
 	} else if (rc_done != sizeof(done)) {
 		// linux guarantees this never happens, but better safe...
 		rc_done = -EIO;
 		LOG_WARN(rc_done,
-			 "Short write to notif pipe!! (" DFID " / %lx)",
+			 "Short write to notif pipe!! (" DFID " / %#lx)",
 			 PFID(&done.key.dfid), done.key.cookie);
 	} else {
 		rc_done = 0;

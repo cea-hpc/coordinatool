@@ -389,7 +389,7 @@ void ct_schedule_client(struct client *client)
 			}
 			report_action(han, "sent " DFID " %s\n",
 				      PFID(&han->info.dfid), client->id);
-			LOG_INFO("%s (%d): Sending " DFID " (cookie %lx)",
+			LOG_INFO("%s (%d): Sending " DFID " (cookie %#lx)",
 				 client->id, client->fd, PFID(&han->info.dfid),
 				 han->info.cookie);
 			han->current_count = extra_count;
