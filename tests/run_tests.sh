@@ -835,11 +835,13 @@ hsm_cancel() {
 	# let mover do its work for a bit
 	do_client 1 "touch ${ARCHIVEDIR@Q}/wait"
 	sleep 5
-	# we don't support sending cancel to client, but even if
-	# we did lhsmtoolcmd doesn't handle cancel either, so
-	# fall back to checking we got exactly 3 archives done...
-	# 5 = 3 + wait file + dir itself
-	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 5 ]" \
+	# also check for cancel markers
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | grep -c cancel)\" = 3 ]" \
+		|| error "Expected exactly 3 cancels"
+	# our test does not actually handle cancel on client,
+	# so check exactly 3 archives were done...
+	# 8 = 3 done + 3 cancel markers + wait file + dir itself
+	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 8 ]" \
 		|| error "Expected exactly 3 archives processed"
 	# check all requests have been ack'd
 	for i in {0..1}; do

@@ -29,6 +29,9 @@ case "$fn" in
 	remove)
 		rm -f "$ARCHIVEDIR/$data$fid"
 		;;
+	cancel)
+		touch "$ARCHIVEDIR/cancel$data$fid"
+		;;
 	*)
 		echo "Wrong arg!"
 		exit 1

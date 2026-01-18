@@ -172,6 +172,7 @@ static struct client *client_alloc(void)
 	struct client *client = xcalloc(client_size, 1);
 
 	CDS_INIT_LIST_HEAD(&client->active_requests);
+	CDS_INIT_LIST_HEAD(&client->cancels);
 #ifdef DEBUG_ACTION_NODE
 	CDS_INIT_LIST_HEAD(&client->node_clients);
 #endif

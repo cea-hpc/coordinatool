@@ -184,6 +184,8 @@ struct client {
 	struct cds_list_head active_requests;
 	/* per client queues */
 	struct hsm_action_queues queues;
+	/* pending cancels */
+	struct cds_list_head cancels;
 	union { /* status-dependant fields */
 		int64_t disconnected_timestamp;
 		struct cds_list_head waiting_node;
@@ -198,9 +200,11 @@ struct ct_stats {
 	unsigned int pending_restore;
 	unsigned int pending_archive;
 	unsigned int pending_remove;
+	unsigned int pending_cancel;
 	long unsigned int done_restore;
 	long unsigned int done_archive;
 	long unsigned int done_remove;
+	long unsigned int done_cancel;
 	unsigned int clients_connected;
 	struct cds_list_head clients;
 	struct cds_list_head disconnected_clients;

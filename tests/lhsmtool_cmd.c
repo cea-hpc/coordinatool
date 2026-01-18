@@ -585,7 +585,8 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 	}
 
 	cb_args->hai = hai;
-	cb_args->fd = llapi_hsm_action_get_fd(cb_args->hcp);
+	if (hsma != HSMA_CANCEL)
+		cb_args->fd = llapi_hsm_action_get_fd(cb_args->hcp);
 
 	rc = ct_build_cmd(hsma, &cmd, hai, cb_args->fd);
 	if (opt.o_dry_run || rc == -ENOSYS) {
@@ -818,10 +819,8 @@ static gpointer subproc_mgr_main(gpointer data)
 		case HSMA_ARCHIVE:
 		case HSMA_RESTORE:
 		case HSMA_REMOVE:
-			ct_hsm_io_cmd(hai->hai_action, loop, hai, hd->hd_flags);
-			break;
 		case HSMA_CANCEL:
-			LOG_ERROR(ENOTSUP, "Operation not implemented");
+			ct_hsm_io_cmd(hai->hai_action, loop, hai, hd->hd_flags);
 			break;
 		}
 		fflush(stderr);

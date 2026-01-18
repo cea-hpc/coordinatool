@@ -57,18 +57,21 @@ static void _hsm_action_free(struct hsm_action_node *han, bool final_cleanup)
 #endif
 	LOG_DEBUG("freeing han for " DFID " node %p", PFID(&han->info.dfid),
 		  (void *)&han->node);
-	if (!final_cleanup) {
-		redis_delete_request(han->info.cookie, &han->info.dfid);
+	if (!final_cleanup)
 		cds_list_del(&han->node);
-#if HAVE_PHOBOS
-		free(han->info.hsm_fuid);
-#endif
-		if (!tdelete(&han->info, &state->hsm_actions_tree,
-			     tree_compare))
-			abort();
+	if (han->info.action != HSMA_CANCEL) {
+		if (!final_cleanup) {
+			redis_delete_request(han->info.cookie, &han->info.dfid);
+			if (!tdelete(&han->info, &state->hsm_actions_tree,
+				     tree_compare))
+				abort();
+		}
+		report_free_action(han);
 	}
+#if HAVE_PHOBOS
+	free(han->info.hsm_fuid);
+#endif
 	free((void *)han->info.data);
-	report_free_action(han);
 	if (han->hai)
 		json_decref(han->hai);
 	free(han);
@@ -164,6 +167,10 @@ int hsm_action_enqueue(struct hsm_action_node *han, struct cds_list_head *list)
 			state->stats.pending_remove++;
 		if (was_running)
 			state->stats.running_remove--;
+		break;
+	case HSMA_CANCEL:
+		/* cancel is never requeued */
+		state->stats.pending_cancel++;
 		break;
 	default:
 		return -EINVAL;
@@ -278,9 +285,15 @@ int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
 			  uint64_t hal_flags, int64_t timestamp)
 {
 	struct hsm_action_node *han;
+	struct client *cancel_client = NULL;
 	int rc;
 
-	if (hai->hai_action == HSMA_CANCEL) {
+	switch (hai->hai_action) {
+	case HSMA_RESTORE:
+	case HSMA_ARCHIVE:
+	case HSMA_REMOVE:
+		break;
+	case HSMA_CANCEL:
 		han = hsm_action_search(hai->hai_cookie, &hai->hai_dfid);
 		if (!han) {
 			LOG_WARN(-ENOENT,
@@ -298,19 +311,15 @@ int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
 			ct_report_error(hai, ECANCELED);
 			return 0;
 		}
-		// XXX signal cancel to client -- most if not all of the copytool
-		// implementations currently ignore cancels, so this is left for
-		// later
-		LOG_DEBUG("Ignored cancel for " DFID
+		/* We can't just cancel the request in memory and need to send to
+		 * client, so continue allocating a han that will be scheduled on
+		 * client... but this is best effort: don't enrich or store on
+		 * redis through the common path */
+		LOG_DEBUG("Enqueuing cancel for " DFID
 			  " / %#llx currently on client %s (%d)",
 			  PFID(&hai->hai_dfid), hai->hai_cookie,
 			  han->client->id, han->client->fd);
-		return 0;
-	}
-	switch (hai->hai_action) {
-	case HSMA_RESTORE:
-	case HSMA_ARCHIVE:
-	case HSMA_REMOVE:
+		cancel_client = han->client;
 		break;
 	default:
 		return -EINVAL;
@@ -339,6 +348,12 @@ int hsm_action_new_lustre(struct hsm_action_item *hai, uint32_t archive_id,
 	// ignore failure here: the worst that can happen is we'll get
 	// order wrong on recovery
 	(void)protocol_setjson_int(han->hai, "timestamp", timestamp);
+
+	if (cancel_client) {
+		// can't fail. We need the assert for scan-build...
+		assert(hsm_action_enqueue(han, &cancel_client->cancels) == 1);
+		return 0;
+	}
 
 	rc = hsm_action_new_common(han);
 	// ignore duplicates
@@ -387,6 +402,10 @@ void hsm_action_start(struct hsm_action_node *han, struct client *client)
 			client->current_remove++;
 		}
 		break;
+	case HSMA_CANCEL:
+		state->stats.pending_cancel--;
+		state->stats.done_cancel++;
+		return;
 	default:
 		LOG_ERROR(-EINVAL,
 			  "starting han %#lx for " DFID

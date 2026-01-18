@@ -105,7 +105,9 @@ static int protocol_reply_status_client(json_t *clients,
 			       &client->queues.waiting_remove)) ||
 		      (rc = protocol_reply_status_dump_list(
 			       c, "waiting_archive",
-			       &client->queues.waiting_archive))))) {
+			       &client->queues.waiting_archive)) ||
+		      (rc = protocol_reply_status_dump_list(
+			       c, "cancels", &client->cancels))))) {
 			json_decref(c);
 			return rc;
 		}
@@ -187,12 +189,16 @@ int protocol_reply_status(struct client *client, int verbose, int status,
 				       ct_stats->pending_archive)) ||
 	    (rc = protocol_setjson_int(reply, "pending_remove",
 				       ct_stats->pending_remove)) ||
+	    (rc = protocol_setjson_int(reply, "pending_cancel",
+				       ct_stats->pending_cancel)) ||
 	    (rc = protocol_setjson_int(reply, "done_restore",
 				       ct_stats->done_restore)) ||
 	    (rc = protocol_setjson_int(reply, "done_archive",
 				       ct_stats->done_archive)) ||
 	    (rc = protocol_setjson_int(reply, "done_remove",
 				       ct_stats->done_remove)) ||
+	    (rc = protocol_setjson_int(reply, "done_cancel",
+				       ct_stats->done_cancel)) ||
 	    (rc = protocol_setjson_int(reply, "clients_connected",
 				       ct_stats->clients_connected)) ||
 	    (rc = protocol_setjson_int(reply, "locked", state->locked)))
@@ -362,17 +368,23 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		return protocol_reply_simple(
 			client, "done", EINVAL,
 			"cookie or fid not set -- old client?");
+
 	struct hsm_action_node *han = hsm_action_search(cookie, &dfid);
-	if (!han)
-		return protocol_reply_simple(client, "done", EINVAL,
-					     "Request not found");
+	if (!han) {
+		/* This can happen on cancel if we're ack'd on both the cancel and the cancelled
+		 * request -- this is probably fine: ignore */
+		LOG_INFO("%s (%d): Done for non-existing request " DFID
+			 " (cookie %#lx): double-ack on cancel?",
+			 client->id, client->fd, PFID(&dfid), cookie);
+		return protocol_reply_simple(client, "done", 0, NULL);
+	}
 
 	int status = protocol_getjson_int(json, "status", 0);
 	LOG_INFO("%s (%d): Finished processing " DFID
 		 " (cookie %#lx): status %d",
-		 client->id, client->fd, PFID(&han->info.dfid), cookie, status);
+		 client->id, client->fd, PFID(&dfid), cookie, status);
 
-	report_action(han, "done " DFID " %d\n", PFID(&han->info.dfid), status);
+	report_action(han, "done " DFID " %d\n", PFID(&dfid), status);
 
 	int action = han->info.action;
 	if (han->current_count)

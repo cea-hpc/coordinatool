@@ -223,6 +223,10 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 		max_action = client->max_remove;
 		current_count = &client->current_remove;
 		break;
+	case HSMA_CANCEL:
+		// cancel isn't accounted
+		max_action = -1;
+		break;
 	default:
 		return -EINVAL;
 	}
@@ -231,6 +235,9 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 
 	json_array_append(hai_list, han->hai);
 	(*enqueued_bytes) += sizeof(struct hsm_action_item) + han->info.hai_len;
+
+	LOG_INFO("%s (%d): Sending " DFID " (cookie %#lx)", client->id,
+		 client->fd, PFID(&han->info.dfid), han->info.cookie);
 
 	return 0;
 }
@@ -312,6 +319,27 @@ void ct_schedule_client(struct client *client)
 					  &state->stats.pending_archive };
 	uint32_t archive_id;
 	uint64_t hal_flags;
+	/* special-case cancels first: these don't get acked and are freed immediately after
+	 * enqueue, enqueueing guarantees they're sent */
+	struct hsm_action_node *han, *nexthan;
+	cds_list_for_each_entry_safe(han, nexthan, &client->cancels, node)
+	{
+		if (enqueued_bytes == 0) {
+			archive_id = han->info.archive_id;
+			hal_flags = han->info.hal_flags;
+		}
+		if ((archive_id != han->info.archive_id ||
+		     hal_flags != han->info.hal_flags)) {
+			/* can only send one archive id at a time */
+			continue;
+		}
+		if (recv_enqueue(client, hai_list, han, &enqueued_bytes))
+			break;
+		LOG_INFO("%s (%d): Sending cancel for " DFID " (cookie %#lx)",
+			 client->id, client->fd, PFID(&han->info.dfid),
+			 han->info.cookie);
+		hsm_action_free(han);
+	}
 	for (size_t i = 0; i < countof(max_action); i++) {
 		unsigned int enqueued_pass = 0,
 			     pending_pass = *pending_count[i];
@@ -389,9 +417,6 @@ void ct_schedule_client(struct client *client)
 			}
 			report_action(han, "sent " DFID " %s\n",
 				      PFID(&han->info.dfid), client->id);
-			LOG_INFO("%s (%d): Sending " DFID " (cookie %#lx)",
-				 client->id, client->fd, PFID(&han->info.dfid),
-				 han->info.cookie);
 			han->current_count = extra_count;
 			hsm_action_start(han, client);
 			enqueued_pass++;
