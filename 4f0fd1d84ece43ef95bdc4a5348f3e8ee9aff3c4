@@ -96,6 +96,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "249eecf3_8b1c5820",
+        "filename": "copytool/queue.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-01-18T12:39:58Z",
+      "side": 1,
+      "message": "Okay, so with a second look this (acknowledging either the cancel or the cancelled request) makes sense because they share the same fid/cookie: the coordinator doesn\u0027t track the two separately.\n\nI\u0027ve added explicit llapi_hsm_action_begin/end calls here as they should ; and I\u0027ve updated the test to check there\u0027s no leftover active requests on the coordinator after this.\n\nThe next two commits implement cancels sent to the client since it\u0027ll apparently be useful, but it\u0027s complex enough (as expected) that it deserves a bit more attention.",
+      "parentUuid": "e7c822e1_f7d70482",
+      "range": {
+        "startLine": 296,
+        "startChar": 25,
+        "endLine": 296,
+        "endChar": 68
+      },
+      "revId": "4f0fd1d84ece43ef95bdc4a5348f3e8ee9aff3c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b44bf27_7c7ee09b",
