@@ -74,20 +74,26 @@ int handle_ct_event(void)
 	unsigned int i = 0;
 	int64_t timestamp = gettime_ns();
 	while (++i <= hal->hal_count) {
+		struct lu_fid fid;
+		/* memcpy to avoid unaligned accesses on log */
+		memcpy(&fid, &hai->hai_fid, sizeof(fid));
+
 		rc = hsm_action_new_lustre(hai, hal->hal_archive_id,
 					   hal->hal_flags, timestamp);
-		if (rc < 0)
-			return rc;
-
-		struct lu_fid fid;
-
-		/* memcpy to avoid unaligned accesses */
-		memcpy(&fid, &hai->hai_fid, sizeof(fid));
-		LOG_INFO("enqueued (%d): %s on " DFID
-			 " (cookie %#llx, #%d, data %s)",
-			 i, ct_action2str(hai->hai_action), PFID(&fid),
-			 hai->hai_cookie, hal->hal_archive_id,
-			 pretty_data(hai));
+		if (rc < 0) {
+			LOG_ERROR(rc,
+				  "handling new lustre action %s failed (" DFID
+				  " (cookie %#llx, #%d, data %s)",
+				  ct_action2str(hai->hai_action), PFID(&fid),
+				  hai->hai_cookie, hal->hal_archive_id,
+				  pretty_data(hai));
+		} else {
+			LOG_INFO("enqueued (%d): %s on " DFID
+				 " (cookie %#llx, #%d, data %s)",
+				 i, ct_action2str(hai->hai_action), PFID(&fid),
+				 hai->hai_cookie, hal->hal_archive_id,
+				 pretty_data(hai));
+		}
 
 		hai = hai_next(hai);
 	}
