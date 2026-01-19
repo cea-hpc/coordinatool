@@ -16,6 +16,24 @@
       "message": "style: remove empty line",
       "revId": "2684ffb2e6d479aebc3f807a3fba5297cb2e11aa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8a4ff27_7e77953d",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 821,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-01-19T12:49:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91e85cc4_54c1ca51",
+      "revId": "2684ffb2e6d479aebc3f807a3fba5297cb2e11aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
