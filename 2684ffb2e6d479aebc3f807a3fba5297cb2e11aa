@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91e85cc4_54c1ca51",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 821,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-01-19T09:02:56Z",
+      "side": 1,
+      "message": "style: remove empty line",
+      "revId": "2684ffb2e6d479aebc3f807a3fba5297cb2e11aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
