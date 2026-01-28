@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a6795cc_76e804c0",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-01-28T10:42:55Z",
+      "side": 1,
+      "message": "question: I\u0027m not familiar enough with the llapi but it seems a bit strange that we need to first acknoledge the begin of the action to be able to then cancel it. Is-it the only way to manage the cancel with the LLAPI ?",
+      "range": {
+        "startLine": 141,
+        "startChar": 1,
+        "endLine": 150,
+        "endChar": 67
+      },
+      "revId": "31892100491c798d2c8cbc899f6a448605057ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6160e0b_ce6f8c0a",
+        "filename": "copytool/queue.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-01-28T10:42:55Z",
+      "side": 1,
+      "message": "question: is this \"report message\" linked with the deported process monitoring that you already implemented ? ( a way for the client to know in which state is its hsm request ?)\n\nIf yes, I was wondering if you should write this message only when your are sure that the cancel is done ?",
+      "range": {
+        "startLine": 292,
+        "startChar": 2,
+        "endLine": 292,
+        "endChar": 60
+      },
+      "revId": "31892100491c798d2c8cbc899f6a448605057ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
