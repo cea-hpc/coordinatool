@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e0b50e3d_b13d1d60",
+        "filename": "copytool/lhsm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-01-28T14:15:19Z",
+      "side": 1,
+      "message": "I think so... I\u0027m not aware of any other way of doing it short of calling `ioctl()` with `LL_IOC_HSM_COPY_END` directly -- llapi_hsm_action_end requires the hcp pointer to be valid (\u003d allocated from action_begin()), and there\u0027s no other call to `LL_IOC_HSM_COPY_END` in the llapi.\n\nFor what it\u0027s worth, the code was not really designed with this in mind -- we should have called action_begin() on the RESTORE/ARCHIVE request somewhere and we should just call action_end() on that; For the hpss copytool that does handle cancels, if it couldn\u0027t find the restore/archive request then it\u0027ll do the same and use begin/end on the cancel request.",
+      "parentUuid": "9a6795cc_76e804c0",
+      "range": {
+        "startLine": 141,
+        "startChar": 1,
+        "endLine": 150,
+        "endChar": 67
+      },
+      "revId": "31892100491c798d2c8cbc899f6a448605057ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d6160e0b_ce6f8c0a",
         "filename": "copytool/queue.c",
         "patchSetId": 5
@@ -37,6 +61,30 @@
       "writtenOn": "2026-01-28T10:42:55Z",
       "side": 1,
       "message": "question: is this \"report message\" linked with the deported process monitoring that you already implemented ? ( a way for the client to know in which state is its hsm request ?)\n\nIf yes, I was wondering if you should write this message only when your are sure that the cancel is done ?",
+      "range": {
+        "startLine": 292,
+        "startChar": 2,
+        "endLine": 292,
+        "endChar": 60
+      },
+      "revId": "31892100491c798d2c8cbc899f6a448605057ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0283132f_5c405a19",
+        "filename": "copytool/queue.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-01-28T14:15:19Z",
+      "side": 1,
+      "message": "Yes, that\u0027s the reporting/tracking that was implemented last year\n\nThanks for pointing it out, I hadn\u0027t really thought about ordering here, I guess it depends if you see this as \"cancel requested\" or \"cancel done\".. In the later case you\u0027re correct that this could lead to duplicates if the coordinatool crashes between this report and the hsm_action_free() below.\n\nI had a look at the other report_action() calls though and it\u0027s not just a problem here, we\u0027re calling report_action() before actually sending to client on \"sent\", before freeing the request on \"done\", etc...\nOn the other hand I don\u0027t think anything bad would happen even if we do send duplicate reports though, so while I could move this below and duplicate the code but I don\u0027t think it\u0027s worth the effort to fix all patterns; especially `sent` is going to be hard to fix: there\u0027ll always be either a window between the reporting and the message actually being sent (and risking re-reporting sent on crash) or a window between actually sending the message and reporting (and risking not reporting at all on crash)... And in that case I prefer reporting twice?\n\n\n(We also need to add some code to that client to handle the cancel reports -- right now unknown messages are ignored except for debug logs, so this new message variant won\u0027t do anything. We could alternatively use \"done\" with -ECANCELED to avoid that?)",
+      "parentUuid": "d6160e0b_ce6f8c0a",
       "range": {
         "startLine": 292,
         "startChar": 2,
