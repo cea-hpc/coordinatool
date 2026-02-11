@@ -71,24 +71,16 @@ schedule_host_mapping_find_client(struct host_mapping *mapping)
 	return client;
 }
 
-static size_t dbj2(const char *buf, size_t size)
-{
-	size_t hash = 5381;
-
-	for (size_t i = 0; i < size; i++)
-		hash = ((hash << 5) + hash) + buf[i];
-
-	return hash;
-}
-
 static struct client *
 schedule_host_mapping_consistent_hash(struct host_mapping *mapping,
 				      struct hsm_action_node *han)
 {
 	struct client *client;
+	char *hash_str = NULL;
 	const char *hostname;
 	const char *value;
 	size_t value_len;
+	size_t hash_len;
 	size_t index;
 	size_t hash;
 
@@ -101,10 +93,34 @@ schedule_host_mapping_consistent_hash(struct host_mapping *mapping,
 		return NULL;
 	}
 
+	if (mapping->hash_count > 0) {
+		char *data;
+
+		hash = dbj2(value, value_len) % mapping->hash_count;
+		hash_len = asprintf(&hash_str, "%ld", hash);
+		if (hash_len <= 0)
+			return NULL;
+
+		data = replace_string(han->info.data, han_data_len(han),
+				      hash_str, hash_len, value, value_len);
+
+		free((void *)han->info.data);
+		han->info.data = data;
+
+		if (json_object_set_new(han->hai, "hai_data",
+					json_string(data)) != 0)
+			return NULL;
+
+		value = hash_str;
+		value_len = hash_len;
+	}
+
 	hash = dbj2(value, value_len);
 	index = hash % mapping->count;
 
 	hostname = mapping->hosts[index];
+
+	free(hash_str);
 
 	client = find_client(&state->stats.clients, hostname);
 	if (client)

@@ -17,6 +17,12 @@ static int config_parse_host_mapping(struct cds_list_head *head, char *val,
 		// val is non-empty so should never happen...
 		return -EINVAL;
 	}
+	char *hash_count = NULL;
+	if (!strcmp(key, "archive_on_hosts_ch")) {
+		hash_count = strtok(NULL, SPACES);
+		if (!hash_count)
+			return -EINVAL;
+	}
 	char *host = strtok(NULL, SPACES);
 	if (!host) {
 		LOG_INFO("Skipping host pattern for %s with no host",
@@ -26,6 +32,8 @@ static int config_parse_host_mapping(struct cds_list_head *head, char *val,
 	struct host_mapping *mapping =
 		xmalloc(sizeof(*mapping) + sizeof(void *));
 	mapping->tag = xstrdup(data_pattern);
+	mapping->hash_count =
+		hash_count ? parse_int(hash_count, INT_MAX, "hash_count") : 0;
 	mapping->consistent_hash =
 		strcmp(key, "archive_on_hosts_ch") == 0 ? true : false;
 	mapping->count = 1;

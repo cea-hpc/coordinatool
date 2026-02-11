@@ -147,6 +147,7 @@ struct host_mapping {
 	const char *tag;
 	int count;
 	bool consistent_hash;
+	int hash_count;
 	const char *hosts[];
 };
 
@@ -419,6 +420,16 @@ void handle_expired_timers(void);
 /* utils */
 char *parse_hint(struct hsm_action_node *han, const char *hint_needle,
 		 size_t *hint_len);
+size_t dbj2(const char *buf, size_t size);
+/**
+ * Replace a substring
+ *
+ * It will replace the string "old_value" with "new_value" inside "orig".
+ *
+ * "old_value" must be a valid pointer inside "orig".
+ */
+char *replace_string(const char *orig, size_t orig_len, const char *new_value,
+		     size_t new_len, const char *old_value, size_t old_len);
 
 /* phobos */
 #if HAVE_PHOBOS
