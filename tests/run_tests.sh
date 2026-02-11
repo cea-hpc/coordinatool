@@ -792,6 +792,64 @@ archive_on_hosts_ch() {
 }
 run_test 13 archive_on_hosts_ch
 
+dbj2() {
+  local buf="$1"
+  local -i hash=5381
+  local -i i c
+
+  for ((i=0; i<${#buf}; i++)); do
+    c=$(printf '%d' "'${buf:i:1}")
+    hash=$(( (hash << 5) + hash + c ))
+  done
+
+  printf '%u\n' "$hash"
+}
+
+archive_on_hosts_ch_hash() {
+	CTOOL_CONF="$SOURCEDIR"/tests/coordinatool_archive_on_host_hash.conf \
+		do_coordinatool_start 0
+	sleep 1
+	CTDATA_PATH=1 ARCHIVEDIR="$ARCHIVEDIR/0" do_lhsmtoolcmd_start 0
+	CTDATA_PATH=1 ARCHIVEDIR="$ARCHIVEDIR/1" do_lhsmtoolcmd_start 1
+	CTDATA_PATH=1 ARCHIVEDIR="$ARCHIVEDIR/2" do_lhsmtoolcmd_start 2
+
+	sleep 1
+	echo "done waiting"
+
+	client_reset 3
+
+	archive_data="grouping=test0" client_archive_n_req 3 19 0
+	archive_data="grouping=test1" client_archive_n_req 3 39 20
+	archive_data="grouping=test2" client_archive_n_req 3 59 40
+
+	client_archive_n_wait 3 59 0
+
+	# All the archive with grouping=test0 should be on $hash_1_node
+	# with $hash_1 as grouping's value
+	hash_1="$(( $(dbj2 "test0") % 10))"
+	hash_1_node="$(( $(dbj2 "$hash_1") % 3))"
+
+	hash_2="$(( $(dbj2 "test1") % 10))"
+	hash_2_node="$(( $(dbj2 "$hash_2") % 3))"
+
+	hash_3="$(( $(dbj2 "test2") % 10))"
+	hash_3_node="$(( $(dbj2 "$hash_3") % 3))"
+
+	do_client $hash_1_node "
+		nb_test=\$(find ${ARCHIVEDIR@Q}/$hash_1_node -name \"grouping=$hash_1*\" | wc -l)
+		[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" = \"\$((\$nb_test + 1))\" ]" \
+		|| error "missing archives on 1 or unexpected archives on 1"
+	do_client $hash_2_node "
+		nb_test=\$(find ${ARCHIVEDIR@Q}/$hash_2_node -name \"grouping=$hash_2*\" | wc -l)
+		[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" = \"\$((\$nb_test + 1))\" ]" \
+		|| error "missing archives on 1 or unexpected archives on 1"
+	do_client $hash_3_node "
+		nb_test=\$(find ${ARCHIVEDIR@Q}/$hash_3_node -name \"grouping=$hash_3*\" | wc -l)
+		[ \"\$(find ${ARCHIVEDIR@Q}/1 | wc -l)\" = \"\$((\$nb_test + 1))\" ]" \
+		|| error "missing archives on 1 or unexpected archives on 1"
+}
+run_test 14 archive_on_hosts_ch_hash
+
 # 3x tests: test lfs hsm_* --data
 # normal copies
 data_normal() {

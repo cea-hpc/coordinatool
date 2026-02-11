@@ -38,3 +38,13 @@ char *parse_hint(struct hsm_action_node *han, const char *hint_needle,
 
 	return hint;
 }
+
+size_t dbj2(const char *buf, size_t size)
+{
+	size_t hash = 5381;
+
+	for (size_t i = 0; i < size; i++)
+		hash = ((hash << 5) + hash) + buf[i];
+
+	return hash;
+}

@@ -147,6 +147,7 @@ struct host_mapping {
 	const char *tag;
 	int count;
 	bool consistent_hash;
+	int hash_count;
 	const char *hosts[];
 };
 
@@ -412,6 +413,7 @@ void handle_expired_timers(void);
 /* utils */
 char *parse_hint(struct hsm_action_node *han, const char *hint_needle,
 		 size_t *hint_len);
+size_t dbj2(const char *buf, size_t size);
 
 /* phobos */
 #if HAVE_PHOBOS
