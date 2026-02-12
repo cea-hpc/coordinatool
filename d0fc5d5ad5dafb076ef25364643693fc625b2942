@@ -16,6 +16,148 @@
       "message": "Since we plan to use the parent FID as the grouping key, we can’t predict in advance how many groupings there will be. So we want to be able to control it by hashing the grouping and taking it modulo N.\n\nWe need to do this in the coordinatool because we can’t do it before, and we can’t do it after either, since the hash modulo N has to be computed before doing the consistent hashing.",
       "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08ebef7e_2fd128ae",
+        "filename": "coordinatool.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "(design) Since I don\u0027t know the needs I\u0027m going to ask stupid questions again -- what is the use of this parameter? How will it be used in practice?\n\nI\u0027m wondering if it will be equal to the number of elements in practice (in which case we could just do without the parameter)",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d0075d4_74ffca27",
+        "filename": "copytool/config.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "(nit) you could NULL-init hash_count and check if it\u0027s set here instead of comparing key again",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6a39256_a0c0eac2",
+        "filename": "copytool/config.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "... and the above was apparently needed for scan-build, that can\u0027t follow the if will be the same:\n```\n../../../copytool/config.c:36:3: warning: 1st function call argument is an uninitialized value [core.CallAndMessage]\n   36 |                 parse_int(hash_count, INT_MAX, \"hash_count\") : 0;\n      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n1 warning generated.\n```",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aea620e7_77df4870",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "This is probably correct but I feel this is the kind of manipulations that can use an unit test with more complex data that `grouping\u003dfoo` (so we check the copy before/after works as expected)\nThis can probably be shoehorned in parse_hint.c if the function is moved to common as \"replace_string(orig, orig_len, new_value, new_len, old_value, old_len)\" or something more general?\n\nOr if you don\u0027t want to then just make the integration test use more complex hint data so we indirectly check this",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 67
+      },
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "321dd728_416486c6",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "(nit) can never happen",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "515ff0dc_362204ab",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "dbj2 is quick to compute so probably no worth it, but could avoid computing this twice easily enough:\n```\nhash \u003d dbj2(...);\nif (mapping-\u003ehash_count \u003e 0) {\n    hash_len \u003d asprintf(\u0026hash_str, \"%ld\", hash % mapping-\u003ehash_count);\n    ...\n}\n```",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c9eb740_be5e9012",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "we don\u0027t need to check this",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67bf2a35_4e5b29d4",
+        "filename": "tests/run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 829,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-12T23:54:33Z",
+      "side": 1,
+      "message": "(this honestly could be hardcoded as it was in the previous test, but there\u0027s no harm in doing it the hard way so ok with this as well)",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
