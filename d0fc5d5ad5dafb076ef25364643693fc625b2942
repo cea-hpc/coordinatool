@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "843c821c_feacc870",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-02-12T09:23:08Z",
+      "side": 1,
+      "message": "Since we plan to use the parent FID as the grouping key, we can’t predict in advance how many groupings there will be. So we want to be able to control it by hashing the grouping and taking it modulo N.\n\nWe need to do this in the coordinatool because we can’t do it before, and we can’t do it after either, since the hash modulo N has to be computed before doing the consistent hashing.",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
