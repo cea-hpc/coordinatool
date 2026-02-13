@@ -1,0 +1,5 @@
+{"data": "test=foo", "needle": "test=", "value": "blob", "match": "test=blob" }
+{"data": "foo,test=foo,bar", "needle": "test=", "value": "blob", "match": "foo,test=blob,bar" }
+{"data": "foo,test=foo", "needle": "test=", "value": "blob", "match": "foo,test=blob" }
+{"data": "test=foo,bar", "needle": "test=", "value": "blob", "match": "test=blob,bar" }
+{"data": ",test=foo,", "needle": "test=", "value": "blob", "match": ",test=blob," }
