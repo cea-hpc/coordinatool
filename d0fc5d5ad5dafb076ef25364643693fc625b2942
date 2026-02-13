@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ba75aca_1f6b1160",
+        "filename": "coordinatool.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-02-13T11:26:57Z",
+      "side": 1,
+      "message": "As we are going to use the parent FID as the grouping key, and we do not know how many groupings we will have, we want to control the number of groupings by replacing each grouping with its hash % N.\n\nWe must do it before the coordinatool schedules the archive with the consistent hash. Otherwise, two identical groupings could be sent to two different data movers.\n\nIdeally, this should be done before the coordinatool, but that would mean computing the hash when running a `lfs hsm_archive --data \"grouping\u003dhash(blob)`.\n\nI tried to integrate this new feature with the consistent hash mechanism, as they will be used together. This new parameter specifies how many distinct groupings we want. In practice, it should be higher than the number of data movers.",
+      "parentUuid": "08ebef7e_2fd128ae",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7d0075d4_74ffca27",
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "edbb3b66_1bd3d52c",
+        "filename": "copytool/config.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-02-13T11:26:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6a39256_a0c0eac2",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aea620e7_77df4870",
@@ -82,6 +118,30 @@
       "writtenOn": "2026-02-12T23:54:33Z",
       "side": 1,
       "message": "This is probably correct but I feel this is the kind of manipulations that can use an unit test with more complex data that `grouping\u003dfoo` (so we check the copy before/after works as expected)\nThis can probably be shoehorned in parse_hint.c if the function is moved to common as \"replace_string(orig, orig_len, new_value, new_len, old_value, old_len)\" or something more general?\n\nOr if you don\u0027t want to then just make the integration test use more complex hint data so we indirectly check this",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 67
+      },
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4e1023d_86423b91",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-02-13T11:26:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aea620e7_77df4870",
       "range": {
         "startLine": 86,
         "startChar": 0,
