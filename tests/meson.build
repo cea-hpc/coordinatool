@@ -44,6 +44,14 @@ foreach parse : parse_tests
     test(parse, exe, args: [meson.current_source_dir() / parse + '.data'])
 endforeach
 
+test('replace_string',
+     executable(
+        'replace_string',
+        sources: ['replace_string.c'],
+        include_directories: include_directories('../common', '../copytool'),
+        link_with: [common]),
+     args: [meson.current_source_dir() / 'replace_string.data'])
+
 executable(
     'json',
     sources: ['json.c'],
