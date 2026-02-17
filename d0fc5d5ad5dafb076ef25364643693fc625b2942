@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "b30b284e_8686ddc9",
+        "filename": "coordinatool.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-02-17T07:56:17Z",
+      "side": 1,
+      "message": "We could do it inside Phobos by hashing grouping use to choose medium and let original grouping for object. But this modification was so easy to be done in the coordinatool that we lazily first decided to add it into the coordinatool.\n\n\nTo spread put requests we followed the same path by putting the consistent hashing inside the coordinatool instead of a \"put locate\" call with a consistent hashing of grouping among existing servers.",
+      "parentUuid": "1ba75aca_1f6b1160",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7d0075d4_74ffca27",

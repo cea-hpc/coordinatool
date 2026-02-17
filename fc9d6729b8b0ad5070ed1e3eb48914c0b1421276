@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e45ffd72_9c59622c",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-02-17T07:56:17Z",
+      "side": 1,
+      "message": "minor: could you comment a bit this function ?",
+      "range": {
+        "startLine": 417,
+        "startChar": 0,
+        "endLine": 418,
+        "endChar": 62
+      },
+      "revId": "fc9d6729b8b0ad5070ed1e3eb48914c0b1421276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
