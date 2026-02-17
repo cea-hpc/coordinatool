@@ -22,6 +22,30 @@
       },
       "revId": "fc9d6729b8b0ad5070ed1e3eb48914c0b1421276",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1d7edc1_fe257fd8",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-02-17T14:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e45ffd72_9c59622c",
+      "range": {
+        "startLine": 417,
+        "startChar": 0,
+        "endLine": 418,
+        "endChar": 62
+      },
+      "revId": "fc9d6729b8b0ad5070ed1e3eb48914c0b1421276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
