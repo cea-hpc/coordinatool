@@ -80,6 +80,8 @@ conf_data.set10('HAVE_GETTID', have_gettid)
 
 configure_file(output: 'config.h', configuration: conf_data)
 
+install_data('coordinatool.conf', install_dir: '/etc')
+
 if systemd.found()
     configure_file(
         copy: true,
