@@ -47,6 +47,7 @@ standalone coordinatool client to interact with the server
 %{_bindir}/lhsmd_coordinatool
 %{_unitdir}/coordinatool@.service
 %config(noreplace) /etc/sysconfig/coordinatool
+%config(noreplace) %{_sysconfdir}/coordinatool.conf
 
 %files client
 %{_bindir}/coordinatool-client
