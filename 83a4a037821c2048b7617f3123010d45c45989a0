@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c0b8207_0d2585a6",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-02-19T15:51:02Z",
+      "side": 1,
+      "message": "question: I\u0027m not familiar enough with meson, but the spec file looks for a file into \"/etc/sysconfig\", Is-it correct that you set only \"/etc\" here without the subdir \"sysconfig\" ?",
+      "range": {
+        "startLine": 83,
+        "startChar": 48,
+        "endLine": 83,
+        "endChar": 52
+      },
+      "revId": "83a4a037821c2048b7617f3123010d45c45989a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
