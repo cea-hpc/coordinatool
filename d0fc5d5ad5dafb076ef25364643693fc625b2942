@@ -73,6 +73,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "e76ad0e1_22904b22",
+        "filename": "coordinatool.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-22T09:51:15Z",
+      "side": 1,
+      "message": "\u003e We must do it before the coordinatool schedules the archive with the consistent hash. Otherwise, two identical groupings could be sent to two different data movers.\n\nThis doesn\u0027t make sense to me -- this doesn\u0027t affect where the request is sent.\n\nBut I think I understood from Patrice\u0027s reply, basically it\u0027s a way to balance between n tapes per mover (so if you have 3 drives on a mover and 3 mover you\u0027d make 9 groupings?)\n\nIf that is the case you might run into troubles if the requests aren\u0027t fairly spread, it\u0027s easy to fill in up to the max_archives with a single \"slot\" (so if you have 0, 3, and 6 going to mover 0; you could fill in mover 0\u0027s allocated archive requests with all \u00273\u0027s and have 0 and 6 queued and waiting while the drives reserved for them are idle)\nWith the batch archive slots mechanisms, the coordinatool ensures that a given \"slot\" can only take up to max_archive / number_of_slots requests, so there\u0027s always room for each slots.\nI think you\u0027ll want to do something similar there, as the two features are really close.\n\nWith that said, I don\u0027t see any reason to block this commit, so OK.",
+      "parentUuid": "b30b284e_8686ddc9",
+      "revId": "d0fc5d5ad5dafb076ef25364643693fc625b2942",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7d0075d4_74ffca27",
         "filename": "copytool/config.c",
         "patchSetId": 1
