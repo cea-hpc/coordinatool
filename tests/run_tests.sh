@@ -778,6 +778,8 @@ archive_on_hosts_ch() {
 	archive_data="grouping=test2" client_archive_n_req 3 59 40
 
 	sleep 0.5
+	# XXX this restart has the same problem as test 06 and this test is
+	# also flaky... ignore for now.
 	do_lhsmtoolcmd_service 1 restart
 
 	client_archive_n_wait 3 59 20
