@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e57babd2_17f01d8f",
+        "filename": "tests/replace_string.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-22T10:11:03Z",
+      "side": 1,
+      "message": "This is not strictly needed, but could you free(data) (or make it `_cleanup_(freep)` to autofree)?\n\nI\u0027m running the tests with asan and it complains about memory leaks on tests:\n```\n\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\u003d\u003d12078\u003d\u003dERROR: LeakSanitizer: detected memory leaks\n\nDirect leak of 68 byte(s) in 5 object(s) allocated from:\n    #0 0x7f2da64b4a07 in __interceptor_malloc (/lib64/libasan.so.6+0xb4a07)\n    #1 0x401378 in xmalloc ../common/utils.h:19\n    #2 0x4015b7 in replace_string ../tests/../copytool/utils.c:61\n    #3 0x40179a in replace_one_string ../tests/replace_string.c:42\n    #4 0x401927 in main ../tests/replace_string.c:81\n    #5 0x7f2da602a60f in __libc_start_call_main (/lib64/libc.so.6+0x2a60f)\n\nSUMMARY: AddressSanitizer: 68 byte(s) leaked in 5 allocation(s).\n```",
+      "revId": "809ae2c94fa022c6dc900fbb9991148bf0150fcc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
