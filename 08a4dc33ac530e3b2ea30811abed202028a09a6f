@@ -33,6 +33,23 @@
       "message": "Sorry, test failure is clang-format:\n\n```\ndiff --git a/copytool/config.c b/copytool/config.c\nindex dd77a5d..68cec4e 100644\n--- a/copytool/config.c\n+++ b/copytool/config.c\n@@ -32,8 +32,8 @@ static int config_parse_host_mapping(struct cds_list_head *head, char *val,\n \tstruct host_mapping *mapping \u003d\n \t\txmalloc(sizeof(*mapping) + sizeof(void *));\n \tmapping-\u003etag \u003d xstrdup(data_pattern);\n-\tmapping-\u003ehash_count \u003d hash_count ?\n-\t\tparse_int(hash_count, INT_MAX, \"hash_count\") : 0;\n+\tmapping-\u003ehash_count \u003d\n+\t\thash_count ? parse_int(hash_count, INT_MAX, \"hash_count\") : 0;\n \tmapping-\u003econsistent_hash \u003d\n \t\tstrcmp(key, \"archive_on_hosts_ch\") \u003d\u003d 0 ? true : false;\n \tmapping-\u003ecount \u003d 1;\ndiff --git a/copytool/scheduler.c b/copytool/scheduler.c\nindex 032bb8a..692a6de 100644\n--- a/copytool/scheduler.c\n+++ b/copytool/scheduler.c\n@@ -104,7 +104,7 @@ schedule_host_mapping_consistent_hash(struct host_mapping *mapping,\n \t\tdata \u003d replace_string(han-\u003einfo.data, han_data_len(han),\n \t\t\t\t     hash_str, hash_len, value, value_len);\n \n-\t\tfree((void *) han-\u003einfo.data);\n+\t\tfree((void *)han-\u003einfo.data);\n \t\than-\u003einfo.data \u003d data;\n \n \t\tif (json_object_set_new(han-\u003ehai, \"hai_data\",\ndiff --git a/copytool/utils.c b/copytool/utils.c\nindex 3c6f74c..51ab9f7 100644\n--- a/copytool/utils.c\n+++ b/copytool/utils.c\n@@ -56,7 +56,7 @@ char *replace_string(const char *orig, size_t orig_len, const char *new_value,\n \tsize_t len;\n \n \tlen \u003d new_len + (old_value - orig) +\n-\t\t((orig + orig_len) - (old_value + old_len));\n+\t     ((orig + orig_len) - (old_value + old_len));\n \n \tstring \u003d xmalloc(len + 1);\n \tstring[len] \u003d \u0027\\0\u0027;\n```\n\nI\u0027ll continue with tests anyway, if there\u0027s no problem I can update the patch with this diff applied afterwards",
       "revId": "08a4dc33ac530e3b2ea30811abed202028a09a6f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22822b7a_b6577ca0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-22T10:13:20Z",
+      "side": 1,
+      "message": "Also needs rebasing on top of master (hsm_cancel test and this one were added in same spot of run_tests.sh)",
+      "revId": "08a4dc33ac530e3b2ea30811abed202028a09a6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
