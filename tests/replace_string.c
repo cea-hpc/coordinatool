@@ -19,9 +19,9 @@
 int replace_one_string(json_t *json)
 {
 	const char *orig, *needle, *old_value, *new_value, *match;
-	size_t orig_len, old_len, new_len, match_len;
+	size_t orig_len, old_len = 0, new_len = 0, match_len = 0;
 	size_t data_len;
-	_cleanup_(freep) char *data = NULL;
+	char *data = NULL;
 
 	orig = protocol_getjson_str(json, "data", NULL, &orig_len);
 	needle = protocol_getjson_str(json, "needle", NULL, NULL);
@@ -47,9 +47,11 @@ int replace_one_string(json_t *json)
 		fprintf(stderr,
 			"string mismatch: \"%s\" (%zd) != \"%s\" (%zd)\n", data,
 			data_len, match, match_len);
+		free(data);
 		return -1;
 	}
 
+	free(data);
 	return 0;
 }
 

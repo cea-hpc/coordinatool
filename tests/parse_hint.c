@@ -19,7 +19,7 @@
 int parse_one_item(json_t *json)
 {
 	const char *data, *needle, *match, *hint;
-	size_t data_len, match_len, hint_len;
+	size_t data_len = 0, match_len, hint_len;
 	data = protocol_getjson_str(json, "data", NULL, &data_len);
 	needle = protocol_getjson_str(json, "needle", NULL, NULL);
 	match = protocol_getjson_str(json, "match", NULL, &match_len);
