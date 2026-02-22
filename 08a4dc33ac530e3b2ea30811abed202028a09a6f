@@ -50,6 +50,24 @@
       "message": "Also needs rebasing on top of master (hsm_cancel test and this one were added in same spot of run_tests.sh)",
       "revId": "08a4dc33ac530e3b2ea30811abed202028a09a6f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5142941f_dc09099e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-22T10:46:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22822b7a_b6577ca0",
+      "revId": "08a4dc33ac530e3b2ea30811abed202028a09a6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
