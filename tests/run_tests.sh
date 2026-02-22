@@ -749,7 +749,9 @@ lock_and_quit() {
 	# service is still running (requests not done)
 	do_coordinatool_service 0 status
 	do_client 1 "touch ${ARCHIVEDIR@Q}/wait"
-	sleep 1
+
+	# we don't know which files are archived so we can't use archive_n_wait...
+	sleep 3
 
 	do_client 1 "[ \"\$(find ${ARCHIVEDIR@Q} | wc -l)\" = 8 ]" \
 		|| error "should be exactly 6 files archived"
