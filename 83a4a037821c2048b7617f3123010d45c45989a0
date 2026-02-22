@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff0fcd5f_1e8fdfc5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-22T10:02:15Z",
+      "side": 1,
+      "message": "(not merging this yet until discussion is resolved)",
+      "revId": "83a4a037821c2048b7617f3123010d45c45989a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c0b8207_0d2585a6",
@@ -14,6 +31,30 @@
       "writtenOn": "2026-02-19T15:51:02Z",
       "side": 1,
       "message": "question: I\u0027m not familiar enough with meson, but the spec file looks for a file into \"/etc/sysconfig\", Is-it correct that you set only \"/etc\" here without the subdir \"sysconfig\" ?",
+      "range": {
+        "startLine": 83,
+        "startChar": 48,
+        "endLine": 83,
+        "endChar": 52
+      },
+      "revId": "83a4a037821c2048b7617f3123010d45c45989a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adf25483_41bc560e",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-02-22T10:02:15Z",
+      "side": 1,
+      "message": "sysconfdir is /etc, so this is fine as far as the value goes -- if anything, the spec file should usese %{_sysconfdir}/sysconfig for the service config above.\n\nFor the meson.build, as a nice to have we could define a variable for /etc like systemd does https://github.com/systemd/systemd/blob/main/meson.build#L9\n - add sysconfdir\u003d/etc in the project\u0027s default_options\n - use `get_option(\u0027sysconfdir\u0027)` here and for the sysconfig\n \n... with that said I was about to write I\u0027m not convinced we want to install coordinatool.conf here (the rpm has `(noreplace)` to make the config file not override any pre-existing config file, but running `ninja install` naively would overwrite the config every time, and I don\u0027t see any option in meson to not overwrite an existing file), so it\u0027d probably be more appropriate to keep a couple of cp in the spec, but we\u0027re doing it for the sysconfig too, so I guess this is fine with me.",
+      "parentUuid": "1c0b8207_0d2585a6",
       "range": {
         "startLine": 83,
         "startChar": 48,
