@@ -1,5 +1,5 @@
 Name: coordinatool
-Version: 0.4
+Version: 0.5
 Release: 1%{?dist}
 Summary: lustre userspace coordinator implemented as a copytool
 License: LGPLv3+
@@ -59,6 +59,13 @@ standalone coordinatool client to interact with the server
 %postun lib -p /sbin/ldconfig
 
 %changelog
+* Thu Feb 26 2026 Gauthier Evraerd <gauthier.evraerd@cea.fr> - 0.5-1
+- Install the configuration file
+- Add a specialized version of archive_on_host with a consistent hash. Also
+  allow replacing the tag value with hash % N.
+- Add cancellation of HSM requests
+- Fix the tests
+
 * Thu Jun 12 2025 Patrice Lucas <patrice.lucas@cea.fr> - 0.4-1
 - Update to new Phobos 3 API (phobos_locate has a new "copy-name" argument)
 - archive batching
