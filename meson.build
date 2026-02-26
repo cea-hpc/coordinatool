@@ -1,7 +1,7 @@
 project(
     'coordinatool',
     'c',
-    version: '0.4',
+    version: '0.5',
     license: 'LGPL3.0-or-later',
     default_options: ['warning_level=3', 'werror=true'],
 )
