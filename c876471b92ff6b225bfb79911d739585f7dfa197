@@ -22,6 +22,23 @@
       },
       "revId": "c876471b92ff6b225bfb79911d739585f7dfa197",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73bc76bd_89c000a4",
+        "filename": "coordinatool.spec",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-03-04T21:58:19Z",
+      "side": 1,
+      "message": "This commit does not have this change yet, you need to rebase the two the other way around\n\nThat aside ok for me",
+      "revId": "c876471b92ff6b225bfb79911d739585f7dfa197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
