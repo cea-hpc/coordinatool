@@ -39,6 +39,24 @@
       "message": "This commit does not have this change yet, you need to rebase the two the other way around\n\nThat aside ok for me",
       "revId": "c876471b92ff6b225bfb79911d739585f7dfa197",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a9a1342_a594bfc2",
+        "filename": "coordinatool.spec",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-03-05T07:38:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73bc76bd_89c000a4",
+      "revId": "c876471b92ff6b225bfb79911d739585f7dfa197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
