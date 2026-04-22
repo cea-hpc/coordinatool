@@ -109,12 +109,8 @@ static int config_parse(struct state_config *config, int fail_enoent)
 				val++;
 			}
 		}
-		if (val == NULL || *val == '\0') {
-			LOG_WARN(
-				rc,
-				"skipping %s in %s (line %zd) not in 'key value' format",
-				line, config->confpath, linenum);
-			continue;
+		if (val == NULL) {
+			val = "";
 		}
 
 		if (!strcasecmp(key, "host")) {
