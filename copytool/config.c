@@ -276,8 +276,8 @@ int config_init(struct state_config *config)
 	/* first set defaults */
 	config->host = xstrdup("coordinatool");
 	config->port = xstrdup("5123");
-	config->redis_host = xstrdup("localhost");
-	config->redis_port = 6379;
+	config->redis_host = xstrdup("");
+	config->redis_port = -1;
 	config->client_grace_ms = 600000; /* 10 mins */
 	config->reporting_schedule_interval_ns = 60 * NS_IN_SEC; /* 1 min */
 	config->verbose = LLAPI_MSG_NORMAL;
