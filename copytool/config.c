@@ -97,12 +97,8 @@ static int config_parse(struct state_config *config, int fail_enoent)
 				val++;
 			}
 		}
-		if (val == NULL || *val == '\0') {
-			LOG_WARN(
-				rc,
-				"skipping %s in %s (line %zd) not in 'key value' format",
-				line, config->confpath, linenum);
-			continue;
+		if (val == NULL) {
+			val = "";
 		}
 
 		if (!strcasecmp(key, "host")) {
@@ -276,7 +272,7 @@ int config_init(struct state_config *config)
 	/* first set defaults */
 	config->host = xstrdup("coordinatool");
 	config->port = xstrdup("5123");
-	config->redis_host = xstrdup("localhost");
+	config->redis_host = xstrdup("");
 	config->redis_port = 6379;
 	config->client_grace_ms = 600000; /* 10 mins */
 	config->reporting_schedule_interval_ns = 60 * NS_IN_SEC; /* 1 min */
