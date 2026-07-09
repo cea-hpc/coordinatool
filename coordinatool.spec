@@ -1,5 +1,5 @@
 Name: coordinatool
-Version: 0.5
+Version: 0.6
 Release: 1%{?dist}
 Summary: lustre userspace coordinator implemented as a copytool
 License: LGPLv3+
@@ -12,6 +12,7 @@ BuildRequires: pkgconfig(jansson)
 BuildRequires: pkgconfig(liburcu)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: hiredis
+BuildRequires: pkgconfig(libsystemd)
 
 %description
 coordinatool is a lustre copytool that takes all requests off lustre's
@@ -59,6 +60,10 @@ standalone coordinatool client to interact with the server
 %postun lib -p /sbin/ldconfig
 
 %changelog
+* Thu Jul 9 2026 Gauthier Evraerd <gauthier.evraerd@cea.fr> - 0.6-1
+- Return an error when the parsing of the configuration fails
+- Notify systemd if the daemon fails to start
+
 * Thu Feb 26 2026 Gauthier Evraerd <gauthier.evraerd@cea.fr> - 0.5-1
 - Install the configuration file
 - Add a specialized version of archive_on_host with a consistent hash. Also
