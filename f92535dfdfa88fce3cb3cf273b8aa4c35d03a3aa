@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "227bc55f_c1198f9d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:34:21Z",
+      "side": 1,
+      "message": "Technically you can run with `lhsmd_coordinatool --redis-host \u0027\u0027` or setting `COORDINATOOL_REDIS_HOST\u003d\"\"`.. But, yes, I guess it\u0027s an oversight that this is not configurable from the config.\n\nPersonally I\u0027d rather strongly encourage to use redis, so I\u0027d like to keep the default value, but we can make the config accept empty values, e.g.?\n```\ndiff --git a/copytool/config.c b/copytool/config.c\nindex 911ecb3f120b..cf8a8c43ea6c 100644\n--- a/copytool/config.c\n+++ b/copytool/config.c\n@@ -109,13 +109,8 @@ static int config_parse(struct state_config *config, int fail_enoent)\n \t\t\t\tval++;\n \t\t\t}\n \t\t}\n-\t\tif (val \u003d\u003d NULL || *val \u003d\u003d \u0027\\0\u0027) {\n-\t\t\tLOG_WARN(\n-\t\t\t\trc,\n-\t\t\t\t\"skipping %s in %s (line %zd) not in \u0027key value\u0027 format\",\n-\t\t\t\tline, config-\u003econfpath, linenum);\n-\t\t\tcontinue;\n-\t\t}\n+\t\tif (val \u003d\u003d NULL)\n+\t\t\tval \u003d \"\";\n \n \t\tif (!strcasecmp(key, \"host\")) {\n \t\t\tfree((void *)config-\u003ehost);\n```\n\n(alternatively check for \"\" or some other keyword like \"disabled\", if you don\u0027t want allowing empty values for other config items.. I think most will just error out down the line if set to empty values but I didn\u0027t take the time to check)",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "870fdaf4_dc2ba7cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:34:21Z",
+      "side": 1,
+      "message": "Please wrap at 74 chars, not 80 (like emails)",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56d83fe7_7bd540b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:34:21Z",
+      "side": 1,
+      "message": "(I\u0027d argue that you can add this to your global gitignore `$XDG_CONFIG_HOME/git/ignore` (or whatever `core.excludesFile` is set to) and it won\u0027t bother you again, but I did add cscope.*, so I guess this is fine)",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c988ef71_515bc77b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:34:21Z",
+      "side": 1,
+      "message": "Sorry for the slow review, I didn\u0027t notice the patch; feel free to ping me if I don\u0027t reply in ~1week next time",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d02d6bb7_7d54b6c0",
+        "filename": "coordinatool.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:34:21Z",
+      "side": 1,
+      "message": "I don\u0027t see the merit in making the port default to -1?",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
