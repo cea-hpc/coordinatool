@@ -17,23 +17,34 @@ static int config_parse_host_mapping(struct cds_list_head *head, char *val,
 		// val is non-empty so should never happen...
 		return -EINVAL;
 	}
-	char *hash_count = NULL;
+	char *str_hash_count = NULL;
+	int hash_count = 0;
 	if (!strcmp(key, "archive_on_hosts_ch")) {
-		hash_count = strtok(NULL, SPACES);
-		if (!hash_count)
+		str_hash_count = strtok(NULL, SPACES);
+		if (!str_hash_count) {
+			LOG_ERROR(-EINVAL, "There is not hash modulo specify "
+				  "in the config");
 			return -EINVAL;
+		}
+
+		hash_count = parse_int(str_hash_count, INT_MAX, "hash_count");
+		if (hash_count < 0) {
+			LOG_ERROR(-EINVAL, "The hash modulo should be greater "
+				  "than or equal 0");
+			return -EINVAL;
+		}
 	}
+
 	char *host = strtok(NULL, SPACES);
 	if (!host) {
-		LOG_INFO("Skipping host pattern for %s with no host",
-			 data_pattern);
-		return 0;
+		LOG_ERROR(-EINVAL, "There is not hosts specify in the config");
+		return -EINVAL;
 	}
+
 	struct host_mapping *mapping =
 		xmalloc(sizeof(*mapping) + sizeof(void *));
 	mapping->tag = xstrdup(data_pattern);
-	mapping->hash_count =
-		hash_count ? parse_int(hash_count, INT_MAX, "hash_count") : 0;
+	mapping->hash_count = hash_count;
 	mapping->consistent_hash =
 		strcmp(key, "archive_on_hosts_ch") == 0 ? true : false;
 	mapping->count = 1;
