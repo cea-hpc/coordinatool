@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa4ef0c2_5a0f393e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:15:32Z",
+      "side": 1,
+      "message": "It took me ages to understand this message, because\n- default (Type\u003dsimple) already gets marked failed if the service exits with an error\n- the code doesn\u0027t notify anything on failure, it notifies when the service is \"ready\"\n\nSo the difference is that start command will wait for setup and thus be able to report early errors, that type\u003dsimple didn\u0027t wait at all.\nI\u0027ve reworded the message, feel free to edit again if you disagree and I\u0027ll keep what you set",
+      "revId": "9db4fc8ac52a7af798c1eecaa68cf031ea376f1f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de6239d8_91e52a63",
+        "filename": "meson.build",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:15:32Z",
+      "side": 1,
+      "message": "(nitpick) in theory for packaging you\u0027d want to make that a feature, so that if the dependency is missing for some reason you\u0027d notice it; but this is probably fine...",
+      "revId": "9db4fc8ac52a7af798c1eecaa68cf031ea376f1f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f96aa322_2d9d3185",
+        "filename": "systemd/coordinatool@.service",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:15:32Z",
+      "side": 1,
+      "message": "This should have its own commit, or at least a mention in the commit message",
+      "revId": "9db4fc8ac52a7af798c1eecaa68cf031ea376f1f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd432547_42477d3d",
+        "filename": "systemd/coordinatool@.service",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:15:32Z",
+      "side": 1,
+      "message": "(nitpick) this is the default for Type\u003dnotify;\non my system most services using Type\u003dnotify do not bother setting the value (58/71) so I\u0027ve removed it, but feel free to revert this part of the change",
+      "revId": "9db4fc8ac52a7af798c1eecaa68cf031ea376f1f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
