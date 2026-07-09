@@ -252,8 +252,9 @@ static int recv_enqueue(struct client *client, json_t *hai_list,
 	json_array_append(hai_list, han->hai);
 	(*enqueued_bytes) += sizeof(struct hsm_action_item) + han->info.hai_len;
 
-	LOG_INFO("%s (%d): Sending " DFID " (cookie %#lx)", client->id,
-		 client->fd, PFID(&han->info.dfid), han->info.cookie);
+	LOG_INFO("Sending " DFID " to %s (%d) (cookie %#lx)",
+		 PFID(&han->info.dfid), client->id,
+		 client->fd, han->info.cookie);
 
 	return 0;
 }
