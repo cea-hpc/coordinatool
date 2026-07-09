@@ -380,9 +380,9 @@ static int done_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 	}
 
 	int status = protocol_getjson_int(json, "status", 0);
-	LOG_INFO("%s (%d): Finished processing " DFID
+	LOG_INFO("Received done for " DFID " from %s (%d)"
 		 " (cookie %#lx): status %d",
-		 client->id, client->fd, PFID(&dfid), cookie, status);
+		 PFID(&dfid), client->id, client->fd, cookie, status);
 
 	report_action(han, "done " DFID " %d\n", PFID(&dfid), status);
 
@@ -584,8 +584,8 @@ static int ehlo_cb(void *fd_arg, json_t *json, void *arg UNUSED)
 		return protocol_reply_simple(client, "ehlo", 0, NULL);
 	}
 
-	LOG_INFO("Clients: '%s' renamed to %s (%d)", client->id, id,
-		 client->fd);
+	LOG_DEBUG("Clients: '%s' renamed to %s (%d)", client->id, id,
+		  client->fd);
 	free((void *)client->id);
 	client->id = xstrdup(id);
 	client->id_set = true;

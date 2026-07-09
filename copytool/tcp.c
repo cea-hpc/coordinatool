@@ -213,7 +213,7 @@ int handle_client_connect(void)
 	client->status = CLIENT_INIT;
 	state->stats.clients_connected++;
 
-	LOG_DEBUG("Clients: new connection %s (%d)", client->id, client->fd);
+	LOG_INFO("Clients: new connection %s (%d)", client->id, client->fd);
 
 	rc = epoll_addfd(state->epoll_fd, fd, client);
 	if (rc < 0) {
