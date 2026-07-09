@@ -10,6 +10,12 @@
 #include <sys/signalfd.h>
 #include <time.h>
 
+#include "config.h"
+
+#if HAVE_SYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
+
 #include "coordinatool.h"
 #include "version.h"
 
@@ -195,8 +201,6 @@ static int lustre_get_fsname(void)
 static int ct_start(void)
 {
 	int rc;
-	struct epoll_event events[MAX_EVENTS];
-	int nfds;
 
 	rc = lustre_get_fsname();
 	if (rc)
@@ -243,6 +247,15 @@ static int ct_start(void)
 	rc = ct_register();
 	if (rc < 0)
 		return rc;
+
+	return 0;
+}
+
+static int ct_run(void)
+{
+	struct epoll_event events[MAX_EVENTS];
+	int nfds;
+	int rc;
 
 	LOG_NORMAL("Starting main loop");
 	while (1) {
@@ -464,6 +477,16 @@ int main(int argc, char *argv[])
 	mstate.mntpath = argv[optind];
 
 	rc = ct_start();
+	if (rc) {
+		rc = EXIT_FAILURE;
+		goto out;
+	}
+
+#if HAVE_SYSTEMD
+	sd_notify(0, "READY=1");
+#endif
+
+	rc = ct_run();
 	rc = rc ? EXIT_FAILURE : EXIT_SUCCESS;
 
 out:
