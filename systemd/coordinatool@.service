@@ -1,7 +1,7 @@
 [Unit]
 Description=Lustre HSM coordinatool agent for %I
 After=%i.mount
-Require=%i.mount
+Requires=%i.mount
 
 [Service]
 EnvironmentFile=-/etc/sysconfig/coordinatool
