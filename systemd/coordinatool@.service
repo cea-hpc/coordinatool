@@ -4,6 +4,7 @@ After=%i.mount
 Requires=%i.mount
 
 [Service]
+Type=notify
 EnvironmentFile=-/etc/sysconfig/coordinatool
 # service-specific config e.g. coordinatool.mnt-lustre
 EnvironmentFile=-/etc/sysconfig/coordinatool.%i

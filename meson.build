@@ -19,6 +19,7 @@ jansson = dependency('jansson')
 libdl = cc.find_library('dl')
 lustre = cc.find_library('lustreapi')
 systemd = dependency('systemd', required: false)
+libsystemd = dependency('libsystemd', required: false)
 systemd_system_unit_dir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
 urcu = dependency('liburcu')
 
@@ -30,6 +31,10 @@ glib = dependency('glib-2.0', required: use_phobos)
 conf_data = configuration_data()
 have_phobos = phobos.found() and glib.found()
 conf_data.set10('HAVE_PHOBOS', have_phobos)
+
+if libsystemd.found()
+  conf_data.set10('HAVE_SYSTEMD', 1)
+endif
 
 if have_phobos
     have_phobos_init = cc.has_function(
@@ -153,7 +158,7 @@ endif
 executable(
     'lhsmd_coordinatool',
     sources: files(lhsmd_coordinatool_sources) + [version_h],
-    dependencies: [hiredis, urcu, glib, phobos],
+    dependencies: [hiredis, urcu, glib, phobos, libsystemd],
     include_directories: include_directories(['common', '.']),
     link_with: [common],
     install: true,
