@@ -33,6 +33,23 @@
       "message": "So the point of having this at INFO and connection at debug is to not log all the connections from `coordinatool-client`: you get exactly one log for long-lived copytools, but not for clients.\n\nDo you actually want to log coordinatool-client requests?\nIf you have monitoring you\u0027ll get a \"new connection\" log every minute/few seconds...",
       "revId": "b8eb94eb4f32690d7bd8b90fbd413a6c023186e0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7da00893_87c03301",
+        "filename": "copytool/scheduler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-09T13:45:09Z",
+      "side": 1,
+      "message": "(failure is because this fails clang-format here, client-\u003efd should be on this line)",
+      "revId": "b8eb94eb4f32690d7bd8b90fbd413a6c023186e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
