@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4a6d1f0_549826a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-22T12:43:47Z",
+      "side": 1,
+      "message": "I\u0027m sorry, but I\u0027m not convinced about this either: logs are normally read from syslog/journal which already has a hostname prefix and there\u0027s no reason to confuse the field here?\nHow were you/whoever reading the logs when that confusion happened?\n\nI\u0027m not opposed to rewording the text (even if I like that hostnames are aligned...), but if you do please rename all the logs that starts with \"client ID (fd)\" so logs are coherent.",
+      "parentUuid": "97bb2bf9_3a9043d8",
+      "revId": "b8eb94eb4f32690d7bd8b90fbd413a6c023186e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "87a63e78_7b87f98b",
         "filename": "copytool/protocol.c",
         "patchSetId": 1
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "I ran some tests, and connecting/disconnecting a client multiple times generates a \"renamed\" log entry each time. We would prefer to see a \"new connection\" log instead. It\u0027s to make it easier to identify when a client connects or disconnects.",
       "parentUuid": "87a63e78_7b87f98b",
+      "revId": "b8eb94eb4f32690d7bd8b90fbd413a6c023186e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "671cb76d_9bb729c3",
+        "filename": "copytool/protocol.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-07-22T12:43:47Z",
+      "side": 1,
+      "message": "Would rewording the text in the rename function make more sense then?\nI really don\u0027t think short lived clients should to be logged at info level.",
+      "parentUuid": "34e488c8_a8198eeb",
       "revId": "b8eb94eb4f32690d7bd8b90fbd413a6c023186e0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
