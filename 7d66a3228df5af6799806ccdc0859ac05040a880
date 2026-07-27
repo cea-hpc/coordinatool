@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "563d84c5_baade226",
+        "filename": "coordinatool.spec",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-27T07:52:00Z",
+      "side": 1,
+      "message": "minor: reword, here it reads like we just fail every command that parses the config",
+      "range": {
+        "startLine": 64,
+        "startChar": 2,
+        "endLine": 64,
+        "endChar": 55
+      },
+      "revId": "7d66a3228df5af6799806ccdc0859ac05040a880",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
