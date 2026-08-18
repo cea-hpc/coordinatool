@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "04910d9b_21be3cc9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-08-18T09:38:08Z",
+      "side": 1,
+      "message": "Thanks!\nPlease also update the commit message to reflect the new version, and I\u0027m good with this.",
+      "parentUuid": "227bc55f_c1198f9d",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "56d83fe7_7bd540b7",
@@ -82,6 +100,24 @@
       "writtenOn": "2026-07-09T13:34:21Z",
       "side": 1,
       "message": "I don\u0027t see the merit in making the port default to -1?",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3aef0df0_d8141717",
+        "filename": "coordinatool.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-08-18T09:38:08Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d02d6bb7_7d54b6c0",
       "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
