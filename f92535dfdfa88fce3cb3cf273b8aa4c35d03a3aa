@@ -55,6 +55,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "9b8cf489_1251837d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-09-07T14:04:55Z",
+      "side": 1,
+      "message": "Sorry, I had assumed that you reverted the default change now it\u0027s possible to set in config, but you had kept both so I was off the mark.\n\nThis has been here long enough, I\u0027ve kept just the config change and adjusted the commit message/comment (and split the ctags gitignore out as that bugged me); if you have a strong reason to disable redis by default instead please say so and we can iterate again.",
+      "parentUuid": "04910d9b_21be3cc9",
+      "revId": "f92535dfdfa88fce3cb3cf273b8aa4c35d03a3aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "56d83fe7_7bd540b7",
         "filename": "/COMMIT_MSG",
         "patchSetId": 4

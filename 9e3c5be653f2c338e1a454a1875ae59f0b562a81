@@ -16,6 +16,24 @@
       "message": "ah, this needs reverting/comment to suggest setting an empty value also",
       "revId": "9e3c5be653f2c338e1a454a1875ae59f0b562a81",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fb4379c_7d9faedf",
+        "filename": "coordinatool.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-09-07T14:04:55Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e8891d83_b12a114c",
+      "revId": "9e3c5be653f2c338e1a454a1875ae59f0b562a81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
