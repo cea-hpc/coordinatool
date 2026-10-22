@@ -29,7 +29,8 @@ int phobos_enrich(struct hsm_action_node *han)
 		return rc;
 	}
 
-	oidlen = fgetxattr(fd, "trusted.hsm_fuid", oid, XATTR_SIZE_MAX);
+	oidlen = fgetxattr(fd, state->config.trusted_fuid_xattr, oid,
+			   XATTR_SIZE_MAX);
 	save_errno = errno;
 	close(fd);
 	if (oidlen < 0) {
@@ -38,7 +39,8 @@ int phobos_enrich(struct hsm_action_node *han)
 			return 0;
 
 		rc = -save_errno;
-		LOG_WARN(rc, "Could not getxattr trusted.hsm_fuid " DFID,
+		LOG_WARN(rc, "Could not getxattr %s " DFID,
+			 state->config.trusted_fuid_xattr,
 			 PFID(&han->info.dfid));
 		return rc;
 	}
