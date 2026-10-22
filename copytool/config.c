@@ -235,6 +235,15 @@ static int config_parse(struct state_config *config, int fail_enoent)
 					NS_IN_MSEC;
 			continue;
 		}
+#if HAVE_PHOBOS
+		if (!strcasecmp(key, "fuid-xattr")) {
+			free((void *)config->trusted_fuid_xattr);
+			config->trusted_fuid_xattr = xstrdup(val);
+			LOG_INFO("config setting fuid-xattr to %s",
+				 config->trusted_fuid_xattr);
+			continue;
+		}
+#endif
 		if (!strcasecmp(key, "verbose")) {
 			int intval = str_to_verbose(val);
 			if (intval < 0) {
@@ -290,6 +299,9 @@ int config_init(struct state_config *config)
 	config->reporting_schedule_interval_ns = 60 * NS_IN_SEC; /* 1 min */
 	config->verbose = LLAPI_MSG_NORMAL;
 	config->batch_slots = 1;
+#if HAVE_PHOBOS
+	config->trusted_fuid_xattr = xstrdup("trusted.hsm_fuid");
+#endif
 	llapi_msg_set_level(config->verbose);
 
 	/* verbose from env once first to debug config.. */
