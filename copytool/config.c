@@ -235,6 +235,19 @@ static int config_parse(struct state_config *config, int fail_enoent)
 					NS_IN_MSEC;
 			continue;
 		}
+		if (!strcasecmp(key, "fuid-xattr")) {
+			rc = snprintf(config->trusted_fuid_xattr,
+						  sizeof(config->trusted_fuid_xattr),
+						  "%s", val);
+			if (rc >= (int) sizeof(config->trusted_fuid_xattr)) {
+				rc = -EINVAL;
+				LOG_ERROR(rc,
+						  "trusted_fuid_xattr too long, max is '%d' characters",
+						  (int) sizeof(config->trusted_fuid_xattr));
+				goto err;
+			}
+			continue;
+		}
 		if (!strcasecmp(key, "verbose")) {
 			int intval = str_to_verbose(val);
 			if (intval < 0) {
@@ -290,6 +303,7 @@ int config_init(struct state_config *config)
 	config->reporting_schedule_interval_ns = 60 * NS_IN_SEC; /* 1 min */
 	config->verbose = LLAPI_MSG_NORMAL;
 	config->batch_slots = 1;
+	strncpy(config->trusted_fuid_xattr, "trusted.hsm_fuid", MAXNAMLEN);
 	llapi_msg_set_level(config->verbose);
 
 	/* verbose from env once first to debug config.. */
