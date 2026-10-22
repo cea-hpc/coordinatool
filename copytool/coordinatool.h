@@ -6,6 +6,7 @@
 // for urcu slight optimization
 #define _LGPL_SOURCE
 
+#include <dirent.h>
 #include <errno.h>
 #include <linux/lustre/lustre_idl.h>
 #include <lustre/lustreapi.h>
@@ -230,6 +231,7 @@ struct state {
 		int64_t batch_slice_idle;
 		int64_t batch_slice_max;
 		int batch_slots;
+		char trusted_fuid_xattr[MAXNAMLEN];
 	} config;
 	/* options: command line switches only */
 	const char *mntpath;
