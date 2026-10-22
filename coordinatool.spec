@@ -1,5 +1,5 @@
 Name: coordinatool
-Version: 0.6
+Version: 0.7
 Release: 1%{?dist}
 Summary: lustre userspace coordinator implemented as a copytool
 License: LGPLv3+
@@ -123,6 +123,10 @@ cp %_vpath_builddir/coordinatool-phobos@.service $install_dir/%{_unitdir}
 %postun lib -p /sbin/ldconfig
 
 %changelog
+* Thu Oct 22 2026 Yoann Valeri <yoann.valeri@cea.fr> - 0.7-1
+- Add a fuid-xattr parameter to the conf to set the xattr to get for the Phobos
+  OID
+
 * Thu Jul 9 2026 Gauthier Evraerd <gauthier.evraerd@cea.fr> - 0.6-1
 - Return an error when the parsing of the configuration fails
 - Notify systemd if the daemon fails to start
