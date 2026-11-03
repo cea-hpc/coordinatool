@@ -22,6 +22,30 @@
       },
       "revId": "d7c71e77adf1955b1976e2441698a24f469761a7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "011449c3_3908a820",
+        "filename": "coordinatool.spec",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-11-03T14:37:37Z",
+      "side": 1,
+      "message": "None since 3.0, which is already handled here.",
+      "parentUuid": "da714e01_e37ad810",
+      "range": {
+        "startLine": 66,
+        "startChar": 20,
+        "endLine": 66,
+        "endChar": 21
+      },
+      "revId": "d7c71e77adf1955b1976e2441698a24f469761a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
