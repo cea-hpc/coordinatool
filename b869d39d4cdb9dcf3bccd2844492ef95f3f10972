@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0271ea1f_fe0d6f1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-11-04T00:36:50Z",
+      "side": 1,
+      "message": "earlier verified -1 was clang-format, please configure your editor to use it if other patches are planned\n\nI modified stuff directly because I don\u0027t have time for proper review, feel free to undo anything",
+      "revId": "b869d39d4cdb9dcf3bccd2844492ef95f3f10972",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3edad203_ed6f77f1",
+        "filename": "client_common/client.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-11-04T00:36:50Z",
+      "side": 1,
+      "message": "This needs to be added to not warn on client reading config, if the config is shared",
+      "revId": "b869d39d4cdb9dcf3bccd2844492ef95f3f10972",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

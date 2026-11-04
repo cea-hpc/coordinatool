@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57fec18b_af4f658a",
+        "filename": "copytool/config.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-11-04T00:36:50Z",
+      "side": 1,
+      "message": "I added the #if to get a warning if someone uses the setting on a build that does not have phobos enable: feel free to remove if you don\u0027t like it",
+      "revId": "27ffaa09918392640504d40b9d026a6dcaa88c1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a66dd514_02e3ed21",
+        "filename": "copytool/coordinatool.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1003556
+      },
+      "writtenOn": "2026-11-04T00:36:50Z",
+      "side": 1,
+      "message": "Other config items all are allocated separately, I converted to keep code coherent (the assignment is also much simpler because we don\u0027t need to check length...)",
+      "revId": "27ffaa09918392640504d40b9d026a6dcaa88c1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
